@@ -27,14 +27,14 @@ function Ring({ score }: { score: number }) {
   return (
     <div className="relative h-32 w-32">
       <svg viewBox="0 0 128 128" className="h-32 w-32 -rotate-90">
-        <circle cx="64" cy="64" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
+        <circle cx="64" cy="64" r={r} fill="none" stroke="#d9d6cc" strokeWidth="10" />
         {/* Animates only when the score changes, never on a loop. */}
         <motion.circle
           cx="64"
           cy="64"
           r={r}
           fill="none"
-          stroke="#ff5a2a"
+          stroke="#b33a1a"
           strokeWidth="10"
           strokeLinecap="round"
           strokeDasharray={c}
@@ -45,7 +45,7 @@ function Ring({ score }: { score: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <Numeral value={Math.round(pct * 100)} suffix="%" size="xl" />
-        <span className="text-[10px] uppercase tracking-wide text-mute">hardened</span>
+        <span className="text-[10px] uppercase tracking-wide text-ink-soft">hardened</span>
       </div>
     </div>
   );
@@ -112,9 +112,9 @@ export default function EmberPage() {
   }, [data]);
 
   return (
-    <div className="mx-auto max-w-xl px-4 pb-24 pt-6">
-      <h1 className="text-3xl font-semibold tracking-tight">Ember Score</h1>
-      <p className="mt-2 leading-relaxed text-mute">
+    <div className="mx-auto max-w-2xl px-6 pb-24 pt-12">
+      <h1 className="display text-4xl">Ember Score</h1>
+      <p className="mt-2 leading-relaxed text-ink-soft">
         A bad outlook you can act on. Each item is weighted by how much it reduces ember ignition
         risk, sourced from IBHS field research.
       </p>
@@ -137,29 +137,29 @@ export default function EmberPage() {
       <div className="mt-8 flex items-center gap-6">
         <Ring score={data?.score ?? 0} />
         <div className="flex-1">
-          <p className="text-sm leading-relaxed text-mute">
+          <p className="text-sm leading-relaxed text-ink-soft">
             {data
               ? `${data.items.filter((i) => state[i.id]).length} of ${data.items.length} actions done.`
               : "Loading your checklist."}
           </p>
-          {busy && <p className="mt-1 text-xs text-mute">Saving.</p>}
+          {busy && <p className="mt-1 text-xs text-ink-soft">Saving.</p>}
         </div>
       </div>
 
       {quickWins.length > 0 && (
         <>
-          <h2 className="mt-10 text-xl font-medium">Start here, these cost nothing</h2>
+          <h2 className="mt-10 text-lg font-medium">Start here, these cost nothing</h2>
           <div className="mt-3 space-y-2">
             {quickWins.map((i) => (
               <button
                 key={i.id}
                 onClick={() => toggle(i.id)}
-                className="flex w-full items-start gap-3 rounded-lg border border-fire/30 bg-fire/5 p-3 text-left transition-transform active:scale-[0.99]"
+                className="flex w-full items-start gap-3 rounded-lg border border-ember/30 bg-ember-soft p-3 text-left transition-transform active:scale-[0.99]"
               >
-                <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-fire/60" />
+                <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-ember/60" />
                 <span>
-                  <span className="block text-sm text-paper">{i.label}</span>
-                  <span className="mt-0.5 block text-xs leading-snug text-mute">{i.rationale}</span>
+                  <span className="block text-sm text-ink">{i.label}</span>
+                  <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{i.rationale}</span>
                 </span>
               </button>
             ))}
@@ -167,26 +167,26 @@ export default function EmberPage() {
         </>
       )}
 
-      <h2 className="mt-10 text-xl font-medium">Full checklist</h2>
+      <h2 className="mt-10 text-lg font-medium">Full checklist</h2>
       <div className="mt-3 space-y-6">
         {data === null ? (
           <Skeleton rows={6} />
         ) : (
           groups.map((g) => (
             <div key={g.label}>
-              <h3 className="text-xs uppercase tracking-wide text-mute">{g.label}</h3>
-              <ul className="mt-2 divide-y divide-white/10 rounded-lg border border-white/10">
+              <h3 className="text-sm font-medium text-ink">{g.label}</h3>
+              <ul className="mt-2 divide-y divide-rule rounded-lg border border-rule">
                 {g.items.map((i) => {
                   const done = !!state[i.id];
                   return (
                     <li key={i.id}>
                       <button
                         onClick={() => toggle(i.id)}
-                        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.03]"
+                        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-paper-sunk"
                       >
                         <span
                           className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
-                            done ? "border-fire bg-fire text-ink" : "border-white/30"
+                            done ? "border-ember bg-ember text-paper" : "border-rule"
                           }`}
                         >
                           {done ? "x" : ""}
@@ -195,8 +195,8 @@ export default function EmberPage() {
                           <span className={`block text-sm ${done ? "text-mute line-through" : "text-paper"}`}>
                             {i.label}
                           </span>
-                          <span className="mt-0.5 block text-xs leading-snug text-mute">{i.rationale}</span>
-                          <span className="mt-1 block text-[10px] uppercase tracking-wide text-mute/70">
+                          <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{i.rationale}</span>
+                          <span className="mt-1 block text-xs text-mute">
                             {COST_LABEL[i.cost] ?? i.cost} · {i.source}
                           </span>
                         </span>

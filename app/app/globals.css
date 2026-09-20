@@ -2,13 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  background: #0c0e12;
-  color: #f2f0ea;
+@layer base {
+  html,
+  body {
+    background: #f4f2ec;
+    color: #17181b;
+  }
+
+  /* Every number in this app is tabular, so figures line up in columns and a
+     measurement never reflows as it updates. */
+  .num {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* Display statements. The italic carries the emphasis word, in the accent,
+     which is the one typographic move the whole page is built on. */
+  .display {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 300;
+    letter-spacing: -0.015em;
+    /* Descender clearance for italic y/g/j/p/q in display sizes. */
+    line-height: 1.12;
+  }
+
+  .display em {
+    font-style: italic;
+    color: #b33a1a;
+    /* Italic descenders need room at display scale. */
+    padding-bottom: 0.06em;
+  }
+
+  :focus-visible {
+    outline: 2px solid #b33a1a;
+    outline-offset: 2px;
+  }
 }
 
+/* The basemap's own attribution control duplicates the credit we render in the
+   legend, and its default styling fights the page. */
 .maplibregl-ctrl-attrib,
 .maplibregl-ctrl-logo {
   display: none !important;
+}
+
+/* A hairline rule used as a section divider and as the flanking marks on the
+   one eyebrow the page allows itself. */
+.rule-flank::before,
+.rule-flank::after {
+  content: "";
+  display: inline-block;
+  width: 2.5rem;
+  height: 1px;
+  background: #d9d6cc;
+  vertical-align: middle;
+  margin: 0 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

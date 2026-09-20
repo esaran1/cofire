@@ -95,9 +95,9 @@ function BeatInner() {
   const streak = mine?.length ?? 0;
 
   return (
-    <div className="mx-auto max-w-xl px-4 pb-24 pt-6">
-      <h1 className="text-3xl font-semibold tracking-tight">Beat the Model</h1>
-      <p className="mt-2 leading-relaxed text-mute">
+    <div className="mx-auto max-w-2xl px-6 pb-24 pt-12">
+      <h1 className="display text-4xl">Beat the Model</h1>
+      <p className="mt-2 leading-relaxed text-ink-soft">
         Lock your call for 4 weeks out before you see the model&apos;s. Both are scored against
         realized USDM and ERC once those weeks arrive.
       </p>
@@ -114,13 +114,13 @@ function BeatInner() {
       )}
 
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
-        <Segmented label="Drought category" options={CATEGORIES} value={cat} onChange={setCat} tone="drought" />
+        <Segmented label="Drought category" options={CATEGORIES} value={cat} onChange={setCat} tone="ochre" />
         <Segmented label="Fire-spread condition" options={BANDS} value={band} onChange={setBand} />
         <div className="flex items-center gap-3">
           <Action type="submit" busy={busy} disabled={!cell}>
             {locked ? "Lock another" : "Lock my pick"}
           </Action>
-          <span className="font-mono text-xs text-mute">{cell || "locating"}</span>
+          <span className="font-mono text-xs text-ink-soft">{cell || "locating"}</span>
         </div>
       </form>
 
@@ -135,26 +135,26 @@ function BeatInner() {
             className="mt-8"
           >
             <Panel>
-              <p className="text-xs uppercase tracking-wide text-mute">The model said</p>
+              <p className="text-sm font-medium text-ink">The model said</p>
               <div className="mt-3 grid grid-cols-2 gap-4">
                 <div>
                   <Numeral
                     value={locked.drought_point !== null && locked.drought_point !== undefined ? locked.drought_point.toFixed(1) : "n/a"}
-                    tone="drought"
+                    tone="ochre"
                     size="xl"
                   />
-                  <p className="mt-1 text-xs text-mute">drought category</p>
+                  <p className="mt-1 text-xs text-ink-soft">drought category</p>
                 </div>
                 <div>
                   <Numeral
                     value={locked.fire_index !== null && locked.fire_index !== undefined ? locked.fire_index.toFixed(0) : "n/a"}
-                    tone="fire"
+                    tone="ember"
                     size="xl"
                   />
-                  <p className="mt-1 text-xs text-mute">fire-spread index</p>
+                  <p className="mt-1 text-xs text-ink-soft">fire-spread index</p>
                 </div>
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-mute">
+              <p className="mt-4 text-xs leading-relaxed text-ink-soft">
                 You picked {CATEGORIES.find((c) => c.value === cat)?.label} and{" "}
                 {BANDS.find((b) => b.value === band)?.label.toLowerCase()}. Neither number is scored
                 yet.
@@ -164,7 +164,7 @@ function BeatInner() {
         )}
       </AnimatePresence>
 
-      <h2 className="mt-12 text-xl font-medium">Your streak</h2>
+      <h2 className="mt-12 text-lg font-medium">Your streak</h2>
       <div className="mt-3">
         {mine === null ? (
           <Skeleton rows={2} />
@@ -177,20 +177,20 @@ function BeatInner() {
           <Panel>
             <div className="flex items-baseline gap-3">
               <Numeral value={streak} size="xl" />
-              <span className="text-sm text-mute">{streak === 1 ? "pick locked" : "picks locked"}</span>
+              <span className="text-sm text-ink-soft">{streak === 1 ? "pick locked" : "picks locked"}</span>
             </div>
           </Panel>
         )}
       </div>
 
-      <h2 className="mt-10 text-xl font-medium">County leaderboard</h2>
+      <h2 className="mt-10 text-lg font-medium">County leaderboard</h2>
       <div className="mt-3">
         {board === null ? (
           <Skeleton rows={3} />
         ) : board.length === 0 ? (
           <EmptyState title="Nobody has played yet" body="The first locked pick in this county starts the board." />
         ) : (
-          <ul className="divide-y divide-white/10 rounded-lg border border-white/10">
+          <ul className="divide-y divide-rule rounded-lg border border-rule">
             {board.slice(0, 8).map((r, i) => (
               <li key={r.device_id} className="flex items-center justify-between px-4 py-3">
                 <span className="flex items-center gap-3">

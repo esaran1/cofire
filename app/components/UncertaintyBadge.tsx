@@ -5,7 +5,7 @@ import { UncertaintyStatus } from "@/lib/api";
 const STYLES: Record<UncertaintyStatus["status"], { chip: string; label: string }> = {
   calibrated: { chip: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40", label: "Calibrated" },
   extrapolating: { chip: "bg-amber-500/20 text-amber-300 border-amber-500/40", label: "Extrapolating" },
-  uncalibrated: { chip: "bg-fire/20 text-fire border-fire/40", label: "Uncalibrated" },
+  uncalibrated: { chip: "bg-ember/20 text-ember border-ember/40", label: "Uncalibrated" },
 };
 
 const BLURB: Record<UncertaintyStatus["status"], string> = {

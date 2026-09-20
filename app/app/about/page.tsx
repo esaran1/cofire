@@ -16,7 +16,7 @@ export default function AboutPage() {
 
   return (
     <div className="px-4 pt-6 max-w-xl mx-auto pb-10">
-      <h1 className="text-3xl font-semibold">About COFIRE</h1>
+      <h1 className="display text-4xl font-normal">About COFIRE</h1>
       <p className="mt-4 text-lg leading-relaxed">
         COFIRE forecasts drought and fire-spread conditions across Colorado 2 to 8 weeks ahead,
         states how uncertain each forecast is, says when that uncertainty itself cannot be trusted,
@@ -24,7 +24,7 @@ export default function AboutPage() {
         and harden (Ember Score).
       </p>
       <p className="mt-4 text-mute">{meta?.disclaimer}</p>
-      {err && <p className="text-fire mt-2">{err}</p>}
+      {err && <p className="text-ember mt-2">{err}</p>}
       <h2 className="text-xl mt-8">Shipping model</h2>
       <p className="mt-1">
         <span className="text-paper font-medium">{meta?.shipping_arm ?? "-"}</span> - {meta?.shipping_arm_basis ?? "chosen on validation"}.
@@ -32,11 +32,11 @@ export default function AboutPage() {
       {meta?.status && (
         <p className="mt-2 text-sm">
           Build status:{" "}
-          <span className={meta.status === "No-go" ? "text-fire font-medium" : "text-paper font-medium"}>
+          <span className={meta.status === "No-go" ? "text-ember font-medium" : "text-paper font-medium"}>
             {meta.status}
           </span>
           {meta.status === "No-go" && (
-            <span className="text-mute">
+            <span className="text-ink-soft">
               {" "}- on this domain and record, no trained arm improves on a persistence baseline at
               4 or 8 weeks. That negative result is reported in artifacts/metrics.md rather than
               hidden. Statewide is not started. See STATUS.md.
@@ -56,15 +56,15 @@ export default function AboutPage() {
       <h2 className="text-xl mt-8">Provenance</h2>
       <dl className="mt-1 text-sm space-y-1">
         <div>
-          <dt className="text-mute inline">Git commit: </dt>
+          <dt className="text-ink-soft inline">Git commit: </dt>
           <dd className="inline"><code className="text-xs break-all">{meta?.git_sha ?? "-"}</code></dd>
         </div>
         <div>
-          <dt className="text-mute inline">MANIFEST hash: </dt>
+          <dt className="text-ink-soft inline">MANIFEST hash: </dt>
           <dd className="inline"><code className="text-xs break-all">{meta?.manifest_hash ?? "-"}</code></dd>
         </div>
       </dl>
-      <p className="text-mute text-xs mt-1">
+      <p className="text-ink-soft text-xs mt-1">
         The MANIFEST hash covers the input data sources. Metrics on this build were produced from
         exactly these inputs at exactly this commit.
       </p>
@@ -74,17 +74,17 @@ export default function AboutPage() {
       </p>
       <h2 className="text-xl mt-8">Data sources</h2>
       <ul className="mt-2 space-y-2 text-sm">
-        {(meta?.manifest.sources ?? []).length === 0 && <li className="text-mute">Run `make data` to fill MANIFEST.json.</li>}
+        {(meta?.manifest.sources ?? []).length === 0 && <li className="text-ink-soft">Run `make data` to fill MANIFEST.json.</li>}
         {(meta?.manifest.sources ?? []).map((s) => (
           <li key={s.name}>
             <span className="text-paper">{s.name}</span> · {s.state}
             {s.state === "source unavailable" ? " - source unavailable" : ""}
-            <span className="text-mute"> {s.note}</span>
+            <span className="text-ink-soft"> {s.note}</span>
           </li>
         ))}
       </ul>
       <h2 className="text-xl mt-8">Why the intervals are hidden</h2>
-      <p className="text-mute text-sm mt-1 leading-relaxed">
+      <p className="text-ink-soft text-sm mt-1 leading-relaxed">
         Every year held out of training carries the same ~2.4x inflation in forecast error: the
         years the model trained on sit at a 90th-percentile error of 20 to 26 ERC points, while
         held-out 2023, 2024 and 2025 all sit at 59 to 63. A three-part leakage audit ruled out
@@ -95,14 +95,14 @@ export default function AboutPage() {
       </p>
 
       <h2 className="text-xl mt-8">Prior art</h2>
-      <p className="text-mute text-sm mt-1">
+      <p className="text-ink-soft text-sm mt-1">
         A separate 2020-2025 science-fair project (Beyond the Forecast) is cited in docs/PRIOR_ART.md as
         precedent for a physics-informed ConvLSTM loss and an anti-leakage protocol. Nothing from it is
         copied. COFIRE&apos;s models are implemented from scratch on Colorado data, with a fuel-moisture
         constraint, conformal calibration, and this public app.
       </p>
       <h2 className="text-xl mt-8">AI usage</h2>
-      <p className="text-mute text-sm mt-1">
+      <p className="text-ink-soft text-sm mt-1">
         See AI_USAGE.md. Feature engineering, conformal calibration, model training, and the
         physics-informed ConvLSTM are marked for student rewrite.
       </p>

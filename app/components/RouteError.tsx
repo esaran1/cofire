@@ -27,8 +27,8 @@ export class RouteError extends Component<
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <div className="rounded-lg border border-fire/40 bg-fire/10 p-4">
-        <p className="text-sm font-medium text-fire">
+      <div className="rounded-lg border border-ember/40 bg-ember/10 p-4">
+        <p className="text-sm font-medium text-ember">
           {this.props.what ? `${this.props.what} could not be shown.` : "This section could not be shown."}
         </p>
         <p className="mt-1 text-xs leading-relaxed text-mute">

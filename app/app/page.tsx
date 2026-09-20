@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { MapView } from "@/components/MapView";
 import { PlaceCard } from "@/components/PlaceCard";
 import { TimeScrubber } from "@/components/TimeScrubber";
 import { UncertaintyChip } from "@/components/UncertaintyBadge";
+import { ErrorNote } from "@/components/ui/Controls";
 import { API, Place, UncertaintyStatus, getParsed } from "@/lib/api";
 import { IssuesSchema, MetaSchema, PlaceSchema, UncertaintySchema } from "@/lib/schemas";
 import { set } from "idb-keyval";
@@ -60,40 +62,73 @@ export default function HomePage() {
   );
 
   return (
-    <div className="relative h-[100dvh]">
-      <MapView issue={issue} horizon={horizon} layer={layer} onClick={onClick} />
-      <div className="absolute top-3 left-3 z-20 text-xs bg-ink/85 px-3 py-2 rounded-lg max-w-[19rem] leading-relaxed">
-        <div className="text-paper">
-          Shipping resolution {place?.resolution_m ?? resolutionM} m · issued {issue || "-"}
+    <div className="grid h-[calc(100dvh-4rem)] grid-rows-[1fr_auto] lg:grid-cols-[22rem_1fr] lg:grid-rows-1">
+      {/* Reading panel. The map alone does not explain itself, so the state of
+          the forecast lives beside it rather than in a box floating over it. */}
+      <aside className="order-2 overflow-y-auto border-t border-rule bg-paper-raised lg:order-1 lg:border-r lg:border-t-0">
+        <div className="p-6">
+          <h1 className="display text-2xl">Fire-spread conditions</h1>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            Forecast of the conditions that let fire spread. Not a forecast of ignitions.
+          </p>
+
+          <dl className="mt-6 space-y-3 border-t border-rule pt-5 text-sm">
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-mute">Issued</dt>
+              <dd className="num text-ink">{issue || "n/a"}</dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-mute">Cell size</dt>
+              <dd className="num text-ink">{place?.resolution_m ?? resolutionM} m</dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-mute">Model</dt>
+              <dd className="text-ink">{shippingArm || "n/a"}</dd>
+            </div>
+          </dl>
+
+          {unc?.available && (
+            <div className="mt-6 border-t border-rule pt-5">
+              <UncertaintyChip status={unc.status} />
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                {unc.status === "uncalibrated"
+                  ? "Intervals are hidden on this view. The calibration record does not support one for these conditions."
+                  : unc.status === "extrapolating"
+                    ? `Conditions run past the calibrated range, so intervals are widened ${unc.widen_factor.toFixed(2)}x and should be read as a floor.`
+                    : "Conditions sit inside the range the intervals were checked against."}
+              </p>
+              <Link href="/about" className="mt-2 inline-block text-sm text-ember underline underline-offset-4">
+                Why
+              </Link>
+            </div>
+          )}
+
+          {err && (
+            <div className="mt-6">
+              <ErrorNote message={err} onRetry={() => setErr(null)} />
+            </div>
+          )}
+
+          <p className="mt-6 border-t border-rule pt-5 text-sm text-mute">
+            Select a cell on the map to see its forecast and the drivers behind it.
+          </p>
+          {resolutionNote && <p className="mt-2 text-xs leading-relaxed text-mute">{resolutionNote}</p>}
         </div>
-        <div className="text-mute">
-          Forecast of conditions that allow fires to spread, not of ignitions.
-        </div>
-        {resolutionNote && <div className="text-mute mt-0.5">{resolutionNote}</div>}
-        {shippingArm && <div className="text-mute mt-0.5">Arm: {shippingArm}</div>}
-        {unc?.available && (
-          <div className="mt-1.5 flex items-center gap-1.5">
-            <UncertaintyChip status={unc.status} />
-            <span className="text-mute">
-              {unc.status === "uncalibrated"
-                ? "intervals hidden"
-                : unc.status === "extrapolating"
-                  ? `intervals widened ${unc.widen_factor.toFixed(2)}×`
-                  : "intervals calibrated"}
-            </span>
-          </div>
-        )}
+      </aside>
+
+      <div className="relative order-1 min-h-[45dvh] lg:order-2">
+        <MapView issue={issue} horizon={horizon} layer={layer} onClick={onClick} />
+        <TimeScrubber
+          issues={issues}
+          issue={issue}
+          horizon={horizon}
+          layer={layer}
+          onIssue={setIssue}
+          onHorizon={setHorizon}
+          onLayer={setLayer}
+        />
       </div>
-      {err && <p className="absolute top-12 left-3 z-20 text-fire text-sm">{err}</p>}
-      <TimeScrubber
-        issues={issues}
-        issue={issue}
-        horizon={horizon}
-        layer={layer}
-        onIssue={setIssue}
-        onHorizon={setHorizon}
-        onLayer={setLayer}
-      />
+
       {place && (
         <PlaceCard
           place={place}

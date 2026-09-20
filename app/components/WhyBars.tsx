@@ -16,12 +16,12 @@ export function WhyBars({ bars }: { bars: WhyBar[] }) {
           <div key={b.group}>
             <div className="flex justify-between text-sm">
               <span className="capitalize">{b.label}</span>
-              <span className="text-mute">{v === null ? "n/a" : `${v >= 0 ? "+" : ""}${v.toFixed(2)}`}</span>
+              <span className="text-ink-soft">{v === null ? "n/a" : `${v >= 0 ? "+" : ""}${v.toFixed(2)}`}</span>
             </div>
-            <div className="h-1.5 bg-white/10 rounded-full mt-1">
+            <div className="h-1.5 bg-paper-sunk rounded-full mt-1">
               <div className="h-1.5 rounded-full" style={{ width: `${w * 100}%`, background: color }} />
             </div>
-            <p className="text-mute text-sm mt-1 leading-snug">{b.text}</p>
+            <p className="text-ink-soft text-sm mt-1 leading-snug">{b.text}</p>
           </div>
         );
       })}
