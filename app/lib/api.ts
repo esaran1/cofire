@@ -3,7 +3,7 @@ export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 export type WhyBar = {
   group: string;
   label: string;
-  value: number;
+  value: number | null;
   text: string;
   sign: string;
   top_feature?: string;
@@ -18,6 +18,19 @@ export type Horizon = {
   confidence: number | null;
 };
 
+export type UncertaintyStatus = {
+  status: "calibrated" | "extrapolating" | "uncalibrated";
+  reason: string;
+  show_interval: boolean;
+  widen_factor: number;
+  current_usdm: number;
+  pool_usdm_max: number;
+  exceedance_sd: number;
+  measured_coverage: number;
+  pool_years?: number[];
+  available: boolean;
+};
+
 export type Place = {
   cell_id: string;
   lat: number;
@@ -27,6 +40,7 @@ export type Place = {
   shipping_arm: string;
   why: WhyBar[];
   horizons: Record<string, Horizon>;
+  uncertainty?: UncertaintyStatus;
 };
 
 export async function getJson<T>(path: string): Promise<T> {

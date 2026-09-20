@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { API } from "@/lib/api";
+import { basemapStyle, registerPmtiles, resolveMode } from "@/lib/basemap";
 
 export function MapView({
   issue,
@@ -23,26 +24,35 @@ export function MapView({
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
+    const mode = resolveMode();
+    void registerPmtiles(mode);
     const map = new maplibregl.Map({
       container: ref.current,
-      style: {
-        version: 8,
-        sources: {
-          carto: {
-            type: "raster",
-            tiles: ["https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"],
-            tileSize: 256,
-            attribution: "© CARTO © OSM",
-          },
-        },
-        layers: [{ id: "carto", type: "raster", source: "carto" }],
-      },
+      style: basemapStyle(mode),
+      // Center is derived from the exported grid, not hardcoded, so moving the
+      // dev subset does not leave the camera pointed at the previous domain.
       center: [-105.1, 40.58],
       zoom: 8,
     });
+    fetch(`${API}/meta`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((m) => {
+        const c = m?.center as [number, number] | undefined;
+        if (c && map.getStyle()) map.jumpTo({ center: c, zoom: m?.zoom ?? 8 });
+      })
+      .catch(() => undefined);
     map.on("click", (e) => clickRef.current(e.lngLat.lat, e.lngLat.lng));
     mapRef.current = map;
+    // Exposed for automated screenshot capture: synthetic DOM events cannot
+    // carry maplibre's lngLat, so the harness needs a handle on the map.
+    (window as unknown as { __cofireMap?: maplibregl.Map }).__cofireMap = map;
+    // The container can still be zero-height on first paint (dvh + absolute
+    // positioning), which leaves maplibre sized to a stale 0/300px canvas and
+    // renders nothing. Observe the element and resize when it gets real bounds.
+    const ro = new ResizeObserver(() => map.resize());
+    ro.observe(ref.current);
     return () => {
+      ro.disconnect();
       map.remove();
       mapRef.current = null;
     };
@@ -96,5 +106,5 @@ export function MapView({
       .catch(() => undefined);
   }, [issue, horizon, layer]);
 
-  return <div ref={ref} data-testid="map" className="absolute inset-0" />;
+  return <div ref={ref} data-testid="map" className="absolute inset-0 h-full w-full" />;
 }

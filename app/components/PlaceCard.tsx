@@ -1,6 +1,7 @@
 "use client";
 
 import { Horizon, Place } from "@/lib/api";
+import { UncertaintyBadge } from "./UncertaintyBadge";
 import { WhyBars } from "./WhyBars";
 
 const HCHIPS = ["2", "4", "8"] as const;
@@ -27,8 +28,17 @@ export function PlaceCard({
   const point = hz?.drought_point ?? 0;
   const set = new Set(hz?.drought_set ?? []);
   const fire = hz?.fire_index ?? 0;
-  const lo = hz?.fire_lo ?? fire;
-  const hi = hz?.fire_hi ?? fire;
+  const u = place.uncertainty;
+  // An uncalibrated regime suppresses the interval entirely: showing a band the
+  // record cannot support is worse than showing none. Widen when extrapolating.
+  const showInterval = u ? u.show_interval : true;
+  const widen = u?.status === "extrapolating" ? u.widen_factor : 1;
+  const rawLo = hz?.fire_lo ?? fire;
+  const rawHi = hz?.fire_hi ?? fire;
+  const mid = (rawLo + rawHi) / 2;
+  const half = ((rawHi - rawLo) / 2) * widen;
+  const lo = Math.max(0, mid - half);
+  const hi = Math.min(100, mid + half);
   return (
     <aside
       data-testid="place-card"
@@ -65,15 +75,26 @@ export function PlaceCard({
       <p className="text-mute text-xs mt-1">Point {point.toFixed(1)} · conformal set highlighted · {cats[Math.round(point)] ?? ""}</p>
       <h2 className="text-2xl mt-4 font-semibold">Fire-spread condition</h2>
       <p className="text-fire text-3xl font-semibold">{fire.toFixed(0)}</p>
-      <div className="h-2 bg-white/10 rounded-full mt-2 relative">
-        <div
-          className="absolute h-2 bg-fire/60 rounded-full"
-          style={{ left: `${lo}%`, width: `${Math.max(2, hi - lo)}%` }}
-        />
-      </div>
-      <p className="text-mute text-xs mt-1">
-        Interval {lo.toFixed(0)}–{hi.toFixed(0)} (ERC percentile index, 0–100). Not an ignition forecast.
-      </p>
+      {showInterval ? (
+        <>
+          <div className="h-2 bg-white/10 rounded-full mt-2 relative">
+            <div
+              className="absolute h-2 bg-fire/60 rounded-full"
+              style={{ left: `${lo}%`, width: `${Math.max(2, hi - lo)}%` }}
+            />
+          </div>
+          <p className="text-mute text-xs mt-1">
+            Interval {lo.toFixed(0)}-{hi.toFixed(0)} (ERC percentile index, 0-100)
+            {widen > 1 ? ` · widened ${widen.toFixed(2)}×` : ""}. Not an ignition forecast.
+          </p>
+        </>
+      ) : (
+        <p className="text-mute text-xs mt-2">
+          Interval hidden: the calibration record does not support one for these conditions. The
+          point forecast and the drivers below still apply. Not an ignition forecast.
+        </p>
+      )}
+      {u && <UncertaintyBadge u={u} />}
       <h3 className="text-lg mt-5 mb-2">Why</h3>
       <WhyBars bars={place.why ?? []} />
       <div className="grid grid-cols-3 gap-2 mt-5">

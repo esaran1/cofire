@@ -11,7 +11,19 @@ def test_health() -> None:
 
 
 def test_forecast_contract() -> None:
-    r = client.get("/forecast", params={"lat": 40.54, "lon": -105.08, "issue": "2026-05-05"})
+    """Contract test, domain-agnostic.
+
+    Coordinates and issue dates follow the active dev subset, so the test asks
+    the API what it has rather than hardcoding a location that breaks whenever
+    the subset moves.
+    """
+    issues = client.get("/forecast/issues").json()["issues"]
+    assert issues, "no exported issues; run `make export`"
+    cell = client.get("/forecast/grid", params={"issue": issues[-1], "horizon": 4}).json()
+    feats = cell.get("features") or []
+    assert feats, "no cells for the latest issue"
+    lon, lat = feats[0]["geometry"]["coordinates"]
+    r = client.get("/forecast", params={"lat": lat, "lon": lon, "issue": issues[-1]})
     assert r.status_code == 200
     body = r.json()
     assert "horizons" in body
@@ -22,8 +34,12 @@ def test_forecast_contract() -> None:
 
 
 def test_issues() -> None:
-    r = client.get("/forecast/issues")
-    assert "2026-05-05" in r.json()["issues"]
+    """Issues are present and ISO-formatted. The specific dates track the
+    active subset and the stages that have been run, so they are not asserted."""
+    issues = client.get("/forecast/issues").json()["issues"]
+    assert issues, "no exported issues"
+    assert all(len(i) == 10 and i[4] == "-" for i in issues)
+    assert issues == sorted(issues)
 
 
 def test_ember_and_observation() -> None:

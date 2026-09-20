@@ -1,118 +1,225 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { API } from "@/lib/api";
 import { deviceId } from "@/lib/device";
-import { Suspense } from "react";
+import {
+  Action,
+  EmptyState,
+  ErrorNote,
+  Numeral,
+  OfflineNote,
+  Panel,
+  Segmented,
+  Skeleton,
+} from "@/components/ui/Controls";
+
+const CATEGORIES = [
+  { value: 0, label: "None", hint: "no drought" },
+  { value: 1, label: "D1", hint: "moderate" },
+  { value: 2, label: "D2", hint: "severe" },
+  { value: 3, label: "D3", hint: "extreme" },
+  { value: 4, label: "D4", hint: "exceptional" },
+];
+
+const BANDS = [
+  { value: "low", label: "Low" },
+  { value: "moderate", label: "Moderate" },
+  { value: "high", label: "High" },
+  { value: "very_high", label: "Very high" },
+];
+
+type Pick = { cell_id: string; horizon: number; drought_category: number; fire_band: string; issue: string };
+type Locked = { drought_point?: number | null; fire_index?: number | null };
 
 function BeatInner() {
   const params = useSearchParams();
-  const [cell, setCell] = useState(params.get("cell") ?? "40.5417_-105.0833");
+  const reduce = useReducedMotion();
+  const [cell, setCell] = useState(params.get("cell") ?? "");
   const [cat, setCat] = useState(2);
   const [band, setBand] = useState("high");
-  const [locked, setLocked] = useState<string>("");
-  const [mine, setMine] = useState<Array<Record<string, string | number>>>([]);
-  const [board, setBoard] = useState<Array<{ device_id: string; picks: number }>>([]);
+  const [locked, setLocked] = useState<Locked | null>(null);
+  const [mine, setMine] = useState<Pick[] | null>(null);
+  const [board, setBoard] = useState<{ device_id: string; picks: number }[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function refresh() {
+  const refresh = useCallback(() => {
     const id = deviceId();
     fetch(`${API}/predictions/me?device_id=${id}`)
       .then((r) => r.json())
-      .then(setMine)
-      .catch((e: Error) => setErr(e.message));
+      .then((d) => {
+        setMine(d);
+        setOffline(false);
+      })
+      .catch(() => setOffline(true));
     fetch(`${API}/leaderboard`)
       .then((r) => r.json())
       .then(setBoard)
-      .catch(() => undefined);
-  }
+      .catch(() => setBoard([]));
+  }, []);
 
   useEffect(() => {
+    if (!cell) {
+      fetch(`${API}/meta`)
+        .then((r) => r.json())
+        .then((m) => {
+          const c = m?.center as [number, number] | undefined;
+          if (c) setCell(`${c[1].toFixed(4)}_${c[0].toFixed(4)}`);
+        })
+        .catch(() => undefined);
+    }
     refresh();
-  }, []);
+  }, [cell, refresh]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const res = await fetch(`${API}/predictions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        device_id: deviceId(),
-        cell_id: cell,
-        horizon: 4,
-        drought_category: cat,
-        fire_band: band,
-      }),
-    });
-    const body = await res.json();
-    setLocked(JSON.stringify(body.locked_model ?? {}, null, 2));
-    refresh();
+    setErr(null);
+    setBusy(true);
+    try {
+      const res = await fetch(`${API}/predictions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          device_id: deviceId(),
+          cell_id: cell,
+          horizon: 4,
+          drought_category: cat,
+          fire_band: band,
+        }),
+      });
+      if (!res.ok) throw new Error(`Could not lock your pick (${res.status}).`);
+      const body = await res.json();
+      setLocked((body.locked_model ?? {}) as Locked);
+      refresh();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Could not lock your pick.");
+    } finally {
+      setBusy(false);
+    }
   }
 
+  const streak = mine?.length ?? 0;
+
   return (
-    <div className="px-4 pt-6 max-w-xl mx-auto">
-      <h1 className="text-3xl font-semibold">Beat the Model</h1>
-      <p className="text-mute mt-2">
-        Lock a drought category and a fire-spread condition band for this week. The model&apos;s number is
-        revealed after you submit. Scoring uses realized USDM and ERC once those weeks exist.
+    <div className="mx-auto max-w-xl px-4 pb-24 pt-6">
+      <h1 className="text-3xl font-semibold tracking-tight">Beat the Model</h1>
+      <p className="mt-2 leading-relaxed text-mute">
+        Lock your call for 4 weeks out before you see the model&apos;s. Both are scored against
+        realized USDM and ERC once those weeks arrive.
       </p>
-      {err && <p className="text-fire mt-2">{err}</p>}
-      <form onSubmit={onSubmit} className="mt-6 space-y-3">
-        <label className="block text-sm">
-          Cell
-          <input className="w-full bg-white/10 rounded p-2 mt-1" value={cell} onChange={(e) => setCell(e.target.value)} />
-        </label>
-        <label className="block text-sm">
-          Drought 0–4
-          <input
-            type="number"
-            min={0}
-            max={4}
-            className="w-full bg-white/10 rounded p-2 mt-1"
-            value={cat}
-            onChange={(e) => setCat(Number(e.target.value))}
-          />
-        </label>
-        <label className="block text-sm">
-          Fire-spread band
-          <select className="w-full bg-white/10 rounded p-2 mt-1" value={band} onChange={(e) => setBand(e.target.value)}>
-            <option value="low">low</option>
-            <option value="moderate">moderate</option>
-            <option value="high">high</option>
-            <option value="very_high">very high</option>
-          </select>
-        </label>
-        <button className="bg-fire text-ink font-medium px-4 py-2 rounded-lg">Submit pick</button>
-      </form>
-      {locked && (
-        <pre className="mt-4 text-xs bg-white/5 p-3 rounded" data-testid="locked-model">
-          {locked}
-        </pre>
+
+      {offline && (
+        <div className="mt-4">
+          <OfflineNote />
+        </div>
       )}
-      <h2 className="text-xl mt-8">Your picks · streak {mine.length}</h2>
-      <ul className="text-sm text-mute mt-2 space-y-1">
-        {mine.map((p) => (
-          <li key={String(p.id)}>
-            {String(p.issue)} h{String(p.horizon)} cat {String(p.drought_category)} / {String(p.fire_band)}
-          </li>
-        ))}
-      </ul>
-      <h2 className="text-xl mt-8">County board</h2>
-      <ul className="text-sm mt-2">
-        {board.map((b) => (
-          <li key={b.device_id}>
-            {b.device_id} · {b.picks}
-          </li>
-        ))}
-      </ul>
+      {err && (
+        <div className="mt-4">
+          <ErrorNote message={err} onRetry={() => setErr(null)} />
+        </div>
+      )}
+
+      <form onSubmit={onSubmit} className="mt-8 space-y-6">
+        <Segmented label="Drought category" options={CATEGORIES} value={cat} onChange={setCat} tone="drought" />
+        <Segmented label="Fire-spread condition" options={BANDS} value={band} onChange={setBand} />
+        <div className="flex items-center gap-3">
+          <Action type="submit" busy={busy} disabled={!cell}>
+            {locked ? "Lock another" : "Lock my pick"}
+          </Action>
+          <span className="font-mono text-xs text-mute">{cell || "locating"}</span>
+        </div>
+      </form>
+
+      {/* One deliberate reveal: the model's number is hidden until the pick is locked. */}
+      <AnimatePresence>
+        {locked && (
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8"
+          >
+            <Panel>
+              <p className="text-xs uppercase tracking-wide text-mute">The model said</p>
+              <div className="mt-3 grid grid-cols-2 gap-4">
+                <div>
+                  <Numeral
+                    value={locked.drought_point !== null && locked.drought_point !== undefined ? locked.drought_point.toFixed(1) : "n/a"}
+                    tone="drought"
+                    size="xl"
+                  />
+                  <p className="mt-1 text-xs text-mute">drought category</p>
+                </div>
+                <div>
+                  <Numeral
+                    value={locked.fire_index !== null && locked.fire_index !== undefined ? locked.fire_index.toFixed(0) : "n/a"}
+                    tone="fire"
+                    size="xl"
+                  />
+                  <p className="mt-1 text-xs text-mute">fire-spread index</p>
+                </div>
+              </div>
+              <p className="mt-4 text-xs leading-relaxed text-mute">
+                You picked {CATEGORIES.find((c) => c.value === cat)?.label} and{" "}
+                {BANDS.find((b) => b.value === band)?.label.toLowerCase()}. Neither number is scored
+                yet.
+              </p>
+            </Panel>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <h2 className="mt-12 text-xl font-medium">Your streak</h2>
+      <div className="mt-3">
+        {mine === null ? (
+          <Skeleton rows={2} />
+        ) : streak === 0 ? (
+          <EmptyState
+            title="No picks yet"
+            body="Lock a call above and it shows up here. Your streak counts consecutive weeks with a pick."
+          />
+        ) : (
+          <Panel>
+            <div className="flex items-baseline gap-3">
+              <Numeral value={streak} size="xl" />
+              <span className="text-sm text-mute">{streak === 1 ? "pick locked" : "picks locked"}</span>
+            </div>
+          </Panel>
+        )}
+      </div>
+
+      <h2 className="mt-10 text-xl font-medium">County leaderboard</h2>
+      <div className="mt-3">
+        {board === null ? (
+          <Skeleton rows={3} />
+        ) : board.length === 0 ? (
+          <EmptyState title="Nobody has played yet" body="The first locked pick in this county starts the board." />
+        ) : (
+          <ul className="divide-y divide-white/10 rounded-lg border border-white/10">
+            {board.slice(0, 8).map((r, i) => (
+              <li key={r.device_id} className="flex items-center justify-between px-4 py-3">
+                <span className="flex items-center gap-3">
+                  <Numeral value={i + 1} size="sm" tone="mute" />
+                  <span className="font-mono text-sm">{r.device_id}</span>
+                </span>
+                <Numeral value={r.picks} size="sm" />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
 
 export default function BeatPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div className="mx-auto max-w-xl px-4 pt-6"><Skeleton rows={5} /></div>}>
       <BeatInner />
     </Suspense>
   );

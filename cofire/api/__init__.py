@@ -19,6 +19,7 @@ from sqlmodel import Session, SQLModel, create_engine, select
 
 from cofire.model.config import get_settings
 from cofire.model.ember import score as ember_score
+from cofire.model.uncertainty.status import classify, pool_from_artifacts
 
 settings = get_settings()
 DB_URL = os.environ.get("DATABASE_URL") or os.environ.get("COFIRE_DATABASE_URL") or str(settings.database_url)
@@ -102,8 +103,25 @@ def _rate_limit(device_id: str, limit: int = 30) -> None:
     _WRITE_HITS[device_id] = hits
 
 
+# `make demo` runs from a committed fixture set with no pipeline run and no
+# network. When demo/ exists it wins, so a fresh clone serves real numbers.
+# Anchored to the repo root (three levels up from this file), not the process
+# cwd: `make demo` and `uvicorn` are started from different directories, and a
+# relative path silently fell through to the test fixture instead.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+DEMO_ROOT = Path(os.environ.get("COFIRE_DEMO_DIR") or (_REPO_ROOT / "demo"))
+
+
+def art_path(rel: str) -> Path:
+    """Artifact path, preferring the committed demo fixture when present."""
+    demo = DEMO_ROOT / "artifacts" / rel
+    if demo.exists():
+        return demo
+    return settings.artifacts_dir / rel
+
+
 def load_index() -> dict[str, Any]:
-    path = settings.artifacts_dir / "forecast_index.json"
+    path = art_path("forecast_index.json")
     fixture = Path("tests/fixtures/forecast_index.json")
     if path.exists():
         return json.loads(path.read_text())
@@ -134,15 +152,91 @@ def health() -> dict[str, str]:
 @app.get("/meta")
 def meta() -> dict[str, Any]:
     index = load_index()
-    man = settings.data_dir / "MANIFEST.json"
+    man = DEMO_ROOT / "MANIFEST.json"
+    if not man.exists():
+        man = settings.data_dir / "MANIFEST.json"
     manifest = json.loads(man.read_text()) if man.exists() else {"sources": []}
+    metrics_path = art_path("metrics.json")
+    metrics = json.loads(metrics_path.read_text()) if metrics_path.exists() else {}
+    shipping = metrics.get("shipping_arm") or index.get("shipping_arm")
+    resolution = metrics.get("resolution_m") or index.get("resolution_m", 4000)
+    status_path = Path("STATUS.md")
+    verdict = "unknown"
+    if status_path.exists():
+        head = status_path.read_text().splitlines()[0] if status_path.read_text() else ""
+        if ":" in head:
+            verdict = head.split(":", 1)[1].strip()
     return {
-        "shipping_arm": index.get("shipping_arm"),
-        "resolution_m": index.get("resolution_m", 4000),
-        "resolution_note": index.get("resolution_note"),
+        "shipping_arm": shipping,
+        "shipping_arm_basis": "lowest validation ERC-percentile MAE on the 2023 split; tie-break drought MAE",
+        "resolution_m": resolution,
+        "resolution_note": index.get("resolution_note")
+        or "gridMET native ~4 km cells. Downscaling to 10–30 m is off.",
         "disclaimer": "COFIRE forecasts drought severity and conditions that allow fires to spread. It does not predict ignitions or where a fire will occur.",
         "manifest": manifest,
+        "manifest_hash": metrics.get("manifest_hash"),
+        "git_sha": metrics.get("git_sha"),
+        "status": verdict,
+        "hindcast_looks": metrics.get("hindcast_looks", []),
+        "issue_dates": index.get("issues", []),
+        # Camera for the map, derived from the exported grid so the view follows
+        # the active dev subset instead of a hardcoded location.
+        **_grid_camera(index),
     }
+
+
+def _grid_camera(index: dict[str, Any]) -> dict[str, Any]:
+    cells = index.get("cells") or []
+    if not cells:
+        return {}
+    lats = [float(c["lat"]) for c in cells[:20000]]
+    lons = [float(c["lon"]) for c in cells[:20000]]
+    span = max(max(lats) - min(lats), max(lons) - min(lons))
+    zoom = 9.0 if span < 0.8 else 8.3 if span < 1.6 else 7.0
+    return {
+        "center": [(min(lons) + max(lons)) / 2, (min(lats) + max(lats)) / 2],
+        "zoom": zoom,
+    }
+
+
+def _regime_status(issue: str | None = None) -> dict[str, Any]:
+    """Three-state uncertainty status for an issue, from calibration diagnostics."""
+    pool_root = DEMO_ROOT / "artifacts" if (DEMO_ROOT / "artifacts" / "uncertainty" / "regime_pool.json").exists() else settings.artifacts_dir
+    pool = pool_from_artifacts(pool_root)
+    if pool is None:
+        return {
+            "status": "uncalibrated",
+            "reason": "no calibration pool on disk; run the multi-regime calibration",
+            "available": False,
+        }
+    index = load_index()
+    iss = issue or (index.get("issues") or [None])[-1]
+    current = None
+    if iss:
+        vals = [
+            (c.get("horizons") or {}).get("4", {}).get("drought_point")
+            for c in index.get("cells", [])
+            if c.get("issue") == iss
+        ]
+        vals = [v for v in vals if isinstance(v, int | float)]
+        if vals:
+            current = sum(vals) / len(vals)
+    if current is None:
+        current = pool.usdm_mean
+    pos = classify(float(current), pool)
+    return {
+        **pos.to_dict(),
+        "issue": iss,
+        "pool_years": pool.pool_years,
+        "pool_usdm_min": pool.usdm_min,
+        "available": True,
+        "show_interval": pos.status != "uncalibrated",
+    }
+
+
+@app.get("/uncertainty/status")
+def uncertainty_status(issue: str | None = None) -> dict[str, Any]:
+    return _regime_status(issue)
 
 
 @app.get("/forecast/issues")
@@ -157,7 +251,11 @@ def forecast(lat: float = Query(...), lon: float = Query(...), issue: str | None
     cell = nearest_cell(lat, lon, index, issue)
     if cell is None:
         raise HTTPException(404, "no forecast for this location")
-    return cell
+    # Attach the uncertainty status so the Place Card can suppress or caveat the
+    # interval without a second round trip.
+    out = dict(cell)
+    out["uncertainty"] = _regime_status(cell.get("issue") or issue)
+    return out
 
 
 @app.get("/forecast/grid")
@@ -204,20 +302,53 @@ def tiles(issue: str, horizon: int, variable: str, z: int, x: int, y: int) -> Fi
 
 @app.get("/hindcast/summary")
 def hindcast_summary() -> dict[str, Any]:
-    cov = settings.artifacts_dir / "uncertainty" / "coverage_2026.png"
-    cmp = settings.artifacts_dir / "uncertainty" / "comparison.md"
+    cov = art_path("uncertainty/coverage_2026.png")
+    cmp = art_path("uncertainty/comparison.md")
+    cmp_json = art_path("uncertainty/comparison.json")
+    metrics_path = art_path("metrics.json")
+    metrics = json.loads(metrics_path.read_text()) if metrics_path.exists() else {}
+    looks = metrics.get("hindcast_looks", [])
+    coverage: list[dict[str, Any]] = []
+    nominal = 0.90
+    if cmp_json.exists():
+        raw = json.loads(cmp_json.read_text())
+        nominal = raw.get("nominal", 0.90)
+        for split in ("calibrate", "hindcast"):
+            for method, block in (raw.get(split) or {}).items():
+                for row in block.get("rows", []):
+                    if row.get("stratum") != "overall":
+                        continue
+                    coverage.append(
+                        {
+                            "split": split,
+                            "method": method,
+                            "horizon": row.get("horizon"),
+                            "coverage": row.get("coverage"),
+                            "width": row.get("width"),
+                            "n": row.get("n"),
+                        }
+                    )
     return {
         "coverage_plot": "/hindcast/coverage.png" if cov.exists() else None,
         "comparison": cmp.read_text() if cmp.exists() else "",
+        "coverage_rows": coverage,
+        "nominal": nominal,
         "may1_issue": "2026-05-05",
+        "look_index": looks[-1]["look_index"] if looks else 0,
+        "contaminated": bool(looks) and looks[-1]["look_index"] > 1,
+        "contamination_note": (
+            "Skill vs persistence was re-scored after a merge_pred bug that scored stored baseline "
+            "hats as the model. Hyperparameters were not changed, but this is a repeat look at the "
+            "locked 2026 holdout and is reported as contaminated."
+        ),
     }
 
 
 @app.get("/hindcast/coverage.png")
 def coverage_png() -> FileResponse:
-    path = settings.artifacts_dir / "uncertainty" / "coverage_2026.png"
+    path = art_path("uncertainty/coverage_2026.png")
     if not path.exists():
-        path = settings.artifacts_dir / "hindcast" / "coverage.png"
+        path = art_path("hindcast/coverage.png")
     if not path.exists():
         raise HTTPException(404, "coverage plot not generated")
     return FileResponse(path, media_type="image/png")
@@ -225,10 +356,21 @@ def coverage_png() -> FileResponse:
 
 @app.get("/hindcast/fires")
 def hindcast_fires() -> Any:
-    path = settings.artifacts_dir / "hindcast" / "fires.json"
-    if not path.exists():
-        return []
-    return json.loads(path.read_text())
+    path = art_path("hindcast/fires.json")
+    ctrl = art_path("hindcast/control.json")
+    fires = json.loads(path.read_text()) if path.exists() else []
+    control = json.loads(ctrl.read_text()) if ctrl.exists() else {}
+    in_domain = [f for f in fires if f.get("in_domain")]
+    return {
+        "fires": fires,
+        "control": control,
+        "n_in_domain": len(in_domain),
+        "threshold_acres": 1000,
+        "note": (
+            "Ranks for fires outside the current domain are nearest-cell only. With no in-domain "
+            "fires this table is not evidence of skill; compare against the control mean rank."
+        ),
+    }
 
 
 @app.post("/predictions")

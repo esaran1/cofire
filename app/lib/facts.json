@@ -1,0 +1,150 @@
+{
+  "generated_from": "artifacts/",
+  "note": "Every figure on the landing page is written here from artifacts. Do not hard-code numbers in components.",
+  "shipping_arm": "ensemble",
+  "git_sha": "a3f212d083122dcf5b6d62efe2a574d7beb4c67b",
+  "manifest_hash": "ec21777b791c57a0295143b43cf551652c08149efe52a05354b00bddd414d18c",
+  "resolution_m": 4000,
+  "n_train": 112752,
+  "effective_n": {
+    "usdm": null,
+    "erc": null
+  },
+  "hindcast_looks": 2,
+  "config_hash": "0957e415fa7f3fad",
+  "calibration": {
+    "larimer": {
+      "variants": [
+        {
+          "label": "base",
+          "mean": 0.409,
+          "worst": 0.348
+        },
+        {
+          "label": "c(k=2)",
+          "mean": 0.409,
+          "worst": 0.38
+        },
+        {
+          "label": "c(k=3)",
+          "mean": 0.409,
+          "worst": 0.369
+        },
+        {
+          "label": "d",
+          "mean": 0.404,
+          "worst": 0.365
+        },
+        {
+          "label": "a",
+          "mean": 0.403,
+          "worst": 0.361
+        },
+        {
+          "label": "b",
+          "mean": 0.403,
+          "worst": 0.363
+        }
+      ],
+      "best": {
+        "label": "base",
+        "mean": 0.409,
+        "worst": 0.348
+      },
+      "baseline": {
+        "label": "base",
+        "mean": 0.409,
+        "worst": 0.348
+      },
+      "improvement": 0.0,
+      "gap_to_target": 0.491,
+      "n_variants": 6
+    },
+    "pueblo": {
+      "variants": [
+        {
+          "label": "base",
+          "mean": 0.331,
+          "worst": 0.249
+        },
+        {
+          "label": "d",
+          "mean": 0.31,
+          "worst": 0.189
+        },
+        {
+          "label": "a",
+          "mean": 0.303,
+          "worst": 0.228
+        },
+        {
+          "label": "c(k=3)",
+          "mean": 0.303,
+          "worst": 0.218
+        },
+        {
+          "label": "c(k=2)",
+          "mean": 0.301,
+          "worst": 0.215
+        },
+        {
+          "label": "b",
+          "mean": 0.287,
+          "worst": 0.211
+        }
+      ],
+      "best": {
+        "label": "base",
+        "mean": 0.331,
+        "worst": 0.249
+      },
+      "baseline": {
+        "label": "base",
+        "mean": 0.331,
+        "worst": 0.249
+      },
+      "improvement": 0.0,
+      "gap_to_target": 0.569,
+      "n_variants": 6
+    }
+  },
+  "lodo": {
+    "larimer": {
+      "n_folds": 4,
+      "level_mean_skill": -0.0264,
+      "delta_mean_skill": -0.0201
+    },
+    "pueblo": {
+      "n_folds": 4,
+      "level_mean_skill": -0.0619,
+      "delta_mean_skill": -0.0382
+    }
+  },
+  "pool": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "usdm_min": 0.017,
+    "usdm_max": 2.058,
+    "measured_coverage": 0.331
+  },
+  "fires": {
+    "total": 25,
+    "in_domain": 2,
+    "in_domain_acres": 109408,
+    "largest": "Aspen Acres",
+    "largest_acres": 102003,
+    "control_mean_rank": {
+      "h2": 49.930078125,
+      "h4": 50.000651041666664,
+      "h8": 49.995138888888896
+    }
+  }
+}

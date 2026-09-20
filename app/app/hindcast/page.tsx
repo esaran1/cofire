@@ -3,34 +3,121 @@
 import { useEffect, useState } from "react";
 import { API, getJson } from "@/lib/api";
 
+type CoverageRow = {
+  split: string;
+  method: string;
+  horizon: number;
+  coverage: number;
+  width: number;
+  n: number;
+};
+
+type Summary = {
+  comparison: string;
+  coverage_rows: CoverageRow[];
+  nominal: number;
+  look_index: number;
+  contaminated: boolean;
+  contamination_note: string;
+};
+
+type Fire = {
+  name: string;
+  discovery: string;
+  acres: number;
+  in_domain: boolean;
+  h2_pct_rank: number | null;
+  h4_pct_rank: number | null;
+  h8_pct_rank: number | null;
+};
+
+type FiresPayload = {
+  fires: Fire[];
+  control: { n?: number; mean_pct_rank?: Record<string, number> };
+  n_in_domain: number;
+  threshold_acres: number;
+  note: string;
+};
+
+function pct(v: number | null | undefined): string {
+  return v === null || v === undefined ? "-" : v.toFixed(1);
+}
+
 export default function HindcastPage() {
-  const [md, setMd] = useState("");
-  const [fires, setFires] = useState<Array<Record<string, unknown>>>([]);
+  const [sum, setSum] = useState<Summary | null>(null);
+  const [fp, setFp] = useState<FiresPayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    getJson<{ comparison: string }>("/hindcast/summary")
-      .then((d) => setMd(d.comparison || "Run `make calibrate` to write the 2026 coverage comparison."))
+    getJson<Summary>("/hindcast/summary")
+      .then(setSum)
       .catch((e: Error) => setErr(e.message));
-    getJson<Array<Record<string, unknown>>>("/hindcast/fires")
-      .then(setFires)
-      .catch(() => setFires([]));
+    getJson<FiresPayload>("/hindcast/fires")
+      .then(setFp)
+      .catch(() => setFp(null));
   }, []);
 
+  const h4 = (sum?.coverage_rows ?? []).filter((r) => r.horizon === 4);
+  const nominal = sum?.nominal ?? 0.9;
+
   return (
-    <div className="px-4 pt-6 max-w-xl mx-auto">
+    <div className="px-4 pt-6 max-w-xl mx-auto pb-10">
       <h1 className="text-3xl font-semibold">Hindcast 2026</h1>
       <p className="text-mute mt-2">
-        Replay of weekly issue dates. Overlay shows forecast fire-spread conditions, then June perimeters
-        if any qualifying NIFC fires (&gt; 1,000 acres) intersect the view. This is not a forecast of ignitions.
+        Replay of weekly issue dates. The overlay shows forecast fire-spread conditions, then 2026
+        perimeters if any qualifying NIFC fires (&gt; {fp?.threshold_acres ?? 1000} acres) intersect the
+        view. This is not a forecast of ignitions.
       </p>
+
+      {sum?.contaminated && (
+        <div className="mt-4 border border-fire/60 rounded-lg p-3 bg-fire/10">
+          <p className="text-fire font-medium text-sm">
+            Contaminated - look {sum.look_index} at a locked holdout
+          </p>
+          <p className="text-mute text-sm mt-1">{sum.contamination_note}</p>
+        </div>
+      )}
+
       <a
         href="/?issue=2026-05-05&horizon=4"
         className="inline-block mt-4 bg-drought text-ink px-4 py-2 rounded-lg font-medium"
       >
         Replay May 1 (issue 2026-05-05)
       </a>
+
       <h2 className="text-xl mt-8">Coverage: conformal vs bootstrap</h2>
+      <p className="text-mute text-sm mt-1">
+        4-week ERC percentile, overall stratum. Target {nominal.toFixed(2)}.
+      </p>
+      {h4.length > 0 && (
+        <table className="w-full text-sm mt-3">
+          <thead>
+            <tr className="text-mute text-left">
+              <th className="py-1">Split</th>
+              <th>Method</th>
+              <th>Coverage</th>
+              <th>Mean width</th>
+            </tr>
+          </thead>
+          <tbody>
+            {h4.map((r) => {
+              const miss = Math.abs(r.coverage - nominal) > 0.05;
+              return (
+                <tr key={`${r.split}-${r.method}`} className="border-t border-white/10">
+                  <td className="py-1">{r.split}</td>
+                  <td>{r.method}</td>
+                  <td className={miss ? "text-fire" : "text-paper"}>{r.coverage.toFixed(3)}</td>
+                  <td className="text-mute">{r.width.toFixed(1)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+      <p className="text-mute text-sm mt-2">
+        Conformal holds on the 2024-2025 calibration split and falls apart on the 2026 shift, with{" "}
+        <em>narrower</em> intervals. The residual bootstrap holds. Reported, not retuned.
+      </p>
       <img
         src={`${API}/hindcast/coverage.png`}
         alt="2026 coverage over weeks for conformal and bootstrap against the 0.90 line"
@@ -40,33 +127,63 @@ export default function HindcastPage() {
         }}
       />
       {err && <p className="text-fire mt-2">{err}</p>}
-      <pre className="mt-4 text-xs text-mute whitespace-pre-wrap">{md.slice(0, 2500)}</pre>
+
       <h2 className="text-xl mt-8">Fires vs pre-discovery ranks</h2>
-      <table className="w-full text-sm mt-2">
+      {fp && fp.n_in_domain === 0 && (
+        <div className="mt-2 border border-white/15 rounded-lg p-3">
+          <p className="text-paper text-sm font-medium">
+            {fp.fires.length} qualifying 2026 perimeters, 0 inside the current domain.
+          </p>
+          <p className="text-mute text-sm mt-1">{fp.note}</p>
+        </div>
+      )}
+      {fp?.control?.mean_pct_rank && (
+        <p className="text-mute text-sm mt-2">
+          Control ({fp.control.n ?? 200} random non-fire cells, same issue dates): mean percentile rank
+          h2 {pct(fp.control.mean_pct_rank.h2)}, h4 {pct(fp.control.mean_pct_rank.h4)}, h8{" "}
+          {pct(fp.control.mean_pct_rank.h8)}. Fire ranks near these values are unremarkable.
+        </p>
+      )}
+      <table className="w-full text-sm mt-3">
         <thead>
           <tr className="text-mute text-left">
-            <th>Fire</th>
-            <th>4w rank</th>
-            <th>8w rank</th>
+            <th className="py-1">Fire</th>
+            <th>Discovery</th>
+            <th>2w</th>
+            <th>4w</th>
+            <th>8w</th>
           </tr>
         </thead>
         <tbody>
-          {fires.length === 0 && (
+          {(!fp || fp.fires.length === 0) && (
             <tr>
-              <td colSpan={3} className="py-3 text-mute">
-                No qualifying 2026 perimeters in the current domain.
+              <td colSpan={5} className="py-3 text-mute">
+                No qualifying 2026 perimeters. Run `make hindcast`.
               </td>
             </tr>
           )}
-          {fires.map((f) => (
-            <tr key={String(f.name)}>
-              <td className="py-1">{String(f.name)}</td>
-              <td>{String(f.h4_pct_rank ?? "—")}</td>
-              <td>{String(f.h8_pct_rank ?? "—")}</td>
+          {(fp?.fires ?? []).map((f) => (
+            <tr key={`${f.name}-${f.discovery}`} className="border-t border-white/10">
+              <td className="py-1">
+                {f.name}
+                {!f.in_domain && (
+                  <span className="text-mute" title="nearest-cell only">
+                    {" "}
+                    ·&nbsp;out
+                  </span>
+                )}
+              </td>
+              <td className="text-mute">{f.discovery}</td>
+              <td>{pct(f.h2_pct_rank)}</td>
+              <td>{pct(f.h4_pct_rank)}</td>
+              <td>{pct(f.h8_pct_rank)}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <h2 className="text-xl mt-8">Full comparison</h2>
+      <pre className="mt-2 text-xs text-mute whitespace-pre-wrap">{(sum?.comparison ?? "").slice(0, 2500)}</pre>
     </div>
   );
 }

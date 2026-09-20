@@ -21,7 +21,7 @@ export function TimeScrubber({
   return (
     <div className="absolute bottom-20 inset-x-3 z-20 rounded-xl bg-ink/90 p-3 border border-white/10">
       <div className="flex justify-between text-xs uppercase tracking-wide text-mute mb-2">
-        <span>Issue {issue || "—"}</span>
+        <span>Issue {issue || "-"}</span>
         <span>{horizon} weeks ahead</span>
       </div>
       <input
