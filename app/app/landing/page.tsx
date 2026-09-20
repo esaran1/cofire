@@ -181,9 +181,9 @@ export default function LandingPage() {
                   Fixing the bug was not enough, so we pre-registered {pueblo?.n_variants ?? 6}{" "}
                   ways to build the calibration pool, wrote down the acceptance bar first, and
                   hashed the document so the goalposts could not move. Every one was rejected. Every
-                  year held out of training carries the same ~2.4x error inflation, and because that
-                  inflation is constant across the pool years, no reweighting of them can recover
-                  it.
+                  year held out of training carries the same ~2.4x error inflation, a leakage audit
+                  ruled out contamination, and because that inflation is constant across the pool
+                  years no reweighting of them can recover it.
                 </p>
                 <div className="mt-8 grid gap-8 sm:grid-cols-3">
                   <Figure value={pct(pueblo?.best.mean)} tone="fire" label={`best coverage reached, against a 90% target`} />
