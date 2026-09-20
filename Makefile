@@ -73,8 +73,17 @@ statewide-run:
 serve:
 	$(UV) run uvicorn cofire.api.main:app --host $(API_HOST) --port $(API_PORT)
 
+# `next build` and `next dev` share .next and write incompatible layouts into
+# it. Building while the dev server is running leaves the dev server serving a
+# manifest whose chunks do not exist, so every route 404s on its CSS and JS and
+# the site loads unstyled and dead. Clearing .next on dev start makes that
+# failure impossible rather than merely unlikely.
 web:
-	cd app && npm run dev -- --port 3000
+	cd app && rm -rf .next && npm run dev -- --port 3000
+
+# Production build, in its own directory, so it cannot clobber the dev server.
+web-build:
+	cd app && rm -rf .next && npx next build
 
 score:
 	$(PY) -m cofire.api.score

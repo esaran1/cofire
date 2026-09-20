@@ -272,3 +272,12 @@
   `null` and the bar renders without a magnitude. This is the fourth render-only failure this
   project has produced, which is why visual verification is a standing rule rather than a
   preference.
+- **`make web` clears `.next` before starting the dev server.** `next build` and `next dev` share
+  the `.next` directory and write incompatible layouts into it. Running a production build while the
+  dev server was up left the dev server serving a manifest whose chunks no longer existed, so every
+  route returned **200 for the HTML but 404 for `layout.css`, `main-app.js` and
+  `app-pages-internals.js`** - the site loaded with no styles and no client JavaScript, and the map
+  never initialised. This bit twice and is invisible to `tsc`, to the copy lint and to an HTTP status
+  check on the route itself, because the document is fine and only its assets are missing. Clearing
+  `.next` on dev start makes the failure impossible rather than merely unlikely; `make web-build`
+  does the same before a production build.
