@@ -61,11 +61,14 @@ export default function HomePage() {
     [issue],
   );
 
+  // Explicit grid tracks per breakpoint. `order` does not move an item between
+  // grid rows, so relying on it collapsed the map pane to zero height. Mobile:
+  // map on top in a fixed-height row, panel below. Desktop: two columns.
   return (
-    <div className="grid h-[calc(100dvh-4rem)] grid-rows-[1fr_auto] lg:grid-cols-[22rem_1fr] lg:grid-rows-1">
+    <div className="grid h-[calc(100dvh-4.0625rem)] grid-rows-[55dvh_1fr] overflow-hidden lg:grid-cols-[22rem_1fr] lg:grid-rows-1">
       {/* Reading panel. The map alone does not explain itself, so the state of
           the forecast lives beside it rather than in a box floating over it. */}
-      <aside className="order-2 overflow-y-auto border-t border-rule bg-paper-raised lg:order-1 lg:border-r lg:border-t-0">
+      <aside className="row-start-2 overflow-y-auto border-t border-rule bg-paper-raised lg:col-start-1 lg:row-start-1 lg:border-r lg:border-t-0">
         <div className="p-6">
           <h1 className="display text-2xl">Fire-spread conditions</h1>
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
@@ -109,26 +112,15 @@ export default function HomePage() {
             </div>
           )}
 
-          <p className="mt-6 border-t border-rule pt-5 text-sm text-mute">
-            Select a cell on the map to see its forecast and the drivers behind it.
-          </p>
-          {resolutionNote && <p className="mt-2 text-xs leading-relaxed text-mute">{resolutionNote}</p>}
+          {!place && (
+            <p className="mt-6 border-t border-rule pt-5 text-sm text-mute">
+              Select a cell on the map to see its forecast and the drivers behind it.
+            </p>
+          )}
+          {!place && resolutionNote && <p className="mt-2 text-xs leading-relaxed text-mute">{resolutionNote}</p>}
         </div>
-      </aside>
 
-      <div className="relative order-1 min-h-[45dvh] lg:order-2">
-        <MapView issue={issue} horizon={horizon} layer={layer} onClick={onClick} />
-        <TimeScrubber
-          issues={issues}
-          issue={issue}
-          horizon={horizon}
-          layer={layer}
-          onIssue={setIssue}
-          onHorizon={setHorizon}
-          onLayer={setLayer}
-        />
-      </div>
-
+        {/* Selected cell. Inside the panel on desktop, a bottom sheet on mobile. */}
       {place && (
         <PlaceCard
           place={place}
@@ -146,6 +138,21 @@ export default function HomePage() {
         />
       )}
       <span className="hidden">{API}</span>
+      </aside>
+
+      <div className="relative row-start-1 min-h-0 lg:col-start-2 lg:row-start-1">
+        <MapView issue={issue} horizon={horizon} layer={layer} onClick={onClick} />
+        <TimeScrubber
+          issues={issues}
+          issue={issue}
+          horizon={horizon}
+          layer={layer}
+          onIssue={setIssue}
+          onHorizon={setHorizon}
+          onLayer={setLayer}
+        />
+      </div>
+
     </div>
   );
 }

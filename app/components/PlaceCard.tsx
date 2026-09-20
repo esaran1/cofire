@@ -42,7 +42,9 @@ export function PlaceCard({
   return (
     <aside
       data-testid="place-card"
-      className="absolute inset-x-0 bottom-16 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-paper-raised p-4 shadow-2xl"
+      /* Mobile: a bottom sheet over the map. Desktop: it is rendered inside the
+         reading panel, so it must be a plain block there and not cover the map. */
+      className="fixed inset-x-0 bottom-0 z-30 max-h-[70dvh] overflow-y-auto border-t border-rule bg-paper-raised p-5 shadow-[0_-2px_24px_rgba(23,24,27,0.12)] lg:static lg:max-h-none lg:border-0 lg:border-t lg:px-6 lg:pb-8 lg:pt-6 lg:shadow-none"
     >
       <button className="text-ink-soft text-sm" onClick={onClose}>
         Close

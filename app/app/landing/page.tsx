@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "@phosphor-icons/react";
 import { CoverageFigure, InflationFigure } from "@/components/landing/CoverageFigure";
+import { LineReveal, ParallaxFigure, ReadingProgress, RecedingHero, Reveal } from "@/components/landing/Scroll";
 import { Numeral } from "@/components/ui/Controls";
 import facts from "@/lib/facts.json";
 
@@ -34,49 +35,51 @@ export default function LandingPage() {
 
   return (
     <>
+      <ReadingProgress />
+
       {/* 1. Hero. Centered is allowed here: this is a launch statement and the
-          message is the design (skill 4.3 override). */}
-      <section className="relative flex min-h-[78dvh] items-center justify-center px-6 pt-16">
-        <div className="text-center">
-          <motion.h1
-            initial={reduce ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="display text-6xl md:text-8xl"
+          message is the design (skill 4.3 override). It recedes on scroll so
+          the first section arrives over it. */}
+      <RecedingHero>
+        <motion.h1
+          initial={reduce ? false : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="display text-6xl md:text-8xl"
+        >
+          CO<em>FIRE</em>
+        </motion.h1>
+        <motion.p
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.25 }}
+          className="mt-6 text-[11px] uppercase tracking-[0.2em] text-mute sm:rule-flank sm:tracking-[0.24em]"
+        >
+          <span className="sm:hidden">Drought and fire-spread conditions</span>
+          <span className="hidden sm:inline">Colorado drought and fire-spread conditions</span>
+        </motion.p>
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="mt-12 flex flex-wrap items-center justify-center gap-3"
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full bg-ember px-6 py-3 font-medium text-paper transition-transform active:scale-[0.98]"
           >
-            CO<em>FIRE</em>
-          </motion.h1>
-          <motion.p
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.25 }}
-            className="mt-6 text-[11px] uppercase tracking-[0.2em] text-mute sm:rule-flank sm:tracking-[0.24em]"
-          >
-            <span className="sm:hidden">Drought and fire-spread conditions</span>
-            <span className="hidden sm:inline">Colorado drought and fire-spread conditions</span>
-          </motion.p>
-          <motion.div
-            initial={reduce ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            className="mt-12 flex flex-wrap items-center justify-center gap-3"
-          >
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-full bg-ember px-6 py-3 font-medium text-paper transition-transform active:scale-[0.98]"
-            >
-              Open the map
-              <ArrowRight size={17} weight="bold" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+            Open the map
+            <ArrowRight size={17} weight="bold" />
+          </Link>
+        </motion.div>
+      </RecedingHero>
 
       {/* 2. The claim, as a display statement. */}
       <Section n="01" title="The idea">
-        <p className="display max-w-[22ch] text-4xl md:text-6xl">
-          Colorado dries out weeks <em>before</em> it burns.
-        </p>
+        <LineReveal
+          className="display max-w-[22ch] text-4xl md:text-6xl"
+          lines={[<>Colorado dries out weeks</>, <><em>before</em> it burns.</>]}
+        />
         <div className="mt-10 grid gap-10 md:grid-cols-2">
           <p className="max-w-prose leading-relaxed text-ink-soft">
             Fire-spread conditions build slowly. Soil moisture falls, fuels cure, and the energy
@@ -92,16 +95,11 @@ export default function LandingPage() {
       </Section>
 
       {/* 3. Full-bleed photograph. Different layout family from every other section. */}
-      <figure className="relative">
-        <img
-          src="/img/hero-highpark.jpg"
-          alt="The sun seen through heavy smoke from the High Park Fire above Poudre Canyon, Colorado"
-          className="h-[44vh] w-full object-cover md:h-[60vh]"
-        />
-        <figcaption className="mx-auto max-w-[1400px] px-6 py-3 text-xs text-mute">
-          High Park Fire above Poudre Canyon. Photo CC BY 2.0 via Wikimedia Commons.
-        </figcaption>
-      </figure>
+      <ParallaxFigure
+        src="/img/hero-highpark.jpg"
+        alt="The sun seen through heavy smoke from the High Park Fire above Poudre Canyon, Colorado"
+        caption="High Park Fire above Poudre Canyon. Photo CC BY 2.0 via Wikimedia Commons."
+      />
 
       {/* 4. What you do with it. Asymmetric trio, no equal cards. */}
       <Section n="02" title="What it does">
@@ -132,9 +130,10 @@ export default function LandingPage() {
 
       {/* 5. The calibration story, carried by two real charts. */}
       <Section n="03" title="The honest part" tinted>
-        <p className="display max-w-[24ch] text-4xl md:text-6xl">
-          Most forecasts show a number. This one says when the number <em>cannot be trusted</em>.
-        </p>
+        <LineReveal
+          className="display max-w-[24ch] text-4xl md:text-6xl"
+          lines={[<>Most forecasts show a number.</>, <>This one says when the number</>, <><em>cannot be trusted</em>.</>]}
+        />
 
         <div className="mt-12 space-y-14">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-16">
@@ -175,11 +174,15 @@ export default function LandingPage() {
         </div>
 
         <div className="mt-14 border-t border-rule pt-10">
-          <p className="display max-w-[30ch] text-2xl md:text-3xl">
-            Every held-out year carries the same <em>2.4x</em> error inflation. A leakage audit ruled
-            out contamination. Because that inflation is constant across the pool years, no
-            reweighting of them can recover it.
-          </p>
+          <LineReveal
+            className="display max-w-[30ch] text-2xl md:text-3xl"
+            lines={[
+              <>Every held-out year carries the same <em>2.4x</em> error inflation.</>,
+              <>A leakage audit ruled out contamination.</>,
+              <>Because that inflation is constant across the pool years,</>,
+              <>no reweighting of them can recover it.</>,
+            ]}
+          />
           <p className="mt-6 max-w-prose leading-relaxed text-ink-soft">
             So the app hides the interval and states the reason, rather than drawing a band the
             record cannot back. Measured coverage on the shipping pool is{" "}
@@ -218,9 +221,10 @@ export default function LandingPage() {
       {/* 7. Close. */}
       <section className="border-t border-rule bg-ink px-6 py-20 text-paper">
         <div className="mx-auto max-w-[1400px]">
-          <p className="display max-w-[20ch] text-4xl text-paper md:text-6xl">
-            Open it on Pueblo County.
-          </p>
+          <LineReveal
+            className="display max-w-[20ch] text-4xl text-paper md:text-6xl"
+            lines={[<>Open it on Pueblo County.</>]}
+          />
           {fires && fires.in_domain > 0 && (
             <p className="mt-5 max-w-prose leading-relaxed text-paper/70">
               The domain contains {fires.in_domain} qualifying 2026 perimeters totalling{" "}
@@ -256,9 +260,11 @@ function Section({
   return (
     <section className={`border-t border-rule px-6 py-20 md:py-28 ${tinted ? "bg-paper-raised" : ""}`}>
       <div className="mx-auto max-w-[1400px]">
-        <p className="num mb-10 text-xs text-mute">
-          {n} <span className="mx-2 text-rule">/</span> {title}
-        </p>
+        <Reveal>
+          <p className="num mb-10 text-xs text-mute">
+            {n} <span className="mx-2 text-rule">/</span> {title}
+          </p>
+        </Reveal>
         {children}
       </div>
     </section>
@@ -292,12 +298,12 @@ function Act({
 
 function Stat({ v, k, tone = "ink" }: { v: string; k: string; tone?: "ink" | "ember" }) {
   return (
-    <div>
+    <Reveal>
       <dt className="sr-only">{k}</dt>
       <dd>
         <Numeral value={v} size="xl" tone={tone} />
         <p className="mt-2 max-w-[30ch] text-sm leading-relaxed text-mute">{k}</p>
       </dd>
-    </div>
+    </Reveal>
   );
 }

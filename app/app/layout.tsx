@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, Newsreader, Outfit } from "next/font/google";
 import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
-import { SiteFooter } from "@/components/SiteFooter";
+import { ConditionalFooter } from "@/components/SiteChrome";
 
 /**
  * Type system, three roles, no more.
@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh bg-paper font-sans text-ink antialiased">
         <SiteNav />
         <main id="main">{children}</main>
-        <SiteFooter />
+        <ConditionalFooter />
       </body>
     </html>
   );
