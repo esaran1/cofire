@@ -1,27 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getJson } from "@/lib/api";
-
-type Meta = {
-  shipping_arm: string;
-  shipping_arm_basis: string;
-  resolution_m: number;
-  resolution_note: string;
-  disclaimer: string;
-  manifest: { sources?: Array<{ name: string; state: string; note: string; optional?: boolean }> };
-  manifest_hash: string | null;
-  git_sha: string | null;
-  status: string;
-  hindcast_looks: Array<{ config_hash: string; look_index: number; timestamp: string }>;
-};
+import { Meta, getParsed } from "@/lib/api";
+import { MetaSchema } from "@/lib/schemas";
 
 export default function AboutPage() {
   const [meta, setMeta] = useState<Meta | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    getJson<Meta>("/meta")
+    getParsed("/meta", MetaSchema)
       .then(setMeta)
       .catch((e: Error) => setErr(e.message));
   }, []);

@@ -3,7 +3,9 @@
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { API } from "@/lib/api";
+import { API, LeaderRow, getParsed, postParsed } from "@/lib/api";
+import { LeaderRowSchema, MetaSchema, PredictionSchema } from "@/lib/schemas";
+import { z } from "zod";
 import { deviceId } from "@/lib/device";
 import {
   Action,
@@ -42,33 +44,29 @@ function BeatInner() {
   const [band, setBand] = useState("high");
   const [locked, setLocked] = useState<Locked | null>(null);
   const [mine, setMine] = useState<Pick[] | null>(null);
-  const [board, setBoard] = useState<{ device_id: string; picks: number }[] | null>(null);
+  const [board, setBoard] = useState<LeaderRow[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const refresh = useCallback(() => {
     const id = deviceId();
-    fetch(`${API}/predictions/me?device_id=${id}`)
-      .then((r) => r.json())
+    getParsed(`/predictions/me?device_id=${id}`, z.array(z.object({ id: z.string().nullish() }).passthrough()))
       .then((d) => {
-        setMine(d);
+        setMine(d as unknown as Pick[]);
         setOffline(false);
       })
       .catch(() => setOffline(true));
-    fetch(`${API}/leaderboard`)
-      .then((r) => r.json())
+    getParsed("/leaderboard", z.array(LeaderRowSchema))
       .then(setBoard)
       .catch(() => setBoard([]));
   }, []);
 
   useEffect(() => {
     if (!cell) {
-      fetch(`${API}/meta`)
-        .then((r) => r.json())
+      getParsed("/meta", MetaSchema)
         .then((m) => {
-          const c = m?.center as [number, number] | undefined;
-          if (c) setCell(`${c[1].toFixed(4)}_${c[0].toFixed(4)}`);
+          if (m.center) setCell(`${m.center[1].toFixed(4)}_${m.center[0].toFixed(4)}`);
         })
         .catch(() => undefined);
     }
@@ -80,19 +78,11 @@ function BeatInner() {
     setErr(null);
     setBusy(true);
     try {
-      const res = await fetch(`${API}/predictions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          device_id: deviceId(),
-          cell_id: cell,
-          horizon: 4,
-          drought_category: cat,
-          fire_band: band,
-        }),
-      });
-      if (!res.ok) throw new Error(`Could not lock your pick (${res.status}).`);
-      const body = await res.json();
+      const body = await postParsed(
+        "/predictions",
+        { device_id: deviceId(), cell_id: cell, horizon: 4, drought_category: cat, fire_band: band },
+        PredictionSchema,
+      );
       setLocked((body.locked_model ?? {}) as Locked);
       refresh();
     } catch (e) {

@@ -3,7 +3,9 @@
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { API } from "@/lib/api";
+import { API, Nudge, Observation, getParsed, postParsed } from "@/lib/api";
+import { ObservationAckSchema, ObservationSchema, MetaSchema } from "@/lib/schemas";
+import { z } from "zod";
 import { deviceId } from "@/lib/device";
 import {
   Action,
@@ -24,8 +26,7 @@ const TYPES = [
   { value: "vegetation_green", label: "Still green" },
 ];
 
-type Obs = { id: string; lat: number; lon: number; type: string; note?: string; created_at?: string };
-type Nudge = { delta_drought: number; delta_fire: number; source: string };
+
 
 function ObserveInner() {
   const params = useSearchParams();
@@ -36,14 +37,13 @@ function ObserveInner() {
   const [note, setNote] = useState("");
   const [photo, setPhoto] = useState<string>("");
   const [nudge, setNudge] = useState<Nudge | null>(null);
-  const [rows, setRows] = useState<Obs[] | null>(null);
+  const [rows, setRows] = useState<Observation[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(() => {
-    fetch(`${API}/observations`)
-      .then((r) => r.json())
+    getParsed("/observations", z.array(ObservationSchema))
       .then((d) => {
         setRows(d);
         setOffline(false);
@@ -56,13 +56,11 @@ function ObserveInner() {
 
   useEffect(() => {
     if (!lat || !lon) {
-      fetch(`${API}/meta`)
-        .then((r) => r.json())
+      getParsed("/meta", MetaSchema)
         .then((m) => {
-          const c = m?.center as [number, number] | undefined;
-          if (c) {
-            setLon(c[0].toFixed(3));
-            setLat(c[1].toFixed(3));
+          if (m.center) {
+            setLon(m.center[0].toFixed(3));
+            setLat(m.center[1].toFixed(3));
           }
         })
         .catch(() => undefined);
@@ -75,21 +73,12 @@ function ObserveInner() {
     setErr(null);
     setBusy(true);
     try {
-      const res = await fetch(`${API}/observations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          device_id: deviceId(),
-          lat: Number(lat),
-          lon: Number(lon),
-          type,
-          note,
-          photo_path: photo,
-        }),
-      });
-      if (!res.ok) throw new Error(`Could not file that report (${res.status}).`);
-      const body = await res.json();
-      setNudge(body.nudge as Nudge);
+      const body = await postParsed(
+        "/observations",
+        { device_id: deviceId(), lat: Number(lat), lon: Number(lon), type, note, photo_path: photo },
+        ObservationAckSchema,
+      );
+      setNudge(body.nudge ?? null);
       setNote("");
       setPhoto("");
       load();

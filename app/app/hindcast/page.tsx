@@ -1,58 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API, getJson } from "@/lib/api";
-
-type CoverageRow = {
-  split: string;
-  method: string;
-  horizon: number;
-  coverage: number;
-  width: number;
-  n: number;
-};
-
-type Summary = {
-  comparison: string;
-  coverage_rows: CoverageRow[];
-  nominal: number;
-  look_index: number;
-  contaminated: boolean;
-  contamination_note: string;
-};
-
-type Fire = {
-  name: string;
-  discovery: string;
-  acres: number;
-  in_domain: boolean;
-  h2_pct_rank: number | null;
-  h4_pct_rank: number | null;
-  h8_pct_rank: number | null;
-};
-
-type FiresPayload = {
-  fires: Fire[];
-  control: { n?: number; mean_pct_rank?: Record<string, number> };
-  n_in_domain: number;
-  threshold_acres: number;
-  note: string;
-};
+import { API, FiresPayload, HindcastSummary, getParsed } from "@/lib/api";
+import { FiresPayloadSchema, HindcastSummarySchema } from "@/lib/schemas";
 
 function pct(v: number | null | undefined): string {
   return v === null || v === undefined ? "-" : v.toFixed(1);
 }
 
 export default function HindcastPage() {
-  const [sum, setSum] = useState<Summary | null>(null);
+  const [sum, setSum] = useState<HindcastSummary | null>(null);
   const [fp, setFp] = useState<FiresPayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    getJson<Summary>("/hindcast/summary")
+    getParsed("/hindcast/summary", HindcastSummarySchema)
       .then(setSum)
       .catch((e: Error) => setErr(e.message));
-    getJson<FiresPayload>("/hindcast/fires")
+    getParsed("/hindcast/fires", FiresPayloadSchema)
       .then(setFp)
       .catch(() => setFp(null));
   }, []);

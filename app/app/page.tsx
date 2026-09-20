@@ -6,7 +6,8 @@ import { MapView } from "@/components/MapView";
 import { PlaceCard } from "@/components/PlaceCard";
 import { TimeScrubber } from "@/components/TimeScrubber";
 import { UncertaintyChip } from "@/components/UncertaintyBadge";
-import { API, Place, UncertaintyStatus, getJson } from "@/lib/api";
+import { API, Place, UncertaintyStatus, getParsed } from "@/lib/api";
+import { IssuesSchema, MetaSchema, PlaceSchema, UncertaintySchema } from "@/lib/schemas";
 import { set } from "idb-keyval";
 
 export default function HomePage() {
@@ -23,13 +24,13 @@ export default function HomePage() {
   const [unc, setUnc] = useState<UncertaintyStatus | null>(null);
 
   useEffect(() => {
-    getJson<{ issues: string[] }>("/forecast/issues")
+    getParsed("/forecast/issues", IssuesSchema)
       .then((d) => {
         setIssues(d.issues);
         setIssue(d.issues[d.issues.length - 1] ?? "");
       })
       .catch((e: Error) => setErr(e.message));
-    getJson<{ resolution_m: number; resolution_note: string; shipping_arm: string }>("/meta")
+    getParsed("/meta", MetaSchema)
       .then((d) => {
         setResolutionM(d.resolution_m || 4000);
         setResolutionNote(d.resolution_note ?? "");
@@ -39,7 +40,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    getJson<UncertaintyStatus>(`/uncertainty/status${issue ? `?issue=${issue}` : ""}`)
+    getParsed(`/uncertainty/status${issue ? `?issue=${issue}` : ""}`, UncertaintySchema)
       .then(setUnc)
       .catch(() => setUnc(null));
   }, [issue]);
@@ -48,7 +49,7 @@ export default function HomePage() {
     async (lat: number, lon: number) => {
       try {
         const q = `/forecast?lat=${lat}&lon=${lon}${issue ? `&issue=${issue}` : ""}`;
-        const p = await getJson<Place>(q);
+        const p = await getParsed(q, PlaceSchema);
         setPlace(p);
         await set("last_place", p);
       } catch (e) {

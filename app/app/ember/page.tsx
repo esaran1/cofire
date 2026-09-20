@@ -2,21 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { API } from "@/lib/api";
+import { API, Checklist, EmberItem, getParsed, postParsed } from "@/lib/api";
+import { ChecklistSchema } from "@/lib/schemas";
 import { deviceId } from "@/lib/device";
 import { Action, ErrorNote, Numeral, OfflineNote, Panel, Segmented, Skeleton } from "@/components/ui/Controls";
-
-type Item = {
-  id: string;
-  label: string;
-  cost: string;
-  rationale: string;
-  source: string;
-  group: string;
-  group_label: string;
-  item_weight: number;
-};
-type Checklist = { score: number; zone: string; items: Item[] };
 
 const ZONES = [
   { value: "wui", label: "Wildland edge" },
@@ -27,6 +16,7 @@ const COST_LABEL: Record<string, string> = {
   free: "Free",
   under_100: "Under $100",
   over_100: "Over $100",
+  contractor: "Contractor",
 };
 
 function Ring({ score }: { score: number }) {
@@ -71,8 +61,7 @@ export default function EmberPage() {
 
   const load = useCallback((z: string) => {
     setData(null);
-    fetch(`${API}/ember/checklist?zone=${z}`)
-      .then((r) => r.json())
+    getParsed(`/ember/checklist?zone=${z}`, ChecklistSchema)
       .then((d) => {
         setData(d);
         setOffline(false);
@@ -88,13 +77,7 @@ export default function EmberPage() {
     setBusy(true);
     setErr(null);
     try {
-      const res = await fetch(`${API}/ember/state`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ device_id: deviceId(), zone, state: next }),
-      });
-      if (!res.ok) throw new Error(`Could not save that change (${res.status}).`);
-      setData(await res.json());
+      setData(await postParsed("/ember/state", { device_id: deviceId(), zone, state: next }, ChecklistSchema));
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Could not save that change.");
     } finally {
@@ -119,7 +102,7 @@ export default function EmberPage() {
 
   const groups = useMemo(() => {
     if (!data) return [];
-    const by = new Map<string, { label: string; items: Item[] }>();
+    const by = new Map<string, { label: string; items: EmberItem[] }>();
     for (const it of data.items) {
       const g = by.get(it.group) ?? { label: it.group_label, items: [] };
       g.items.push(it);
