@@ -111,6 +111,18 @@ def write_comparison(
     return out_dir / "comparison.md"
 
 
+def _overall(block: object, method: str, horizon: int = 4) -> tuple[float, float]:
+    if not isinstance(block, dict):
+        return float("nan"), float("nan")
+    blob = block.get(method)
+    if not isinstance(blob, dict):
+        return float("nan"), float("nan")
+    for row in blob.get("rows", []):
+        if row.get("stratum") == "overall" and int(row.get("horizon", -1)) == horizon:
+            return float(row.get("coverage", float("nan"))), float(row.get("width", float("nan")))
+    return float("nan"), float("nan")
+
+
 def _markdown(payload: dict[str, object]) -> str:
     lines = [
         "# Conformal vs bootstrap",
@@ -120,11 +132,40 @@ def _markdown(payload: dict[str, object]) -> str:
         "Conformal `qhat` is frozen on the same split; ACI updates alpha online.",
         "Neither method is tuned on the 2026 hindcast.",
         "",
-        "2026 Colorado drought expanded sharply relative to the training record "
-        "(USDM area in D0+ rose from roughly half the state to nearly all of it). "
-        "That shift is the coverage stress test.",
+        "2026 is treated as a distribution-shift test. Coverage is reported, not retuned.",
         "",
     ]
+    cal = payload.get("calibrate")
+    hc = payload.get("hindcast")
+    cc, cw = _overall(cal, "conformal")
+    bc, bw = _overall(cal, "bootstrap")
+    lines.append(
+        f"On the 2024–2025 calibration split, conformal 4-week ERC coverage is {cc:.3f} "
+        f"(target {COVERAGE_TARGET:.2f}, mean width {cw:.2f}); bootstrap coverage is {bc:.3f} (mean width {bw:.2f})."
+    )
+    if isinstance(hc, dict):
+        hcc, hcw = _overall(hc, "conformal")
+        hbc, hbw = _overall(hc, "bootstrap")
+        lines.append(
+            f"On the 2026 hindcast, conformal 4-week ERC coverage is {hcc:.3f} (mean width {hcw:.2f}); "
+            f"bootstrap coverage is {hbc:.3f} (mean width {hbw:.2f})."
+        )
+        miss = abs(hcc - COVERAGE_TARGET) if np.isfinite(hcc) else float("nan")
+        if np.isfinite(miss) and miss > 0.03:
+            lines.append(
+                f"Conformal hindcast coverage misses the 0.90 target by {100.0 * miss:.1f} points. "
+                "Whether the ACI learning rate (0.01) is too slow for weekly steps is a pre-registered follow-up, "
+                "not a post-hindcast fix."
+            )
+        elif np.isfinite(hcc) and np.isfinite(hbc) and abs(hcc - COVERAGE_TARGET) <= 0.03 and abs(hbc - COVERAGE_TARGET) <= 0.03:
+            lines.append("Both methods held near 0.90 on 2026. The conformal-vs-bootstrap contrast is not the story here.")
+        elif np.isfinite(hcc) and np.isfinite(hbc) and abs(hcc - COVERAGE_TARGET) <= 0.03 < abs(hbc - COVERAGE_TARGET):
+            lines.append("Conformal held near 0.90 on 2026; bootstrap did not.")
+        elif np.isfinite(hcc) and np.isfinite(hbc) and abs(hbc - COVERAGE_TARGET) <= 0.03 < abs(hcc - COVERAGE_TARGET):
+            lines.append("Bootstrap held near 0.90 on 2026; conformal did not.")
+    else:
+        lines.append("Hindcast coverage is not in this file yet.")
+    lines.append("")
     for split in ("calibrate", "hindcast"):
         block = payload.get(split)
         if not isinstance(block, dict):
@@ -143,9 +184,9 @@ def _markdown(payload: dict[str, object]) -> str:
                 if stratum != "overall" and not stratum.startswith("usdm=") and not stratum.startswith("month="):
                     continue
                 cov = row["coverage"]
-                cov_s = "nan" if cov != cov else f"{cov:.3f}"
+                cov_s = "nan" if not isinstance(cov, (int, float)) or cov != cov else f"{float(cov):.3f}"
                 w = row["width"]
-                w_s = "nan" if w != w else f"{w:.2f}"
+                w_s = "nan" if not isinstance(w, (int, float)) or w != w else f"{float(w):.2f}"
                 lines.append(
                     f"| {method} | {row['horizon']} | {row['stratum']} | {cov_s} | {w_s} | {row['n']} |"
                 )

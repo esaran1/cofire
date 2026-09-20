@@ -8,7 +8,9 @@ qhat/widths are frozen after the calibrate split; hindcast is evaluation only.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -59,13 +61,47 @@ def bootstrap_interval(
 def attach_bootstrap(frame: pd.DataFrame, state: BootstrapState, arm: str) -> pd.DataFrame:
     rng = np.random.default_rng(state.seed)
     out = frame.copy()
+    q = 0.90
+    lo_q = (1.0 - q) / 2.0
+    hi_q = 1.0 - lo_q
     for h in HORIZONS_WEEKS:
-        resid = state.residuals.get((arm, h), np.asarray([]))
-        los, his = [], []
-        for point in out.get(f"erc_pct_h{h}_hat", pd.Series(np.nan, index=out.index)):
-            lo, hi = bootstrap_interval(float(point), resid, state.n_samples, rng)
-            los.append(lo)
-            his.append(hi)
-        out[f"erc_pct_h{h}_boot_lo"] = los
-        out[f"erc_pct_h{h}_boot_hi"] = his
+        resid = state.residuals.get((arm, h), np.asarray([], dtype=float))
+        points = pd.to_numeric(out.get(f"erc_pct_h{h}_hat", pd.Series(np.nan, index=out.index)), errors="coerce").to_numpy(
+            dtype=float
+        )
+        n = int(points.size)
+        if resid.size == 0 or n == 0:
+            out[f"erc_pct_h{h}_boot_lo"] = np.nan
+            out[f"erc_pct_h{h}_boot_hi"] = np.nan
+            continue
+        draws = rng.choice(resid, size=(n, state.n_samples), replace=True)
+        sim = points[:, None] + draws
+        lo = np.quantile(sim, lo_q, axis=1)
+        hi = np.quantile(sim, hi_q, axis=1)
+        bad = ~np.isfinite(points)
+        lo[bad] = np.nan
+        hi[bad] = np.nan
+        out[f"erc_pct_h{h}_boot_lo"] = lo
+        out[f"erc_pct_h{h}_boot_hi"] = hi
     return out
+
+
+def save_bootstrap(state: BootstrapState, path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+    payload = {f"{arm}|{h}": arr.tolist() for (arm, h), arr in state.residuals.items()}
+    (path / "bootstrap.json").write_text(
+        json.dumps({"n_samples": state.n_samples, "seed": state.seed, "residuals": payload})
+    )
+
+
+def load_bootstrap(path: Path) -> BootstrapState:
+    meta = json.loads((path / "bootstrap.json").read_text())
+    resid: dict[tuple[str, int], np.ndarray] = {}
+    for key, arr in meta["residuals"].items():
+        arm, h = str(key).rsplit("|", 1)
+        resid[(arm, int(h))] = np.asarray(arr, dtype=float)
+    return BootstrapState(
+        residuals=resid,
+        n_samples=int(meta["n_samples"]),
+        seed=int(meta["seed"]),
+    )
