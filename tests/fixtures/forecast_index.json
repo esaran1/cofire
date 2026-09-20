@@ -1,0 +1,48 @@
+{
+  "resolution_m": 4000,
+  "resolution_note": "gridMET native ~4 km cells. Downscaling to 10–30 m is off.",
+  "shipping_arm": "lightgbm",
+  "issues": ["2026-05-05", "2026-05-12"],
+  "cells": [
+    {
+      "cell_id": "40.5417_-105.0833",
+      "lat": 40.5417,
+      "lon": -105.0833,
+      "issue": "2026-05-05",
+      "resolution_m": 4000,
+      "shipping_arm": "lightgbm",
+      "why": [
+        {"group": "precipitation_deficit", "label": "precipitation deficit", "value": 0.32, "text": "Precipitation has been running below this cell's own normal.", "sign": "pos", "top_feature": "spi_90"},
+        {"group": "snowpack", "label": "snowpack", "value": 0.18, "text": "Basin snowpack is below median for this date, so soils will dry faster.", "sign": "pos", "top_feature": "swe_pct_median"},
+        {"group": "soil_dryness", "label": "soil dryness", "value": 0.22, "text": "1,000-hour fuels are drier than this cell's seasonal mean.", "sign": "pos", "top_feature": "fm1000_anom"},
+        {"group": "vegetation_fuel_dryness", "label": "vegetation and fuel dryness", "value": 0.21, "text": "Energy release and live-fuel dryness are elevated versus this cell's climatology.", "sign": "pos", "top_feature": "erc_pct"},
+        {"group": "heat", "label": "heat", "value": 0.07, "text": "Maximum temperatures are running hot relative to this week of year.", "sign": "pos", "top_feature": "tmmx_anom"}
+      ],
+      "horizons": {
+        "2": {"drought_point": 1.2, "drought_set": [1, 2], "fire_index": 58.0, "fire_lo": 44.0, "fire_hi": 71.0, "confidence": 0.73, "alpha": 0.1},
+        "4": {"drought_point": 1.8, "drought_set": [1, 2, 3], "fire_index": 64.0, "fire_lo": 48.0, "fire_hi": 79.0, "confidence": 0.69, "alpha": 0.1},
+        "8": {"drought_point": 2.1, "drought_set": [1, 2, 3], "fire_index": 70.0, "fire_lo": 51.0, "fire_hi": 86.0, "confidence": 0.65, "alpha": 0.12}
+      }
+    },
+    {
+      "cell_id": "40.5833_-105.1250",
+      "lat": 40.5833,
+      "lon": -105.125,
+      "issue": "2026-05-05",
+      "resolution_m": 4000,
+      "shipping_arm": "lightgbm",
+      "why": [
+        {"group": "precipitation_deficit", "label": "precipitation deficit", "value": -0.1, "text": "Recent precipitation is above this cell's own normal.", "sign": "neg", "top_feature": "pr_roll13"},
+        {"group": "snowpack", "label": "snowpack", "value": -0.2, "text": "Basin snowpack is above median for this date.", "sign": "neg", "top_feature": "swe_pct_median"},
+        {"group": "soil_dryness", "label": "soil dryness", "value": 0.15, "text": "1,000-hour fuels are drier than this cell's seasonal mean.", "sign": "pos", "top_feature": "fm1000_anom"},
+        {"group": "vegetation_fuel_dryness", "label": "vegetation and fuel dryness", "value": 0.4, "text": "Energy release and live-fuel dryness are elevated versus this cell's climatology.", "sign": "pos", "top_feature": "erc_pct"},
+        {"group": "heat", "label": "heat", "value": 0.15, "text": "Maximum temperatures are running hot relative to this week of year.", "sign": "pos", "top_feature": "tmmx_anom"}
+      ],
+      "horizons": {
+        "2": {"drought_point": 0.4, "drought_set": [0, 1], "fire_index": 41.0, "fire_lo": 30.0, "fire_hi": 55.0, "confidence": 0.75, "alpha": 0.1},
+        "4": {"drought_point": 0.7, "drought_set": [0, 1], "fire_index": 47.0, "fire_lo": 33.0, "fire_hi": 62.0, "confidence": 0.71, "alpha": 0.1},
+        "8": {"drought_point": 1.0, "drought_set": [0, 1, 2], "fire_index": 52.0, "fire_lo": 36.0, "fire_hi": 70.0, "confidence": 0.66, "alpha": 0.11}
+      }
+    }
+  ]
+}

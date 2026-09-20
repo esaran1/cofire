@@ -1,0 +1,35 @@
+# Decisions (v0 + v0.2)
+
+- Next.js lives at repo-root `app/`; Python packages are `cofire.model` and `cofire.api` (matches `mypy --strict cofire/model`).
+- Dev-subset splits (2019–2026, not 2004–2021): train 2019–2022, validate 2023, calibrate 2024–2025, hindcast 2026. Fetch 2018 as a 365-day warmup for SPI/rolling windows.
+- Week index is USDM Tuesday (W-TUE, label right). Issue date = that Tuesday; features may use data through that date inclusive.
+- USDM ordinal: shapefile `DM` 0–4 (D0–D4) unchanged; unmapped cells (None) → 0, so None and D0 share 0 as specified.
+- gridMET via the Climatology Lab yearly NetCDF4 file server (`www.northwestknowledge.net/metdata/data`), spatially subset with HDF5 byte-range reads so CONUS files are never stored. THREDDS NCSS (port 8080) is documented as a fallback but was unreachable from this environment.
+- USDM yearly `YYYY_USDM_M.zip` contains nested weekly zips (`USDM_YYYYMMDD_M.zip`), not loose shapefiles. Rasterize opens the inner zip per Tuesday.
+- "Replay May 1" uses issue date 2026-05-05 (first USDM Tuesday in May 2026) so 4w/8w land in June.
+- Fire overlay: NIFC 2026 CO perimeters > 1000 acres. If none intersect Larimer, the map says so; the fire table still lists statewide qualifying fires.
+- Conformal quantile `qhat` is frozen on the calibrate split; only ACI alpha updates online. Hindcast coverage is reported, never used to retune `qhat`.
+- Fire-spread condition index = mean(ERC percentile, BI percentile), post hoc, not a third trained target.
+- Observation feature weights are documented constants; the UI nudge is a cached model delta from bumping a count by 1, never an animation.
+- Identity is an anonymous `device_id` in localStorage; no accounts.
+- Tile demo uses pre-rendered PNG overlays plus COGs; rio-tiler serves COG tiles when present.
+- Optional SMAP/VIIRS/HRRR/RAWS/NFMD are skipped unless a key is present and the fetch succeeds.
+- OpenFreeMap dark style for the basemap (no API key); Carto dark raster tiles as fallback.
+- `DATABASE_URL` (or `COFIRE_DATABASE_URL`) selects SQLite by default, Postgres when set.
+- If TIGER is unreachable, Larimer/Colorado bounding boxes fall back to Census-published extents hard-coded as constants (not invented geometry).
+- ERC NCSS variable is `energy_release_component-g`; BI is `burning_index_g` (gridMET 2024 catalog).
+- SNOTEL station list is filtered client-side to `stateCode=CO` and `networkCode=SNTL` because the AWDB list endpoint ignores network filters.
+- Percent-of-median SWE uses training-window medians by station and day-of-year (leakage rule), not a 1991–2020 climate normal.
+- D4 is kept as 4 (already the top of 0–4). P(category ≥ 2) = D2 or worse; P(category ≥ 3) = D3 or worse.
+- `make demo` forces `COFIRE_DEV_SUBSET=1`. Statewide is an explicit `COFIRE_DEV_SUBSET=0`.
+- Git SHA in metrics is `"uncommitted"` when HEAD is missing.
+- CI uses committed tiny forecast fixtures; no network in pytest/Playwright.
+- PI-ConvLSTM tiles are 32×32 with 8-cell overlap (stride 24). Larimer (~16×30) is padded to one 32×32 tile; loss is masked to valid cells.
+- Hydro coefficient `k` is the 99th percentile of week-over-week `(-fm1000_anom) / pet` on the training split, positives only. Not tuned on val/hindcast.
+- Fuel bound `f(vpd, precip_28d)` is OLS on the training split with signs clipped to be monotone (df/dVPD ≤ 0, df/dprecip ≥ 0). Not retuned later.
+- λ_hydro = λ_fuel = 0.1 a priori. Three reported configs: (0,0), (0.1,0), (0.1,0.1). No λ search on val or hindcast.
+- Bootstrap intervals are residual bootstrap (300 draws of calibrate-split residuals added to the point forecast), the same residual pool for both arms so the comparison is not confounded by retraining cost.
+- Shipping arm = lowest validation ERC-percentile MAE, ties broken by drought MAE. Named in About and metrics.md.
+- Why bars = grouped TreeSHAP of the LightGBM ERC-percentile model at the selected horizon, even if ConvLSTM ships, labeled as LightGBM attribution.
+- HLS / Sentinel-2 10–30 m downscaling is `COFIRE_ENABLE_HLS=0` by default; UI legend always prints the displayed resolution (4000 m unless the flag is on and a downscaled layer actually loaded).
+- Copy lint forbids "predicts fires", "where fires will happen", "fire prediction" in app/ and docs/.

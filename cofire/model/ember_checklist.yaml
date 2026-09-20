@@ -1,0 +1,110 @@
+zone0_vents:
+  label: Zone 0 and vents
+  weight: 0.40
+  items:
+    - id: 0_5_noncombustible
+      label: Noncombustible surface in the first 0–5 feet
+      cost: under_100
+      zone_applicability: [urban, wui]
+      rationale: Embers ignite mulch and debris against the walls long before a flame front arrives.
+      source: IBHS Wildfire Prepared Home
+    - id: vents_mesh
+      label: 1/8-inch metal mesh on vents
+      cost: under_100
+      zone_applicability: [urban, wui]
+      rationale: Unscreened vents are an ember pathway into attics and crawlspaces.
+      source: IBHS Wildfire Prepared Home
+    - id: gutters_clean
+      label: Gutters and roof valleys free of needles
+      cost: free
+      zone_applicability: [urban, wui]
+      rationale: Accumulated litter is an ember receptor on the roof edge.
+      source: IBHS Wildfire Prepared Home
+    - id: no_firewood_walls
+      label: Firewood and lumber stored away from the walls
+      cost: free
+      zone_applicability: [urban, wui]
+      rationale: Stacked wood against siding is a structure-adjacent fuel bed.
+      source: Colorado wildfire resiliency code
+structure:
+  label: Structure
+  weight: 0.20
+  items:
+    - id: roof_class_a
+      label: Class A roof covering
+      cost: contractor
+      zone_applicability: [urban, wui]
+      rationale: Roof covering rating is the highest-leverage structure variable in ember storms.
+      source: IBHS Wildfire Prepared Home
+    - id: ember_resistant_eaves
+      label: Enclosed or ember-resistant eaves
+      cost: contractor
+      zone_applicability: [wui]
+      rationale: Open eave channels collect embers and expose fascia.
+      source: IBHS Wildfire Prepared Home
+    - id: dual_pane_windows
+      label: Dual-pane or tempered windows
+      cost: contractor
+      zone_applicability: [urban, wui]
+      rationale: Single-pane glass fails under radiant heat and lets embers inside.
+      source: Colorado wildfire resiliency code
+defensible_space:
+  label: Defensible space
+  weight: 0.20
+  items:
+    - id: 5_30_trees
+      label: Trees in 5–30 feet spaced so canopies do not touch
+      cost: free
+      zone_applicability: [wui]
+      rationale: Continuous canopy carries fire to the structure.
+      source: Colorado wildfire resiliency code
+    - id: grass_mowed
+      label: Grass within 30 feet kept short
+      cost: free
+      zone_applicability: [urban, wui]
+      rationale: Cured grass is a fast fine-fuel pathway.
+      source: IBHS Wildfire Prepared Home
+    - id: propane_clear
+      label: Vegetation cleared around propane tanks
+      cost: free
+      zone_applicability: [wui]
+      rationale: Tanks are ignition sources if vegetation burns under them.
+      source: Colorado wildfire resiliency code
+ignition_behavior:
+  label: Ignition behavior
+  weight: 0.10
+  items:
+    - id: no_burn_red_flag
+      label: No debris burning on red-flag days
+      cost: free
+      zone_applicability: [urban, wui]
+      rationale: Human ignitions cluster on high-ERC, high-wind days.
+      source: Colorado wildfire resiliency code
+    - id: spark_arrestor
+      label: Spark arrestor on chimneys and outdoor burners
+      cost: under_100
+      zone_applicability: [urban, wui]
+      rationale: Unarrested sparks are embers leaving the property.
+      source: IBHS Wildfire Prepared Home
+readiness:
+  label: Readiness
+  weight: 0.10
+  items:
+    - id: go_bag
+      label: Household go-bag packed
+      cost: free
+      zone_applicability: [urban, wui]
+      rationale: Evacuation time shrinks when ember showers start.
+      source: Colorado wildfire resiliency code
+    - id: address_visible
+      label: Address numbers visible from the street
+      cost: under_100
+      zone_applicability: [urban, wui]
+      rationale: Responders cannot defend a house they cannot find.
+      source: IBHS Wildfire Prepared Home
+    - id: hose_reach
+      label: Outdoor hose can reach Zone 0
+      cost: under_100
+      zone_applicability: [urban, wui]
+      rationale: A reachable hose lets residents wet ember receptors before leaving if they choose to.
+      source: IBHS Wildfire Prepared Home
