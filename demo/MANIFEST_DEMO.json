@@ -1,0 +1,40 @@
+{
+  "files": {
+    "forecast_index.json": 1841720,
+    "metrics.json": 22645,
+    "metrics.md": 10481,
+    "sanity.json": 8814,
+    "sanity.md": 2629,
+    "shipping_arm.txt": 8,
+    "runtime.json": 1032,
+    "why.json": 530201,
+    "hindcast/fires.json": 11650,
+    "hindcast/fires.md": 3193,
+    "hindcast/control.json": 275,
+    "hindcast/run_log.json": 362,
+    "hindcast/coverage.png": 47299,
+    "uncertainty/comparison.json": 16088,
+    "uncertainty/comparison.md": 5430,
+    "uncertainty/coverage_2026.png": 68850,
+    "uncertainty/multiregime.json": 138510,
+    "uncertainty/multiregime.md": 8638,
+    "uncertainty/regime_pool.json": 258,
+    "uncertainty/diagnosis.md": 6989,
+    "uncertainty/leak_check.md": 5664,
+    "lodo/folds.json": 9837,
+    "lodo/lodo.md": 5200,
+    "lodo/coverage.json": 1746,
+    "profile/throughput.md": 3818,
+    "features/year=2026.parquet": 4837263,
+    "MANIFEST.json": 3756
+  },
+  "bytes": 7593415,
+  "issues_kept": [
+    "2026-09-22",
+    "2026-05-05"
+  ],
+  "cells_kept": 864,
+  "megabytes": 7.6,
+  "under_cap": true,
+  "cap_mb": 200
+}

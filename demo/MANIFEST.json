@@ -1,0 +1,118 @@
+{
+  "written_at": "2026-09-20T20:18:45.662866+00:00",
+  "hash": "ec21777b791c57a0295143b43cf551652c08149efe52a05354b00bddd414d18c",
+  "sources": [
+    {
+      "name": "gridMET",
+      "state": "ok",
+      "url": "https://www.northwestknowledge.net/metdata/data",
+      "path": "data/processed_pueblo/gridmet",
+      "checksum": "7e05893f3e05136e506ac699638cb5e1bbcad474dd3c9d3d94a23d0a1801e9e2",
+      "note": "fetched=117 failed=[] source=file-server-subset",
+      "optional": false,
+      "records": null,
+      "extra": {
+        "failed": []
+      }
+    },
+    {
+      "name": "boundaries",
+      "state": "ok",
+      "url": "https://www2.census.gov/geo/tiger/GENZ2023/shp/cb_2023_us_county_500k.zip",
+      "path": "data/processed_pueblo/boundaries",
+      "checksum": "f712d227d7f3d18c904f8731650a7a48578fa7bb7432eb03e6c1ef1012462d71",
+      "note": "counties=ok; huc8=ok",
+      "optional": false,
+      "records": null,
+      "extra": {}
+    },
+    {
+      "name": "US Drought Monitor",
+      "state": "ok",
+      "url": "https://droughtmonitor.unl.edu/data/shapefiles_m/",
+      "path": "data/processed_pueblo/usdm/weekly.nc",
+      "checksum": "6affcdb00e6bc6e52fba781d49bb17ac764ad15de9dbaf86d3a5fe4081765cae",
+      "note": "yearly shapefiles rasterized",
+      "optional": false,
+      "records": null,
+      "extra": {}
+    },
+    {
+      "name": "NRCS SNOTEL",
+      "state": "ok",
+      "url": "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/stations",
+      "path": "data/processed_pueblo/snotel/swe_pct_median.nc",
+      "checksum": "e1f56c2621e9cf8b14e96d07473619da36b944bf4d313689fedf75be2039845e",
+      "note": "118 CO SNOTEL stations",
+      "optional": false,
+      "records": 118,
+      "extra": {}
+    },
+    {
+      "name": "USGS 3DEP",
+      "state": "ok",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+      "path": "data/processed_pueblo/elevation/grid.nc",
+      "checksum": "600604c203b8bc06ae7a1bc93309056e82435aed90ad7451a64131be000d634d",
+      "note": "mean and roughness on gridMET cells",
+      "optional": false,
+      "records": null,
+      "extra": {}
+    },
+    {
+      "name": "NIFC WFIGS",
+      "state": "ok",
+      "url": "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters_YearToDate/FeatureServer/0/query",
+      "path": "data/processed_pueblo/nifc/perimeters_2026.geojson",
+      "checksum": "33f05be9cdb23db7a1ea0ba8a9f339d2e25843bdf61d690b83ce50fb12e54005",
+      "note": "eval/overlay only; excluded from training features",
+      "optional": false,
+      "records": 25,
+      "extra": {}
+    },
+    {
+      "name": "NFMD",
+      "state": "skipped",
+      "url": "https://fems.fs2c.usda.gov/",
+      "path": null,
+      "checksum": null,
+      "note": "flag COFIRE_ENABLE_NFMD off",
+      "optional": true,
+      "records": null,
+      "extra": {}
+    },
+    {
+      "name": "Synoptic RAWS",
+      "state": "skipped",
+      "url": "https://api.synopticdata.com/v2/stations/timeseries",
+      "path": null,
+      "checksum": null,
+      "note": "no SYNOPTIC_TOKEN",
+      "optional": true,
+      "records": null,
+      "extra": {}
+    },
+    {
+      "name": "SMAP L4 / VIIRS NDVI",
+      "state": "skipped",
+      "url": "https://earthdata.nasa.gov/",
+      "path": null,
+      "checksum": null,
+      "note": "no Earthdata credentials",
+      "optional": true,
+      "records": null,
+      "extra": {}
+    },
+    {
+      "name": "HRRR (Herbie)",
+      "state": "skipped",
+      "url": "https://rapidrefresh.noaa.gov/hrrr/",
+      "path": null,
+      "checksum": null,
+      "note": "flag COFIRE_ENABLE_HRRR off",
+      "optional": true,
+      "records": null,
+      "extra": {}
+    }
+  ]
+}
