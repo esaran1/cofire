@@ -11,6 +11,8 @@ htmlcov/
 logs/
 data/raw/
 data/processed/
+# Subset-scoped processed stores (v0.6). Same rule as data/processed/.
+data/processed_*/
 data/cache/
 data/*.db
 data/*.db-journal
@@ -38,3 +40,13 @@ app/blob-report/
 .DS_Store
 uv.lock.bak
 /package-lock.json
+
+# Regenerable pipeline intermediates. The reports, metrics, run log and the
+# demo fixture are committed; the bulk parquet/JSON they were computed from is
+# not, because `make train calibrate export` rebuilds it.
+artifacts/predictions/
+artifacts/forecast_index.json
+artifacts/calibration/
+artifacts/training_stats.pkl
+artifacts/frontend/screens/*.png
+!artifacts/frontend/screens/.gitkeep

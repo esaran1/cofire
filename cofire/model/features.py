@@ -118,7 +118,7 @@ def add_calendar(frame: pd.DataFrame) -> pd.DataFrame:
 
 def add_lags_and_rolls(frame: pd.DataFrame) -> pd.DataFrame:
     """Per-cell lags of current-week aggregates and rolling precipitation sums."""
-    out = frame.sort_values(["cell_id", "time"]).copy()
+    out = frame.sort_values(["cell_id", "time"]).drop_duplicates(["cell_id", "time"], keep="last").copy()
     grouped = out.groupby("cell_id", sort=False)
     base_cols = [c for c in [*GRIDMET_MEAN_VARS, *GRIDMET_SUM_VARS] if c in out.columns]
     for lag in LAGS_WEEKS:
@@ -261,7 +261,7 @@ def transform(frame: pd.DataFrame, training_stats: TrainingStats) -> pd.DataFram
 
 def add_targets(frame: pd.DataFrame) -> pd.DataFrame:
     """Future USDM category and ERC percentile at each horizon. Shifts per cell."""
-    out = frame.sort_values(["cell_id", "time"]).copy()
+    out = frame.sort_values(["cell_id", "time"]).drop_duplicates(["cell_id", "time"], keep="last").copy()
     grouped = out.groupby("cell_id", sort=False)
     for h in HORIZONS_WEEKS:
         if "usdm" in out.columns:
@@ -326,12 +326,22 @@ def cubes_to_frame(settings: Settings | None = None) -> pd.DataFrame:
     grid_files = sorted((settings.processed_dir / "gridmet").glob("weekly_*.nc"))
     if not grid_files:
         raise FileNotFoundError("no gridMET weekly cubes — run `make data` first")
-    gm = xr.open_mfdataset([str(p) for p in grid_files], combine="by_coords")
+    opened = [xr.open_dataset(str(p)) for p in grid_files]
+    gm = xr.concat(opened, dim="time") if len(opened) > 1 else opened[0]
+    gm = gm.sortby("time")
+    # Yearly weekly cubes overlap by one Tuesday at each year boundary.
+    time_index = pd.Index(gm["time"].values)
+    gm = gm.isel(time=~time_index.duplicated(keep="last"))
     frame = gm.to_dataframe().reset_index()
+    for ds in opened:
+        ds.close()
     gm.close()
     frame = frame.rename(columns={"day": "time"})
     frame["time"] = pd.to_datetime(frame["time"])
-    frame["cell_id"] = frame.apply(lambda r: f"{float(r['lat']):.4f}_{float(r['lon']):.4f}", axis=1)
+    frame["cell_id"] = [
+        f"{float(lat):.4f}_{float(lon):.4f}"
+        for lat, lon in zip(frame["lat"].to_numpy(), frame["lon"].to_numpy(), strict=False)
+    ]
 
     def _merge_cube(path: Path, var: str) -> pd.DataFrame:
         if not path.exists():

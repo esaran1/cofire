@@ -30,7 +30,12 @@ class ElevationSource(DataSource):
         self._last = SourceStatus(name=self.name, state=SourceState.UNAVAILABLE, url=self.url, note="not fetched")
 
     def _raw_path(self) -> Path:
-        return self.settings.raw_dir / "elevation" / "3dep.tif"
+        # Downloaded with the bbox baked in, so scope it per subset (same trap as
+        # the gridMET raw cache).
+        name = "3dep.tif"
+        if self.settings.dev_subset and self.settings.subset_name != "larimer":
+            name = f"3dep_{self.settings.subset_name}.tif"
+        return self.settings.raw_dir / "elevation" / name
 
     def _out_path(self) -> Path:
         return self.settings.processed_dir / "elevation" / "grid.nc"

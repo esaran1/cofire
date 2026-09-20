@@ -129,7 +129,13 @@ class GridmetSource(DataSource):
         )
 
     def _year_var_path(self, year: int, short: str) -> Path:
-        return self.settings.raw_dir / "gridmet" / f"{short}_{year}.nc"
+        """Raw yearly extracts are bbox-clipped at download time, so they must be
+        scoped per dev subset. Sharing one cache across subsets silently re-serves
+        the first subset's geography to every later one."""
+        root = self.settings.raw_dir / "gridmet"
+        if self.settings.dev_subset and self.settings.subset_name != "larimer":
+            root = self.settings.raw_dir / f"gridmet_{self.settings.subset_name}"
+        return root / f"{short}_{year}.nc"
 
     def _weekly_path(self, year: int) -> Path:
         return self.settings.processed_dir / "gridmet" / f"weekly_{year}.nc"

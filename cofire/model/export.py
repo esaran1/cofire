@@ -50,7 +50,12 @@ def run_export() -> Path:
     log = setup_logging(settings.log_dir)
     arm = (settings.artifacts_dir / "shipping_arm.txt").read_text().strip() if (settings.artifacts_dir / "shipping_arm.txt").exists() else "lightgbm"
     pred_dir = settings.artifacts_dir / "predictions"
-    path = pred_dir / f"{arm}_hindcast_intervals.parquet"
+    # Prefer the scoring-free 2026 forecasts (cofire.model.forecast_issues): they
+    # carry intervals from the frozen calibrate pool and cost no holdout look.
+    # Fall back to the scored hindcast intervals only if that stage has not run.
+    path = pred_dir / f"{arm}_forecast_issues.parquet"
+    if not path.exists():
+        path = pred_dir / f"{arm}_hindcast_intervals.parquet"
     if not path.exists():
         path = pred_dir / f"{arm}_hindcast.parquet"
     cal = pred_dir / f"{arm}_calibrate_intervals.parquet"
@@ -60,7 +65,31 @@ def run_export() -> Path:
             frames.append(pd.read_parquet(p))
     if not frames:
         raise SystemExit("no predictions to export")
-    frame = pd.concat(frames, ignore_index=True)
+
+    # Drop any frame whose cells sit outside the active domain. The hindcast
+    # intervals parquet is written only by hindcast.py, which costs a holdout
+    # look, so after a subset move it can legitimately be stale. Mixing its
+    # cells with fresh ones silently produces a two-domain index and a map
+    # pointed at the wrong place, which is worse than exporting without it.
+    west, south, east, north = settings.bbox
+    kept = []
+    for f in frames:
+        if "lat" not in f.columns or f.empty:
+            continue
+        inside = ((f["lat"] >= south) & (f["lat"] <= north) & (f["lon"] >= west) & (f["lon"] <= east)).mean()
+        if inside < 0.5:
+            log.warning(
+                "export: dropping %s rows outside the %s bbox (%.0f%% inside); "
+                "re-run that stage for this subset",
+                len(f),
+                settings.subset_name,
+                inside * 100,
+            )
+            continue
+        kept.append(f)
+    if not kept:
+        raise SystemExit("no predictions inside the active bbox - re-run train/calibrate for this subset")
+    frame = pd.concat(kept, ignore_index=True)
     frame["time"] = pd.to_datetime(frame["time"])
 
     why_path = settings.artifacts_dir / "why.json"

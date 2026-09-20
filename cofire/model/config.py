@@ -14,7 +14,19 @@ COLORADO_BBOX: tuple[float, float, float, float] = (-109.06, 36.99, -102.04, 41.
 COLORADO_BBOX_BUFFERED: tuple[float, float, float, float] = (-109.56, 36.49, -101.54, 41.50)
 LARIMER_BBOX: tuple[float, float, float, float] = (-106.192, 40.324, -104.943, 40.998)
 LARIMER_FIPS = "08069"
+# Pueblo County: the Larimer-sized southern domain with the most in-domain 2026
+# perimeter area (109,408 acres over 2 fires, including Aspen Acres at 102,003 ac,
+# the largest Colorado perimeter of 2026). 484 cells against Larimer's 494, so
+# runtimes stay comparable. Larimer contains 0 in-domain 2026 perimeters, which
+# left the fire evaluation empty through v0.5.
+PUEBLO_BBOX: tuple[float, float, float, float] = (-105.051, 37.735, -104.054, 38.522)
+PUEBLO_FIPS = "08101"
 COLORADO_FIPS = "08"
+
+SUBSETS: dict[str, tuple[tuple[float, float, float, float], str]] = {
+    "larimer": (LARIMER_BBOX, LARIMER_FIPS),
+    "pueblo": (PUEBLO_BBOX, PUEBLO_FIPS),
+}
 
 HORIZONS_WEEKS: tuple[int, int, int] = (2, 4, 8)
 COVERAGE_TARGET = 0.90
@@ -31,6 +43,9 @@ class Settings(BaseSettings):
     )
 
     dev_subset: bool = True
+    # Which dev subset to use when dev_subset=1. COFIRE_SUBSET_NAME=larimer|pueblo.
+    # Pueblo is the default from v0.6: Larimer has 0 in-domain 2026 perimeters.
+    subset_name: str = "pueblo"
     data_dir: Path = Path("data")
     artifacts_dir: Path = Path("artifacts")
     log_dir: Path = Path("logs")
@@ -69,12 +84,12 @@ class Settings(BaseSettings):
     @property
     def bbox(self) -> tuple[float, float, float, float]:
         if self.dev_subset:
-            return LARIMER_BBOX
+            return SUBSETS[self.subset_name][0]
         return COLORADO_BBOX_BUFFERED
 
     @property
     def county_fips(self) -> str | None:
-        return LARIMER_FIPS if self.dev_subset else None
+        return SUBSETS[self.subset_name][1] if self.dev_subset else None
 
     def apply_subset_defaults(self) -> None:
         """Remap date splits when running the Larimer vertical slice."""
@@ -98,6 +113,15 @@ class Settings(BaseSettings):
 
     @property
     def processed_dir(self) -> Path:
+        """Subset-scoped so two dev subsets can coexist on disk.
+
+        Larimer data predates this split and lives at the unscoped path, which is
+        kept as the `larimer` location so v0.5 artifacts stay reproducible. A new
+        subset gets `processed_<name>/`, so fetching Pueblo cannot clobber
+        Larimer and the two domains can be compared.
+        """
+        if self.dev_subset and self.subset_name != "larimer":
+            return self.data_dir / f"processed_{self.subset_name}"
         return self.data_dir / "processed"
 
     @property

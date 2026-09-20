@@ -12,9 +12,18 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import brier_score_loss, mean_absolute_error, r2_score
 
-from cofire.model.config import HORIZONS_WEEKS, SEED, get_settings
+from cofire.model.config import SEED, get_settings
+from cofire.model.eval import (
+    _as_float,
+    ar1_neff,
+    attach_skills,
+    climatology_pred,
+    evaluate_arm,
+    format_skill_sentence,
+    persistence_pred,
+    random_pred,
+)
 from cofire.model.explain import GROUP_ORDER, load_groups
 from cofire.model.features import available_features, build_feature_store, load_features
 from cofire.model.log import setup_logging
@@ -23,13 +32,6 @@ from cofire.model.models.ensemble import EnsembleModel
 from cofire.model.models.external import ExternalDroughtModel
 from cofire.model.models.lightgbm_arm import LightGBMConditionModel
 from cofire.model.models.pi_convlstm import PhysicsInformedConvLSTM
-
-
-def _as_float(value: object, default: float = float("nan")) -> float:
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        return float(value)
-    return default
-
 
 np.random.seed(SEED)
 
@@ -52,58 +54,6 @@ def split_frames(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
         ].copy(),
         "hindcast": frame[t >= pd.Timestamp(settings.hindcast_start)].copy(),
     }
-
-
-def persistence(frame: pd.DataFrame, h: int) -> pd.Series:
-    return frame["usdm"] if "usdm" in frame.columns else pd.Series(np.nan, index=frame.index)
-
-
-def climatology(train: pd.DataFrame, frame: pd.DataFrame, col: str) -> pd.Series:
-    if col not in train.columns or "woy" not in train.columns:
-        return pd.Series(np.nan, index=frame.index)
-    means = train.groupby(["cell_id", "woy"])[col].mean()
-    keys = list(zip(frame["cell_id"], frame["woy"], strict=False))
-    return pd.Series([means.get(k, np.nan) for k in keys], index=frame.index)
-
-
-def persistence_plus_trend(frame: pd.DataFrame, col: str) -> pd.Series:
-    g = frame.sort_values(["cell_id", "time"]).groupby("cell_id")[col]
-    prev = g.shift(1)
-    cur = frame[col]
-    return cur + (cur - prev)
-
-
-def skill_vs_persistence(mae_model: float, mae_pers: float) -> float:
-    if not np.isfinite(mae_pers) or mae_pers == 0:
-        return float("nan")
-    return float(1.0 - mae_model / mae_pers)
-
-
-def evaluate_arm(name: str, pred: pd.DataFrame, truth: pd.DataFrame) -> dict[str, object]:
-    merged = truth.join(pred, how="left")
-    out: dict[str, object] = {"arm": name}
-    for h in HORIZONS_WEEKS:
-        if f"usdm_h{h}" in merged and f"usdm_h{h}_hat" in merged:
-            y = merged[f"usdm_h{h}"].to_numpy(dtype=float)
-            yhat = merged[f"usdm_h{h}_hat"].to_numpy(dtype=float)
-            ok = np.isfinite(y) & np.isfinite(yhat)
-            out[f"usdm_h{h}_mae"] = float(mean_absolute_error(y[ok], yhat[ok])) if ok.any() else float("nan")
-            out[f"usdm_h{h}_acc"] = float(np.mean(np.round(yhat[ok]) == y[ok])) if ok.any() else float("nan")
-        if f"erc_pct_h{h}" in merged and f"erc_pct_h{h}_hat" in merged:
-            y = merged[f"erc_pct_h{h}"].to_numpy(dtype=float)
-            yhat = merged[f"erc_pct_h{h}_hat"].to_numpy(dtype=float)
-            ok = np.isfinite(y) & np.isfinite(yhat)
-            out[f"erc_h{h}_mae"] = float(mean_absolute_error(y[ok], yhat[ok])) if ok.any() else float("nan")
-            out[f"erc_h{h}_r2"] = float(r2_score(y[ok], yhat[ok])) if ok.sum() > 2 else float("nan")
-        ge_col = f"usdm_ge2_h{h}_hat"
-        if ge_col in merged and f"usdm_h{h}" in merged:
-            y = (merged[f"usdm_h{h}"] >= 2).astype(float)
-            p = merged[ge_col].clip(0, 1)
-            ok = y.notna() & p.notna()
-            out[f"usdm_h{h}_brier_ge2"] = (
-                float(brier_score_loss(y[ok], p[ok])) if ok.any() else float("nan")
-            )
-    return out
 
 
 def group_ablation(train: pd.DataFrame, valid: pd.DataFrame) -> list[dict[str, object]]:
@@ -186,56 +136,63 @@ def run_train() -> Path:
     members = {"lightgbm": lgbm, "pi_convlstm_both": pi_models["pi_convlstm_both"]}
     if ext.available:
         members["external_drought"] = ext
-    lgbm_val = evaluate_arm("lightgbm", lgbm.predict(valid), valid)
-    pi_val = evaluate_arm("pi_convlstm_both", pi_models["pi_convlstm_both"].predict(valid), valid)
+    pers_pred = persistence_pred(valid)
+    clim_pred = climatology_pred(train, valid)
+    rnd_pred = random_pred(train, valid)
+    preds_by_arm = {
+        "lightgbm": lgbm.predict(valid),
+        "pi_convlstm_none": pi_models["pi_convlstm_none"].predict(valid),
+        "pi_convlstm_hydro": pi_models["pi_convlstm_hydro"].predict(valid),
+        "pi_convlstm_both": pi_models["pi_convlstm_both"].predict(valid),
+    }
+    lgbm_val = evaluate_arm("lightgbm", preds_by_arm["lightgbm"], valid)
+    pi_val = evaluate_arm("pi_convlstm_both", preds_by_arm["pi_convlstm_both"], valid)
     w_lgb = 1.0 / max(_as_float(lgbm_val.get("erc_h4_mae"), 1.0) or 1.0, 1e-3)
     w_pi = 1.0 / max(_as_float(pi_val.get("erc_h4_mae"), 1.0) or 1.0, 1e-3)
     weights = {"lightgbm": w_lgb, "pi_convlstm_both": w_pi}
     if ext.available:
         weights["external_drought"] = min(w_lgb, w_pi) * 0.25
     ensemble = EnsembleModel(members, weights)
+    preds_by_arm["ensemble"] = ensemble.predict(valid)
 
     val_metrics = [
-        lgbm_val,
-        evaluate_arm("pi_convlstm_none", pi_models["pi_convlstm_none"].predict(valid), valid),
-        evaluate_arm("pi_convlstm_hydro", pi_models["pi_convlstm_hydro"].predict(valid), valid),
-        pi_val,
-        evaluate_arm("ensemble", ensemble.predict(valid), valid),
+        attach_skills(lgbm_val, valid, preds_by_arm["lightgbm"], pers_pred, clim_pred),
+        attach_skills(
+            evaluate_arm("pi_convlstm_none", preds_by_arm["pi_convlstm_none"], valid),
+            valid,
+            preds_by_arm["pi_convlstm_none"],
+            pers_pred,
+            clim_pred,
+        ),
+        attach_skills(
+            evaluate_arm("pi_convlstm_hydro", preds_by_arm["pi_convlstm_hydro"], valid),
+            valid,
+            preds_by_arm["pi_convlstm_hydro"],
+            pers_pred,
+            clim_pred,
+        ),
+        attach_skills(pi_val, valid, preds_by_arm["pi_convlstm_both"], pers_pred, clim_pred),
+        attach_skills(
+            evaluate_arm("ensemble", preds_by_arm["ensemble"], valid),
+            valid,
+            preds_by_arm["ensemble"],
+            pers_pred,
+            clim_pred,
+        ),
+        evaluate_arm("persistence", pers_pred, valid),
+        evaluate_arm("climatology", clim_pred, valid),
+        evaluate_arm("random", rnd_pred, valid),
     ]
-    # Baselines on drought / ERC at h=4.
-    pers = persistence(valid, 4)
-    clim = climatology(train, valid, "erc_pct")
-    if "usdm_h4" in valid.columns:
-        ok = valid["usdm_h4"].notna() & pers.notna()
-        if ok.any():
-            val_metrics.append(
-                {
-                    "arm": "persistence",
-                    "usdm_h4_mae": float(mean_absolute_error(valid.loc[ok, "usdm_h4"], pers[ok])),
-                }
-            )
-    if "erc_pct_h4" in valid.columns and clim.notna().any():
-        ok = valid["erc_pct_h4"].notna() & clim.notna()
-        if ok.any():
-            val_metrics.append(
-                {
-                    "arm": "climatology",
-                    "erc_h4_mae": float(mean_absolute_error(valid.loc[ok, "erc_pct_h4"], clim[ok])),
-                }
-            )
-    if "erc_pct" in valid.columns and "erc_pct_h4" in valid.columns:
-        ppt = persistence_plus_trend(valid, "erc_pct")
-        ok = valid["erc_pct_h4"].notna() & ppt.notna()
-        if ok.any():
-            val_metrics.append(
-                {
-                    "arm": "persistence_plus_trend",
-                    "erc_h4_mae": float(mean_absolute_error(valid.loc[ok, "erc_pct_h4"], ppt[ok])),
-                }
-            )
 
     shipping = pick_shipping(val_metrics)
     ablation = group_ablation(train, valid)
+    weekly = (
+        train.groupby(pd.to_datetime(train["time"]))[["usdm", "erc_pct"]]
+        .mean()
+        .sort_index()
+    )
+    rho_u, neff_u, n_u = ar1_neff(weekly["usdm"].to_numpy(dtype=float) if "usdm" in weekly else np.array([]))
+    rho_e, neff_e, n_e = ar1_neff(weekly["erc_pct"].to_numpy(dtype=float) if "erc_pct" in weekly else np.array([]))
 
     pred_dir = settings.artifacts_dir / "predictions"
     pred_dir.mkdir(parents=True, exist_ok=True)
@@ -270,6 +227,15 @@ def run_train() -> Path:
         "n_train": int(len(train)),
         "n_valid": int(len(valid)),
         "resolution_m": 30 if settings.enable_hls else 4000,
+        "effective_n": {
+            "usdm_rho": rho_u,
+            "usdm_neff_weeks": neff_u,
+            "usdm_n_weeks": n_u,
+            "erc_rho": rho_e,
+            "erc_neff_weeks": neff_e,
+            "erc_n_weeks": n_e,
+            "note": "Week-block bootstrap CIs already account for weekly dependence. Cell-weeks are not independent samples.",
+        },
     }
     (settings.artifacts_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, default=str))
     (settings.artifacts_dir / "shipping_arm.txt").write_text(shipping)
@@ -288,12 +254,56 @@ def _metrics_md(metrics: dict[str, object]) -> str:
         f"Git: `{metrics['git_sha']}`  MANIFEST: `{metrics['manifest_hash']}`",
         f"Displayed resolution: {metrics['resolution_m']} m (gridMET native 4 km unless HLS is on and loaded).",
         "",
-        "## Validation",
+        "Hyperparameters were frozen on the validation split. Hindcast 2026 is scored only in hindcast.py.",
+        "",
+    ]
+    ne = metrics.get("effective_n")
+    if isinstance(ne, dict):
+        lines += [
+            "## Effective sample size",
+            "",
+            f"Training-window weekly domain-mean AR(1): USDM rho={ne.get('usdm_rho')} n_weeks={ne.get('usdm_n_weeks')} n_eff={ne.get('usdm_neff_weeks')}; "
+            f"ERC rho={ne.get('erc_rho')} n_weeks={ne.get('erc_n_weeks')} n_eff={ne.get('erc_neff_weeks')}. "
+            "Headline intervals use week-block bootstrap, not cell-weeks as independent samples.",
+            "",
+        ]
+    val_rows = metrics.get("validation")
+    by_arm: dict[str, dict[str, object]] = {}
+    pers_row: dict[str, object] = {}
+    if isinstance(val_rows, list):
+        for row in val_rows:
+            if isinstance(row, dict) and isinstance(row.get("arm"), str):
+                by_arm[str(row["arm"])] = row
+                if row.get("arm") == "persistence":
+                    pers_row = row
+    lines += ["## Validation sentences", ""]
+    for arm in ("lightgbm", "pi_convlstm_none", "pi_convlstm_hydro", "pi_convlstm_both", "ensemble"):
+        row = by_arm.get(arm)
+        if not row:
+            continue
+        lines.append(f"### {arm}")
+        lines.append("")
+        for h in (2, 4, 8):
+            lines.append(format_skill_sentence(arm, h, "usdm", row, pers_row))
+            acc = row.get(f"usdm_h{h}_acc")
+            b2 = row.get(f"usdm_h{h}_brier_ge2")
+            e2 = row.get(f"usdm_h{h}_ece_ge2")
+            b3 = row.get(f"usdm_h{h}_brier_ge3")
+            e3 = row.get(f"usdm_h{h}_ece_ge3")
+            lines.append(
+                f"Drought h={h} exact-category accuracy {acc}; "
+                f"Brier P(cat>=2)={b2} ECE={e2}; Brier P(cat>=3)={b3} ECE={e3}."
+            )
+            lines.append(format_skill_sentence(arm, h, "erc", row, pers_row))
+            r2 = row.get(f"erc_h{h}_r2")
+            lines.append(f"Fire-condition (ERC percentile) h={h} R²={r2}.")
+        lines.append("")
+    lines += [
+        "## Validation table",
         "",
         "| arm | ERC h=4 MAE | drought h=4 MAE | drought h=4 exact acc |",
         "| --- | --- | --- | --- |",
     ]
-    val_rows = metrics.get("validation")
     if isinstance(val_rows, list):
         for row in val_rows:
             if not isinstance(row, dict):
@@ -316,11 +326,6 @@ def _metrics_md(metrics: dict[str, object]) -> str:
         "Configs: no penalties, hydro only, both.",
         "",
     ]
-    by_arm: dict[str, dict[str, object]] = {}
-    if isinstance(val_rows, list):
-        for row in val_rows:
-            if isinstance(row, dict) and isinstance(row.get("arm"), str):
-                by_arm[str(row["arm"])] = row
     none_mae = _as_float((by_arm.get("pi_convlstm_none") or {}).get("erc_h4_mae"))
     hydro_mae = _as_float((by_arm.get("pi_convlstm_hydro") or {}).get("erc_h4_mae"))
     both_mae = _as_float((by_arm.get("pi_convlstm_both") or {}).get("erc_h4_mae"))
