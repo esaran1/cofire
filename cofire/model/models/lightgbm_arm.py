@@ -41,6 +41,7 @@ class LightGBMConditionModel(ConditionModel):
             "bagging_freq": 1,
             "verbosity": -1,
             "seed": self.seed,
+            "num_threads": 1,
         }
         dtrain = lgb.Dataset(x, label=y, free_raw_data=False)
         valid_sets = [dtrain]

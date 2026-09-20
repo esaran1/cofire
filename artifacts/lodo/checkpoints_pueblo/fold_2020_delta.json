@@ -1,0 +1,62 @@
+[
+  {
+    "year": 2020,
+    "horizon": 2,
+    "target": "usdm",
+    "parameterisation": "delta",
+    "model_mae": 0.24753243175788556,
+    "persistence_mae": 0.14685719373219372,
+    "skill": -0.6855315389539685,
+    "n": 22464
+  },
+  {
+    "year": 2020,
+    "horizon": 2,
+    "target": "erc_pct",
+    "parameterisation": "delta",
+    "model_mae": 26.516168790401338,
+    "persistence_mae": 23.213141025641026,
+    "skill": -0.14229128927928447,
+    "n": 22464
+  },
+  {
+    "year": 2020,
+    "horizon": 4,
+    "target": "usdm",
+    "parameterisation": "delta",
+    "model_mae": 0.4846750298008645,
+    "persistence_mae": 0.28717058404558404,
+    "skill": -0.687760016965838,
+    "n": 22464
+  },
+  {
+    "year": 2020,
+    "horizon": 4,
+    "target": "erc_pct",
+    "parameterisation": "delta",
+    "model_mae": 31.881294636640774,
+    "persistence_mae": 25.77857905982906,
+    "skill": -0.23673591793589654,
+    "n": 22464
+  },
+  {
+    "year": 2020,
+    "horizon": 8,
+    "target": "usdm",
+    "parameterisation": "delta",
+    "model_mae": 0.7437264909088338,
+    "persistence_mae": 0.5274661680911681,
+    "skill": -0.4099984717508687,
+    "n": 22464
+  },
+  {
+    "year": 2020,
+    "horizon": 8,
+    "target": "erc_pct",
+    "parameterisation": "delta",
+    "model_mae": 33.832742935713306,
+    "persistence_mae": 25.589387464387464,
+    "skill": -0.3221396167766051,
+    "n": 22464
+  }
+]

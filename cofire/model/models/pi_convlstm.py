@@ -313,6 +313,25 @@ def pad_grid(arr: np.ndarray, h: int = TILE, w: int = TILE) -> np.ndarray:
     return out[0] if squeeze else out
 
 
+def _scatter_cube(
+    frame: pd.DataFrame,
+    col: str,
+    n_t: int,
+    n_y: int,
+    n_x: int,
+    ti: np.ndarray,
+    yi: np.ndarray,
+    xi: np.ndarray,
+) -> np.ndarray:
+    grid = np.full((n_t, n_y, n_x), np.nan, dtype=np.float32)
+    if col not in frame.columns:
+        return grid
+    vals = frame[col].to_numpy(dtype=np.float64)
+    ok = (ti >= 0) & (yi >= 0) & (xi >= 0) & np.isfinite(vals)
+    grid[ti[ok], yi[ok], xi[ok]] = vals[ok].astype(np.float32)
+    return grid
+
+
 def frame_to_samples(frame: pd.DataFrame) -> list[dict[str, np.ndarray]]:
     """Build overlapping (or single padded) 32×32 × T=8 samples from a long table."""
     frame = frame.copy()
@@ -321,40 +340,17 @@ def frame_to_samples(frame: pd.DataFrame) -> list[dict[str, np.ndarray]]:
     lons = np.sort(frame["lon"].unique())
     times = np.sort(frame["time"].unique())
     h0, w0 = len(lats), len(lons)
-    lat_i = {float(v): i for i, v in enumerate(lats)}
-    lon_i = {float(v): i for i, v in enumerate(lons)}
+    ti = pd.Index(pd.to_datetime(times)).get_indexer(pd.to_datetime(frame["time"]))
+    yi = pd.Index(lats).get_indexer(frame["lat"].to_numpy())
+    xi = pd.Index(lons).get_indexer(frame["lon"].to_numpy())
     cubes: dict[str, np.ndarray] = {}
     for ch in CHANNELS:
-        grid = np.full((len(times), h0, w0), np.nan, dtype=np.float32)
-        if ch in frame.columns:
-            for row in frame.itertuples():
-                yi = lat_i.get(float(row.lat))
-                xi = lon_i.get(float(row.lon))
-                ti = int(np.searchsorted(times, row.time))
-                if yi is None or xi is None or ti >= len(times):
-                    continue
-                grid[ti, yi, xi] = float(getattr(row, ch, np.nan))
-        cubes[ch] = grid
+        cubes[ch] = _scatter_cube(frame, ch, len(times), h0, w0, ti, yi, xi)
     y_usdm = np.full((len(times), len(HORIZONS_WEEKS), h0, w0), np.nan, dtype=np.float32)
     y_erc = np.full_like(y_usdm, np.nan)
     for i, h in enumerate(HORIZONS_WEEKS):
-        col_u, col_e = f"usdm_h{h}", f"erc_pct_h{h}"
-        if col_u in frame.columns:
-            for row in frame.itertuples():
-                yi = lat_i.get(float(row.lat))
-                xi = lon_i.get(float(row.lon))
-                ti = int(np.searchsorted(times, row.time))
-                if yi is None or xi is None or ti >= len(times):
-                    continue
-                y_usdm[ti, i, yi, xi] = float(getattr(row, col_u, np.nan))
-        if col_e in frame.columns:
-            for row in frame.itertuples():
-                yi = lat_i.get(float(row.lat))
-                xi = lon_i.get(float(row.lon))
-                ti = int(np.searchsorted(times, row.time))
-                if yi is None or xi is None or ti >= len(times):
-                    continue
-                y_erc[ti, i, yi, xi] = float(getattr(row, col_e, np.nan))
+        y_usdm[:, i] = _scatter_cube(frame, f"usdm_h{h}", len(times), h0, w0, ti, yi, xi)
+        y_erc[:, i] = _scatter_cube(frame, f"erc_pct_h{h}", len(times), h0, w0, ti, yi, xi)
     mask0 = np.zeros((h0, w0), dtype=bool)
     if "erc" in frame.columns:
         last = cubes["erc"]
@@ -437,9 +433,15 @@ class PhysicsInformedConvLSTM(ConditionModel):
         self.tag = f"hydro{lambda_hydro}_fuel{lambda_fuel}"
 
     def fit(self, train: pd.DataFrame, valid: pd.DataFrame | None = None) -> None:
+        torch.set_num_threads(1)
         torch.manual_seed(self.seed)
         np.random.seed(self.seed)
+        import logging
+
+        log = logging.getLogger("cofire")
+        log.info("%s building tiles", self.tag)
         train_samples = frame_to_samples(train)
+        log.info("%s train tiles=%s", self.tag, len(train_samples))
         if not train_samples:
             return
         self.lat_axis = train_samples[0]["lat0"]
@@ -475,6 +477,7 @@ class PhysicsInformedConvLSTM(ConditionModel):
             if valid_loader is None:
                 continue
             val = self._eval_task(valid_loader, device)
+            log.info("%s epoch=%s val_task=%.4f", self.tag, _epoch, val)
             if val + 1e-6 < best:
                 best = val
                 stale = 0

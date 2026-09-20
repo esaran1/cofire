@@ -16,7 +16,10 @@ Hand-written core logic vs agent-generated scaffolding. Judges should treat the 
 | `cofire/model/uncertainty/compare.py` | yes | no | conformal vs bootstrap report |
 | `cofire/model/explain/shap_why.py` | yes | no | TreeSHAP grouping |
 | `cofire/model/explain/feature_groups.yaml` | yes | **yes** | driver buckets; edit freely |
-| `cofire/model/hindcast.py` | yes | no | 2026 cutoff + NIFC overlay |
+| `cofire/model/eval.py` | yes | **yes** | skill scores, week-block CIs |
+| `cofire/model/sanity.py` | yes | **yes** | leakage / label / shuffle gates |
+| `cofire/model/pipeline.py` | yes | no | wall-clock + RSS per stage |
+| `cofire/model/status.py` | yes | **yes** | Go / Partial / No-go from artifacts |
 | `cofire/model/export.py` | yes | no | COG/JSON/overlays |
 | `cofire/model/ember.py` | yes | no | checklist score |
 | `cofire/model/config.py` | yes | no | pydantic-settings |
@@ -29,3 +32,44 @@ Hand-written core logic vs agent-generated scaffolding. Judges should treat the 
 | `scripts/check_copy.py` | yes | no | wording lint |
 | `docs/PRIOR_ART.md` | yes | no | citation of independent prior art |
 | `Makefile`, `pyproject.toml` | yes | no | tooling |
+
+## v0.3 session note (artifact wiring)
+
+AI-assisted, no student-rewrite files touched. `cofire/api/__init__.py` gained provenance and
+honesty fields on `/meta`, `/hindcast/summary`, and `/hindcast/fires` (MANIFEST hash, git SHA,
+STATUS verdict, look_index/contaminated, in-domain fire count). `app/app/hindcast/page.tsx`,
+`app/app/about/page.tsx`, and `app/app/page.tsx` render those values from disk instead of
+placeholders. No model code, hyperparameter, feature, or calibration path was modified, so the
+frozen config hash `0957e415fa7f3fad` and the hindcast look count are unchanged — this wiring is
+display-only and does not constitute a post-hindcast change.
+
+## v0.5 session note (diagnose the No-go)
+
+AI-assisted. New files marked for student rewrite: `cofire/model/lodo.py` (LODO folds, delta
+parameterisation, severe-week weighting) and `tests/test_conformal_aci.py`. `cofire/model/conformal.py`
+was already marked for hand-rewrite and received the two ACI fixes. `cofire/model/statewide.py`
+(staged planner) is infrastructure, not science.
+
+The two conformal defects were found by tracing alpha and interval width through the **stored** 2026
+interval parquet and reproducing the behaviour on synthetic streams — no new evaluation on the
+sealed holdout. The 2026 hindcast stands at 2 looks, unchanged, and `docs/PREREGISTRATION.md` binds
+the next one.
+
+## v0.6 session note (subset move + multi-regime calibration)
+
+AI-assisted. New files marked for student rewrite: `cofire/model/uncertainty/multiregime.py` (pool
+variants) and `cofire/model/uncertainty/status.py` (three-state status). New tests:
+`tests/test_uncertainty_status.py`. New infrastructure, not science:
+`cofire/model/uncertainty/run_multiregime.py`, `docs/DESIGN.md`, the `UncertaintyBadge` component.
+
+The calibration experiment was **pre-registered and hashed before it ran**
+(`docs/PREREGISTRATION_CALIBRATION.md`, sha256 `6a69e9a2...`), with the variant list, covariates,
+width cap and acceptance criteria all fixed in advance. All six variants were rejected against that
+criterion and all six are reported. No variant was added after results were seen.
+
+The subset move exposed two silent cache-scoping bugs (raw gridMET and raw elevation are clipped at
+download time but were cached at shared paths), which would have served Larimer geography under the
+Pueblo name. Caught by checking that the new domain's weather differed from the old one's rather
+than trusting the fetch log.
+
+The 2026 hindcast stands at **2 looks**, unchanged. Nothing in v0.6 evaluated on 2026.

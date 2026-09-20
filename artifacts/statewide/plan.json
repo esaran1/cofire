@@ -1,0 +1,145 @@
+{
+  "dry_run": true,
+  "stages": [
+    {
+      "stage": "sanity",
+      "status": "dry-run",
+      "eta_minutes": 8.6
+    },
+    {
+      "stage": "features",
+      "status": "dry-run",
+      "eta_minutes": 50.0
+    },
+    {
+      "stage": "train_lgbm",
+      "status": "dry-run",
+      "eta_minutes": 1.7
+    },
+    {
+      "stage": "train_pi",
+      "status": "dry-run",
+      "eta_minutes": 362.0
+    },
+    {
+      "stage": "calibrate",
+      "status": "dry-run",
+      "eta_minutes": 5.1
+    },
+    {
+      "stage": "export",
+      "status": "dry-run",
+      "eta_minutes": 25.6
+    }
+  ],
+  "plan": [
+    {
+      "stage": "sanity",
+      "larimer_seconds": 10.3,
+      "scaling": "linear",
+      "eta_seconds": 515.0,
+      "eta_minutes": 8.6,
+      "over_stop_rule": false,
+      "note": "gates only; cheap"
+    },
+    {
+      "stage": "features",
+      "larimer_seconds": 60.0,
+      "scaling": "linear",
+      "eta_seconds": 3000.0,
+      "eta_minutes": 50.0,
+      "over_stop_rule": false,
+      "note": "chunked per year to bound peak RSS"
+    },
+    {
+      "stage": "train_lgbm",
+      "larimer_seconds": 21.0,
+      "scaling": "rows",
+      "eta_seconds": 102.8,
+      "eta_minutes": 1.7,
+      "over_stop_rule": false,
+      "note": "6 fits; rows^0.41"
+    },
+    {
+      "stage": "train_pi",
+      "larimer_seconds": 724.0,
+      "scaling": "tiles",
+      "eta_seconds": 21720.0,
+      "eta_minutes": 362.0,
+      "over_stop_rule": true,
+      "note": "3 configs + ablation; linear in tiles"
+    },
+    {
+      "stage": "calibrate",
+      "larimer_seconds": 6.17,
+      "scaling": "linear",
+      "eta_seconds": 308.5,
+      "eta_minutes": 5.1,
+      "over_stop_rule": false,
+      "note": ""
+    },
+    {
+      "stage": "export",
+      "larimer_seconds": 30.72,
+      "scaling": "linear",
+      "eta_seconds": 1536.0,
+      "eta_minutes": 25.6,
+      "over_stop_rule": false,
+      "note": ""
+    }
+  ],
+  "splits_needed": [
+    {
+      "stage": "train_pi",
+      "eta_minutes": 362.0,
+      "chunks_needed": 7,
+      "per_chunk_minutes": 51.7,
+      "split_by": "tile block"
+    }
+  ],
+  "total_eta_hours": 7.55,
+  "stages_defined": [
+    {
+      "name": "sanity",
+      "module": "cofire.model.sanity",
+      "larimer_seconds": 10.3,
+      "scaling": "linear",
+      "note": "gates only; cheap"
+    },
+    {
+      "name": "features",
+      "module": "cofire.model.features",
+      "larimer_seconds": 60.0,
+      "scaling": "linear",
+      "note": "chunked per year to bound peak RSS"
+    },
+    {
+      "name": "train_lgbm",
+      "module": "cofire.model.train",
+      "larimer_seconds": 21.0,
+      "scaling": "rows",
+      "note": "6 fits; rows^0.41"
+    },
+    {
+      "name": "train_pi",
+      "module": "cofire.model.train",
+      "larimer_seconds": 724.0,
+      "scaling": "tiles",
+      "note": "3 configs + ablation; linear in tiles"
+    },
+    {
+      "name": "calibrate",
+      "module": "cofire.model.calibrate",
+      "larimer_seconds": 6.17,
+      "scaling": "linear",
+      "note": ""
+    },
+    {
+      "name": "export",
+      "module": "cofire.model.export",
+      "larimer_seconds": 30.72,
+      "scaling": "linear",
+      "note": ""
+    }
+  ]
+}

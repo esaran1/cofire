@@ -1,0 +1,1329 @@
+{
+  "nominal": 0.9,
+  "calibrate": {
+    "conformal": {
+      "method": "conformal",
+      "rows": [
+        {
+          "horizon": 2,
+          "stratum": "overall",
+          "coverage": 0.9142857142857143,
+          "width": 110.85243234705716,
+          "n": 50400
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=0",
+          "coverage": 0.9515345090959589,
+          "width": 110.89774498441737,
+          "n": 28804
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=1",
+          "coverage": 0.8883196721311475,
+          "width": 110.8043725148149,
+          "n": 11712
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=2",
+          "coverage": 0.8236702798084194,
+          "width": 110.82374059748456,
+          "n": 7934
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=3",
+          "coverage": 0.8887179487179487,
+          "width": 110.58849998285578,
+          "n": 1950
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=1",
+          "coverage": 0.6134259259259259,
+          "width": 110.85243234705717,
+          "n": 4320
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=2",
+          "coverage": 0.9786458333333333,
+          "width": 110.85243234705716,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=3",
+          "coverage": 0.971875,
+          "width": 110.85243234705716,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=4",
+          "coverage": 0.9470833333333334,
+          "width": 110.85243234705719,
+          "n": 4800
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=5",
+          "coverage": 0.98515625,
+          "width": 110.85243234705716,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=6",
+          "coverage": 0.9895833333333334,
+          "width": 110.85243234705716,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=7",
+          "coverage": 0.9358333333333333,
+          "width": 110.85243234705719,
+          "n": 4800
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=8",
+          "coverage": 0.9651041666666667,
+          "width": 110.85243234705716,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=9",
+          "coverage": 0.9291666666666667,
+          "width": 110.85243234705717,
+          "n": 4320
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=10",
+          "coverage": 0.9472222222222222,
+          "width": 110.85243234705717,
+          "n": 4320
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=11",
+          "coverage": 0.9830729166666666,
+          "width": 110.85243234705716,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=12",
+          "coverage": 0.7775,
+          "width": 110.85243234705719,
+          "n": 4800
+        },
+        {
+          "horizon": 4,
+          "stratum": "overall",
+          "coverage": 0.9142857142857143,
+          "width": 112.28440918660272,
+          "n": 50400
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=0",
+          "coverage": 0.9354603527287877,
+          "width": 112.26171319225314,
+          "n": 28804
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=1",
+          "coverage": 0.8942110655737705,
+          "width": 112.14639924838146,
+          "n": 11712
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=2",
+          "coverage": 0.8670279808419461,
+          "width": 112.40297075783111,
+          "n": 7934
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=3",
+          "coverage": 0.9143589743589744,
+          "width": 112.96617344894504,
+          "n": 1950
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=1",
+          "coverage": 0.8777777777777778,
+          "width": 112.28440918660273,
+          "n": 4320
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=2",
+          "coverage": 0.9734375,
+          "width": 112.28440918660273,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=3",
+          "coverage": 0.9755208333333333,
+          "width": 112.28440918660273,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=4",
+          "coverage": 0.9347916666666667,
+          "width": 112.28440918660274,
+          "n": 4800
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=5",
+          "coverage": 0.959375,
+          "width": 112.28440918660273,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=6",
+          "coverage": 0.9828125,
+          "width": 112.28440918660273,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=7",
+          "coverage": 0.9427083333333334,
+          "width": 112.28440918660274,
+          "n": 4800
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=8",
+          "coverage": 0.9893229166666667,
+          "width": 112.28440918660273,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=9",
+          "coverage": 0.9180555555555555,
+          "width": 112.28440918660273,
+          "n": 4320
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=10",
+          "coverage": 0.825,
+          "width": 112.28440918660273,
+          "n": 4320
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=11",
+          "coverage": 0.9015625,
+          "width": 112.28440918660273,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=12",
+          "coverage": 0.738125,
+          "width": 112.28440918660274,
+          "n": 4800
+        },
+        {
+          "horizon": 8,
+          "stratum": "overall",
+          "coverage": 0.9142857142857143,
+          "width": 114.66183774479902,
+          "n": 50400
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=0",
+          "coverage": 0.9199763921677545,
+          "width": 114.70158130461601,
+          "n": 28804
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=1",
+          "coverage": 0.9234118852459017,
+          "width": 114.73695096194051,
+          "n": 11712
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=2",
+          "coverage": 0.8797580035291152,
+          "width": 114.52074218412206,
+          "n": 7934
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=3",
+          "coverage": 0.9158974358974359,
+          "width": 114.19771091519964,
+          "n": 1950
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=1",
+          "coverage": 0.9814814814814815,
+          "width": 114.66183774479902,
+          "n": 4320
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=2",
+          "coverage": 0.92265625,
+          "width": 114.66183774479902,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=3",
+          "coverage": 0.99765625,
+          "width": 114.66183774479902,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=4",
+          "coverage": 0.9872916666666667,
+          "width": 114.66183774479903,
+          "n": 4800
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=5",
+          "coverage": 0.9919270833333333,
+          "width": 114.66183774479902,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=6",
+          "coverage": 0.8716145833333333,
+          "width": 114.66183774479902,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=7",
+          "coverage": 0.9972916666666667,
+          "width": 114.66183774479903,
+          "n": 4800
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=8",
+          "coverage": 0.9809895833333333,
+          "width": 114.66183774479902,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=9",
+          "coverage": 0.9872685185185185,
+          "width": 114.66183774479902,
+          "n": 4320
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=10",
+          "coverage": 0.8925925925925926,
+          "width": 114.66183774479902,
+          "n": 4320
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=11",
+          "coverage": 0.5502604166666667,
+          "width": 114.66183774479902,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=12",
+          "coverage": 0.788125,
+          "width": 114.66183774479903,
+          "n": 4800
+        }
+      ]
+    },
+    "bootstrap": {
+      "method": "bootstrap",
+      "rows": [
+        {
+          "horizon": 2,
+          "stratum": "overall",
+          "coverage": 0.8939484126984127,
+          "width": 106.6914939484591,
+          "n": 50400
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=0",
+          "coverage": 0.9352520483266213,
+          "width": 106.69513977263563,
+          "n": 28804
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=1",
+          "coverage": 0.8564719945355191,
+          "width": 106.6677816511565,
+          "n": 11712
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=2",
+          "coverage": 0.8153516511217545,
+          "width": 106.70110043678146,
+          "n": 7934
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=3",
+          "coverage": 0.8287179487179487,
+          "width": 106.74097406542182,
+          "n": 1950
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=1",
+          "coverage": 0.6113425925925926,
+          "width": 106.7121455424604,
+          "n": 4320
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=2",
+          "coverage": 0.9934895833333334,
+          "width": 106.65141207551945,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=3",
+          "coverage": 0.97890625,
+          "width": 106.63386938595549,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=4",
+          "coverage": 0.9533333333333334,
+          "width": 106.68219745226119,
+          "n": 4800
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=5",
+          "coverage": 0.9307291666666667,
+          "width": 106.6631433497853,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=6",
+          "coverage": 0.9861979166666667,
+          "width": 106.74052622723951,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=7",
+          "coverage": 0.89,
+          "width": 106.66834006627504,
+          "n": 4800
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=8",
+          "coverage": 0.8544270833333333,
+          "width": 106.74388914563022,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=9",
+          "coverage": 0.9185185185185185,
+          "width": 106.66258213804325,
+          "n": 4320
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=10",
+          "coverage": 0.8780092592592592,
+          "width": 106.73299139729733,
+          "n": 4320
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=11",
+          "coverage": 0.94609375,
+          "width": 106.71755466344675,
+          "n": 3840
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=12",
+          "coverage": 0.8241666666666667,
+          "width": 106.692885892202,
+          "n": 4800
+        },
+        {
+          "horizon": 4,
+          "stratum": "overall",
+          "coverage": 0.8937698412698413,
+          "width": 105.93160322735056,
+          "n": 50400
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=0",
+          "coverage": 0.9164699347312874,
+          "width": 105.92949202904876,
+          "n": 28804
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=1",
+          "coverage": 0.8639856557377049,
+          "width": 105.94788924974178,
+          "n": 11712
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=2",
+          "coverage": 0.8542979581547769,
+          "width": 105.9109741760193,
+          "n": 7934
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=3",
+          "coverage": 0.897948717948718,
+          "width": 105.94890576832546,
+          "n": 1950
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=1",
+          "coverage": 0.9481481481481482,
+          "width": 105.92162973100265,
+          "n": 4320
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=2",
+          "coverage": 0.99765625,
+          "width": 105.9352174859815,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=3",
+          "coverage": 0.9528645833333333,
+          "width": 105.94499879042564,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=4",
+          "coverage": 0.9514583333333333,
+          "width": 105.89599954280777,
+          "n": 4800
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=5",
+          "coverage": 0.9299479166666667,
+          "width": 105.90273332456758,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=6",
+          "coverage": 0.9682291666666667,
+          "width": 105.92282124388596,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=7",
+          "coverage": 0.8585416666666666,
+          "width": 105.93188250903,
+          "n": 4800
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=8",
+          "coverage": 0.7109375,
+          "width": 105.96871145666537,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=9",
+          "coverage": 0.9224537037037037,
+          "width": 105.91654748015378,
+          "n": 4320
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=10",
+          "coverage": 0.7770833333333333,
+          "width": 105.92669329088083,
+          "n": 4320
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=11",
+          "coverage": 0.878125,
+          "width": 105.97752107358878,
+          "n": 3840
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=12",
+          "coverage": 0.8414583333333333,
+          "width": 105.94396568341773,
+          "n": 4800
+        },
+        {
+          "horizon": 8,
+          "stratum": "overall",
+          "coverage": 0.8941865079365079,
+          "width": 106.28241074528228,
+          "n": 50400
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=0",
+          "coverage": 0.8836967087904458,
+          "width": 106.28185476141155,
+          "n": 28804
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=1",
+          "coverage": 0.8943818306010929,
+          "width": 106.29464098634463,
+          "n": 11712
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=2",
+          "coverage": 0.9120241996470885,
+          "width": 106.25386513411691,
+          "n": 7934
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=3",
+          "coverage": 0.9753846153846154,
+          "width": 106.3333106709625,
+          "n": 1950
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=1",
+          "coverage": 0.9949074074074075,
+          "width": 106.33365303193146,
+          "n": 4320
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=2",
+          "coverage": 0.92734375,
+          "width": 106.2988388137539,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=3",
+          "coverage": 0.9236979166666667,
+          "width": 106.26076059488165,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=4",
+          "coverage": 0.9791666666666666,
+          "width": 106.31153147137292,
+          "n": 4800
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=5",
+          "coverage": 0.9830729166666666,
+          "width": 106.29977967225419,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=6",
+          "coverage": 0.8002604166666667,
+          "width": 106.27375270345712,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=7",
+          "coverage": 0.78125,
+          "width": 106.26748125913517,
+          "n": 4800
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=8",
+          "coverage": 0.9078125,
+          "width": 106.25538690041415,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=9",
+          "coverage": 0.9726851851851852,
+          "width": 106.22970868767987,
+          "n": 4320
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=10",
+          "coverage": 0.9372685185185186,
+          "width": 106.30860352242496,
+          "n": 4320
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=11",
+          "coverage": 0.6200520833333333,
+          "width": 106.27931176437987,
+          "n": 3840
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=12",
+          "coverage": 0.884375,
+          "width": 106.26726701781047,
+          "n": 4800
+        }
+      ]
+    }
+  },
+  "hindcast": {
+    "conformal": {
+      "method": "conformal",
+      "rows": [
+        {
+          "horizon": 2,
+          "stratum": "overall",
+          "coverage": 0.49774305555555554,
+          "width": 63.362973510087805,
+          "n": 17280
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=1",
+          "coverage": 0.5475086906141368,
+          "width": 72.35239949211412,
+          "n": 3452
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=2",
+          "coverage": 0.46315653632726805,
+          "width": 60.317545207871504,
+          "n": 7749
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=3",
+          "coverage": 0.5076216329087492,
+          "width": 62.27195487896503,
+          "n": 4789
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=4",
+          "coverage": 0.5356589147286822,
+          "width": 61.65166626075921,
+          "n": 1290
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=1",
+          "coverage": 0.9072916666666667,
+          "width": 98.44500766063508,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=2",
+          "coverage": 0.9713541666666666,
+          "width": 76.90652516439937,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=3",
+          "coverage": 0.16208333333333333,
+          "width": 65.87304605032615,
+          "n": 2400
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=4",
+          "coverage": 0.4583333333333333,
+          "width": 64.8718448423845,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=5",
+          "coverage": 0.7307291666666667,
+          "width": 56.813475558054115,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=6",
+          "coverage": 0.07875,
+          "width": 53.44159582609024,
+          "n": 2400
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=7",
+          "coverage": 0.359375,
+          "width": 51.49180060596935,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=8",
+          "coverage": 0.5416666666666666,
+          "width": 49.47453045470257,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=9",
+          "coverage": 0.4197916666666667,
+          "width": 46.24054991824936,
+          "n": 960
+        },
+        {
+          "horizon": 4,
+          "stratum": "overall",
+          "coverage": 0.4854779411764706,
+          "width": 67.09627691375829,
+          "n": 16320
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=1",
+          "coverage": 0.49504373177842564,
+          "width": 75.54127875629378,
+          "n": 3430
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=2",
+          "coverage": 0.38617153942081195,
+          "width": 64.2924546802877,
+          "n": 7217
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=3",
+          "coverage": 0.5281770476842346,
+          "width": 66.12584946021629,
+          "n": 4383
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=4",
+          "coverage": 0.8705426356589148,
+          "width": 63.625123633087775,
+          "n": 1290
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=1",
+          "coverage": 0.8854166666666666,
+          "width": 99.81442144974874,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=2",
+          "coverage": 0.6296875,
+          "width": 79.19272915076833,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=3",
+          "coverage": 0.14791666666666667,
+          "width": 73.24551227187634,
+          "n": 2400
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=4",
+          "coverage": 0.8927083333333333,
+          "width": 68.00359307179355,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=5",
+          "coverage": 0.32395833333333335,
+          "width": 58.2464319953058,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=6",
+          "coverage": 0.3545833333333333,
+          "width": 56.76567942385585,
+          "n": 2400
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=7",
+          "coverage": 0.46822916666666664,
+          "width": 52.9313860992087,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=8",
+          "coverage": 0.2984375,
+          "width": 49.615802380455094,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=9",
+          "coverage": NaN,
+          "width": NaN,
+          "n": 0
+        },
+        {
+          "horizon": 8,
+          "stratum": "overall",
+          "coverage": 0.5384027777777778,
+          "width": 67.21740940655891,
+          "n": 14400
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=1",
+          "coverage": 0.6367395156526875,
+          "width": 75.6634650962444,
+          "n": 3386
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=2",
+          "coverage": 0.5192588980984886,
+          "width": 65.70712648307484,
+          "n": 6153
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=3",
+          "coverage": 0.5203024362923551,
+          "width": 64.88850278014661,
+          "n": 3571
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=4",
+          "coverage": 0.42170542635658914,
+          "width": 58.6987674110866,
+          "n": 1290
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=1",
+          "coverage": 0.91875,
+          "width": 101.96387887820592,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=2",
+          "coverage": 0.7041666666666667,
+          "width": 79.55164601227996,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=3",
+          "coverage": 0.72625,
+          "width": 69.2870199859106,
+          "n": 2400
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=4",
+          "coverage": 0.37083333333333335,
+          "width": 58.806814338062935,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=5",
+          "coverage": 0.19739583333333333,
+          "width": 57.6330248387979,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=6",
+          "coverage": 0.49083333333333334,
+          "width": 55.07018102300424,
+          "n": 2400
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=7",
+          "coverage": 0.3255208333333333,
+          "width": 50.728705220701585,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=8",
+          "coverage": NaN,
+          "width": NaN,
+          "n": 0
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=9",
+          "coverage": NaN,
+          "width": NaN,
+          "n": 0
+        }
+      ]
+    },
+    "bootstrap": {
+      "method": "bootstrap",
+      "rows": [
+        {
+          "horizon": 2,
+          "stratum": "overall",
+          "coverage": 0.9669560185185185,
+          "width": 106.70406687962591,
+          "n": 17280
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=1",
+          "coverage": 0.9953650057937428,
+          "width": 106.75095616996065,
+          "n": 3452
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=2",
+          "coverage": 0.9541876371144664,
+          "width": 106.71482785774126,
+          "n": 7749
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=3",
+          "coverage": 0.9588640634788056,
+          "width": 106.66947994142114,
+          "n": 4789
+        },
+        {
+          "horizon": 2,
+          "stratum": "usdm=4",
+          "coverage": 0.9976744186046511,
+          "width": 106.6423523039757,
+          "n": 1290
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=1",
+          "coverage": 1.0,
+          "width": 106.79243614091358,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=2",
+          "coverage": 1.0,
+          "width": 106.78262585617048,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=3",
+          "coverage": 0.9379166666666666,
+          "width": 106.63094002773174,
+          "n": 2400
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=4",
+          "coverage": 0.996875,
+          "width": 106.62615871975996,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=5",
+          "coverage": 1.0,
+          "width": 106.60195686381145,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=6",
+          "coverage": 0.9983333333333333,
+          "width": 106.62390280055382,
+          "n": 2400
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=7",
+          "coverage": 0.940625,
+          "width": 106.81039574586224,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=8",
+          "coverage": 0.9192708333333334,
+          "width": 106.75522746934979,
+          "n": 1920
+        },
+        {
+          "horizon": 2,
+          "stratum": "month=9",
+          "coverage": 0.8510416666666667,
+          "width": 106.79849517081723,
+          "n": 960
+        },
+        {
+          "horizon": 4,
+          "stratum": "overall",
+          "coverage": 0.9625612745098039,
+          "width": 105.93488689260157,
+          "n": 16320
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=1",
+          "coverage": 0.9900874635568513,
+          "width": 105.95576040960377,
+          "n": 3430
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=2",
+          "coverage": 0.9476236663433559,
+          "width": 105.93577396726104,
+          "n": 7217
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=3",
+          "coverage": 0.9550536162445813,
+          "width": 105.90958123467253,
+          "n": 4383
+        },
+        {
+          "horizon": 4,
+          "stratum": "usdm=4",
+          "coverage": 0.9984496124031008,
+          "width": 105.96040357288678,
+          "n": 1290
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=1",
+          "coverage": 0.9994791666666667,
+          "width": 105.95241431095268,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=2",
+          "coverage": 0.9958333333333333,
+          "width": 105.88812625806264,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=3",
+          "coverage": 0.99625,
+          "width": 105.95041836238128,
+          "n": 2400
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=4",
+          "coverage": 0.9989583333333333,
+          "width": 105.93428364583252,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=5",
+          "coverage": 0.9942708333333333,
+          "width": 105.91598061700705,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=6",
+          "coverage": 0.9720833333333333,
+          "width": 105.9107938125031,
+          "n": 2400
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=7",
+          "coverage": 0.9260416666666667,
+          "width": 106.00064393451967,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=8",
+          "coverage": 0.8067708333333333,
+          "width": 105.92857460213322,
+          "n": 1920
+        },
+        {
+          "horizon": 4,
+          "stratum": "month=9",
+          "coverage": NaN,
+          "width": NaN,
+          "n": 0
+        },
+        {
+          "horizon": 8,
+          "stratum": "overall",
+          "coverage": 0.9481944444444445,
+          "width": 106.29502465545796,
+          "n": 14400
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=1",
+          "coverage": 0.9616066154754873,
+          "width": 106.24033284007719,
+          "n": 3386
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=2",
+          "coverage": 0.9215017064846417,
+          "width": 106.32719360851979,
+          "n": 6153
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=3",
+          "coverage": 0.9627555306636797,
+          "width": 106.25593673743072,
+          "n": 3571
+        },
+        {
+          "horizon": 8,
+          "stratum": "usdm=4",
+          "coverage": 1.0,
+          "width": 106.39334548798921,
+          "n": 1290
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=1",
+          "coverage": 0.9838541666666667,
+          "width": 106.25029769619171,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=2",
+          "coverage": 0.9911458333333333,
+          "width": 106.28231691088467,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=3",
+          "coverage": 0.9983333333333333,
+          "width": 106.36773716331861,
+          "n": 2400
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=4",
+          "coverage": 1.0,
+          "width": 106.35809193799945,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=5",
+          "coverage": 0.9833333333333333,
+          "width": 106.26512391394671,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=6",
+          "coverage": 0.9441666666666667,
+          "width": 106.28952089472845,
+          "n": 2400
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=7",
+          "coverage": 0.725,
+          "width": 106.23528188435343,
+          "n": 1920
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=8",
+          "coverage": NaN,
+          "width": NaN,
+          "n": 0
+        },
+        {
+          "horizon": 8,
+          "stratum": "month=9",
+          "coverage": NaN,
+          "width": NaN,
+          "n": 0
+        }
+      ]
+    }
+  }
+}

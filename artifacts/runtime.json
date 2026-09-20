@@ -1,0 +1,43 @@
+{
+  "git_sha": "a3f212d083122dcf5b6d62efe2a574d7beb4c67b",
+  "dev_subset": true,
+  "stages": [
+    {
+      "stage": "sanity",
+      "module": "cofire.model.sanity",
+      "exit_code": 0,
+      "wall_seconds": 10.3,
+      "peak_rss_mb": 1636.4,
+      "note": "from pipeline run after feature store existed"
+    },
+    {
+      "stage": "train",
+      "module": "cofire.model.train",
+      "exit_code": 0,
+      "wall_seconds": 745.67,
+      "peak_rss_mb": null,
+      "note": "timed from process elapsed_ms after OpenMP pin; peak RSS not sampled"
+    },
+    {
+      "stage": "calibrate",
+      "module": "cofire.model.calibrate",
+      "exit_code": 0,
+      "wall_seconds": 6.17,
+      "peak_rss_mb": 406.5
+    },
+    {
+      "stage": "hindcast",
+      "module": "cofire.model.hindcast",
+      "exit_code": 0,
+      "wall_seconds": 12.28,
+      "peak_rss_mb": 1400.4
+    },
+    {
+      "stage": "export",
+      "module": "cofire.model.export",
+      "exit_code": 0,
+      "wall_seconds": 30.72,
+      "peak_rss_mb": 1438.6
+    }
+  ]
+}
