@@ -4,19 +4,23 @@ Git `a3f212d083122dcf5b6d62efe2a574d7beb4c67b`. Dev subset: **Pueblo County** (`
 moved from Larimer this session. Displayed resolution 4000 m. **2026 hindcast remains sealed at 2
 looks** on config `0957e415fa7f3fad` — nothing in v0.6 evaluated on 2026.
 
-## Look 3 pre-registration (not taken in this session)
+## Look 3 pre-registration (current, not taken in this session)
 
-`docs/PREREGISTRATION_LOOK3.md`, sha256 `c6d45df72dedb51b3ae063c1ad7050796da91e6af5e3bfe8063bd77faef50b2c`.
+`docs/PREREGISTRATION_LOOK3.md`, sha256 `88d8fdf7253e258e1c58b12e80ff845c40da181a682d16b8bae5af881ebc1243`.
 
-The 2026 holdout stands at **2 looks** on config `0957e415fa7f3fad`. This
-session took none. The three questions look 3 answers are fixed in that
-document, along with recorded predictions so that a surprising result is
-visibly surprising: coverage is predicted to fail at h=8, to land between 0.75
-and 0.88 at h=2, and the 2.4x residual inflation is predicted to recur.
+Names **8 target-and-domain pairs** that survived the confirmation pass: 51
+targets, 40 estimable under the rare-event rule, 13 surviving BH at q=0.10 with
+Holm within event family, 9 clearing every applicable baseline, 8 agreeing in
+sign across both domains.
 
-The v1 additions from this session sit outside the frozen hash and are not part
-of look 3 unless a human decides otherwise, because they are not yet validated
-on both domains. `tests/test_look_seal.py` fails if the counter moves.
+Reference is week-of-year seasonal climatology. Stage 1 is a fixed ridge
+specification at penalty 100 chosen on pooled LODO. Bootstrap is stratified by
+positive weeks with a 12-week estimability floor. Pass rule, exclusions and
+predictions are all fixed in the document. The recorded prediction is
+**partially confirmed**, 2 to 4 of 8.
+
+The holdout remains at **2 looks** on config `0957e415fa7f3fad`. This session
+took none.
 
 
 ## Phase 4 pre-registration (v1.0, recorded before the first PID run)
