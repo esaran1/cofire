@@ -41,7 +41,18 @@ from cofire.model.targets import (  # noqa: E402
 LOGGER = logging.getLogger("cofire.shipping")
 
 OUT_DIR = Path("artifacts/shipping")
-FOLD_YEARS = (2020, 2021, 2024, 2025)
+# Shared LODO years: drought years present in BOTH domains' training spans, so
+# a pooled selection scores every arm on the same folds. 2024 and 2025 are gone
+# because the restored split puts them in the calibration window, and the old
+# list predates the 2007 extension.
+FOLD_YEARS = (2011, 2012, 2013, 2018, 2020, 2021)
+
+# Per-domain reporting folds: the shared set plus each domain's own
+# above-median drought years.
+DOMAIN_FOLDS = {
+    "larimer": (2011, 2012, 2013, 2016, 2017, 2018, 2020, 2021),
+    "pueblo": (2011, 2012, 2013, 2014, 2018, 2020, 2021),
+}
 DOMAINS = ("larimer", "pueblo")
 FIRE_ARMS = ("transition", "damped")
 
