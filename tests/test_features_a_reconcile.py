@@ -27,7 +27,8 @@ import pytest
 from cofire.model.config import get_settings
 
 DOMAINS = ("larimer", "pueblo")
-A_COLUMNS = ("usdm", "erc", "erc_pct")
+# erc_pct is gated against the reference, not the store: see below.
+A_COLUMNS = ("usdm", "erc")
 OVERLAP = (2018, 2025)
 
 
@@ -52,7 +53,48 @@ def _load_pair(domain: str) -> tuple[pd.DataFrame, pd.DataFrame] | None:
 
 
 @pytest.mark.parametrize("domain", DOMAINS)
-@pytest.mark.parametrize("column", A_COLUMNS)
+def test_erc_pct_equals_the_reference(domain: str) -> None:
+    """erc_pct is gated against the reference, not against the store.
+
+    The store's erc_pct is the value shown to be wrong: it was fitted through
+    2022-12-31, past a split ending 2021, and used kind="weak". Comparing to it
+    would enforce the defect. The reference is the definition.
+    """
+    from cofire.model.erc_pct import erc_percentile_reference
+
+    pair = _load_pair(domain)
+    if pair is None:
+        pytest.skip(f"{domain}: feature stores not built in this checkout")
+    _old, new = pair
+    st = get_settings()
+    mask = (new["time"] <= pd.Timestamp(st.train_end)).to_numpy()
+    ref = erc_percentile_reference(new[["cell_id", "time", "erc"]], mask)
+    got = pd.to_numeric(new["erc_pct"], errors="coerce").to_numpy(dtype=float)
+    k = np.isfinite(got) & np.isfinite(ref)
+    assert k.sum() > 10_000
+    worst = float(np.abs(got[k] - ref[k]).max())
+    assert worst <= 1e-6, f"{domain}: erc_pct differs from the reference by {worst:.6g}"
+
+
+@pytest.mark.parametrize("domain", DOMAINS)
+def test_erc_pct_is_approximately_uniform_on_training_data(domain: str) -> None:
+    """A week-of-year percentile has a near-uniform marginal per cell.
+
+    The check that would have caught both the single-week pool, which gave nine
+    distinct values, and a wrong percentile formula.
+    """
+    pair = _load_pair(domain)
+    if pair is None:
+        pytest.skip(f"{domain}: feature stores not built in this checkout")
+    _old, new = pair
+    st = get_settings()
+    tr = new[new["time"] <= pd.Timestamp(st.train_end)]
+    widths = tr.groupby("cell_id")["erc_pct"].apply(lambda s: s.quantile(0.95) - s.quantile(0.05))
+    assert 80.0 <= float(widths.mean()) <= 100.0, f"{domain}: mean width {widths.mean():.2f}"
+
+
+@pytest.mark.parametrize("domain", DOMAINS)
+@pytest.mark.parametrize("column", ("usdm", "erc"))
 def test_decoupled_builder_matches_the_store(domain: str, column: str) -> None:
     pair = _load_pair(domain)
     if pair is None:
