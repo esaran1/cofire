@@ -37,7 +37,7 @@ from cofire.model.config import Settings, get_settings  # noqa: E402
 from cofire.model.data import DateRange  # noqa: E402
 from cofire.model.data.erc_extension import cache_path as erc_cache_path  # noqa: E402
 from cofire.model.dates import tuesdays  # noqa: E402
-from cofire.model.features import PCT_HALF_WINDOW, _percentile  # noqa: E402
+from cofire.model.features import PCT_HALF_WINDOW  # noqa: E402
 
 LOGGER = logging.getLogger("cofire.features_a")
 
@@ -183,37 +183,42 @@ def weekly_usdm(template: GridTemplate, settings: Settings | None = None) -> xr.
 def erc_percentile(
     erc: xr.DataArray, train_end: pd.Timestamp, half_window: int = PCT_HALF_WINDOW
 ) -> xr.DataArray:
-    """Per-cell week-of-year percentile of ERC, training years only.
+    """`erc_pct` through the single reference implementation.
 
-    The same construction the full builder uses: a circular window of
-    `half_window` weeks either side, because a single week holds about one
-    value per training year and a percentile against four values can only
-    return 0, 25, 50, 75 or 100.
+    Delegates to `cofire.model.erc_pct.erc_percentile_reference` so that this
+    builder, the store's `transform`, and anything else computing a percentile
+    share one definition and one formula. Computing the same quantity two ways
+    is how the original ACI failure happened, and the `erc_pct` disagreement
+    found during the record extension was the same shape.
     """
-    t = pd.DatetimeIndex(erc["time"].values)
-    woy = t.isocalendar().week.astype(int).clip(1, 52).to_numpy()
-    train_mask = t <= train_end
-    vals = np.asarray(erc.values, dtype=float)
-    out = np.full(vals.shape, np.nan, dtype=float)
+    from cofire.model.erc_pct import erc_percentile_reference
 
-    n_lat, n_lon = vals.shape[1], vals.shape[2]
-    for i in range(n_lat):
-        for j in range(n_lon):
-            series = vals[:, i, j]
-            by_week: dict[int, list[float]] = {}
-            for k in np.where(train_mask)[0]:
-                v = series[k]
-                if np.isfinite(v):
-                    by_week.setdefault(int(woy[k]), []).append(float(v))
-            pooled: dict[int, np.ndarray] = {}
-            for w in range(1, 53):
-                window = [((w - 1 + d) % 52) + 1 for d in range(-half_window, half_window + 1)]
-                vs = [x for ww in window for x in by_week.get(ww, [])]
-                if vs:
-                    pooled[w] = np.sort(np.asarray(vs, dtype=float))
-            for k in range(len(series)):
-                hist = pooled.get(int(woy[k]))
-                out[k, i, j] = _percentile(float(series[k]), hist)
+    times = pd.DatetimeIndex(erc["time"].values)
+    lat = np.asarray(erc["lat"].values, dtype=float)
+    lon = np.asarray(erc["lon"].values, dtype=float)
+    vals = np.asarray(erc.values, dtype=float)
+
+    frames = []
+    for i, la in enumerate(lat):
+        for j, lo in enumerate(lon):
+            frames.append(
+                pd.DataFrame(
+                    {
+                        "cell_id": f"{la:.4f}_{lo:.4f}",
+                        "time": times,
+                        "erc": vals[:, i, j],
+                    }
+                )
+            )
+    flat = pd.concat(frames, ignore_index=True)
+    mask = (flat["time"] <= train_end).to_numpy()
+    flat["pct"] = erc_percentile_reference(flat, mask, half_window=half_window)
+
+    wide = flat.pivot(index="time", columns="cell_id", values="pct")
+    out = np.full(vals.shape, np.nan, dtype=float)
+    for i, la in enumerate(lat):
+        for j, lo in enumerate(lon):
+            out[:, i, j] = wide[f"{la:.4f}_{lo:.4f}"].reindex(times).to_numpy(dtype=float)
     return xr.DataArray(out, dims=erc.dims, coords=erc.coords, name="erc_pct")
 
 

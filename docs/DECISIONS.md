@@ -1260,3 +1260,79 @@ passes for `usdm` and `erc` on both domains and fails for `erc_pct`, which is
 the honest state. Nothing downstream has been run on this data. Resolving it
 means reading `fit_training_stats` and reproducing its pooling exactly, not
 relaxing the tolerance.
+
+## erc_pct: one reference implementation, and what the two old ones did wrong
+
+The definition, stated once and now implemented once in `cofire/model/erc_pct.py`:
+the empirical percentile of a cell-week's ERC within that cell's pool of
+training values whose week-of-year lies within +/- 3 of it on a circular
+calendar, with `scipy.stats.percentileofscore(kind="mean")`.
+
+`kind="mean"` rather than `"weak"` because a value drawn from its own pool
+should be unbiased: for a pool of n distinct values the n results are evenly
+spaced about 50 under `"mean"`, while `"weak"` skews them upward by 100/(2n).
+
+**The hand-calculated cell, fully reproducible.** Cell `40.8583_-105.1833`,
+week 2018-01-02, woy 1, window weeks [50, 51, 52, 1, 2, 3, 4]. On a 2018 to
+2020 training window the pool holds 22 values:
+
+    40.0 51.1 44.6 42.1 35.6 54.0 51.7 32.0 46.6 43.3 47.6
+    29.4 33.3 48.3 36.6 44.6 43.4 41.4 66.7 43.9 44.1 47.7
+
+Target ERC 40.0: 5 strictly below, 1 equal, n=22.
+
+    strict  = 500/22   = 22.7273
+    weak    = 600/22   = 27.2727
+    mean    = 550/22   = 25.0000   <- reference
+
+The store reported **11.7647**, which is none of these.
+
+**Why the store differed: the wrong training window, not the wrong formula.**
+Its window code in `fit_training_stats` uses the same circular wrap as the
+reference. The persisted `artifacts/training_stats.pkl` carries
+`train_end = 2022-12-31` and a pool of **34** values for that cell-week, giving
+4/34 = 11.7647 exactly under `kind="weak"`. A woy-1 pool spans 7 weeks, so 34
+values is five training years and 22 is three.
+
+So `erc_pct` in the store was fitted on **2018 to 2022**, which includes the
+validation years. The percentile target saw its own evaluation period.
+
+**Disagreement with the reference, measured on the store's own window:**
+
+    domain   store vs reference              builder vs reference
+    larimer  79.9% of cell-weeks, max 14.71  97.6%, max 42.38
+    pueblo   81.4% of cell-weeks, max 11.43  98.4%, max 36.67
+
+The store differs by the tie convention; the decoupled builder differs by the
+wider 2007 to 2021 training window, which is the intended change.
+
+**Both now delegate to the reference.** `features.py::_percentile` and
+`features_a.py::erc_percentile` call the same function, so fitting and
+transformation cannot drift apart again. Eight tests cover the reference,
+including the year wrap at weeks 50 to 3, the tie convention, and a pool listed
+row by row for hand-checking.
+
+## Which earlier results were computed on a flawed target
+
+`erc_pct` feeds every fire target, since `f_gt80`, `f_gt90` and `f_gt97` are
+exceedances of it, and `erc_pct_h{2,4,8}` are its horizon shifts.
+
+**Affected, and superseded rather than corrected:**
+
+- every fire row of `artifacts/ablation/confirm.csv`
+- `artifacts/ablation/fire_baselines.csv` in full, which is the table that
+  retired the three `f_gt97` survivors
+- the fire rows of `artifacts/ablation/oracle_decomposition.csv` and
+  `two_stage.csv`
+- the fire entries of `artifacts/shipping/choices.json`, 9 of 27 targets
+- `artifacts/shipping/continuous_reference.csv` in full, since the continuous
+  target *is* `erc_pct`
+- the SubX result for `f_gt90_h2`, the one target that switched to
+  configuration B
+
+The drought targets are built from USDM categories and are unaffected.
+
+Two of the conclusions those tables support are worth flagging as now resting
+on a flawed target: that the fire transition baseline absorbed every fire
+survivor, and that `f_gt90_h2` was the single SubX adoption. Both are plausible
+on their face and neither is confirmed. The extended rerun recomputes them.
