@@ -17,13 +17,11 @@ import json
 from pathlib import Path
 
 import pytest
-
 from cofire.model.freeze import (
     HOLDOUT_YEAR,
     config_hash,
     look_count,
     model_files_match,
-    record_look,
 )
 
 

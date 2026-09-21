@@ -9,11 +9,9 @@ that resets a counter.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
-
 from cofire.model.look3 import (
     COND_COVERAGE_TARGET,
     COND_COVERAGE_TOL,
@@ -66,7 +64,7 @@ def test_criteria_match_the_preregistration() -> None:
     preregister, which is the failure the document exists to prevent.
     """
     doc = Path("docs/PREREGISTRATION_LOOK3.md").read_text()
-    assert f"≥ 0.70" in doc and ROLL13_FLOOR == 0.70
+    assert "≥ 0.70" in doc and ROLL13_FLOOR == 0.70
     assert "within 0.05 of 0.90" in doc
     assert COND_COVERAGE_TOL == 0.05
     assert COND_COVERAGE_TARGET == 0.90

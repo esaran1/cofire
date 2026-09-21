@@ -13,7 +13,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from cofire.model.freeze import config_hash, model_files_match
 
 FREEZE_FILE = Path("artifacts/FREEZE_COMMIT")
