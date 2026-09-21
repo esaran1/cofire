@@ -199,6 +199,43 @@ def offset_logit_for_rows(
     return np.asarray(t.map(z).to_numpy(dtype=float), dtype=float)
 
 
+def fit_deviation_weight(
+    stage1_logit: np.ndarray, cell_score: np.ndarray, y: np.ndarray
+) -> float:
+    """How much the cell model's deviation is worth, fitted out of sample.
+
+    The cell logit is not on a meaningful scale: measured on Larimer
+    `f_gt90_h8` it has sd 1.88 and spans -7.9 to 2.9. Adding that to a level at
+    full weight swamps the level, which is what drove the first two-stage run to
+    a mean prediction of 0.1615 against an actual rate of 0.067 and a recovery of
+    -18. The weight is therefore estimated rather than assumed, by a
+    one-parameter logistic fit with the stage-1 logit as a fixed offset.
+
+    Must be fitted on data the cell model did not train on, or the weight
+    inherits the cell model's in-sample overconfidence.
+    """
+    from sklearn.linear_model import LogisticRegression
+
+    m = np.isfinite(stage1_logit) & np.isfinite(cell_score) & np.isfinite(y)
+    if m.sum() < 50 or len(np.unique(y[m])) < 2:
+        return 0.0
+    eps = 1e-6
+    q = np.clip(cell_score[m], eps, 1 - eps)
+    zc = np.log(q / (1 - q))
+    dev = zc - float(np.mean(zc))
+    # Fit only the slope on the deviation; the level is already carried by the
+    # offset, so no intercept is estimated.
+    lr = LogisticRegression(max_iter=400, fit_intercept=False)
+    try:
+        lr.fit(dev.reshape(-1, 1), y[m], sample_weight=None)
+    except ValueError:
+        return 0.0
+    w = float(lr.coef_.ravel()[0])
+    # A negative weight would mean the ranking is inverted, which is a finding
+    # about the model rather than something to exploit, so it is floored at 0.
+    return float(np.clip(w, 0.0, 1.0))
+
+
 def two_stage_probability(
     stage1_logit: np.ndarray, cell_score: np.ndarray, weight: float = 1.0
 ) -> np.ndarray:
@@ -206,8 +243,12 @@ def two_stage_probability(
 
     The cell score is re-centred on its own logit mean so it contributes only
     the *deviation* of a cell from its week, and the level comes entirely from
-    stage 1. Without the re-centring the two stages would both be asserting a
-    level and the result would double-count.
+    stage 1. Without the re-centring the two stages would both assert a level
+    and the result would double-count.
+
+    `weight` scales the deviation. It defaults to 1.0 for the identity case but
+    should normally come from `fit_deviation_weight`, because an unscaled cell
+    logit overwhelms the level it is meant to refine.
     """
     eps = 1e-6
     q = np.clip(cell_score, eps, 1 - eps)

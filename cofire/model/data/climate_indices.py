@@ -163,9 +163,15 @@ def attach_monthly_indices(
         return out
 
     idx = idx.copy()
-    idx["time"] = pd.to_datetime(idx["time"])
+    # Force a common resolution. The parquet round-trip stores microseconds
+    # while the feature store carries nanoseconds, and merge_asof refuses to
+    # join datetime64[us] against datetime64[ns].
+    idx["time"] = pd.to_datetime(idx["time"]).astype("datetime64[ns]")
+    out["time"] = out["time"].astype("datetime64[ns]")
     # Shift the index forward by the publication lag, then as-of join backwards.
-    idx["readable_from"] = idx["time"] + pd.DateOffset(months=lag_months)
+    idx["readable_from"] = (idx["time"] + pd.DateOffset(months=lag_months)).astype(
+        "datetime64[ns]"
+    )
     idx = idx.sort_values("readable_from")
     merged = pd.merge_asof(
         out.sort_values("time"),

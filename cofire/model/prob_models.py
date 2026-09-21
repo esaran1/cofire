@@ -216,3 +216,37 @@ def out_of_fold_predictions(
     if not ps:
         return np.array([]), np.array([])
     return np.concatenate(ps), np.concatenate(ys)
+
+
+def out_of_fold_frame(
+    frame: pd.DataFrame,
+    feature_cols: list[str],
+    target: str,
+    fold_years: tuple[int, ...],
+    fit: Callable[[pd.DataFrame, pd.DataFrame, list[str], str], np.ndarray],
+) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
+    """Out-of-fold predictions, with the rows they came from.
+
+    Returns (predictions, outcomes, rows). The rows matter when something
+    downstream needs to line up another per-row quantity with these
+    predictions: truncating two independently ordered arrays to a common length
+    would silently pair unrelated rows.
+    """
+    t = pd.to_datetime(frame["time"])
+    ps: list[np.ndarray] = []
+    ys: list[np.ndarray] = []
+    frames: list[pd.DataFrame] = []
+    for year in fold_years:
+        held = frame[t.dt.year == year]
+        rest = frame[t.dt.year != year]
+        if held.empty or rest.empty:
+            continue
+        y = pd.to_numeric(held[target], errors="coerce").to_numpy(dtype=float)
+        if not np.isfinite(y).any() or len(np.unique(y[np.isfinite(y)])) < 2:
+            continue
+        ps.append(np.asarray(fit(rest, held, feature_cols, target), dtype=float))
+        ys.append(y)
+        frames.append(held)
+    if not ps:
+        return np.array([]), np.array([]), frame.iloc[:0]
+    return np.concatenate(ps), np.concatenate(ys), pd.concat(frames, ignore_index=True)

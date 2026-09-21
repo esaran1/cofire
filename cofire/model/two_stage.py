@@ -32,6 +32,7 @@ from cofire.model.base_rate import (  # noqa: E402
     BaseRateModel,
     add_slow_predictors,
     domain_weeks,
+    fit_deviation_weight,
     offset_logit_for_rows,
     select_predictors,
     two_stage_probability,
@@ -41,7 +42,7 @@ from cofire.model.oracle_decomp import oracle_calibrate  # noqa: E402
 from cofire.model.prob_metrics import block_bootstrap, brier, brier_decomposition  # noqa: E402
 from cofire.model.prob_models import (  # noqa: E402
     fit_lightgbm_classifier,
-    out_of_fold_predictions,
+    out_of_fold_frame,
     platt_recalibrate,
 )
 from cofire.model.targets import (  # noqa: E402
@@ -83,11 +84,23 @@ def evaluate_target(
 
     # --- stage 2: the cell model's ranking on top of that level
     raw = fit_lightgbm_classifier(train, valid, feature_cols, target)
-    p_oof, y_oof = out_of_fold_predictions(
+    p_oof, y_oof, rows_oof = out_of_fold_frame(
         train, feature_cols, target, FOLD_YEARS, fit_lightgbm_classifier
     )
-    p_stage2 = two_stage_probability(z1, raw)
     p_platt = platt_recalibrate(p_oof, y_oof, raw) if p_oof.size else raw
+
+    # The deviation weight is fitted on the pooled out-of-fold predictions, so
+    # it never sees validation and does not inherit the cell model's in-sample
+    # overconfidence. The offset is computed from the very rows those
+    # predictions came from, which is why out_of_fold_frame returns them:
+    # truncating two independently ordered arrays to a common length would pair
+    # unrelated rows.
+    if p_oof.size:
+        z_oof = offset_logit_for_rows(rows_oof, s1, domain_weeks(rows_oof, target))
+        weight = fit_deviation_weight(z_oof, p_oof, y_oof)
+    else:
+        weight = 0.0
+    p_stage2 = two_stage_probability(z1, raw, weight=weight)
 
     # --- references and counterfactuals
     const = constant_event_baseline(train, target, valid)
@@ -127,6 +140,7 @@ def evaluate_target(
         "train_rate": round(float(pd.to_numeric(train[target], errors="coerce").mean()), 5),
         "valid_rate": round(float(np.nanmean(y)), 5),
         "stage1_predictors": ",".join(chosen) if chosen else "(season only)",
+        "deviation_weight": round(weight, 4),
         "brier_constant": round(b_const, 5),
         "brier_seasonal": round(b_seasonal, 5),
         "brier_oracle_constant": round(b_oracle_const, 5),
