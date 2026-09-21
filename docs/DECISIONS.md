@@ -1067,3 +1067,46 @@ some spread for usable sample size, and a single cell's own distribution is
 tighter than the cross-cell marginal. 91.4 is the right check on the *synthetic
 uniform* invariant, which `tests/test_clim_width.py` asserts at 80 to 95; 73 to
 75 is the right value for a real per-cell interval.
+
+## The single SubX run: one target adopted
+
+The rule was applied mechanically, once, with no iteration.
+
+**Leakage guard, active.** The lead-dependent SubX climatology is refit inside
+each fold with the held-out year excluded, and `assert_no_self_contribution`
+raises if any held-out week fed the climatology used for its own anomalies. Five
+tests cover it, including one that confirms the assertion fires rather than
+merely existing. Configuration A is rescored on exactly the rows B sees: the
+SubX-covered subset, 74,880 of 218,880 rows on Larimer and 67,392 of 196,992 on
+Pueblo.
+
+**Coverage limitation, recorded in the run output.** SubX has no hindcast
+coverage inside the training split. The hindcast ends 2017-09-30 and the split
+begins 2018, so B draws only on the forecast series.
+
+**Result: 54 comparisons, 43 estimable, 10 passing in one domain, 1 passing in
+both.**
+
+    target      domain   Brier A   Brier B   BSS B vs A [95% CI]
+    f_gt90_h2   larimer  0.14459   0.13393   +0.0737 [+0.0036, +0.1119]
+    f_gt90_h2   pueblo   0.18622   0.12536   +0.3268 [+0.2006, +0.4509]
+
+`f_gt90_h2` switches to configuration B. Every other target stays on A, which is
+what the rule says and is why it was written as a both-domains rule: five
+Larimer targets and five Pueblo targets passed individually, and only one
+overlaps. Ten single-domain passes out of 43 estimable comparisons is close to
+what a 5 percent per-comparison error rate would produce by itself.
+
+**The caveat that belongs with this result.** Only **one** LODO fold, 2020,
+falls inside the 2018 to 2020 training split, so each comparison rests on a
+single held-out year. The circular block bootstrap prices the uncertainty
+within that year, not across years, and no amount of resampling inside one year
+substitutes for seeing another. `f_gt90_h2` is adopted because the rule says so
+and the rule was fixed in advance, but its evidential basis is one year on each
+domain, and the look-3 pre-registration states that.
+
+**Why this target is plausible rather than surprising.** `f_gt90_h2` is fire
+danger above the 90th percentile at a two-week lead. Two weeks is the horizon at
+which a subseasonal precipitation and temperature forecast still carries real
+information, and fire danger responds to weather on that timescale. If any
+target were going to benefit from forecast weather, this is the one.

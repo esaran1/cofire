@@ -242,3 +242,50 @@ def anomalies(frame: pd.DataFrame, var: str) -> pd.DataFrame:
     out = out.merge(clim, on=["lead", "woy"], how="left")
     out[f"{var}_anom"] = out[var] - out[f"{var}_clim"]
     return out.drop(columns=["woy"])
+
+
+def fold_climatology(
+    frame: pd.DataFrame, var: str, exclude_year: int
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Lead-dependent climatology refit with one year held out.
+
+    Returns (climatology, rows_used). The held-out year contributes nothing to
+    the climatology used for its own anomalies, which is what
+    `assert_no_self_contribution` verifies on the returned rows.
+    """
+    if frame.empty:
+        return pd.DataFrame(columns=["lead", "woy", f"{var}_clim"]), frame
+    issues = pd.to_datetime(frame["issue"])
+    used = frame[issues.dt.year != exclude_year]
+    return lead_climatology(used, var, hindcast_only=False), used
+
+
+def assert_no_self_contribution(rows_used: pd.DataFrame, exclude_year: int) -> None:
+    """Fail loudly if a held-out week fed the climatology for its own anomaly.
+
+    The assertion the leakage guard turns on. A lead-dependent climatology is
+    fitted per fold, and if the fold's own year leaked into it the anomalies
+    would be centred on the very weeks they are meant to be evaluated against.
+    """
+    if rows_used.empty:
+        return
+    years = pd.to_datetime(rows_used["issue"]).dt.year.unique()
+    bad = sorted(int(y) for y in years if int(y) == exclude_year)
+    if bad:
+        raise AssertionError(
+            f"climatology for fold {exclude_year} was fitted on rows from "
+            f"{bad}: the held-out year contributed to its own anomalies"
+        )
+
+
+def coverage_note() -> str:
+    """What the SubX arm can and cannot see, recorded in every run output."""
+    return (
+        "SubX CFSv2 has no hindcast coverage inside the training split: the "
+        "hindcast series ends 2017-09-30 and the training split begins 2018, so "
+        "configuration B draws only on the forecast series. With a 2018 to 2020 "
+        "training split and one year held out, B is trained on at most 2 years "
+        "per fold, and on at most 7 years were the split extended to 2025. "
+        "Ensemble size and configuration differ between the hindcast and "
+        "forecast series, which is why subx_is_forecast travels with the data."
+    )

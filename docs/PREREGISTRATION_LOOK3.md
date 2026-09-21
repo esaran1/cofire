@@ -21,6 +21,13 @@ So the baselines ship, and there is nothing left to claim skill over. This look
 tests **calibration**, not skill. There are no skill hypotheses in it, because
 the shipped forecast *is* the baseline.
 
+## The shipped configuration
+
+**Final config sha256
+`f65b7f7a28bcba199b38e9ea2d43f364f9ca7db16b9b32a042c850a70534de99`**, over the
+frozen family choices, the continuous arms, the SubX verdict and the pinned
+constants. This is what look 3 tests.
+
 ## Configuration A, frozen
 
 sha256 `67da282e8b377ea0b59834372945e5071d5bab4774fd78172a43c432b00ad49b`,
@@ -55,6 +62,28 @@ The SubX run happens **once**, after the fetch completes and before look 3, with
 the rule applied mechanically. No iteration, no re-specification, no second run
 with different covariates. If the rule selects nothing, A is frozen unchanged
 and that is the recorded result.
+
+**The run has been executed. Result: one target adopted.**
+
+    target      domain   Brier A   Brier B   BSS B vs A [95% CI]
+    f_gt90_h2   larimer  0.14459   0.13393   +0.0737 [+0.0036, +0.1119]
+    f_gt90_h2   pueblo   0.18622   0.12536   +0.3268 [+0.2006, +0.4509]
+
+54 comparisons, 43 estimable, 10 passing in a single domain, 1 passing in both.
+`f_gt90_h2` ships on **configuration B**; all other targets ship on **A**.
+
+The leakage guard was active: the lead-dependent climatology is refit per fold
+with the held-out year excluded, `assert_no_self_contribution` verifies no
+held-out week fed its own anomalies, and A was rescored on exactly the rows B
+sees, 74,880 of 218,880 on Larimer and 67,392 of 196,992 on Pueblo.
+
+**The evidential basis is one year.** Only 2020 falls inside the 2018 to 2020
+training split, so each comparison rests on a single held-out year and the
+bootstrap prices uncertainty within that year rather than across years. Ten
+single-domain passes out of 43 estimable comparisons is roughly what a 5 percent
+per-comparison error rate produces unaided, which is the reason the rule demands
+both domains. `f_gt90_h2` is adopted because the rule was fixed in advance and
+it passed; its confirmation on 2026 is a genuine test of a thin result.
 
 ## Confirmatory tests on 2026
 
@@ -164,10 +193,37 @@ circular plus or minus 3 week window used to define the percentile itself.
     pooled +/- 3 weeks                81.2
     cross-cell marginal               91.4
 
-The shipped estimator reports 73.5 to 75.5 across the six cells below. That sits
-below the 91.4 marginal because a single cell's own distribution is tighter than
-the pooled-across-cells one, which is the correct comparison for a per-cell
-interval. `tests/test_clim_width.py` asserts the invariant on a synthetic
+**Which figure the rule uses, and why two appear.** The rule uses the
+**LODO figure, 73.5 to 75.5**, because the ratio is computed inside the same
+folds the forecast is scored in. The 81.2 quoted above is the same estimator run
+on the **full** training frame. The difference is a small-sample tail effect,
+not an estimator discrepancy, and it was traced rather than assumed:
+
+    same estimator, full training frame, per row          80.96
+    same estimator, full frame, unique (cell, woy)        80.96
+    independent probe, unique (cell, woy), 60 cells       81.17
+    same estimator, inside the LODO fold                  73.54
+
+Per-row and per-cell-week means agree to two decimals, so it is not a weighting
+artefact. It is the number of values available: a pooled 7-week window holds
+about 7n values for n training years, so the full frame gives about 21 and a
+LODO fold about 14, and a 5th-to-95th spread estimated from 14 values sits
+inside one estimated from 21. Fewer values, narrower apparent tails.
+
+Ties were checked and ruled out: the fraction of `erc_pct_h4` values pinned at 0
+or 100 is 0.0000 to 0.0248 by season on Larimer and 0.0000 to 0.0445 on Pueblo,
+far too small to move a width by 7 points.
+
+**A limitation this exposed, stated plainly.** The training split runs 2018 to
+2020, so of the four nominal LODO fold years only **2020** falls inside it. Every
+LODO figure in this document therefore rests on **one fold fit on two years**.
+That is thin, it is why the fold width is biased low, and it bounds how much
+weight any LODO number here can carry. It does not change the classification:
+the ratio intervals are 1.111 to 1.369 and would have to fall by roughly a fifth
+to reach 1.0, which the 81.2 full-frame width moves them further from, not
+closer to.
+
+`tests/test_clim_width.py` asserts the estimator's invariant on a synthetic
 uniform panel, which is the check that would have caught the original error.
 
 **Corrected reference values, LODO, training years:**
@@ -270,6 +326,11 @@ and under neither of which was any look taken:
   whose climatological width was computed on single-week groups of about three
   values and understated it by roughly a factor of 2.2, and whose
   classification rule used a point estimate rather than an interval.
+- sha256 `fdccb0f6a00a6ef27b92ea7ca4eeb87da6ee4e6f3ee26a6eedbe4d06b2b8b991`,
+  which reported the corrected reference values without explaining why the
+  in-fold width differs from the full-frame width, and without recording that
+  only one LODO fold falls inside the training split. No reference value or
+  classification changed; the basis is now stated.
 
 ## Stopping rule
 
