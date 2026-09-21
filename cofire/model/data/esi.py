@@ -49,12 +49,19 @@ LOGGER = logging.getLogger("cofire.data.esi")
 BASE = "https://gis1.servirglobal.net/data/esi"
 PRODUCT = "4WK"
 # One global scanline is 7200 float32 px; the domain needs a contiguous row band.
-# Measured, not guessed. The ESI GeoTIFFs are uncompressed float32 in
-# single-row strips (7200 x 1 = 28.8 KB), so a windowed read pulls whole rows
-# but only the rows the bbox touches: ~16 strips for a county-scale window.
-# 16 x 28_800 = 460_800. The earlier 1_930_000 was a guess that overcharged the
-# ledger 4.2x and falsely blocked the Larimer 12WK series; see DECISIONS.md.
-BYTES_PER_FILE_ESTIMATE = 460_800
+# Measured over the wire, not inferred. The ESI GeoTIFFs are uncompressed
+# float32 in single-row strips (7200 x 1 = 28.8 KB), so a windowed read pulls
+# whole rows but only the rows the bbox touches, plus the header GDAL reads
+# first. Measured by issuing the exact byte ranges and counting what came back:
+#
+#     larimer  rows 980..995   16 strips 460_800 B + 65_536 header = 0.526 MB
+#     pueblo   rows 1029..1045 17 strips 489_600 B + 65_536 header = 0.555 MB
+#
+# The larger domain is used so the projection is conservative. The original
+# 1_930_000 was a guess that overcharged the ledger 3.5x and falsely blocked the
+# Larimer 12WK series. An earlier correction to 460_800 was closer but omitted
+# the header. See DECISIONS.md.
+BYTES_PER_FILE_ESTIMATE = 555_136
 
 # GDAL settings that keep /vsicurl/ from listing directories or probing
 # sidecars, both of which cost round trips and bytes we have not budgeted.
@@ -121,10 +128,18 @@ class EsiSource(DataSource):
 
     # ------------------------------------------------------------------ io
 
-    def _out_path(self) -> Path:
+    def _out_path(self, start_year: int | None = None) -> Path:
+        """Cache path. The start year is part of the key.
+
+        Without it an extended fetch silently returns the shorter cached series:
+        a 2010-onward backfill hit the 2018 cache and reported success having
+        transferred nothing. The default keeps the existing 2018 files valid.
+        """
         stem = "weekly" if self.product == "4WK" else f"weekly_{self.product.lower()}"
         if self.stride > 1:
             stem += f"_stride{self.stride}"
+        if start_year is not None and start_year != 2018:
+            stem += f"_from{start_year}"
         return self.settings.processed_dir / "esi" / f"{stem}.nc"
 
     def _listing(self, year: int) -> list[str]:
@@ -151,7 +166,7 @@ class EsiSource(DataSource):
         import rasterio
         from rasterio.windows import from_bounds
 
-        out = self._out_path()
+        out = self._out_path(date_range.start.year)
         if out.exists() and out.stat().st_size > 0:
             LOGGER.info("ESI cache hit at %s", out)
             self._last = SourceStatus(

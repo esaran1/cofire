@@ -59,6 +59,10 @@ class DownloadLedger:
         self.path = path
         self.budget_bytes = budget_bytes
         self._transfers: list[Transfer] = []
+        # Appended adjustments to the recorded totals. A ledger is an audit
+        # record, so a mis-estimate is corrected by appending a correction, not
+        # by editing the entries that were written at the time.
+        self._corrections: list[dict[str, object]] = []
         self._load()
 
     # ---------------------------------------------------------------- state
@@ -73,6 +77,7 @@ class DownloadLedger:
             return
         self.budget_bytes = int(blob.get("budget_bytes", self.budget_bytes))
         self._transfers = [Transfer(**t) for t in blob.get("transfers", [])]
+        self._corrections = list(blob.get("corrections", []))
 
     def _save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -80,8 +85,11 @@ class DownloadLedger:
             json.dumps(
                 {
                     "budget_bytes": self.budget_bytes,
+                    "recorded_bytes": self.recorded_bytes,
+                    "correction_bytes": self.correction_bytes,
                     "total_bytes": self.total_bytes,
                     "remaining_bytes": self.remaining_bytes,
+                    "corrections": self._corrections,
                     "transfers": [asdict(t) for t in self._transfers],
                 },
                 indent=2,
@@ -89,8 +97,40 @@ class DownloadLedger:
         )
 
     @property
-    def total_bytes(self) -> int:
+    def recorded_bytes(self) -> int:
+        """What the transfer entries say, exactly as they were written."""
         return sum(t.bytes for t in self._transfers)
+
+    @property
+    def correction_bytes(self) -> int:
+        """Net adjustment from appended corrections. Usually negative."""
+        total = 0
+        for c in self._corrections:
+            raw = c.get("delta_bytes", 0)
+            total += int(raw) if isinstance(raw, (int, float, str)) else 0
+        return total
+
+    @property
+    def total_bytes(self) -> int:
+        """The best current estimate of true spend: recorded plus corrections."""
+        return max(0, self.recorded_bytes + self.correction_bytes)
+
+    def add_correction(self, reason: str, delta_bytes: int, evidence: str = "") -> None:
+        """Append a correction to the totals, leaving the entries untouched.
+
+        Used when a per-file estimate is later measured and found wrong. The
+        original entries stay exactly as recorded, which is what makes the
+        ledger an audit record rather than a running guess.
+        """
+        self._corrections.append(
+            {
+                "at": datetime.now(UTC).isoformat(),
+                "reason": reason,
+                "delta_bytes": int(delta_bytes),
+                "evidence": evidence,
+            }
+        )
+        self._save()
 
     @property
     def remaining_bytes(self) -> int:
