@@ -201,10 +201,20 @@ def freeze_conditions(freeze_commit: str, prereg_hash: str) -> FreezeReport:
         Condition("working tree clean", working_tree_clean(),
                   "clean" if working_tree_clean() else "dirty", "clean")
     )
+    # HEAD need not equal FREEZE_COMMIT: recording the freeze commit's own hash
+    # necessarily creates a commit after it, and so does anything else outside
+    # the model. What the condition is for is that the model tree being run is
+    # the frozen one, which is what `model_files_match` tests directly. A later
+    # commit that leaves cofire/model/ untouched does not unfreeze anything.
     head = git_sha()
+    same_tree, changed = model_files_match(freeze_commit)
     rep.conditions.append(
-        Condition("HEAD is FREEZE_COMMIT", head.startswith(freeze_commit[:7]) or
-                  freeze_commit.startswith(head[:7]), head[:12], freeze_commit[:12])
+        Condition(
+            "cofire/model/ matches FREEZE_COMMIT", same_tree,
+            f"HEAD {head[:12]}, "
+            + ("no model file differs" if same_tree else f"differs: {changed}"),
+            f"no diff against {freeze_commit[:12]}",
+        )
     )
     cfg = config_hash()
     rep.conditions.append(

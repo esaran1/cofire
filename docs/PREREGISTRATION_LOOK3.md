@@ -17,7 +17,7 @@ the year, whatever code does the looking.
 
 ## Configuration
 
-**Config hash** sha256 `a23a7efe818b3a56a97b02485d39880163ef6b34901fb7494944d191bd5ac797`,
+**Config hash** sha256 `ed0c2079a5bc0eee1d0aa11869d3bc5eb0af671b9f30ee0c5114c3b9ca7be157`,
 over every file under `cofire/model/` (path and contents, so a rename moves it)
 plus every fitted artifact the shipped path loads and each one's fit-window
 sidecar. The previous hash covered a handful of hyperparameters and would not
@@ -39,7 +39,10 @@ training pool over weeks of year within ±3 on a circular calendar, ties by
 
 ## Preconditions, verified in code before the look
 
-1. Working tree clean and HEAD equal to `FREEZE_COMMIT`.
+1. Working tree clean, and no file under `cofire/model/` differing from
+   `FREEZE_COMMIT`. HEAD itself need not equal `FREEZE_COMMIT`: recording that
+   commit's own hash creates a commit after it, as does any later work outside
+   the model. What matters is that the model tree being run is the frozen one.
 2. Recomputed config hash equals the hash above.
 3. The fit-window loader runs in strict mode with no violations. Every fitted
    artifact declares `[fit_start, fit_end]` and a scope, and the loader raises
