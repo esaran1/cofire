@@ -96,8 +96,12 @@ demo: setup
 	$(UV) run uvicorn cofire.api.main:app --host $(API_HOST) --port $(API_PORT) & \
 	cd app && npm run dev -- --port 3000
 
+# torch and LightGBM must not share a process on macOS: mixing their OpenMP
+# runtimes segfaults the interpreter mid-suite. Run the torch tests in their
+# own process. See DECISIONS.md.
 test:
-	$(PY) -m pytest
+	OMP_NUM_THREADS=1 $(PY) -m pytest --ignore=tests/test_pi_convlstm.py
+	OMP_NUM_THREADS=1 $(PY) -m pytest tests/test_pi_convlstm.py
 	cd app && npx tsc --noEmit
 
 lint:

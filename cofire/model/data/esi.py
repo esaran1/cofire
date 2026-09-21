@@ -49,7 +49,12 @@ LOGGER = logging.getLogger("cofire.data.esi")
 BASE = "https://gis1.servirglobal.net/data/esi"
 PRODUCT = "4WK"
 # One global scanline is 7200 float32 px; the domain needs a contiguous row band.
-BYTES_PER_FILE_ESTIMATE = 1_930_000
+# Measured, not guessed. The ESI GeoTIFFs are uncompressed float32 in
+# single-row strips (7200 x 1 = 28.8 KB), so a windowed read pulls whole rows
+# but only the rows the bbox touches: ~16 strips for a county-scale window.
+# 16 x 28_800 = 460_800. The earlier 1_930_000 was a guess that overcharged the
+# ledger 4.2x and falsely blocked the Larimer 12WK series; see DECISIONS.md.
+BYTES_PER_FILE_ESTIMATE = 460_800
 
 # GDAL settings that keep /vsicurl/ from listing directories or probing
 # sidecars, both of which cost round trips and bytes we have not budgeted.
@@ -190,8 +195,18 @@ class EsiSource(DataSource):
                 frames.append(arr)
                 times.append(pd.Timestamp(d))
                 fetched += 1
-                # Bytes crossed the wire whether or not we keep them all.
-                ledger.record(self.name, url, BYTES_PER_FILE_ESTIMATE, f"windowed {d.isoformat()}")
+                # Bytes crossed the wire whether or not we keep them all. Charge
+                # what GDAL actually transferred where it will tell us; fall back
+                # to the estimate otherwise, and say which in the note so the
+                # ledger total is never mistaken for a measurement.
+                measured = _transferred_bytes()
+                ledger.record(
+                    self.name,
+                    url,
+                    measured if measured is not None else BYTES_PER_FILE_ESTIMATE,
+                    f"windowed {d.isoformat()} "
+                    f"({'measured' if measured is not None else 'estimated'})",
+                )
             except Exception as exc:  # noqa: BLE001
                 failed += 1
                 LOGGER.warning("ESI %s failed: %s", fname, exc)
@@ -250,6 +265,36 @@ def standardised_change(esi: np.ndarray, train_mask: np.ndarray) -> np.ndarray:
     sd = np.where(np.isfinite(sd) & (sd > 1e-6), sd, 1.0)
     out: np.ndarray = (d - mu) / sd
     return out
+
+
+def _transferred_bytes() -> int | None:
+    """Bytes GDAL moved over the wire since the last call, if it will say.
+
+    GDAL exposes a network-usage counter from 3.2 onward. It is monotonic per
+    process, so we difference it. Returns None when the build does not carry the
+    counter, which is why the ledger records a fallback rather than a zero: an
+    unmeasurable transfer must never look free.
+    """
+    global _LAST_NET_USAGE
+    try:
+        from osgeo import gdal  # type: ignore[import-not-found]
+    except ImportError:
+        return None
+    fn = getattr(gdal, "GetNetworkStatsAsSerializedJSON", None)
+    if fn is None:
+        return None
+    try:
+        import json
+
+        total = int(json.loads(fn()).get("bytes_downloaded", 0))
+    except Exception:  # noqa: BLE001
+        return None
+    delta = total - _LAST_NET_USAGE
+    _LAST_NET_USAGE = total
+    return delta if delta >= 0 else None
+
+
+_LAST_NET_USAGE = 0
 
 
 def rapid_change_index(z: np.ndarray) -> np.ndarray:

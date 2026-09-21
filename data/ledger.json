@@ -1,7 +1,7 @@
 {
   "budget_bytes": 2500000000,
-  "total_bytes": 1852613977,
-  "remaining_bytes": 647386023,
+  "total_bytes": 2220129577,
+  "remaining_bytes": 279870423,
   "transfers": [
     {
       "source": "SERVIR ESI 4-week",
@@ -6729,6 +6729,2442 @@
       "bytes": 1930000,
       "timestamp": "2026-09-21T00:26:51+00:00",
       "note": "windowed 2023-04-18"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023113.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:51+00:00",
+      "note": "windowed 2023-04-25"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023120.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:52+00:00",
+      "note": "windowed 2023-05-02"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023127.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:52+00:00",
+      "note": "windowed 2023-05-09"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023134.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:53+00:00",
+      "note": "windowed 2023-05-16"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023141.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:53+00:00",
+      "note": "windowed 2023-05-23"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023148.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:54+00:00",
+      "note": "windowed 2023-05-30"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023155.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:54+00:00",
+      "note": "windowed 2023-06-06"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023162.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:55+00:00",
+      "note": "windowed 2023-06-13"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023169.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:55+00:00",
+      "note": "windowed 2023-06-20"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023176.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:56+00:00",
+      "note": "windowed 2023-06-27"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023183.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:56+00:00",
+      "note": "windowed 2023-07-04"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023190.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:57+00:00",
+      "note": "windowed 2023-07-11"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023197.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:57+00:00",
+      "note": "windowed 2023-07-18"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023204.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:58+00:00",
+      "note": "windowed 2023-07-25"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023211.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:58+00:00",
+      "note": "windowed 2023-08-01"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023218.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:59+00:00",
+      "note": "windowed 2023-08-08"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023225.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:26:59+00:00",
+      "note": "windowed 2023-08-15"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:00+00:00",
+      "note": "windowed 2023-08-22"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023239.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:00+00:00",
+      "note": "windowed 2023-08-29"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023246.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:01+00:00",
+      "note": "windowed 2023-09-05"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023253.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:01+00:00",
+      "note": "windowed 2023-09-12"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023260.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:02+00:00",
+      "note": "windowed 2023-09-19"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023267.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:02+00:00",
+      "note": "windowed 2023-09-26"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023274.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:03+00:00",
+      "note": "windowed 2023-10-03"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023281.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:03+00:00",
+      "note": "windowed 2023-10-10"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023288.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:04+00:00",
+      "note": "windowed 2023-10-17"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023295.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:04+00:00",
+      "note": "windowed 2023-10-24"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023302.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:05+00:00",
+      "note": "windowed 2023-10-31"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023309.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:05+00:00",
+      "note": "windowed 2023-11-07"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023316.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:06+00:00",
+      "note": "windowed 2023-11-14"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023323.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:06+00:00",
+      "note": "windowed 2023-11-21"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023330.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:07+00:00",
+      "note": "windowed 2023-11-28"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023337.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:07+00:00",
+      "note": "windowed 2023-12-05"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023344.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:08+00:00",
+      "note": "windowed 2023-12-12"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023351.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:08+00:00",
+      "note": "windowed 2023-12-19"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2023/DFPPM_4WK_2023358.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:09+00:00",
+      "note": "windowed 2023-12-26"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024001.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:09+00:00",
+      "note": "windowed 2024-01-02"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024008.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:10+00:00",
+      "note": "windowed 2024-01-09"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024015.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:10+00:00",
+      "note": "windowed 2024-01-16"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024022.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:11+00:00",
+      "note": "windowed 2024-01-23"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024029.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:11+00:00",
+      "note": "windowed 2024-01-30"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024036.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:12+00:00",
+      "note": "windowed 2024-02-06"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024043.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:12+00:00",
+      "note": "windowed 2024-02-13"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024050.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:13+00:00",
+      "note": "windowed 2024-02-20"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024057.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:13+00:00",
+      "note": "windowed 2024-02-27"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024064.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:14+00:00",
+      "note": "windowed 2024-03-05"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024071.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:14+00:00",
+      "note": "windowed 2024-03-12"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024078.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:14+00:00",
+      "note": "windowed 2024-03-19"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024085.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:15+00:00",
+      "note": "windowed 2024-03-26"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024092.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:15+00:00",
+      "note": "windowed 2024-04-02"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024099.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:16+00:00",
+      "note": "windowed 2024-04-09"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024106.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:16+00:00",
+      "note": "windowed 2024-04-16"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024113.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:17+00:00",
+      "note": "windowed 2024-04-23"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024120.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:17+00:00",
+      "note": "windowed 2024-04-30"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024127.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:18+00:00",
+      "note": "windowed 2024-05-07"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024134.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:18+00:00",
+      "note": "windowed 2024-05-14"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024141.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:19+00:00",
+      "note": "windowed 2024-05-21"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024148.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:20+00:00",
+      "note": "windowed 2024-05-28"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024155.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:20+00:00",
+      "note": "windowed 2024-06-04"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024162.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:21+00:00",
+      "note": "windowed 2024-06-11"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024169.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:21+00:00",
+      "note": "windowed 2024-06-18"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024176.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:22+00:00",
+      "note": "windowed 2024-06-25"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024183.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:22+00:00",
+      "note": "windowed 2024-07-02"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024190.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:23+00:00",
+      "note": "windowed 2024-07-09"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024197.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:23+00:00",
+      "note": "windowed 2024-07-16"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024204.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:24+00:00",
+      "note": "windowed 2024-07-23"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024211.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:24+00:00",
+      "note": "windowed 2024-07-30"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024218.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:25+00:00",
+      "note": "windowed 2024-08-06"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024225.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:25+00:00",
+      "note": "windowed 2024-08-13"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:26+00:00",
+      "note": "windowed 2024-08-20"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024239.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:26+00:00",
+      "note": "windowed 2024-08-27"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024246.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:26+00:00",
+      "note": "windowed 2024-09-03"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024253.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:27+00:00",
+      "note": "windowed 2024-09-10"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024260.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:27+00:00",
+      "note": "windowed 2024-09-17"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024267.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:28+00:00",
+      "note": "windowed 2024-09-24"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024274.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:28+00:00",
+      "note": "windowed 2024-10-01"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024281.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:29+00:00",
+      "note": "windowed 2024-10-08"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024288.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:29+00:00",
+      "note": "windowed 2024-10-15"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024295.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:30+00:00",
+      "note": "windowed 2024-10-22"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024302.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:30+00:00",
+      "note": "windowed 2024-10-29"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024309.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:31+00:00",
+      "note": "windowed 2024-11-05"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024316.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:31+00:00",
+      "note": "windowed 2024-11-12"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024323.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:32+00:00",
+      "note": "windowed 2024-11-19"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024330.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:32+00:00",
+      "note": "windowed 2024-11-26"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024337.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:33+00:00",
+      "note": "windowed 2024-12-03"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024344.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:33+00:00",
+      "note": "windowed 2024-12-10"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024351.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:34+00:00",
+      "note": "windowed 2024-12-17"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024358.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:34+00:00",
+      "note": "windowed 2024-12-24"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2024/DFPPM_4WK_2024365.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:35+00:00",
+      "note": "windowed 2024-12-31"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025001.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:35+00:00",
+      "note": "windowed 2025-01-07"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025008.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:36+00:00",
+      "note": "windowed 2025-01-14"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025015.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:36+00:00",
+      "note": "windowed 2025-01-21"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025022.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:36+00:00",
+      "note": "windowed 2025-01-28"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025029.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:37+00:00",
+      "note": "windowed 2025-02-04"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025036.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:37+00:00",
+      "note": "windowed 2025-02-11"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025043.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:38+00:00",
+      "note": "windowed 2025-02-18"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025050.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:38+00:00",
+      "note": "windowed 2025-02-25"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025057.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:39+00:00",
+      "note": "windowed 2025-03-04"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025064.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:39+00:00",
+      "note": "windowed 2025-03-11"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025071.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:40+00:00",
+      "note": "windowed 2025-03-18"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025078.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:40+00:00",
+      "note": "windowed 2025-03-25"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025085.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:41+00:00",
+      "note": "windowed 2025-04-01"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025092.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:41+00:00",
+      "note": "windowed 2025-04-08"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025099.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:41+00:00",
+      "note": "windowed 2025-04-15"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025106.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:42+00:00",
+      "note": "windowed 2025-04-22"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025113.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:42+00:00",
+      "note": "windowed 2025-04-29"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025120.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:43+00:00",
+      "note": "windowed 2025-05-06"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025127.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:43+00:00",
+      "note": "windowed 2025-05-13"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025134.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:44+00:00",
+      "note": "windowed 2025-05-20"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025141.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:44+00:00",
+      "note": "windowed 2025-05-27"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025148.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:45+00:00",
+      "note": "windowed 2025-06-03"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025155.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:45+00:00",
+      "note": "windowed 2025-06-10"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025162.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:46+00:00",
+      "note": "windowed 2025-06-17"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025169.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:46+00:00",
+      "note": "windowed 2025-06-24"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025176.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:46+00:00",
+      "note": "windowed 2025-07-01"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025183.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:47+00:00",
+      "note": "windowed 2025-07-08"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025190.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:47+00:00",
+      "note": "windowed 2025-07-15"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025197.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:48+00:00",
+      "note": "windowed 2025-07-22"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025204.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:48+00:00",
+      "note": "windowed 2025-07-29"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025211.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:49+00:00",
+      "note": "windowed 2025-08-05"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025218.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:49+00:00",
+      "note": "windowed 2025-08-12"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025225.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-08-19"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-08-26"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-09-02"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-09-09"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-09-16"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-09-23"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-09-30"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-10-07"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-10-14"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-10-21"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-10-28"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-11-04"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-11-11"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-11-18"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-11-25"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-12-02"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-12-09"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-12-16"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-12-23"
+    },
+    {
+      "source": "SERVIR ESI 4WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2025/DFPPM_4WK_2025232.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:27:50+00:00",
+      "note": "windowed 2025-12-30"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018015.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:20+00:00",
+      "note": "windowed 2018-01-16 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018029.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:21+00:00",
+      "note": "windowed 2018-01-30 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018043.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:21+00:00",
+      "note": "windowed 2018-02-13 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018057.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:22+00:00",
+      "note": "windowed 2018-02-27 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018071.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:22+00:00",
+      "note": "windowed 2018-03-13 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018085.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:22+00:00",
+      "note": "windowed 2018-03-27 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018099.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:23+00:00",
+      "note": "windowed 2018-04-10 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018113.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:23+00:00",
+      "note": "windowed 2018-04-24 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018127.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:24+00:00",
+      "note": "windowed 2018-05-08 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018141.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:24+00:00",
+      "note": "windowed 2018-05-22 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018155.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:24+00:00",
+      "note": "windowed 2018-06-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018169.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:25+00:00",
+      "note": "windowed 2018-06-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018183.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:25+00:00",
+      "note": "windowed 2018-07-03 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018197.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:26+00:00",
+      "note": "windowed 2018-07-17 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018211.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:26+00:00",
+      "note": "windowed 2018-07-31 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018225.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:27+00:00",
+      "note": "windowed 2018-08-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018239.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:27+00:00",
+      "note": "windowed 2018-08-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018253.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:28+00:00",
+      "note": "windowed 2018-09-11 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018267.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:28+00:00",
+      "note": "windowed 2018-09-25 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018281.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:28+00:00",
+      "note": "windowed 2018-10-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018295.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:29+00:00",
+      "note": "windowed 2018-10-23 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018309.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:29+00:00",
+      "note": "windowed 2018-11-06 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018323.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:30+00:00",
+      "note": "windowed 2018-11-20 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018337.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:30+00:00",
+      "note": "windowed 2018-12-04 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2018/DFPPM_12WK_2018351.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:30+00:00",
+      "note": "windowed 2018-12-18 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019015.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:31+00:00",
+      "note": "windowed 2019-01-15 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019029.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:32+00:00",
+      "note": "windowed 2019-01-29 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019043.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:32+00:00",
+      "note": "windowed 2019-02-12 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019057.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:32+00:00",
+      "note": "windowed 2019-02-26 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019071.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:33+00:00",
+      "note": "windowed 2019-03-12 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019085.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:33+00:00",
+      "note": "windowed 2019-03-26 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019099.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:34+00:00",
+      "note": "windowed 2019-04-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019113.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:34+00:00",
+      "note": "windowed 2019-04-23 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019127.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:35+00:00",
+      "note": "windowed 2019-05-07 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019141.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:35+00:00",
+      "note": "windowed 2019-05-21 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019155.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:36+00:00",
+      "note": "windowed 2019-06-04 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019169.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:36+00:00",
+      "note": "windowed 2019-06-18 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019183.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:36+00:00",
+      "note": "windowed 2019-07-02 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019197.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:37+00:00",
+      "note": "windowed 2019-07-16 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019211.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:38+00:00",
+      "note": "windowed 2019-07-30 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019225.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:38+00:00",
+      "note": "windowed 2019-08-13 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019239.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:38+00:00",
+      "note": "windowed 2019-08-27 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019253.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:39+00:00",
+      "note": "windowed 2019-09-10 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019267.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:40+00:00",
+      "note": "windowed 2019-09-24 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019281.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:40+00:00",
+      "note": "windowed 2019-10-08 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019295.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:40+00:00",
+      "note": "windowed 2019-10-22 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019309.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:41+00:00",
+      "note": "windowed 2019-11-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019323.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:41+00:00",
+      "note": "windowed 2019-11-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019337.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:42+00:00",
+      "note": "windowed 2019-12-03 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019351.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:42+00:00",
+      "note": "windowed 2019-12-17 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2019/DFPPM_12WK_2019365.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:43+00:00",
+      "note": "windowed 2019-12-31 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020008.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:43+00:00",
+      "note": "windowed 2020-01-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020022.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:44+00:00",
+      "note": "windowed 2020-01-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020036.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:44+00:00",
+      "note": "windowed 2020-02-11 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020050.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:45+00:00",
+      "note": "windowed 2020-02-25 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020064.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:45+00:00",
+      "note": "windowed 2020-03-10 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020078.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:46+00:00",
+      "note": "windowed 2020-03-24 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020092.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:46+00:00",
+      "note": "windowed 2020-04-07 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020106.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:46+00:00",
+      "note": "windowed 2020-04-21 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020120.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:47+00:00",
+      "note": "windowed 2020-05-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020134.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:47+00:00",
+      "note": "windowed 2020-05-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020148.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:48+00:00",
+      "note": "windowed 2020-06-02 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020162.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:48+00:00",
+      "note": "windowed 2020-06-16 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020176.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:49+00:00",
+      "note": "windowed 2020-06-30 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020190.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:49+00:00",
+      "note": "windowed 2020-07-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020204.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:50+00:00",
+      "note": "windowed 2020-07-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020218.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:50+00:00",
+      "note": "windowed 2020-08-11 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:51+00:00",
+      "note": "windowed 2020-08-25 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020246.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:51+00:00",
+      "note": "windowed 2020-09-08 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020260.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:52+00:00",
+      "note": "windowed 2020-09-22 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020274.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:52+00:00",
+      "note": "windowed 2020-10-06 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020288.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:53+00:00",
+      "note": "windowed 2020-10-20 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020302.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:53+00:00",
+      "note": "windowed 2020-11-03 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020316.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:54+00:00",
+      "note": "windowed 2020-11-17 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020330.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:54+00:00",
+      "note": "windowed 2020-12-01 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020344.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:55+00:00",
+      "note": "windowed 2020-12-15 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2020/DFPPM_12WK_2020358.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:55+00:00",
+      "note": "windowed 2020-12-29 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021008.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:55+00:00",
+      "note": "windowed 2021-01-12 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021022.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:56+00:00",
+      "note": "windowed 2021-01-26 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021036.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:56+00:00",
+      "note": "windowed 2021-02-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021050.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:57+00:00",
+      "note": "windowed 2021-02-23 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021064.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:57+00:00",
+      "note": "windowed 2021-03-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021078.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:58+00:00",
+      "note": "windowed 2021-03-23 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021092.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:58+00:00",
+      "note": "windowed 2021-04-06 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021106.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:59+00:00",
+      "note": "windowed 2021-04-20 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021120.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:57:59+00:00",
+      "note": "windowed 2021-05-04 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021134.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:00+00:00",
+      "note": "windowed 2021-05-18 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021148.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:00+00:00",
+      "note": "windowed 2021-06-01 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021162.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:00+00:00",
+      "note": "windowed 2021-06-15 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021176.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:01+00:00",
+      "note": "windowed 2021-06-29 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021190.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:01+00:00",
+      "note": "windowed 2021-07-13 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021204.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:02+00:00",
+      "note": "windowed 2021-07-27 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021218.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:02+00:00",
+      "note": "windowed 2021-08-10 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:03+00:00",
+      "note": "windowed 2021-08-24 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021246.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:03+00:00",
+      "note": "windowed 2021-09-07 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021260.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:04+00:00",
+      "note": "windowed 2021-09-21 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021274.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:04+00:00",
+      "note": "windowed 2021-10-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021288.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:05+00:00",
+      "note": "windowed 2021-10-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021302.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:05+00:00",
+      "note": "windowed 2021-11-02 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021316.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:06+00:00",
+      "note": "windowed 2021-11-16 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021330.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:06+00:00",
+      "note": "windowed 2021-11-30 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021344.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:06+00:00",
+      "note": "windowed 2021-12-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2021/DFPPM_12WK_2021358.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:07+00:00",
+      "note": "windowed 2021-12-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022008.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:07+00:00",
+      "note": "windowed 2022-01-11 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022022.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:08+00:00",
+      "note": "windowed 2022-01-25 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022036.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:08+00:00",
+      "note": "windowed 2022-02-08 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022050.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:09+00:00",
+      "note": "windowed 2022-02-22 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022064.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:09+00:00",
+      "note": "windowed 2022-03-08 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022078.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:10+00:00",
+      "note": "windowed 2022-03-22 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022092.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:10+00:00",
+      "note": "windowed 2022-04-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022106.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:11+00:00",
+      "note": "windowed 2022-04-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022120.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:11+00:00",
+      "note": "windowed 2022-05-03 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022134.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:12+00:00",
+      "note": "windowed 2022-05-17 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022148.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:12+00:00",
+      "note": "windowed 2022-05-31 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022162.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:13+00:00",
+      "note": "windowed 2022-06-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022176.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:13+00:00",
+      "note": "windowed 2022-06-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022190.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:14+00:00",
+      "note": "windowed 2022-07-12 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022204.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:14+00:00",
+      "note": "windowed 2022-07-26 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022218.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:15+00:00",
+      "note": "windowed 2022-08-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:15+00:00",
+      "note": "windowed 2022-08-23 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022246.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:16+00:00",
+      "note": "windowed 2022-09-06 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022260.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:16+00:00",
+      "note": "windowed 2022-09-20 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022274.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:17+00:00",
+      "note": "windowed 2022-10-04 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022288.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:17+00:00",
+      "note": "windowed 2022-10-18 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022302.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:17+00:00",
+      "note": "windowed 2022-11-01 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022316.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:18+00:00",
+      "note": "windowed 2022-11-15 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022330.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:18+00:00",
+      "note": "windowed 2022-11-29 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022344.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:19+00:00",
+      "note": "windowed 2022-12-13 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2022/DFPPM_12WK_2022358.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:19+00:00",
+      "note": "windowed 2022-12-27 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023008.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:20+00:00",
+      "note": "windowed 2023-01-10 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023022.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:20+00:00",
+      "note": "windowed 2023-01-24 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023036.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:21+00:00",
+      "note": "windowed 2023-02-07 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023050.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:21+00:00",
+      "note": "windowed 2023-02-21 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023064.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:22+00:00",
+      "note": "windowed 2023-03-07 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023078.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:22+00:00",
+      "note": "windowed 2023-03-21 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023092.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:23+00:00",
+      "note": "windowed 2023-04-04 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023106.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:24+00:00",
+      "note": "windowed 2023-04-18 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023120.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:24+00:00",
+      "note": "windowed 2023-05-02 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023134.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:25+00:00",
+      "note": "windowed 2023-05-16 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023148.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:25+00:00",
+      "note": "windowed 2023-05-30 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023162.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:26+00:00",
+      "note": "windowed 2023-06-13 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023176.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:26+00:00",
+      "note": "windowed 2023-06-27 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023190.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:27+00:00",
+      "note": "windowed 2023-07-11 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023204.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:27+00:00",
+      "note": "windowed 2023-07-25 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023218.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:28+00:00",
+      "note": "windowed 2023-08-08 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:28+00:00",
+      "note": "windowed 2023-08-22 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023246.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:28+00:00",
+      "note": "windowed 2023-09-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023260.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:29+00:00",
+      "note": "windowed 2023-09-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023274.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:29+00:00",
+      "note": "windowed 2023-10-03 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023288.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:30+00:00",
+      "note": "windowed 2023-10-17 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023302.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:30+00:00",
+      "note": "windowed 2023-10-31 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023316.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:31+00:00",
+      "note": "windowed 2023-11-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023330.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:31+00:00",
+      "note": "windowed 2023-11-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023344.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:32+00:00",
+      "note": "windowed 2023-12-12 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2023/DFPPM_12WK_2023358.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:32+00:00",
+      "note": "windowed 2023-12-26 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024008.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:33+00:00",
+      "note": "windowed 2024-01-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024022.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:33+00:00",
+      "note": "windowed 2024-01-23 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024036.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:34+00:00",
+      "note": "windowed 2024-02-06 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024050.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:35+00:00",
+      "note": "windowed 2024-02-20 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024064.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:35+00:00",
+      "note": "windowed 2024-03-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024078.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:36+00:00",
+      "note": "windowed 2024-03-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024092.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:36+00:00",
+      "note": "windowed 2024-04-02 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024106.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:37+00:00",
+      "note": "windowed 2024-04-16 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024120.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:37+00:00",
+      "note": "windowed 2024-04-30 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024134.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:38+00:00",
+      "note": "windowed 2024-05-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024148.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:38+00:00",
+      "note": "windowed 2024-05-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024162.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:39+00:00",
+      "note": "windowed 2024-06-11 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024176.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:39+00:00",
+      "note": "windowed 2024-06-25 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024190.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:40+00:00",
+      "note": "windowed 2024-07-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024204.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:41+00:00",
+      "note": "windowed 2024-07-23 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024218.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:41+00:00",
+      "note": "windowed 2024-08-06 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:42+00:00",
+      "note": "windowed 2024-08-20 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024246.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:42+00:00",
+      "note": "windowed 2024-09-03 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024260.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:43+00:00",
+      "note": "windowed 2024-09-17 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024274.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:43+00:00",
+      "note": "windowed 2024-10-01 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024288.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:44+00:00",
+      "note": "windowed 2024-10-15 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024302.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:44+00:00",
+      "note": "windowed 2024-10-29 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024316.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:45+00:00",
+      "note": "windowed 2024-11-12 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024330.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:45+00:00",
+      "note": "windowed 2024-11-26 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024344.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:46+00:00",
+      "note": "windowed 2024-12-10 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2024/DFPPM_12WK_2024358.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:47+00:00",
+      "note": "windowed 2024-12-24 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025001.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:47+00:00",
+      "note": "windowed 2025-01-07 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025015.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:48+00:00",
+      "note": "windowed 2025-01-21 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025029.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:48+00:00",
+      "note": "windowed 2025-02-04 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025043.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:49+00:00",
+      "note": "windowed 2025-02-18 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025057.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:49+00:00",
+      "note": "windowed 2025-03-04 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025071.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:50+00:00",
+      "note": "windowed 2025-03-18 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025085.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:50+00:00",
+      "note": "windowed 2025-04-01 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025099.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:51+00:00",
+      "note": "windowed 2025-04-15 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025113.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:51+00:00",
+      "note": "windowed 2025-04-29 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025127.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:52+00:00",
+      "note": "windowed 2025-05-13 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025141.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:52+00:00",
+      "note": "windowed 2025-05-27 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025155.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:52+00:00",
+      "note": "windowed 2025-06-10 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025169.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:53+00:00",
+      "note": "windowed 2025-06-24 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025183.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:53+00:00",
+      "note": "windowed 2025-07-08 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025197.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:54+00:00",
+      "note": "windowed 2025-07-22 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025211.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:54+00:00",
+      "note": "windowed 2025-08-05 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025225.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-08-19 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-09-02 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-09-16 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-09-30 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-10-14 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-10-28 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-11-11 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-11-25 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-12-09 (estimated)"
+    },
+    {
+      "source": "SERVIR ESI 12WK",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/12WK/2025/DFPPM_12WK_2025232.tif",
+      "bytes": 460800,
+      "timestamp": "2026-09-21T01:58:55+00:00",
+      "note": "windowed 2025-12-23 (estimated)"
     }
   ]
 }

@@ -116,7 +116,7 @@ def attach_esi(
     # ---- RCI from the 4-week composite, standardised on training weeks only
     train_end = pd.Timestamp(settings.train_end)
     esi_panel = da4.values.reshape(da4.sizes["time"], -1)
-    train_mask = (src_times4 <= train_end).to_numpy()
+    train_mask = np.asarray(src_times4 <= train_end)
     if train_mask.sum() >= 10:
         z = standardised_change(esi_panel, train_mask)
         for acc in (1, 2, 4):
