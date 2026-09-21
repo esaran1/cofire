@@ -1110,3 +1110,54 @@ danger above the 90th percentile at a two-week lead. Two weeks is the horizon at
 which a subseasonal precipitation and temperature forecast still carries real
 information, and fire danger responds to weather on that timescale. If any
 target were going to benefit from forecast weather, this is the one.
+
+## The hand-written DODS parser was wrong; the library path reconciles exactly
+
+The hand parser produced a Larimer 2018 domain mean of **21.4** against the
+store's **43.6** for the same year and variable, while returning values in a
+physically plausible 0 to 96 range. Two faults, one root.
+
+**Fault 1: the bbox was a literal.** I used 40.25 to 41.00, which is 18 latitude
+rows; `Settings.bbox` is 40.324 to 40.998, which is 16. Different terrain,
+silently.
+
+**Fault 2: the byte offset was assumed.** `Data:\n` plus 8 bytes was a guess at
+the XDR framing, and it was never verified against a known value.
+
+**The fix is to stop parsing a binary wire format by hand.**
+`xarray.open_dataset` on the OPeNDAP URL, `.sel` with the bbox read from
+`Settings`, and the descending latitude axis handled by ordering the slice high
+to low. Result on Larimer 2018:
+
+    reconciliation: ok=True, n_compared=175200, max|diff| = 0
+
+Exact, every cell-day. Pueblo: ok=True, n=157680, max|diff| = 0.
+
+**A permanent gate, not a one-off check.** `reconcile` compares a newly fetched
+source-year cell for cell against an overlapping year already in the store, and
+nothing is ingested until it passes. Six tests cover it, including a
+time-shifted array whose marginal statistics are *identical* to the reference:
+anything comparing means would pass it, and only a cell-for-cell check catches
+it.
+
+**The gate caught a real fault immediately.** Pueblo failed on its first run
+with "no overlapping coordinates", because `reference_daily` globbed `raw/` and
+returned Larimer's file. The raw caches are subset-scoped, `raw/gridmet` against
+`raw/gridmet_pueblo`, so the path is now derived rather than searched. This is
+the third appearance of the unscoped-cache fault in this project, after the v0.6
+subset mix-up and the ESI start-year key, and this time a gate caught it before
+any wrong data was written.
+
+**Fetched.** ERC 2004 to 2017, both domains, 28 files, about 10 MB through the
+reconciled path. USDM 2007 to 2017, 11 yearly bundles, 550 MB. Ledger stands at
+2914 MB true of the 3000 MB cap.
+
+**Record start is 2007**, bound by USDM rather than ERC. The 2012 gate is
+cleared with five years to spare.
+
+**On the USDM spatial archive.** Checked before defaulting to the zips.
+`ndmcgeodata.unl.edu` serves WMS only, which returns rendered images rather than
+polygons, and WFS returns `InvalidParameterValue`. The county statistics API is
+5 kB per county-year but returns county-level area percentages, and the existing
+raster carries 2.14 distinct USDM values per week across 480 cells, so
+substituting it would redefine the target. The zips were used, as specified.
