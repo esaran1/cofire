@@ -140,6 +140,72 @@ class BaseRateModel:
         return np.asarray(1.0 / (1.0 + np.exp(-np.clip(z, -30, 30))), dtype=float)
 
 
+# The fixed stage-1 specification. Per-target forward selection chose each
+# predictor on 17 to 23 of 51 fits, which is the signature of a search ranking
+# noise: with roughly 400 domain weeks and few independent episodes there is not
+# enough evidence to tell these apart. One specification is used for every
+# target, and the ridge penalty is chosen once on pooled validation rather than
+# per target.
+FIXED_SPEC = CANDIDATES
+
+
+def fit_ridge(
+    dw: pd.DataFrame, predictors: tuple[str, ...], penalty: float
+) -> BaseRateModel:
+    """Ridge-penalised quasi-binomial fit on domain-week rates."""
+    m = BaseRateModel(target="_")
+    m.predictors = tuple(p for p in predictors if p in dw.columns)
+    m.fallback_rate = float(np.clip(dw["rate"].mean(), 1e-4, 1 - 1e-4))
+    x = m._design(dw)
+    m.mean = x.mean(axis=0)
+    m.scale = x.std(axis=0)
+    x = m._design(dw)
+
+    eps = 1e-3
+    r = np.clip(dw["rate"].to_numpy(dtype=float), eps, 1 - eps)
+    z = np.log(r / (1 - r))
+    xd = np.column_stack([np.ones(len(x)), x])
+    # Penalise the slopes, never the intercept: shrinking the intercept would
+    # pull the level away from the training rate, which is the one thing the
+    # model does know.
+    pen = np.eye(xd.shape[1]) * penalty
+    pen[0, 0] = 0.0
+    coef = np.linalg.solve(xd.T @ xd + pen, xd.T @ z)
+    m.intercept = float(coef[0])
+    m.coef = np.asarray(coef[1:], dtype=float)
+    return m
+
+
+def select_penalty(
+    per_target_dw: list[pd.DataFrame], fold_years: tuple[int, ...],
+    grid: tuple[float, ...] = (0.1, 1.0, 10.0, 100.0, 1000.0),
+) -> float:
+    """One penalty for every target, chosen on pooled LODO error.
+
+    Pooled so that the choice cannot be tuned per target, which is the failure
+    mode the fixed specification exists to remove.
+    """
+    best, best_score = grid[0], float("inf")
+    for pen in grid:
+        errs: list[float] = []
+        for dw in per_target_dw:
+            years = pd.to_datetime(dw["time"]).dt.year
+            for yr in fold_years:
+                tr, te = dw[years != yr], dw[years == yr]
+                if len(tr) < 20 or te.empty:
+                    continue
+                m = fit_ridge(tr, FIXED_SPEC, pen)
+                eps = 1e-3
+                r = np.clip(te["rate"].to_numpy(dtype=float), eps, 1 - eps)
+                errs.append(float(np.mean((m.predict_logit(te) - np.log(r / (1 - r))) ** 2)))
+        score = float(np.mean(errs)) if errs else float("inf")
+        LOGGER.info("penalty %.3g -> pooled LODO mse %.5f", pen, score)
+        if score < best_score:
+            best, best_score = pen, score
+    LOGGER.info("selected penalty %.3g", best)
+    return best
+
+
 def select_predictors(
     dw_train: pd.DataFrame,
     target: str,

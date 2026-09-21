@@ -239,3 +239,89 @@ def evaluate_probabilistic(
         out["n_weeks"] = res.n_weeks
         out["n_eff_weeks"] = round(res.n_eff, 1)
     return out
+
+
+MIN_POSITIVE_WEEKS = 12
+
+
+def positive_weeks(y: np.ndarray, weeks: np.ndarray) -> np.ndarray:
+    """Distinct weeks containing at least one positive outcome."""
+    m = np.isfinite(y) & (y > 0)
+    return np.unique(weeks[m]) if m.any() else np.array([], dtype=weeks.dtype)
+
+
+@dataclass
+class StratifiedBootstrapResult:
+    point: float
+    lo: float
+    hi: float
+    n_weeks: int
+    n_eff: float
+    n_positive_weeks: int
+    estimable: bool
+    reason: str = ""
+
+
+def stratified_block_bootstrap(
+    stat_fn: Callable[[np.ndarray], float],
+    weeks: np.ndarray,
+    y: np.ndarray,
+    n_boot: int = 500,
+    alpha: float = 0.05,
+    seed: int = 2026,
+    min_positive_weeks: int = MIN_POSITIVE_WEEKS,
+) -> StratifiedBootstrapResult:
+    """Block bootstrap that preserves the number of positive weeks.
+
+    An unstratified resample of a rare-event target frequently draws zero
+    positives, and a Brier skill score computed on a resample with no events is
+    not a skill score. Measured on Larimer, `d_intensify2_h2` has **3 positive
+    domain-weeks out of 104**, and its unstratified interval came out as
+    [+0.002, +0.954]: an interval that wide is the bootstrap reporting that it
+    has nothing to work with.
+
+    Two changes. Positive and negative weeks are resampled separately, each to
+    its own original count, so every replicate carries the same number of event
+    weeks as the data. And a target with fewer than `min_positive_weeks`
+    positive weeks is reported as **not estimable** rather than given a number,
+    because stratifying a sample of three does not make it informative.
+    """
+    uniq = np.unique(weeks)
+    pos = positive_weeks(y, weeks)
+    neg = np.setdiff1d(uniq, pos)
+    n_pos = int(pos.size)
+    point = float(stat_fn(uniq))
+
+    if n_pos < min_positive_weeks:
+        return StratifiedBootstrapResult(
+            point, float("nan"), float("nan"), int(uniq.size), float("nan"), n_pos,
+            estimable=False,
+            reason=(
+                f"{n_pos} positive weeks is below the {min_positive_weeks} needed; "
+                "a resample of this target is mostly empty draws"
+            ),
+        )
+
+    rng = np.random.default_rng(seed)
+    draws = np.empty(n_boot, dtype=float)
+    for b in range(n_boot):
+        pick = np.concatenate(
+            [
+                rng.choice(pos, size=pos.size, replace=True),
+                rng.choice(neg, size=neg.size, replace=True) if neg.size else np.array([], dtype=pos.dtype),
+            ]
+        )
+        draws[b] = stat_fn(pick)
+    good = draws[np.isfinite(draws)]
+    if good.size < max(20, n_boot // 10):
+        return StratifiedBootstrapResult(
+            point, float("nan"), float("nan"), int(uniq.size), float("nan"), n_pos,
+            estimable=False,
+            reason=f"only {good.size} of {n_boot} replicates were finite",
+        )
+    lo = float(np.percentile(good, 100 * alpha / 2))
+    hi = float(np.percentile(good, 100 * (1 - alpha / 2)))
+    per_week = np.array([stat_fn(np.array([w])) for w in uniq], dtype=float)
+    return StratifiedBootstrapResult(
+        point, lo, hi, int(uniq.size), ar1_neff(per_week), n_pos, estimable=True
+    )

@@ -616,3 +616,74 @@ zero. `d_ge2_h2` on Pueblo is the one clear exception at BSS +0.34 with an
 interval well clear of zero, and it is also the target with the largest
 base-rate swing, which is consistent with the rest of the picture rather than
 a surprise.
+
+## The confirmation pass: what survives when the references are right
+
+Five corrections were applied together, because each changes what the numbers
+mean and applying them one at a time would have invited reading the most
+favourable intermediate state.
+
+**The earlier two-stage table used the wrong reference.** Its BSS was against a
+flat training constant (`two_stage.py`, `ref = brier(const[m], y[m])`).
+`brier_seasonal` was computed and stored but never used. Seasonal climatology is
+now primary, and every target also carries persistence, Markov and constant.
+
+**Per-target predictor selection is gone.** Selection frequencies of 17 to 23
+across five predictors over 51 fits is a search ranking noise. One fixed
+specification is used everywhere: all five slow predictors plus season,
+ridge-penalised, with a single penalty chosen once on pooled LODO across every
+target and both domains. The selected penalty is **100**, which is heavy
+shrinkage and is itself a statement about how little signal the predictors
+carry.
+
+**The rare-event bootstrap was reporting meaningless intervals.** Larimer
+`d_intensify2_h2` has **3 positive domain-weeks out of 104**, and its
+unstratified interval came out as [+0.002, +0.954]. Positive and negative weeks
+are now resampled separately to their own counts, and a target with fewer than
+12 positive weeks is reported **not estimable** rather than given a number. This
+removed 11 of 51 targets, including three of the four that previously appeared
+to separate.
+
+**Multiplicity is controlled.** Holm within each event family, where horizon
+variants of one event are a family, then Benjamini-Hochberg at q=0.10 across
+what survives. A negative skill score is never a discovery regardless of its
+p-value.
+
+### Result
+
+    51 targets -> 40 estimable -> 13 survive BH -> 9 clear every baseline
+
+The four that survive BH but fail a baseline are informative:
+
+    larimer d_nochange_h2/h4/h8   markov -0.217, -0.359, -0.515
+    pueblo  d_intensify2_h8       persistence -0.021
+
+`d_nochange` is the persistence-dominated case the review predicted: the model
+clears climatology while losing badly to a transition matrix that already knows
+how sticky drought categories are. Reporting it as skill would have been wrong.
+
+### The nine, with every baseline
+
+    domain   target            h   seasonal [95% CI]        persist  markov  posWk
+    pueblo   d_intensify1_h4   4   +0.1558 [+0.070,+0.262]   +0.105  +0.066    42
+    pueblo   f_gt80_h2         2   +0.1215 [+0.034,+0.229]   +0.318     n/a    37
+    pueblo   f_gt80_h4         4   +0.1110 [+0.022,+0.243]   +0.397     n/a    36
+    pueblo   f_gt80_h8         8   +0.1041 [+0.029,+0.210]   +0.420     n/a    35
+    larimer  f_gt97_h4         4   +0.0993 [+0.052,+0.189]   +0.451     n/a    27
+    larimer  f_gt97_h2         2   +0.0901 [+0.046,+0.178]   +0.414     n/a    28
+    larimer  f_gt97_h8         8   +0.0883 [+0.052,+0.153]   +0.449     n/a    25
+    larimer  d_intensify1_h2   2   +0.0691 [+0.026,+0.133]   +0.006  +0.157    20
+    larimer  f_gt90_h8         8   +0.0531 [+0.018,+0.096]   +0.419     n/a    40
+
+### Two caveats that belong with the table
+
+**`d_intensify1_h4` does not agree across domains**: +0.1558 on Pueblo against
+**-0.5357** on Larimer. The standing two-domain rule treats disagreement as
+evidence of fitting one geography, so it is excluded from the look-3 set despite
+being the largest surviving effect.
+
+**The fire targets have no Markov reference**, so they clear three hurdles where
+the drought targets clear four. They also have no forecast weather behind them,
+since SubX was found but not ingested. Their skill against persistence is large
+(+0.32 to +0.45) because persistence is a weak forecast for an exceedance
+target, and their skill against climatology is the number that matters.
