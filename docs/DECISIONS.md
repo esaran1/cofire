@@ -375,3 +375,53 @@ This is the same class of bug as the subset-scoping failure in v0.6, where a
 Pueblo fetch re-served Larimer geography: a cache key that omits a dimension the
 data actually varies along. Worth noting because it is the third time this
 project has hit it.
+
+## CFSv2 forecast weather: archive exists, subsetting does not, so it is dropped
+
+Phase 1 never actually investigated this, so it was checked now rather than
+reported from memory.
+
+**A historical archive does exist.** The NOAA CFS public S3 bucket
+`noaa-cfs-pds` carries forecast runs keyed by issue date from **2018-10-31 to
+2026-09-20**, covering most of the training record:
+
+    https://noaa-cfs-pds.s3.amazonaws.com/?list-type=2&delimiter=/&prefix=cfs.
+
+    cfs.20181031/ ... cfs.20260920/     forecast runs, by issue date
+    cdas.20230422/ ...                  analysis, rolling, starts 2023
+
+Each issue holds 6-hourly GRIB2 with `.idx` sidecars giving per-record byte
+offsets, so individual variables can be range-read:
+
+    cfs.20200101/00/6hrly_grib_01/flxf2020010100.01.2020010100.grb2   4.27 MB
+    record 5   TMP:surface        90679 B
+    record 31  PRATE:surface      41105 B
+    record 45  PEVPR:surface      ~40000 B
+
+**But the records are global.** A GRIB record is one variable over the whole
+planet, so a range read retrieves a global field, not a Colorado subset. Priced
+for weeks 1 to 4 of the four variables named in the brief:
+
+    4 variables per 6-hourly step        256 KB
+    112 steps per issue (28 days)         28.6 MB
+    375 weekly issues, 2018-11 to 2025-12  10.74 GB single member
+                                           42.97 GB four members
+
+**The spatial subsetting service cannot reach the training years.** NOMADS
+`filter_cfs_flx.pl` accepts a `subregion` with lat/lon bounds and would cut this
+to a few kilobytes per field, but it returns HTTP 403 for a 2020 issue date:
+"This data has expired and is no longer available." It serves only recent runs.
+
+**Decision: dropped.** 10.74 GB is more than four times the entire session
+budget and about eight times the true remaining headroom, for the cheapest
+single-member configuration. There is no route to a cheaper one: the archive
+that has the history will not subset, and the service that subsets does not have
+the history.
+
+**What this costs, stated plainly.** The fire exceedance targets at h >= 4 have
+no physical source of skill without forecast weather. Four-week and eight-week
+ERC percentile exceedance is largely determined by weather that has not happened
+yet, and the model sees only antecedent conditions. Any apparent skill on
+`f_gt90_h4` and `f_gt90_h8` should be read as persistence of fuel state, not as
+weather forecasting, and the reported numbers for those targets should be
+interpreted with that ceiling in mind.
