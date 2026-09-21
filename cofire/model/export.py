@@ -141,6 +141,23 @@ def run_export() -> Path:
                 "fire_hi": _finite(row.get(f"erc_pct_h{h}_hi")),
                 "confidence": _finite(row.get(f"erc_pct_h{h}_conf"), 0.5),
                 "alpha": _finite(row.get(f"erc_pct_h{h}_alpha"), 0.1),
+                # v1 probabilistic targets, each carrying its own baseline so
+                # the card can show the model beside the reference rather than
+                # in place of it. `baseline` is null for fire, which has no
+                # Markov reference: a USDM category transition matrix cannot
+                # forecast ERC exceedance. See docs/DECISIONS.md.
+                "p_intensify": {
+                    "value": _finite(row.get(f"d_intensify1_h{h}_hat")),
+                    "baseline": _finite(row.get(f"d_intensify1_h{h}_markov")),
+                },
+                "p_d2plus": {
+                    "value": _finite(row.get(f"d_ge2_h{h}_hat")),
+                    "baseline": _finite(row.get(f"d_ge2_h{h}_markov")),
+                },
+                "p_fire_gt90": {
+                    "value": _finite(row.get(f"f_gt90_h{h}_hat")),
+                    "baseline": None,
+                },
             }
         cells.append(entry)
 

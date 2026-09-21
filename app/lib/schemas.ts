@@ -31,6 +31,20 @@ export const WhyBarSchema = z.object({
   source: z.string().nullish(),
 });
 
+// Probabilistic outputs are optional at the schema level because a cell can
+// legitimately lack them: a target is skipped where the event never occurs in
+// the training window, and a Markov reference does not exist for fire targets
+// at all. Parsing them as required would turn an absent forecast into a client
+// crash, which is how the earlier null-SHAP bug took down a whole Place Card.
+export const ProbabilitySchema = z.object({
+  value: maybeNumber,
+  // The Markov transition baseline for the same event, shown beside the model
+  // rather than behind it. Null for fire targets, which have no Markov
+  // reference: an empirical USDM category transition matrix cannot forecast ERC
+  // exceedance. See docs/DECISIONS.md.
+  baseline: maybeNumber,
+});
+
 export const HorizonSchema = z.object({
   drought_point: maybeNumber,
   drought_set: z.array(z.number()).default([]),
@@ -39,6 +53,10 @@ export const HorizonSchema = z.object({
   fire_hi: maybeNumber,
   confidence: maybeNumber,
   alpha: maybeNumber,
+  // v1 probabilistic targets.
+  p_intensify: ProbabilitySchema.nullish(),
+  p_d2plus: ProbabilitySchema.nullish(),
+  p_fire_gt90: ProbabilitySchema.nullish(),
 });
 
 export const UncertaintySchema = z.object({
@@ -209,6 +227,7 @@ export const GridSchema = z.object({
 });
 
 // Types are derived, never hand-declared.
+export type Probability = z.infer<typeof ProbabilitySchema>;
 export type WhyBar = z.infer<typeof WhyBarSchema>;
 export type Horizon = z.infer<typeof HorizonSchema>;
 export type UncertaintyStatus = z.infer<typeof UncertaintySchema>;
