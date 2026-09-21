@@ -41,6 +41,7 @@ from cofire.model.data.subx import (  # noqa: E402
     VARIABLES,
     assert_no_self_contribution,
     coverage_note,
+    coverage_note_extended,
     fold_climatology,
     load_chunks,
 )
@@ -237,10 +238,10 @@ def run(n_boot: int = 400, n_shuffles: int = 20) -> Path:
     path = OUT / "subx_verdict.csv"
     df.to_csv(path, index=False)
     (OUT / "subx_coverage_note.txt").write_text(
-        coverage_note()
-        + "\n\nThis run: cached SubX is the forecast series 2018-01 to 2025-12 only; "
-        "the hindcast series was not ingested, so both arms were scored on 2018 "
-        "onward rows and configuration A was rescored on exactly the rows B sees.\n"
+        coverage_note_extended()
+        + "\n\nSuperseded note, kept because earlier artifacts quote it:\n"
+        + coverage_note()
+        + "\n"
     )
     LOGGER.info(
         "%d comparisons, %d estimable, %d with CI above zero, %d switching to B",

@@ -289,3 +289,22 @@ def coverage_note() -> str:
         "Ensemble size and configuration differ between the hindcast and "
         "forecast series, which is why subx_is_forecast travels with the data."
     )
+
+
+def coverage_note_extended() -> str:
+    """Coverage as it stands on the extended record, replacing the note above.
+
+    `coverage_note` describes the 2018 to 2020 split that has since been
+    restored to 2007 to 2021, and is kept because earlier artifacts quote it.
+    """
+    return (
+        "Cached SubX is the CFSv2 forecast series only, 2018-01 to 2025-12, 96 "
+        "months each of pr and tas. The hindcast series (1999 to 2017-09-30) "
+        "was not ingested, so configuration B can see no row before 2018. The "
+        "restored split trains on 2007 to 2021 and validates on 2022 to 2023, "
+        "so the whole validation period lies inside SubX coverage and both arms "
+        "score the same rows, while B's own fit draws only on the 2018 to 2021 "
+        "part of the training split. Ensemble size and configuration differ "
+        "between the hindcast and forecast series, which is why "
+        "subx_is_forecast travels with the data."
+    )
