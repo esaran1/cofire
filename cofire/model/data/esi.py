@@ -90,20 +90,37 @@ def _nearest_available(target: date, cache: dict[int, list[str]]) -> str | None:
 
 
 class EsiSource(DataSource):
-    """Windowed ESI reads onto the gridMET grid, plus the Rapid Change Index."""
+    """Windowed ESI reads onto the gridMET grid, plus the Rapid Change Index.
 
-    name = "SERVIR ESI 4-week"
-    url = BASE
+    `product` selects 4WK or 12WK. `stride` samples every Nth week: a 12-week
+    composite changes little week to week, so fetching it biweekly and
+    interpolating costs half the bytes. The interpolation is validated against
+    a full-rate series before it is trusted (see tests/test_esi_interp.py), and
+    it is behind a flag so the ablation can run with and without it.
+    """
+
     optional = False
 
-    def __init__(self, settings: Settings | None = None) -> None:
+    def __init__(
+        self,
+        settings: Settings | None = None,
+        product: str = PRODUCT,
+        stride: int = 1,
+    ) -> None:
         self.settings = settings or get_settings()
+        self.product = product
+        self.stride = max(1, int(stride))
+        self.name = f"SERVIR ESI {product}"
+        self.url = f"{BASE}/{product}"
         self._last: SourceStatus | None = None
 
     # ------------------------------------------------------------------ io
 
     def _out_path(self) -> Path:
-        return self.settings.processed_dir / "esi" / "weekly.nc"
+        stem = "weekly" if self.product == "4WK" else f"weekly_{self.product.lower()}"
+        if self.stride > 1:
+            stem += f"_stride{self.stride}"
+        return self.settings.processed_dir / "esi" / f"{stem}.nc"
 
     def _listing(self, year: int) -> list[str]:
         """Filenames present for a year. One small HTML listing per year."""
@@ -113,13 +130,13 @@ class EsiSource(DataSource):
 
         try:
             r = requests.get(
-                f"{BASE}/{PRODUCT}/{year}/", timeout=30, headers={"User-Agent": USER_AGENT}
+                f"{BASE}/{self.product}/{year}/", timeout=30, headers={"User-Agent": USER_AGENT}
             )
             if r.status_code >= 400:
                 return []
             import re
 
-            return sorted(set(re.findall(rf"DFPPM_{PRODUCT}_{year}\d{{3}}\.tif", r.text)))
+            return sorted(set(re.findall(rf"DFPPM_{self.product}_{year}\d{{3}}\.tif", r.text)))
         except Exception as exc:  # noqa: BLE001
             LOGGER.warning("ESI listing for %s failed: %s", year, exc)
             return []
@@ -139,7 +156,7 @@ class EsiSource(DataSource):
 
         ledger = get_ledger()
         w, s, e, n = self.settings.bbox
-        weeks = [d for d in tuesdays(date_range.start, date_range.end)]
+        weeks = list(tuesdays(date_range.start, date_range.end))[:: self.stride]
         years = sorted({d.year for d in weeks})
         listings = {y: self._listing(y) for y in years}
 
@@ -160,7 +177,7 @@ class EsiSource(DataSource):
             fname = _nearest_available(d, listings)
             if not fname:
                 continue
-            url = f"/vsicurl/{BASE}/{PRODUCT}/{d.year}/{fname}"
+            url = f"/vsicurl/{BASE}/{self.product}/{d.year}/{fname}"
             try:
                 with rasterio.open(url) as ds:
                     win = from_bounds(w, s, e, n, ds.transform)
@@ -194,7 +211,7 @@ class EsiSource(DataSource):
             np.stack(frames),
             dims=("time", "lat", "lon"),
             coords={"time": pd.DatetimeIndex(times), "lat": lat_axis, "lon": lon_axis},
-            name="esi_4wk",
+            name=f"esi_{self.product.lower()}",
         )
         out.parent.mkdir(parents=True, exist_ok=True)
         da.to_dataset().to_netcdf(out)
@@ -204,8 +221,8 @@ class EsiSource(DataSource):
             url=self.url,
             path=str(out),
             records=fetched,
-            note=f"windowed reads: {fetched} weeks, {failed} failures, "
-            f"{fetched * BYTES_PER_FILE_ESTIMATE / 1e6:.0f} MB",
+            note=f"windowed reads: {fetched} samples (stride {self.stride}), "
+            f"{failed} failures, {fetched * BYTES_PER_FILE_ESTIMATE / 1e6:.0f} MB",
         )
         return out
 
@@ -257,3 +274,56 @@ def rapid_change_index(z: np.ndarray) -> np.ndarray:
         out[t] = sign * run_sum * run_len
         prev_sign = np.where(sign != 0, sign, prev_sign)
     return out
+
+
+# ------------------------------------------------------- biweekly interpolation
+
+
+def interpolate_to_weekly(
+    da: xr.DataArray, target_times: pd.DatetimeIndex, enabled: bool = True
+) -> xr.DataArray:
+    """Linearly interpolate a strided series onto weekly issue dates.
+
+    A 12-week composite is near-constant week to week, so sampling biweekly and
+    interpolating costs half the bytes for a small error. That claim is not
+    taken on faith: `tests/test_esi_interp.py` reconstructs a biweekly-sampled
+    series and asserts the reconstruction matches the full-rate series within a
+    stated tolerance on real fetched data.
+
+    `enabled=False` returns nearest-previous values instead, which is the
+    honest no-interpolation arm for the ablation: it uses only values that were
+    actually fetched and never invents an intermediate week.
+    """
+    if not enabled:
+        return da.reindex(time=target_times, method="ffill")
+    return da.interp(time=target_times, method="linear", kwargs={"fill_value": "extrapolate"})
+
+
+def interpolation_error(full: xr.DataArray, stride: int = 2) -> dict[str, float]:
+    """Sample `full` at `stride`, interpolate back, and measure the damage.
+
+    Reported on the weeks that were dropped, because the kept weeks are exact by
+    construction and including them would flatter the result.
+    """
+    times = pd.DatetimeIndex(full.time.values)
+    kept = times[::stride]
+    dropped = times.difference(kept)
+    if dropped.empty:
+        return {"n_dropped": 0.0, "mae": float("nan"), "p95_abs": float("nan"), "max_abs": float("nan")}
+    recon = full.sel(time=kept).interp(
+        time=dropped, method="linear", kwargs={"fill_value": "extrapolate"}
+    )
+    truth = full.sel(time=dropped)
+    err = np.abs(recon.values - truth.values)
+    err = err[np.isfinite(err)]
+    if err.size == 0:
+        return {"n_dropped": float(len(dropped)), "mae": float("nan"), "p95_abs": float("nan"), "max_abs": float("nan")}
+    spread = float(np.nanstd(full.values))
+    return {
+        "n_dropped": float(len(dropped)),
+        "mae": float(np.mean(err)),
+        "p95_abs": float(np.percentile(err, 95)),
+        "max_abs": float(np.max(err)),
+        "series_sd": spread,
+        "mae_over_sd": float(np.mean(err) / spread) if spread > 0 else float("nan"),
+    }

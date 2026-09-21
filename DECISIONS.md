@@ -299,3 +299,25 @@
   water-supply and the evaporative-demand side.
 - EDDI native resolution is 0.125 degrees (~12 km) against gridMET's 4 km, so it is upsampled onto
   the gridMET grid and is recorded in `docs/DATA.md` as coarser support, not as 4 km information.
+- **Gate 1 amendment: ESI 12WK restored, EDDI dropped.** The amendment is right that dropping the
+  12-week composite trades away the only long-timescale stress signal, and that a missing 12-week
+  composite is the first thing that would explain a null result at h=8. Re-pricing with real measured
+  costs rather than the earlier estimate changed the arithmetic: the ESI 4WK fetch used the
+  **per-domain** bbox, not the union I had priced, so Larimer needs its own pass. Measured 1.93 MB
+  per file for Pueblo's 16 rows; a union read spanning both domains plus the gap between them costs
+  8.08 MB per file, so per-domain reads are 4.2x cheaper than one union read and the union idea was
+  wrong.
+  Remaining options, against 824 MB already spent:
+    A  ESI 4WK + ESI 12WK biweekly, both domains, no EDDI      2.274 GB  fits
+    B  ESI 4WK + ESI 12WK biweekly, Pueblo only, EDDI weekly   1.957 GB  fits
+    C  everything, EDDI trimmed to 2022-2026                   2.642 GB  over
+  **Chosen A.** Both domains reporting every experiment is a standing rule, so B fails it. EDDI's
+  4-week evaporative demand largely duplicates what gridMET already carries through VPD, reference
+  ET and precipitation deficits, whereas the 12-week ESI composite is the only slow-accumulation
+  signal available and is what should move USDM categories at 4 to 8 week leads. Trimming EDDI to
+  fit (option C) would leave 132 affordable weeks, too short to span the training window, which makes
+  it useless as a training feature rather than merely weaker.
+  **Gate 1 is therefore closed on ESI 4WK + ESI 12WK rather than on ESI + EDDI.** That is a
+  deviation from the original gate wording, taken because the amendment reprioritised the 12-week
+  composite above EDDI explicitly. The 13 EDDI files already fetched are retained and the source
+  class is kept working, so EDDI can be added in a later session with its own budget.

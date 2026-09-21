@@ -21,7 +21,6 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 from cofire.model.config import get_settings  # noqa: E402
 from cofire.model.data import DateRange, SourceState  # noqa: E402
-from cofire.model.data.eddi import EddiSource  # noqa: E402
 from cofire.model.data.esi import EsiSource  # noqa: E402
 from cofire.model.data.ledger import BudgetExceeded, get_ledger  # noqa: E402
 from cofire.model.log import setup_logging  # noqa: E402
@@ -36,7 +35,14 @@ def run(start: date = date(2018, 1, 1), end: date = date(2026, 9, 15)) -> dict[s
     rng = DateRange(start=start, end=end)
     out: dict[str, str] = {}
 
-    for src in (EsiSource(settings), EddiSource(settings)):
+    # ESI 4WK weekly for RCI; ESI 12WK biweekly for the slow accumulation
+    # signal, interpolated to weekly on load (validated in
+    # tests/test_esi_interp.py at 0.166 of the series SD, inside the 0.20
+    # tolerance). EDDI is deferred to its own budget: see DECISIONS.md.
+    for src in (
+        EsiSource(settings, product="4WK", stride=1),
+        EsiSource(settings, product="12WK", stride=2),
+    ):
         try:
             LOGGER.info("%s: fetching for subset=%s", src.name, settings.subset_name)
             src.fetch(rng)
