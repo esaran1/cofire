@@ -37,6 +37,9 @@ dependencies = [
   "pillow>=10.3",
   "aiohttp>=3.14.3",
   "h5py>=3.16.0",
+  "arch>=8.0.0",
+  "statsmodels>=0.15.0",
+  "climate-indices>=2.4.0",
 ]
 
 [project.optional-dependencies]
@@ -79,6 +82,9 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 module = [
   "lightgbm.*",
+  "statsmodels.*",
+  "arch.*",
+  "climate_indices.*",
   "geopandas.*",
   "rioxarray.*",
   "rio_tiler.*",

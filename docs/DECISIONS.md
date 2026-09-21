@@ -687,3 +687,60 @@ the drought targets clear four. They also have no forecast weather behind them,
 since SubX was found but not ingested. Their skill against persistence is large
 (+0.32 to +0.45) because persistence is a weak forecast for an exceedance
 target, and their skill against climatology is the number that matters.
+
+## The library replacements overturned the result
+
+This is the most consequential correction in the session. The eight-target
+pre-registration submitted for look 3 does not survive it, and that
+pre-registration is withdrawn.
+
+**BH and Holm were correct.** `benjamini_hochberg` and `holm` agree with
+`statsmodels.stats.multitest.multipletests` on every case tested, including the
+step-up and step-down edge cases. No result changes.
+
+**The block bootstrap was understating uncertainty.** The hand-rolled version
+resampled whole weeks independently with replacement. That is a valid block
+bootstrap only if weeks are exchangeable, and in a drought series they are not:
+what matters is runs of consecutive weeks. `arch.bootstrap.CircularBlockBootstrap`
+resamples blocks of consecutive weeks, wrapping at the series end, and produces
+materially wider intervals:
+
+    domain   target           h   custom              circular block
+    larimer  d_intensify1_h2  2   [+0.026, +0.133]    [-0.007, +0.290]
+    larimer  d_nochange_h8    8   [+0.003, +0.085]    [-0.035, +0.119]
+    larimer  f_gt90_h8        8   [+0.018, +0.096]    [-0.004, +0.136]
+    pueblo   f_gt80_h2        2   [+0.034, +0.229]    [-0.020, +0.370]
+    pueblo   f_gt80_h4        4   [+0.022, +0.243]    [-0.042, +0.389]
+    pueblo   f_gt80_h8        8   [+0.029, +0.210]    [-0.024, +0.322]
+
+**Six of thirteen conclusions flip.** Every flip is from significant to not
+significant. The point estimates are unchanged, because the statistic on the
+full series does not depend on the resampling scheme; only the uncertainty was
+wrong, and it was wrong in the flattering direction.
+
+**Effective sample size also changes**, because `neff_from_acf` sums the
+observed autocorrelations instead of assuming AR(1). On the surviving targets it
+moves from a custom 20.1 to 52.7 into a library 19.4 to 36.7. Neither is
+uniformly larger: a 20-point moving average, where autocorrelation terminates at
+lag 20, gets n_eff 19.8 from the ACF estimator against 10.6 from AR(1), because
+the AR(1) fit implies a geometric tail the series does not have. The ACF version
+is the better estimate and is now what the pipeline reports.
+
+### What is left
+
+    13 survived BH under the custom bootstrap
+     7 still separate under the circular block bootstrap
+     4 of those also clear every applicable baseline
+     3 after two-domain agreement
+
+The three are `f_gt97` on Larimer at h2, h4 and h8. `d_intensify1_h4` clears the
+bootstrap and the baselines at +0.1558 on Pueblo but scores -0.5357 on Larimer,
+so the two-domain rule excludes it. `d_nochange_h2` and `d_nochange_h4` clear
+the bootstrap but lose to Markov by -0.217 and -0.359, and `d_intensify2_h8`
+loses to persistence at -0.021.
+
+**The lesson is about the direction of the error.** A hand-rolled statistic
+that is wrong tends to be wrong in the direction that makes the work look
+better, because that is the direction in which a mistake is not investigated.
+The custom bootstrap was tested, and its tests passed, and it was still wrong
+about the thing that mattered.

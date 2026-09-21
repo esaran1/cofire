@@ -4,7 +4,20 @@ Git `a3f212d083122dcf5b6d62efe2a574d7beb4c67b`. Dev subset: **Pueblo County** (`
 moved from Larimer this session. Displayed resolution 4000 m. **2026 hindcast remains sealed at 2
 looks** on config `0957e415fa7f3fad` — nothing in v0.6 evaluated on 2026.
 
-## Look 3 pre-registration (current, not taken in this session)
+## Look 3 pre-registration WITHDRAWN
+
+The eight-target pre-registration (sha256 `88d8fdf7...`) is **withdrawn** and
+must not be acted on. Replacing the hand-rolled block bootstrap with
+`arch.bootstrap.CircularBlockBootstrap` widened every interval and flipped 6 of
+13 conclusions from significant to not significant. Three of the eight
+pre-registered targets lose significance outright.
+
+Under the library implementations: 7 of 13 still separate, 4 of those clear
+every baseline, 3 survive two-domain agreement. A replacement pre-registration
+follows the operational benchmarks, the fire transition baseline and the SubX
+arm.
+
+## Superseded look 3 pre-registration (do not act on)
 
 `docs/PREREGISTRATION_LOOK3.md`, sha256 `88d8fdf7253e258e1c58b12e80ff845c40da181a682d16b8bae5af881ebc1243`.
 

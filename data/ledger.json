@@ -1,9 +1,9 @@
 {
   "budget_bytes": 2500000000,
-  "recorded_bytes": 3592425769,
+  "recorded_bytes": 3595800481,
   "correction_bytes": -1477699344,
-  "total_bytes": 2114726425,
-  "remaining_bytes": 385273575,
+  "total_bytes": 2118101137,
+  "remaining_bytes": 381898863,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
@@ -26479,6 +26479,27 @@
       "bytes": 555136,
       "timestamp": "2026-09-21T03:01:20+00:00",
       "note": "windowed 2025-12-30 (estimated)"
+    },
+    {
+      "source": "SubX CFSv2 pr",
+      "url": "https://iridl.ldeo.columbia.edu/SOURCES/.Models/.SubX/.NCEP/.CFSv2/.forecast/.pr/X/-107.0/-104.0/RANGEEDGES/Y/37.0/41.0/RANGEEDGES/L/0/28/RANGE/S/%281%20Jan%202020%29/%2831%20Jan%202020%29/RANGEEDGES/data.nc",
+      "bytes": 1162040,
+      "timestamp": "2026-09-21T03:53:23+00:00",
+      "note": "forecast 2020-01 (measured)"
+    },
+    {
+      "source": "SubX CFSv2 pr",
+      "url": "https://iridl.ldeo.columbia.edu/SOURCES/.Models/.SubX/.NCEP/.CFSv2/.forecast/.pr/X/-107.0/-104.0/RANGEEDGES/Y/37.0/41.0/RANGEEDGES/L/0/28/RANGE/S/%281%20Jan%202018%29/%2831%20Jan%202018%29/RANGEEDGES/data.nc",
+      "bytes": 1162040,
+      "timestamp": "2026-09-21T03:55:19+00:00",
+      "note": "forecast 2018-01 (measured)"
+    },
+    {
+      "source": "SubX CFSv2 pr",
+      "url": "https://iridl.ldeo.columbia.edu/SOURCES/.Models/.SubX/.NCEP/.CFSv2/.forecast/.pr/X/-107.0/-104.0/RANGEEDGES/Y/37.0/41.0/RANGEEDGES/L/0/28/RANGE/S/%281%20Feb%202018%29/%2828%20Feb%202018%29/RANGEEDGES/data.nc",
+      "bytes": 1050632,
+      "timestamp": "2026-09-21T03:57:11+00:00",
+      "note": "forecast 2018-02 (measured)"
     }
   ]
 }
