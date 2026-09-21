@@ -90,7 +90,7 @@ def test_fire_thresholds_are_nested() -> None:
 def test_markov_rows_sum_to_one() -> None:
     """The check the brief names: every transition row is a distribution."""
     df = _frame()
-    mk = MarkovBaseline(horizon=4, min_count=5).fit(df)
+    mk = MarkovBaseline(horizon=4, min_weeks=2).fit(df)
     assert np.isclose(mk.global_row.sum(), 1.0)
     for row in mk.by_cat.values():
         assert np.isclose(row.sum(), 1.0)
@@ -104,7 +104,7 @@ def test_markov_rows_sum_to_one() -> None:
 
 def test_markov_predicted_events_are_probabilities() -> None:
     df = _frame()
-    mk = MarkovBaseline(horizon=4, min_count=5).fit(df)
+    mk = MarkovBaseline(horizon=4, min_weeks=2).fit(df)
     ev = mk.predict_events(df)
     for name, p in ev.items():
         assert np.all((p >= -1e-6) & (p <= 1 + 1e-6)), name
@@ -114,8 +114,8 @@ def test_markov_is_fit_on_training_rows_only() -> None:
     """Fitting on a wet training block must not absorb a dry later block."""
     df = _frame()
     train = df[pd.to_datetime(df["time"]) < "2020-01-01"]
-    mk_train = MarkovBaseline(horizon=4, min_count=5).fit(train)
-    mk_all = MarkovBaseline(horizon=4, min_count=5).fit(df)
+    mk_train = MarkovBaseline(horizon=4, min_weeks=2).fit(train)
+    mk_all = MarkovBaseline(horizon=4, min_weeks=2).fit(df)
     # Different data must give different estimates; identical rows would mean
     # the training filter was ignored.
     assert not np.allclose(mk_train.global_row, mk_all.global_row) or len(train) == len(df)

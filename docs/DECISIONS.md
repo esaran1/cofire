@@ -210,3 +210,119 @@ session's result.
 **What is needed to finish this properly.** Larimer prediction parquets, from a
 pipeline run on the Larimer subset. Until those exist the comparison is
 single-domain and the verdict stands at not adopted.
+
+## Fix 1: the Markov baseline was broken in three ways, none of them the obvious one
+
+The reviewer's bound is the right diagnostic: a transition matrix conditioned on
+(category, month) contains the unconditional rate as a special case, so on its
+own training data it cannot score worse. Measured, it did not — training Brier
+0.0758 against a constant's 0.1272 — while validation inverted to 0.2245 against
+0.0936. The bound held in sample and failed out of sample, which rules out
+degenerate 0/1 probabilities (only 0.85% of predictions were near 0 or 1) and
+points at overfitting. Three separate causes, found by measurement after two
+wrong guesses.
+
+**1. Support was counted in rows, not weeks.** USDM moves in spatially coherent
+blocks. Measured on Pueblo training data, 84% of (category, month, week) blocks
+are more than 98% unanimous across all 432 cells, so a week carries roughly one
+observation rather than 432. Under the row gate, 42 of 47 category-month cells
+qualified; under a week gate, 0 of 47 did. `min_count=30` was satisfied by a
+single week of one county, and the estimator memorised individual drought
+episodes. Support is now counted in distinct weeks.
+
+**2. Rates must still be estimated from rows.** The first repair estimated the
+rates from week-weighted counts too, and that broke the bound in the other
+direction: every category row sat up to 0.05 off the row rate in a consistent
+direction, because weeks with many cells in a category were downweighted in
+fitting but not in scoring. Row-level Brier is minimised by the row mean. So the
+two units do different jobs: **gate on weeks, estimate on rows.**
+
+**3. The fallback was the unconditional marginal.** With a strict week gate most
+cells fall back, and `global_row` is the marginal over *destinations*, which
+forgets where the chain started. It told a cell sitting in D2 that D0 was the
+most likely next state, because D0 is the commonest state overall. On Larimer,
+where every category fell back at a strict gate, that inflated `d_improve1_h2`
+Brier by 642% over the constant. Pure persistence is the opposite error: a point
+mass states P(category >= 3) = 1 for a D3 cell, which broke the bound on the
+absolute-level `d_ge3` targets. The fallback is now a blend, weight 0.75 on
+staying put.
+
+**Settings, all selected on validation across both domains, never on the
+holdout.** `min_weeks=32` is the largest gate at which neither domain violates
+the bound: Pueblo would prefer 48 (0.0892 against 0.0901) but Larimer fails 12
+of 18 targets there. `persistence_weight=0.75` is the smallest value at which
+Larimer's improve targets satisfy the bound; Pueblo is indifferent across the
+whole range.
+
+**Result.** The bound now holds on 18 of 18 drought targets on both domains.
+Mean validation Brier is 0.0455 on Larimer and 0.0901 on Pueblo.
+
+**A note on the synthetic fixture.** At 200 weeks it preferred
+`persistence_weight=0`, the opposite of what both real domains need, because
+that length forced constant fallback and never exercised the estimator. It was
+lengthened to 600 weeks rather than used to select the parameter. A fixture that
+disagrees with both real domains is measuring its own construction.
+
+**h-step construction was already correct.** Each horizon is estimated from its
+own direct `usdm_h{h}` transitions rather than a one-step matrix raised to a
+power, so no first-order assumption is imposed.
+
+## Fix 2: class weights removed, Platt replaces isotonic, and a ceiling appears
+
+**Class weighting is gone** from LightGBM (`scale_pos_weight`) and from logistic
+regression (`class_weight="balanced"`). Weighting is standard when the goal is
+ranking and wrong when the goal is a probability: it moves the output off the
+scale Brier scores, by construction. That is what produced AUC 0.598 with a
+Brier worse than a constant, which is real discrimination attached to unusable
+probabilities.
+
+**Platt replaces isotonic**, fit on pooled out-of-fold predictions from the LODO
+folds rather than on one calibration split. Isotonic is non-parametric and needs
+many positives per bin; on targets whose base rate is 0.4% it fits the noise in
+a handful of events and produces a step function that does not transfer. Platt
+has two parameters and cannot chase that noise. Measured on Pueblo
+`d_intensify1_h4`, it cuts reliability from 0.0409 to 0.0174 and Brier from
+0.1310 to 0.1072.
+
+**But it overshoots, and the reason is not fixable by calibration.** Platt lands
+at mean prediction 0.2257 against an actual 0.1015, because the pooled
+out-of-fold base rate is 0.1771 and the validation year's is 0.1015. The
+calibrator is correctly fit to the years it saw. Those years simply ran
+differently. The base rate of `d_intensify1_h4` on Pueblo by year:
+
+    2018 0.1948   2020 0.1771   2022 0.1230   2024 0.0114
+    2019 0.0755   2021 0.1315   2023 0.0802   2025 0.0673
+
+A 17x range, with no trend to extrapolate. On a rare event Brier is dominated by
+calibration, and calibration is dominated by the base rate, so this swing sets a
+ceiling on what any method fit to past years can achieve.
+
+**The ceiling, measured.** Giving LightGBM an oracle calibrator that knows the
+true validation base rate, which is not available in practice:
+
+    constant at train rate    brier 0.0931  rel 0.00190  res 0.00000  auc 0.500
+    constant at TRUE rate     brier 0.0912  rel 0.00000  res 0.00000  auc 0.500
+    lgbm raw                  brier 0.1310  rel 0.04094  res 0.00047  auc 0.607
+    lgbm oracle-calibrated    brier 0.0907  rel 0.00020  res 0.00109  auc 0.607
+
+Discrimination is worth 0.0005 Brier once the base rate is known. Not knowing
+the base rate costs 0.0019, four times more. The models do carry signal, and
+that signal is smaller than the year-to-year base-rate uncertainty it has to
+overcome. This is a property of the problem at this sample size, not a defect
+left to fix, and the ablation should be read against that ceiling rather than
+against zero.
+
+## Fix 3: equal row sets, and the restriction is not free
+
+Every arm, the gridMET-only arm included, is now restricted to rows where every
+source group is present, so a group's lift cannot be confounded with how many
+rows it was fit on. The unrestricted gridMET-only arm is reported beside it as
+`gridmet_full_record`.
+
+The restriction matters more than expected. On Pueblo `d_intensify1_h4` the
+restricted gridMET arm scores Brier 0.1030 against the full-record arm's 0.1258.
+The ESI-era rows are genuinely easier, so comparing an ESI arm against the
+full-record baseline would have credited ESI with a difference that belongs to
+the sample. On Pueblo the restriction keeps 99.2% of rows; on Larimer, where ESI
+coverage is elevation-limited, it will cost considerably more, and that cost is
+reported rather than hidden.

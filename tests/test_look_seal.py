@@ -12,7 +12,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from cofire.model.uncertainty.run_pid import _assert_no_holdout
 
 RUN_LOG = Path("artifacts/hindcast/run_log.json")

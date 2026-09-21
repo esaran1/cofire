@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -89,21 +90,25 @@ def fit_lightgbm_classifier(
     target: str,
     seed: int = 2026,
 ) -> np.ndarray:
-    """Class-weighted LightGBM, predicting on `valid`.
+    """LightGBM on the natural class balance, predicting on `valid`.
 
-    Class weighting matters: intensification by two categories is rare, and an
-    unweighted objective will happily predict the base rate everywhere and score
-    well on Brier while carrying no resolution at all.
+    No class weighting. The earlier version set `scale_pos_weight` to the
+    negative/positive ratio, which is standard practice when the goal is
+    ranking, and wrong here. Weighting shifts the predicted probabilities off
+    the true scale by construction, and the scale is what Brier scores. The
+    result was AUC 0.598 with a Brier worse than a constant forecast: real
+    discrimination, unusable probabilities.
+
+    Recalibration cannot reliably undo it either, because the shift depends on
+    the base rate and the base rate moves between the calibration years and the
+    evaluation year. Fitting the model on the natural balance keeps the output
+    on the probability scale to begin with.
     """
     import lightgbm as lgb
 
     xtr, ytr, _ = _xy(train, feature_cols, target)
     if xtr.empty or len(np.unique(ytr)) < 2:
         return np.full(len(valid), float(np.nanmean(ytr)) if ytr.size else 0.5, dtype="float32")
-
-    pos = float(ytr.sum())
-    neg = float(len(ytr) - pos)
-    spw = (neg / pos) if pos > 0 else 1.0
 
     params = {
         "objective": "binary",
@@ -116,7 +121,6 @@ def fit_lightgbm_classifier(
         "verbosity": -1,
         "seed": seed,
         "num_threads": 1,
-        "scale_pos_weight": spw,
     }
     ds = lgb.Dataset(xtr, label=ytr, free_raw_data=False)
     booster = lgb.train(params, ds, num_boost_round=150)
@@ -140,30 +144,75 @@ def fit_logistic(
     if xtr.empty or len(np.unique(ytr)) < 2:
         return np.full(len(valid), float(np.nanmean(ytr)) if ytr.size else 0.5, dtype="float32")
     med = xtr.median(numeric_only=True)
+    # No `class_weight="balanced"`, for the same reason LightGBM drops
+    # `scale_pos_weight`: it moves the probabilities off the scale Brier scores.
     pipe = make_pipeline(
         StandardScaler(),
-        LogisticRegression(max_iter=400, class_weight="balanced", n_jobs=1),
+        LogisticRegression(max_iter=400),
     )
     pipe.fit(xtr.fillna(med), ytr)
     xva = valid[feature_cols].replace([np.inf, -np.inf], np.nan).fillna(med)
     return np.asarray(pipe.predict_proba(xva)[:, 1], dtype="float32")
 
 
-def isotonic_recalibrate(
+def platt_recalibrate(
     p_cal: np.ndarray, y_cal: np.ndarray, p_target: np.ndarray
 ) -> np.ndarray:
-    """Fit isotonic regression on the calibration split only.
+    """Platt scaling: a logistic fit on the log-odds of the raw score.
 
-    Class weighting distorts the probability scale by design, so the raw scores
-    are good at ranking and bad at calibration. Isotonic fixes the scale without
-    touching the ranking, and it is fit on the calibration split so it never
-    sees validation or holdout outcomes.
+    Replaces isotonic regression, which overfits badly here. Isotonic is
+    non-parametric and needs many positive events per bin to be stable; on
+    targets whose base rate is 0.4% it fits the noise in a handful of positives
+    and produces a step function that does not transfer to another year. Platt
+    has two parameters, so it cannot chase that noise.
+
+    Fit on pooled out-of-fold predictions when they are available, which is what
+    `out_of_fold_predictions` assembles from the LODO folds. A single
+    calibration split gives one year's worth of base rate, and the base rate is
+    exactly what moves between years.
     """
-    from sklearn.isotonic import IsotonicRegression
+    from sklearn.linear_model import LogisticRegression
 
     m = np.isfinite(p_cal) & np.isfinite(y_cal)
     if m.sum() < 50 or len(np.unique(y_cal[m])) < 2:
         return p_target
-    iso = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
-    iso.fit(p_cal[m], y_cal[m])
-    return np.asarray(iso.predict(np.clip(p_target, 0, 1)), dtype="float32")
+    eps = 1e-6
+    z = np.log(np.clip(p_cal[m], eps, 1 - eps) / (1 - np.clip(p_cal[m], eps, 1 - eps)))
+    lr = LogisticRegression(max_iter=400)
+    lr.fit(z.reshape(-1, 1), y_cal[m])
+    zt = np.clip(p_target, eps, 1 - eps)
+    zt = np.log(zt / (1 - zt))
+    return np.asarray(lr.predict_proba(zt.reshape(-1, 1))[:, 1], dtype="float32")
+
+
+def out_of_fold_predictions(
+    frame: pd.DataFrame,
+    feature_cols: list[str],
+    target: str,
+    fold_years: tuple[int, ...],
+    fit: Callable[[pd.DataFrame, pd.DataFrame, list[str], str], np.ndarray],
+) -> tuple[np.ndarray, np.ndarray]:
+    """Pooled out-of-fold predictions across the LODO folds.
+
+    For each fold year the model is fit on the other years and predicts that
+    year, so every prediction is out of sample. Pooling them gives the
+    calibrator several years of base-rate variation to fit against rather than
+    one, which is the whole point: a calibrator fit on a single year learns that
+    year's base rate and carries it into a year that does not share it.
+    """
+    t = pd.to_datetime(frame["time"])
+    ps: list[np.ndarray] = []
+    ys: list[np.ndarray] = []
+    for year in fold_years:
+        held = frame[t.dt.year == year]
+        rest = frame[t.dt.year != year]
+        if held.empty or rest.empty:
+            continue
+        y = pd.to_numeric(held[target], errors="coerce").to_numpy(dtype=float)
+        if not np.isfinite(y).any() or len(np.unique(y[np.isfinite(y)])) < 2:
+            continue
+        ps.append(np.asarray(fit(rest, held, feature_cols, target), dtype=float))
+        ys.append(y)
+    if not ps:
+        return np.array([]), np.array([])
+    return np.concatenate(ps), np.concatenate(ys)

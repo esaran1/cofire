@@ -45,7 +45,8 @@ from cofire.model.prob_models import (  # noqa: E402
     ablation_sets,
     fit_lightgbm_classifier,
     fit_logistic,
-    isotonic_recalibrate,
+    out_of_fold_predictions,
+    platt_recalibrate,
     split_groups,
 )
 from cofire.model.targets import (  # noqa: E402
@@ -74,6 +75,11 @@ class AblationConfig:
     cal_fraction: float = 0.25
     seed: int = 2026
     targets: tuple[str, ...] = ()
+    # LODO folds used to pool out-of-fold predictions for the calibrator.
+    fold_years: tuple[int, ...] = (2020, 2021, 2024, 2025)
+    # Restrict every arm to the rows where every source group is present, so a
+    # group's lift is not confounded with how many rows it can be fit on.
+    equal_rows: bool = True
 
 
 # Columns built by shifting a series backwards in time, i.e. the future values
@@ -143,11 +149,32 @@ def run_domain(
         {k: len(v) for k, v in sets.items()},
     )
 
+    # Equal row sets. ESI exists only from 2018, while the feature store starts
+    # earlier, so an arm carrying ESI features is otherwise fit on a different
+    # and smaller sample than the gridMET-only arm. Its lift would then be
+    # confounded with sample size rather than attributable to the source. Every
+    # arm, gridMET-only included, is restricted to the rows where every group is
+    # present, and the unrestricted gridMET-only result is reported separately.
+    full_frame = frame
+    if cfg.equal_rows:
+        v1_cols = [c for g in ("esi", "rci") for c in groups.get(g, [])]
+        if v1_cols:
+            keep = frame[v1_cols].notna().all(axis=1)
+            LOGGER.info(
+                "%s: equal-row restriction keeps %d of %d rows (%.1f%%)",
+                domain, int(keep.sum()), len(frame), 100.0 * float(keep.mean()),
+            )
+            frame = frame[keep]
+
     train, cal, valid = _splits(frame, settings, cfg.cal_fraction)
     LOGGER.info("%s: train=%d cal=%d valid=%d", domain, len(train), len(cal), len(valid))
     if valid.empty or train.empty:
         LOGGER.warning("%s: empty split, skipping", domain)
         return rows
+
+    # The full-record gridMET-only arm, reported beside the restricted one so
+    # the cost of the restriction is visible rather than assumed away.
+    full_train, _full_cal, full_valid = _splits(full_frame, settings, cfg.cal_fraction)
 
     wanted = set(cfg.targets) if cfg.targets else None
 
@@ -166,15 +193,22 @@ def run_domain(
                 continue
 
             baselines = {
+                # Constant is the primary skill reference: it is the hardest
+                # opponent on rare events, because Brier is calibration
+                # dominated and a constant has no reliability error to pay.
+                "constant": constant_event_baseline(train, tname, valid),
                 "markov": mk_valid.get(tname, np.full(len(valid), np.nan)),
                 "climatology": climatology_event_baseline(train, tname, valid),
                 "persistence": persistence_event_baseline(valid, tname),
-                "constant": constant_event_baseline(train, tname, valid),
             }
             # Score the baselines themselves, so the table has a floor row.
             for bname, bp in baselines.items():
                 rep = evaluate_probabilistic(
-                    bp, y_valid, valid["time"].to_numpy(), {"markov": baselines["markov"]},
+                    bp, y_valid, valid["time"].to_numpy(),
+                    # Constant first: it is the primary reference. Markov is
+                    # secondary, reported now that it satisfies the training
+                    # bound on both domains.
+                    {"constant": baselines["constant"], "markov": baselines["markov"]},
                     n_boot=cfg.n_boot,
                 )
                 rows.append(
@@ -188,10 +222,19 @@ def run_domain(
                     fit = fit_lightgbm_classifier if arm == "lightgbm" else fit_logistic
                     try:
                         p_valid = fit(train, valid, cols, tname)
-                        if not cal.empty:
+                        # Platt on pooled out-of-fold predictions, not isotonic
+                        # on one calibration split: the base rate moves between
+                        # years, and a calibrator fit on a single year carries
+                        # that year's rate into one that does not share it.
+                        p_oof, y_oof = out_of_fold_predictions(
+                            train, cols, tname, cfg.fold_years, fit
+                        )
+                        if p_oof.size:
+                            p_valid = platt_recalibrate(p_oof, y_oof, p_valid)
+                        elif not cal.empty:
                             p_cal = fit(train, cal, cols, tname)
                             y_cal = pd.to_numeric(cal[tname], errors="coerce").to_numpy(dtype=float)
-                            p_valid = isotonic_recalibrate(p_cal, y_cal, p_valid)
+                            p_valid = platt_recalibrate(p_cal, y_cal, p_valid)
                     except Exception as exc:  # noqa: BLE001
                         LOGGER.warning("%s %s %s h=%d failed: %s", domain, arm, tname, h, exc)
                         continue
@@ -201,8 +244,41 @@ def run_domain(
                     rows.append(
                         {"domain": domain, "target": tname, "horizon": h, "arm": arm,
                          "feature_set": set_name, "n_features": len(cols),
+                         "row_set": "equal" if cfg.equal_rows else "full",
+                         "n_rows_train": len(train),
                          "runtime_s": round(time.time() - t0, 1), **rep}
                     )
+                    # Same arm on the unrestricted record, for the base group
+                    # only: that is where the restriction costs rows, and
+                    # comparing the two prices the restriction itself.
+                    if cfg.equal_rows and set_name == "gridmet" and not full_valid.empty:
+                        try:
+                            p_full = fit(full_train, full_valid, cols, tname)
+                            y_full = pd.to_numeric(
+                                full_valid[tname], errors="coerce"
+                            ).to_numpy(dtype=float)
+                            mk_full = MarkovBaseline(horizon=h).fit(full_train)
+                            rep_full = evaluate_probabilistic(
+                                p_full, y_full, full_valid["time"].to_numpy(),
+                                {
+                                    "markov": mk_full.predict_events(full_valid).get(
+                                        tname, np.full(len(full_valid), np.nan)
+                                    ),
+                                    "constant": constant_event_baseline(
+                                        full_train, tname, full_valid
+                                    ),
+                                },
+                                n_boot=cfg.n_boot,
+                            )
+                            rows.append(
+                                {"domain": domain, "target": tname, "horizon": h,
+                                 "arm": arm, "feature_set": "gridmet_full_record",
+                                 "n_features": len(cols), "row_set": "full",
+                                 "n_rows_train": len(full_train),
+                                 "runtime_s": 0.0, **rep_full}
+                            )
+                        except Exception as exc:  # noqa: BLE001
+                            LOGGER.warning("%s full-record arm failed: %s", domain, exc)
                     LOGGER.info(
                         "%s %s %s h=%d [%s] bss_markov=%.4f (%.4f..%.4f) auc=%.3f",
                         domain, arm, tname, h, set_name,
