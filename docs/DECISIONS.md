@@ -1017,3 +1017,53 @@ rate wherever resolution is zero for the domain being displayed.
 **The resolution figures also bound what look 3 can test.** A target with zero
 resolution has no discrimination to confirm, so it can only be scored for
 calibration, which is what the pre-registration says.
+
+## A unit error in the climatological width, caught by a dimensional argument
+
+The reviewer spotted it from first principles: PID widths were 89 to 95 in
+`erc_pct` units while the climatological width read 33 to 37, and a week-of-year
+relative percentile has a near-uniform marginal, so its 5th-to-95th width must
+be near 90. Two quantities in the same units cannot differ that way.
+
+**The variable was right and the grouping was wrong.** The width was computed on
+`erc_pct_h{h}`, the correct column, grouped by `(cell_id, week_of_year)` on a
+*single* week. That group holds about **three** training values per cell, and the
+5th and 95th percentiles of three values are its minimum and maximum:
+
+    single week, 3 values per cell    50.6
+    pooled +/- 3 weeks                81.2
+    cross-cell marginal               91.4
+
+The reported 33 to 37 was lower still because thin groups fell back to a
+cross-cell figure. Fixed by pooling the same circular plus or minus 3 week
+window that defines the percentile in the first place.
+
+This is the third instance of one failure mode in this project: an order
+statistic estimated from about three or four values per cell-week. It produced
+the identical fire targets earlier, and it produced this. The shape to watch for
+is a per-cell per-week group in a record only four years long.
+
+**Corrected table:**
+
+    domain   h  MAE    clim MAE  gain [95% CI]          ratio [95% CI]
+    larimer  2  24.97   31.81    +6.85 [+3.98, +9.58]   1.265 [1.210, 1.324]
+    larimer  4  25.22   31.45    +6.23 [+3.36, +8.66]   1.244 [1.168, 1.322]
+    larimer  8  26.64   31.05    +4.41 [+1.88, +6.70]   1.287 [1.206, 1.369]
+    pueblo   2  23.43   29.43    +5.99 [+2.21, +10.07]  1.205 [1.148, 1.260]
+    pueblo   4  23.25   29.45    +6.20 [+1.72, +10.03]  1.233 [1.165, 1.298]
+    pueblo   8  23.64   27.44    +3.80 [+0.35,  +7.24]  1.181 [1.111, 1.248]
+
+**The conclusion is unchanged, the magnitude was wrong.** Ratios fall from 2.41
+to 2.79 down to 1.18 to 1.29, and all six still classify as climatological
+because every interval lies entirely above 1.0.
+
+**One conclusion did change.** With correct units all six MAE gains clear zero,
+where `pueblo h8` previously did not: [-0.63, +6.98] became [+0.35, +7.24]. So
+every point forecast is informative against a climatological median predictor
+and no interval is.
+
+**Why the shipped width is 73 to 75 rather than 90.** The pooled window trades
+some spread for usable sample size, and a single cell's own distribution is
+tighter than the cross-cell marginal. 91.4 is the right check on the *synthetic
+uniform* invariant, which `tests/test_clim_width.py` asserts at 80 to 95; 73 to
+75 is the right value for a real per-cell interval.

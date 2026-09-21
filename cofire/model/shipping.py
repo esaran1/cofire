@@ -340,3 +340,92 @@ def choose_continuous(
         LOGGER.info("h=%d continuous arm -> %s (LODO MAE %s)",
                     h, best, {k: round(v, 3) for k, v in scores.items()})
     return chosen
+
+
+CLIM_HALF_WINDOW = 3
+
+
+def climatological_median(
+    train: pd.DataFrame, horizon: int, index: pd.DataFrame, target: str = "erc_pct"
+) -> np.ndarray:
+    """Per-cell week-of-year median of the future percentile.
+
+    Pooled over the same circular window used to define the percentile itself.
+    A single week holds about three training values, which is too few for any
+    order statistic.
+    """
+    return _clim_stat(train, horizon, index, target, kind="median")
+
+
+def climatological_width(
+    train: pd.DataFrame, horizon: int, index: pd.DataFrame, target: str = "erc_pct"
+) -> np.ndarray:
+    """Width of the per-cell week-of-year 5th to 95th percentile interval.
+
+    Pooled over a circular +/- CLIM_HALF_WINDOW week window, matching how the
+    percentile target is constructed. Grouping on a single week gave about
+    three values per cell-week, so the 5th and 95th percentiles collapsed to the
+    minimum and maximum and understated the spread by roughly 40 points: 50.6
+    against a correctly pooled 81.2 and a marginal 91.4.
+
+    For a week-of-year relative percentile the marginal is near uniform on
+    0 to 100, so this width must come out near 90. `tests/test_clim_width.py`
+    asserts that, which is the check that would have caught the original error.
+    """
+    return _clim_stat(train, horizon, index, target, kind="width")
+
+
+def _clim_stat(
+    train: pd.DataFrame,
+    horizon: int,
+    index: pd.DataFrame,
+    target: str,
+    kind: str,
+) -> np.ndarray:
+    col = f"{target}_h{horizon}"
+    tr = train[["cell_id", "time", col]].copy()
+    tr["woy"] = pd.to_datetime(tr["time"]).dt.isocalendar().week.astype(int).clip(1, 52)
+    vals = pd.to_numeric(tr[col], errors="coerce")
+    tr = tr.assign(_v=vals).dropna(subset=["_v"])
+
+    per_cell_week: dict[str, dict[int, np.ndarray]] = {}
+    for cell, g in tr.groupby("cell_id"):
+        per_cell_week[str(cell)] = {
+            int(w): sub["_v"].to_numpy(dtype=float) for w, sub in g.groupby("woy")
+        }
+
+    allv = tr["_v"].to_numpy(dtype=float)
+    fallback = (
+        float(np.median(allv))
+        if kind == "median"
+        else float(np.percentile(allv, 95) - np.percentile(allv, 5))
+    )
+
+    cache: dict[tuple[str, int], float] = {}
+
+    def value_for(cell: str, woy: int) -> float:
+        key = (cell, woy)
+        if key in cache:
+            return cache[key]
+        weeks = per_cell_week.get(cell, {})
+        window = [((woy - 1 + d) % 52) + 1 for d in range(-CLIM_HALF_WINDOW, CLIM_HALF_WINDOW + 1)]
+        parts = [weeks[w] for w in window if w in weeks]
+        out = fallback
+        if parts:
+            pool = np.concatenate(parts)
+            if pool.size >= 10:
+                out = (
+                    float(np.median(pool))
+                    if kind == "median"
+                    else float(np.percentile(pool, 95) - np.percentile(pool, 5))
+                )
+        cache[key] = out
+        return out
+
+    idx_cells = index["cell_id"].astype(str).to_numpy()
+    idx_woy = (
+        pd.to_datetime(index["time"]).dt.isocalendar().week.astype(int).clip(1, 52).to_numpy()
+    )
+    return np.asarray(
+        [value_for(c, int(w)) for c, w in zip(idx_cells, idx_woy, strict=True)], dtype=float
+    )

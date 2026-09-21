@@ -118,19 +118,26 @@ horizon:
   width**, per cell and week of year, estimated on training years.
 
 **Classification rule, fixed here.** A continuous target and horizon is
-classified **climatological** if the width ratio exceeds **1.0** or the MAE
-difference interval against the median predictor includes zero.
+classified **informative** only if the circular-block-bootstrap 95 percent
+interval of the width ratio lies **entirely below 1.0**. Otherwise it is
+classified **climatological**.
 
-The threshold of 1.0 is not tuned. It is the point at which the interval the
+The anchor of 1.0 is not tuned. It is the point at which the interval the
 product would display is exactly as wide as quoting the historical range for
 that week. Above it, a "forecast" interval is wider than history, which cannot
 be more informative than history. The two quantities are directly comparable:
 PID targets 90 percent coverage of the absolute residual and reports a two-sided
-width of 2q, against a 5th-to-95th-percentile climatological spread.
+width of 2q, against a 5th-to-95th-percentile climatological spread in the same
+units.
+
+Requiring the whole interval below 1.0, rather than the point estimate, makes
+the rule conservative by construction and independent of where the point
+estimate happens to fall. A ratio estimated at 0.98 with an interval reaching
+1.15 is not evidence that the forecast interval is narrower than history.
 
 This is a classification, not a verdict on the method. A well-calibrated
-interval that is wider than climatology is still correctly calibrated; it is
-simply not worth displaying as a forecast.
+interval wider than climatology is still correctly calibrated; it is simply not
+worth displaying as a forecast.
 
 **No skill claims against baselines.** The shipped forecast is the baseline.
 
@@ -144,43 +151,71 @@ against the holdout.
 cell's own week-of-year training distribution, pooled over a circular plus or
 minus 3 week window (`features.py`, `PCT_HALF_WINDOW = 3`). Checked
 empirically: the monthly mean of `erc_pct` spans 40.5 to 60.8 against raw ERC's
-39.9 to 63.6, so the seasonal cycle is removed as intended. The residual
-variation is interannual drift, not a calendar signal.
+39.9 to 63.6, so the seasonal cycle is removed as intended.
 
-    domain   h  arm                 MAE   median MAE   gain [95% CI]        PID width  clim width  ratio
-    larimer  2  damped_regression  24.97     32.91     +7.94 [+4.80, +10.74]   92.94      33.70    2.758
-    larimer  4  damped_regression  25.22     32.82     +7.61 [+4.95, +10.25]   91.46      32.73    2.795
-    larimer  8  decile_mean        26.64     32.02     +5.38 [+2.27,  +8.27]   94.51      34.07    2.774
-    pueblo   2  damped_regression  23.43     29.65     +6.22 [+2.49,  +9.88]   90.89      36.05    2.521
-    pueblo   4  damped_regression  23.25     29.61     +6.36 [+2.15,  +9.97]   93.12      35.24    2.643
-    pueblo   8  decile_mean        23.64     27.31     +3.67 [-0.63,  +6.98]   89.10      36.94    2.412
+**A unit error in the previous version, corrected.** The climatological width
+was computed by grouping on a *single* week of year, which holds about **three**
+training values per cell. The 5th and 95th percentiles of three values are its
+minimum and maximum, so the width collapsed to 33 to 37 for a quantity that must
+be near 90 on a near-uniform percentile marginal. It is now pooled over the same
+circular plus or minus 3 week window used to define the percentile itself.
 
-**What this says, stated before the look.** Applying the rule above to these
-LODO values classifies **all six continuous target-and-horizon pairs as
-climatological**, on the width criterion, since every ratio is between 2.41 and
-2.79. `pueblo h8` fails on the MAE criterion as well, its interval including
-zero at [-0.63, +6.98].
+    single week, 3 values per cell    50.6
+    pooled +/- 3 weeks                81.2
+    cross-cell marginal               91.4
 
-The point forecasts do carry information: five of six have MAE gains over the
-median predictor with intervals clear of zero, 3.67 to 7.94 percentile points.
-The *intervals* do not. A residual MAE of about 24 percentile points on a 0 to
-100 scale needs a wide interval to cover 90 percent of cases, and that width
-exceeds what history alone would quote.
+The shipped estimator reports 73.5 to 75.5 across the six cells below. That sits
+below the 91.4 marginal because a single cell's own distribution is tighter than
+the pooled-across-cells one, which is the correct comparison for a per-cell
+interval. `tests/test_clim_width.py` asserts the invariant on a synthetic
+uniform panel, which is the check that would have caught the original error.
 
-Recording this now means the look cannot change the classification, and the
-product consequence below is already decided.
+**Corrected reference values, LODO, training years:**
+
+    domain   h  arm                 MAE   clim MAE   gain [95% CI]         PID w  clim w  ratio [95% CI]
+    larimer  2  damped_regression  24.97    31.81   +6.85 [+3.98, +9.58]   92.94   73.46  1.265 [1.210, 1.324]
+    larimer  4  damped_regression  25.22    31.45   +6.23 [+3.36, +8.66]   91.46   73.54  1.244 [1.168, 1.322]
+    larimer  8  decile_mean        26.64    31.05   +4.41 [+1.88, +6.70]   94.51   73.45  1.287 [1.206, 1.369]
+    pueblo   2  damped_regression  23.43    29.43   +5.99 [+2.21, +10.07]  90.89   75.43  1.205 [1.148, 1.260]
+    pueblo   4  damped_regression  23.25    29.45   +6.20 [+1.72, +10.03]  93.12   75.51  1.233 [1.165, 1.298]
+    pueblo   8  decile_mean        23.64    27.44   +3.80 [+0.35,  +7.24]  89.10   75.44  1.181 [1.111, 1.248]
+
+**What this says, stated before the look.** Under the rule above, **all six
+classify as climatological**: every ratio interval lies entirely *above* 1.0, so
+none can be classified informative. The correction changed the magnitude, from
+ratios of 2.41 to 2.79 down to 1.18 to 1.29, but not the conclusion.
+
+It did change one thing. With correct units **all six MAE gains now clear zero**,
+where `pueblo h8` previously did not, at [-0.63, +6.98] against a corrected
+[+0.35, +7.24]. So every point forecast is informative against a climatological
+median predictor, by 3.80 to 6.85 percentile points, while no interval is.
+
+That split is the finding: the point forecasts carry real information and the
+intervals around them do not, because a residual MAE near 24 percentile points
+on a 0 to 100 scale requires more width to cover 90 percent of cases than the
+historical range for that week already spans.
 
 ## Product consequence, decided now
 
-Any continuous target and horizon classified climatological renders on the Place
-Card as **the historical range for that week of year**, labelled as such, with
-no forecast interval and no language implying a prediction. The point forecast
-may still be shown, because it is informative, but the uncertainty around it is
-presented as what history says rather than as what the model claims.
+Fixed here so the look cannot influence it.
 
-On the LODO evidence above that is **all six**, so the Place Card ships showing
-historical ranges for the continuous ERC target at every horizon on both
-domains. The look does not change this: it is decided here.
+**Where the target is classified climatological and the MAE gain interval
+clears zero**, which on the LODO evidence is all six, the Place Card shows:
+
+- the **point forecast**, because it is informative, and
+- the **historical week-of-year range of raw ERC for that cell**, labelled as
+  the historical range.
+
+The historical range is quoted in **raw ERC units, not percentile units**,
+because "somewhere between the 5th and 95th percentile" tells a reader nothing:
+it is the definition of the scale restated. A range in ERC is a quantity a fire
+manager already reads.
+
+**Where the MAE gain interval does not clear zero**, the Place Card shows the
+historical range only, with no point forecast.
+
+No forecast interval is displayed for any target classified climatological, and
+no wording implies a prediction of the range.
 
 ## Overall outcome, fixed in advance
 
@@ -225,11 +260,16 @@ the easiest case. It should be investigated before it is believed.
 
 ## Superseded version
 
-This document supersedes sha256
-`341b68e788b50b77226c965464fbcec594f20177d6d00a080a9405ff5001b0c0`, which
-lacked the local coverage tests, the informativeness classification and the
-product consequence. That version was never acted on and no look was taken
-under it.
+This document supersedes two earlier versions, neither of which was acted on
+and under neither of which was any look taken:
+
+- sha256 `341b68e788b50b77226c965464fbcec594f20177d6d00a080a9405ff5001b0c0`,
+  which lacked the local coverage tests, the informativeness classification and
+  the product consequence.
+- sha256 `cabf75e1c847ae8038fcb02d2151d90383d5c4d21e605f90cf8aaadda687cef9`,
+  whose climatological width was computed on single-week groups of about three
+  values and understated it by roughly a factor of 2.2, and whose
+  classification rule used a point estimate rather than an interval.
 
 ## Stopping rule
 

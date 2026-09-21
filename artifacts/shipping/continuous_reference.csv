@@ -1,7 +1,7 @@
-domain,horizon,arm,mae_model,mae_clim_median,mae_gain,gain_lo,gain_hi,pid_width,clim_width,width_ratio
-larimer,2,damped_regression,24.966,32.91,7.944,4.8024,10.7429,92.94,33.7,2.7577
-larimer,4,damped_regression,25.219,32.824,7.605,4.9466,10.246,91.46,32.73,2.7945
-larimer,8,decile_mean,26.64,32.023,5.383,2.2714,8.2713,94.51,34.07,2.7739
-pueblo,2,damped_regression,23.434,29.65,6.216,2.4948,9.8787,90.89,36.05,2.5213
-pueblo,4,damped_regression,23.247,29.61,6.363,2.1539,9.9668,93.12,35.24,2.6429
-pueblo,8,decile_mean,23.641,27.311,3.669,-0.627,6.9759,89.1,36.94,2.4122
+domain,horizon,arm,mae_model,mae_clim_median,mae_gain,mae_lo,mae_hi,pid_width,clim_width,width_ratio,ratio_lo,ratio_hi,classification
+larimer,2,damped_regression,24.966,31.814,6.848,3.9781,9.5783,92.94,73.46,1.2651,1.2097,1.324,climatological
+larimer,4,damped_regression,25.219,31.446,6.226,3.36,8.6577,91.46,73.54,1.2436,1.1676,1.3215,climatological
+larimer,8,decile_mean,26.64,31.052,4.412,1.8765,6.7,94.51,73.45,1.2868,1.2058,1.3689,climatological
+pueblo,2,damped_regression,23.434,29.427,5.993,2.2071,10.067,90.89,75.43,1.2049,1.1476,1.2596,climatological
+pueblo,4,damped_regression,23.247,29.45,6.203,1.7208,10.0252,93.12,75.51,1.2332,1.1653,1.2975,climatological
+pueblo,8,decile_mean,23.641,27.437,3.796,0.3455,7.2393,89.1,75.44,1.1811,1.1108,1.248,climatological
