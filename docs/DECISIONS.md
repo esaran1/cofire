@@ -158,3 +158,55 @@ Fire targets are still floored: `constant_event_baseline` and
 column the report reads first in any case. The fire rows are therefore scored
 against a constant at the training base rate and against per-cell
 week-of-year climatology, with the Markov column empty and visibly so.
+
+## Phase 4: PID is not adopted, and the reason is not the one predicted
+
+The pre-registration (`docs/PREREGISTRATION_V1.md`, hash in STATUS.md) predicted
+that PID would not help much. That prediction was wrong in an interesting
+direction, but the verdict is still **not adopted**, for a procedural reason
+that matters more than the numbers.
+
+**Not adopted, because only one domain could be evaluated.** The rule requires
+the improvement to hold on both Larimer and Pueblo. Only Pueblo has prediction
+parquets: `artifacts/predictions/` holds Pueblo (lat 37.8 to 38.5) and no
+Larimer equivalent exists, only archived summary JSON. Pueblo alone meets the
+numeric criteria (deviation improves 0.1179, width ratio 0.872), but one domain
+passing is the rule being untested, not the rule being met.
+
+**A mislabelling bug was caught on the way.** The first run reported
+byte-identical results for both domains. `run_domain` took a `domain` argument
+and never used it, reading the same files twice. Two-domain agreement is the
+brief's main guard against fitting one geography, so counting one domain twice
+would have turned that guard into a rubber stamp while appearing to satisfy it.
+`_assert_is_domain` now checks that at least half the rows fall inside the named
+domain's bounding box and refuses to report otherwise.
+
+**The substantive finding, on Pueblo only.** At the 8-week horizon both frozen
+split conformal and ACI collapse:
+
+    h=8      coverage   mean|dev|   width
+    split      0.364      0.553     43.98
+    aci        0.363      0.552     43.75
+    pid_p      0.899      0.095     85.63
+    pid_pi     0.873      0.069     75.90
+    pid_full   0.785      0.120     64.66
+
+A 36% realised coverage against a 90% target is a 54-point miss, and ACI is
+indistinguishable from the frozen baseline it was supposed to improve on. The
+PID arms hold 79 to 90%, and they pay for it: widths roughly double, from 44 to
+between 65 and 86. That is the honest trade and it is why width is a
+pre-registered secondary endpoint rather than a footnote.
+
+**`pid_full` is the worst PID arm.** Adding the scorecaster makes deviation
+worse at every horizon (0.1400 against `pid_pi`'s 0.0718 at h=2 and h=4). The
+scorecaster pulls the radius toward the recent median score, which on this data
+means pulling it down in calm stretches just before volatility returns. The
+pre-registration fixed `pid_full` as the arm compared against ACI, so that is
+what the adoption rule used, and the rule is not rewritten after seeing that
+`pid_pi` would have looked better. That `pid_pi` is the strongest arm is
+recorded here as an observation for a future pre-registration, not as this
+session's result.
+
+**What is needed to finish this properly.** Larimer prediction parquets, from a
+pipeline run on the Larimer subset. Until those exist the comparison is
+single-domain and the verdict stands at not adopted.

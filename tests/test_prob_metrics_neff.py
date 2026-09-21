@@ -9,7 +9,6 @@ meaningless. These tests pin that it now tracks the statistic.
 from __future__ import annotations
 
 import numpy as np
-
 from cofire.model.prob_metrics import ar1_neff, block_bootstrap
 
 
