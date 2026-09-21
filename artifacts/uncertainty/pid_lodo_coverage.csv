@@ -1,0 +1,13 @@
+domain,horizon,fold,impl,coverage,width,miss_run
+pueblo,2,all,reference_pid,0.8986,72.79,21
+pueblo,2,all,aci,0.8938,88.69,360
+pueblo,2,2024,reference_pid,0.8966,69.33,34
+pueblo,2,2025,reference_pid,0.8991,74.9,20
+pueblo,4,all,reference_pid,0.8989,74.42,13
+pueblo,4,all,aci,0.9326,93.36,212
+pueblo,4,2024,reference_pid,0.8984,71.77,20
+pueblo,4,2025,reference_pid,0.8976,77.04,34
+pueblo,8,all,reference_pid,0.903,72.0,31
+pueblo,8,all,aci,0.363,43.75,1780
+pueblo,8,2024,reference_pid,0.9042,69.78,14
+pueblo,8,2025,reference_pid,0.9016,76.82,20

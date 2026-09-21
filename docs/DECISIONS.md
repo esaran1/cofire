@@ -873,3 +873,55 @@ loses to a decile lookup table is not a candidate to replace an expert forecast.
 The app should therefore not display a model forecast for these targets. It
 should link to the operational products, which is what a user should be reading
 anyway.
+
+## The shipping layer: empirical conditional models, reference PID for intervals
+
+What ships is the baseline, because the baseline is what survived. The ML arms
+stay in the repo and in the ablation results and are not in the serving path.
+
+**Step 1, frozen per target on pooled LODO** (`artifacts/shipping/choices.json`):
+
+    family counts   markov 18, transition 6, damped 3
+    pooled wins     21 of 27
+
+Drought targets all ship the fixed Markov model. Fire targets split: the ERC
+decile transition table wins 6 and the damped-persistence logistic wins 3, and
+the damped logistic wins precisely where the target is rarest, `f_gt97` at h4
+and h8 and `f_gt80` at h8, which is where a decile table runs short of events
+per cell. Pooling across domains with an indicator wins 21 of 27, consistent
+with the unanimity finding: two domains are two independent series, and doubling
+them matters more than the row count suggests.
+
+**Worth stating plainly: several shipped targets have resolution 0.000000.**
+`d_intensify1_h2`, `d_intensify2_h2`, `d_intensify2_h4` and `d_intensify2_h8`
+ship as essentially climatology. They carry reliability but no discrimination.
+The Place Card must not present those as a forecast that distinguishes one cell
+from another, because it does not.
+
+**Step 2, reference conformal PID in the shipping path.** The authors'
+implementation is vendored byte-identical at
+`cofire/model/uncertainty/reference_pid.py`, exempted from ruff and mypy so it
+stays that way, and wrapped by `shipping_pid.py` where the project-specific
+parts live. `pid.py` is kept as the comparison arm.
+
+LODO coverage against a nominal 0.90, on the calibration and validation stream
+with 2026 never opened:
+
+    horizon  fold  coverage  width  longest miss run
+    2        all     0.8986  72.79        21
+    2        2024    0.8966  69.33        34
+    2        2025    0.8991  74.90        20
+    4        all     0.8989  74.42        13
+    4        2024    0.8984  71.77        20
+    4        2025    0.8976  77.04        34
+    8        all     0.9030  72.00        31
+    8        2024    0.9042  69.78        14
+    8        2025    0.9016  76.82        20
+
+Every fold is within 0.005 of nominal. ACI on the same streams gives 0.8938 at
+h2, 0.9326 at h4 and 0.3630 at h8, with miss runs of 360, 212 and 1780.
+
+**A limitation on this table.** Only Pueblo has prediction parquets, so these
+are Pueblo figures. The Larimer equivalent needs a pipeline run that has not
+happened, and the look-3 pre-registration must either state Pueblo only or wait
+for that run. It cannot claim both domains on this evidence.
