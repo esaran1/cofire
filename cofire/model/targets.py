@@ -432,3 +432,96 @@ def seasonal_climatology_baseline(
 
     woy_idx = pd.to_datetime(index["time"]).dt.isocalendar().week.astype(int).clip(1, 52)
     return np.asarray(rate[woy_idx.to_numpy()], dtype="float32")
+
+
+ERC_DECILES = 10
+
+
+def fire_transition_baseline(
+    train: pd.DataFrame,
+    target: str,
+    index: pd.DataFrame,
+    min_weeks: int = 32,
+    persistence_weight: float = 0.75,
+) -> np.ndarray:
+    """Empirical exceedance rate by current ERC decile and season.
+
+    The fire analogue of the Markov drought baseline, and it needs the same
+    three corrections that one needed:
+
+    - **Support is counted in weeks, not rows.** Cells within a week move
+      together, so a (decile, season) cell backed by 400 rows from two weeks has
+      two observations of evidence, not four hundred.
+    - **Rates are estimated from rows.** Row-level Brier is minimised by the row
+      mean, so the gate and the estimate use different units deliberately.
+    - **The fallback blends toward staying put**, rather than falling back to
+      the unconditional rate, which forgets where the series started.
+
+    Conditioning on the current ERC decile is the right structure for an
+    exceedance target: a cell already at the 95th percentile has a very
+    different chance of exceeding the 97th in four weeks than one at the 20th.
+    """
+    tr = train[["time", "erc_pct", target]].copy()
+    tr["time"] = pd.to_datetime(tr["time"])
+    tr["season"] = tr["time"].dt.month.map(SEASONS)
+    pct = pd.to_numeric(tr["erc_pct"], errors="coerce")
+    tr["dec"] = np.clip((pct // ERC_DECILES).astype("float"), 0, ERC_DECILES - 1)
+    y = pd.to_numeric(tr[target], errors="coerce")
+    tr = tr.assign(_y=y).dropna(subset=["_y", "dec"])
+    overall = float(tr["_y"].mean()) if len(tr) else 0.0
+
+    by_ds: dict[tuple[float, str], float] = {}
+    by_d: dict[float, float] = {}
+    for (dec, sea), g in tr.groupby(["dec", "season"]):
+        if g["time"].nunique() >= min_weeks:
+            by_ds[(float(dec), str(sea))] = float(g["_y"].mean())
+    for dec, g in tr.groupby("dec"):
+        if g["time"].nunique() >= min_weeks:
+            by_d[float(dec)] = float(g["_y"].mean())
+
+    idx = index[["time", "erc_pct"]].copy()
+    idx["time"] = pd.to_datetime(idx["time"])
+    idx["season"] = idx["time"].dt.month.map(SEASONS)
+    ipct = pd.to_numeric(idx["erc_pct"], errors="coerce")
+    idx["dec"] = np.clip((ipct // ERC_DECILES).astype("float"), 0, ERC_DECILES - 1)
+
+    out = np.full(len(idx), overall, dtype="float32")
+    for i, (dec, sea) in enumerate(zip(idx["dec"].to_numpy(), idx["season"].to_numpy(), strict=True)):
+        if not np.isfinite(dec):
+            continue
+        key = (float(dec), str(sea))
+        if key in by_ds:
+            out[i] = by_ds[key]
+        elif float(dec) in by_d:
+            out[i] = by_d[float(dec)]
+        else:
+            # Blend toward the decile's own implied persistence rather than
+            # collapsing to the overall rate.
+            implied = 1.0 if float(dec) >= ERC_DECILES - 1 else 0.0
+            out[i] = persistence_weight * implied + (1.0 - persistence_weight) * overall
+    return out
+
+
+def damped_persistence_baseline(
+    train: pd.DataFrame, target: str, index: pd.DataFrame
+) -> np.ndarray:
+    """Logistic regression of the target on the current ERC percentile alone.
+
+    One predictor, two parameters. It asks whether anything beyond today's fire
+    danger is needed at all, and on an exceedance target that is a serious
+    question: a model that cannot clear this has learned nothing the current
+    percentile did not already say.
+    """
+    from sklearn.linear_model import LogisticRegression
+
+    x = pd.to_numeric(train["erc_pct"], errors="coerce").to_numpy(dtype=float)
+    y = pd.to_numeric(train[target], errors="coerce").to_numpy(dtype=float)
+    m = np.isfinite(x) & np.isfinite(y)
+    if m.sum() < 50 or len(np.unique(y[m])) < 2:
+        rate = float(np.nanmean(y)) if np.isfinite(y).any() else 0.0
+        return np.full(len(index), rate, dtype="float32")
+    lr = LogisticRegression(max_iter=400)
+    lr.fit(x[m].reshape(-1, 1), y[m])
+    xi = pd.to_numeric(index["erc_pct"], errors="coerce").to_numpy(dtype=float)
+    xi = np.where(np.isfinite(xi), xi, float(np.nanmedian(x[m])))
+    return np.asarray(lr.predict_proba(xi.reshape(-1, 1))[:, 1], dtype="float32")

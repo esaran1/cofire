@@ -744,3 +744,50 @@ that is wrong tends to be wrong in the direction that makes the work look
 better, because that is the direction in which a mistake is not investigated.
 The custom bootstrap was tested, and its tests passed, and it was still wrong
 about the thing that mattered.
+
+## The fire transition baseline absorbs every fire result
+
+Two baselines were added for the fire targets, both with the corrections the
+drought Markov baseline needed: support counted in weeks, rates estimated from
+rows, a blended fallback.
+
+- **Fire transition**: exceedance rate at t+h by current ERC decile and season,
+  pooled across cells, gated at 32 independent weeks.
+- **Damped persistence**: a logistic regression on the current ERC percentile
+  alone. Two parameters.
+
+Both satisfy the training bound against the constant on 18 of 18 fire targets.
+
+**Result: 0 of 18 fire targets clear the transition baseline with an interval
+above zero.** Only 4 of 18 have a positive point estimate at all.
+
+The three Larimer `f_gt97` targets that were the entire remaining survivor set:
+
+    target       vs seasonal   vs transition   vs damped persistence
+    f_gt97_h2      +0.0901        +0.0039           -0.0457
+    f_gt97_h4      +0.0993        -0.0046           -0.0162
+    f_gt97_h8      +0.0883        -0.0047           -0.0097
+
+The apparent skill against seasonal climatology was the model learning that fire
+danger persists. A two-parameter logistic on today's ERC percentile captures it
+and then some.
+
+**`f_gt80` on Larimer is significantly worse than the transition baseline** at
+all three horizons, with intervals entirely below zero: -0.1976 [-0.302, -0.044]
+at h2, -0.1444 [-0.229, -0.017] at h4, -0.1071 [-0.180, -0.019] at h8. The
+model is actively worse than the decile table there.
+
+## Survivor count under the agreed definition: zero
+
+The agreed definition is the same target passing BH/Holm and every baseline in
+**both** domains. Checked explicitly:
+
+`f_gt97` **does not pass on Pueblo**. It is not estimable there, with 6 to 7
+positive weeks against the 12-week floor, so no interval exists and it cannot
+pass BH. The three Larimer `f_gt97` results have no counterpart.
+
+Combined with the fire transition result above, which removes them on their own
+domain as well, **the survivor count is 0**.
+
+There is currently no target on which this model demonstrates forecast skill
+over an appropriate baseline in both domains.
