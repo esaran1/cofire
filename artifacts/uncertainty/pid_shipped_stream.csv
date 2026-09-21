@@ -1,0 +1,13 @@
+domain,horizon,impl,arm,coverage,width,miss_run,mae
+larimer,2,reference_pid,damped_regression,0.8991,72.83,9,23.943
+larimer,2,aci,damped_regression,0.932,83.41,21,23.943
+larimer,4,reference_pid,damped_regression,0.899,75.33,18,24.845
+larimer,4,aci,damped_regression,0.8961,76.22,28,24.845
+larimer,8,reference_pid,decile_mean,0.8995,79.77,8,25.948
+larimer,8,aci,decile_mean,0.8057,75.87,193,25.948
+pueblo,2,reference_pid,damped_regression,0.8991,59.95,19,21.382
+pueblo,2,aci,damped_regression,0.9019,77.43,186,21.382
+pueblo,4,reference_pid,damped_regression,0.8987,64.97,11,23.591
+pueblo,4,aci,damped_regression,0.597,50.92,930,23.591
+pueblo,8,reference_pid,decile_mean,0.8989,70.89,10,25.607
+pueblo,8,aci,decile_mean,0.6887,62.74,1860,25.607

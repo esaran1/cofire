@@ -30,6 +30,7 @@ from cofire.model.config import Settings  # noqa: E402
 from cofire.model.prob_metrics import brier, brier_decomposition  # noqa: E402
 from cofire.model.targets import (  # noqa: E402
     HORIZONS,
+    SEASONS,
     MarkovBaseline,
     all_event_targets,
     damped_persistence_baseline,
@@ -230,3 +231,112 @@ def run() -> Path:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     print(run())
+
+
+# ------------------------------------------------------ continuous forecast
+
+
+CONTINUOUS_ARMS = ("damped_regression", "decile_mean")
+
+
+def damped_regression(
+    train: pd.DataFrame, horizon: int, index: pd.DataFrame, target: str = "erc_pct"
+) -> np.ndarray:
+    """Least-squares regression of the future percentile on today's.
+
+    The continuous analogue of the damped-persistence logistic: one predictor,
+    two parameters. The fitted slope is normally below one, which is the damping
+    and is why plain persistence is the wrong continuous baseline.
+    """
+    col = f"{target}_h{horizon}"
+    x = pd.to_numeric(train.get(target), errors="coerce").to_numpy(dtype=float)
+    y = pd.to_numeric(train.get(col), errors="coerce").to_numpy(dtype=float)
+    m = np.isfinite(x) & np.isfinite(y)
+    xi = pd.to_numeric(index.get(target), errors="coerce").to_numpy(dtype=float)
+    if m.sum() < 50:
+        fill = float(np.nanmean(y)) if np.isfinite(y).any() else 50.0
+        return np.full(len(index), fill, dtype=float)
+    slope, intercept = np.polyfit(x[m], y[m], 1)
+    med = float(np.nanmedian(x[m]))
+    xi = np.where(np.isfinite(xi), xi, med)
+    return np.asarray(np.clip(intercept + slope * xi, 0.0, 100.0), dtype=float)
+
+
+def decile_mean(
+    train: pd.DataFrame, horizon: int, index: pd.DataFrame, target: str = "erc_pct"
+) -> np.ndarray:
+    """Conditional mean of the future percentile by current decile and season.
+
+    The continuous analogue of the transition table, with the same week-gated
+    support rule the probabilistic version uses.
+    """
+    col = f"{target}_h{horizon}"
+    tr = train[["time", target, col]].copy()
+    tr["time"] = pd.to_datetime(tr["time"])
+    tr["season"] = tr["time"].dt.month.map(SEASONS)
+    x = pd.to_numeric(tr[target], errors="coerce")
+    tr["dec"] = np.clip((x // 10).astype(float), 0, 9)
+    tr["_y"] = pd.to_numeric(tr[col], errors="coerce")
+    tr = tr.dropna(subset=["_y", "dec"])
+    overall = float(tr["_y"].mean()) if len(tr) else 50.0
+
+    by_ds: dict[tuple[float, str], float] = {}
+    for (dec, sea), g in tr.groupby(["dec", "season"]):
+        if g["time"].nunique() >= 32:
+            by_ds[(float(dec), str(sea))] = float(g["_y"].mean())
+    by_d = {
+        float(dec): float(g["_y"].mean())
+        for dec, g in tr.groupby("dec")
+        if g["time"].nunique() >= 32
+    }
+
+    idx = index[["time", target]].copy()
+    idx["time"] = pd.to_datetime(idx["time"])
+    idx["season"] = idx["time"].dt.month.map(SEASONS)
+    xi = pd.to_numeric(idx[target], errors="coerce")
+    idx["dec"] = np.clip((xi // 10).astype(float), 0, 9)
+
+    out = np.full(len(idx), overall, dtype=float)
+    for i, (dec, sea) in enumerate(zip(idx["dec"].to_numpy(), idx["season"].to_numpy(), strict=True)):
+        if not np.isfinite(dec):
+            continue
+        out[i] = by_ds.get((float(dec), str(sea)), by_d.get(float(dec), overall))
+    return out
+
+
+def continuous_predict(
+    arm: str, train: pd.DataFrame, horizon: int, index: pd.DataFrame
+) -> np.ndarray:
+    return (
+        damped_regression(train, horizon, index)
+        if arm == "damped_regression"
+        else decile_mean(train, horizon, index)
+    )
+
+
+def choose_continuous(
+    frame_by_domain: dict[str, pd.DataFrame], fold_years: tuple[int, ...] = FOLD_YEARS
+) -> dict[int, str]:
+    """One continuous arm per horizon, chosen once on pooled LODO MAE."""
+    pooled = pd.concat(frame_by_domain.values(), ignore_index=True)
+    t = pd.to_datetime(pooled["time"])
+    chosen: dict[int, str] = {}
+    for h in HORIZONS:
+        scores: dict[str, float] = {}
+        for arm in CONTINUOUS_ARMS:
+            errs: list[float] = []
+            for year in fold_years:
+                tr, te = pooled[t.dt.year != year], pooled[t.dt.year == year]
+                if tr.empty or te.empty:
+                    continue
+                y = pd.to_numeric(te.get(f"erc_pct_h{h}"), errors="coerce").to_numpy(dtype=float)
+                p = continuous_predict(arm, tr, h, te)
+                m = np.isfinite(y) & np.isfinite(p)
+                if m.any():
+                    errs.append(float(np.mean(np.abs(p[m] - y[m]))))
+            scores[arm] = float(np.mean(errs)) if errs else float("inf")
+        best = min(scores, key=lambda k: scores[k])
+        chosen[h] = best
+        LOGGER.info("h=%d continuous arm -> %s (LODO MAE %s)",
+                    h, best, {k: round(v, 3) for k, v in scores.items()})
+    return chosen

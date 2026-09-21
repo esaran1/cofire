@@ -925,3 +925,95 @@ h2, 0.9326 at h4 and 0.3630 at h8, with miss runs of 360, 212 and 1780.
 are Pueblo figures. The Larimer equivalent needs a pipeline run that has not
 happened, and the look-3 pre-registration must either state Pueblo only or wait
 for that run. It cannot claim both domains on this evidence.
+
+## The PID table wrapped the wrong forecast, and fixing it improved the result
+
+**What the first table measured.** The residual streams came from
+`ensemble_calibrate.parquet` and `ensemble_valid.parquet`, written by
+`train.py` from the `ensemble` arm, which blends LightGBM with the PI-ConvLSTM
+variants. Checked rather than assumed: `erc_pct_h4_hat` correlates 0.4844 with
+`erc_pct` and spans 30.2 to 77.6 against the observed 0 to 100, which is a
+fitted regressor shrinking toward the mean, not persistence.
+
+So PID was wrapping an ML forecast that is no longer shipped. The table was
+measuring intervals around a point forecast nobody will see.
+
+**The continuous analogue of step 1**, chosen once on pooled LODO MAE:
+
+    h=2  damped_regression    h=4  damped_regression    h=8  decile_mean
+
+`damped_regression` is the least-squares analogue of the damped-persistence
+logistic: regress the future percentile on today's, one predictor. `decile_mean`
+is the conditional mean by current decile and season, the analogue of the
+transition table, and it wins at the longest horizon where today's value has
+decayed most.
+
+**Reference PID on the shipped streams, both domains:**
+
+    domain   h  arm                 coverage  width  miss run   MAE
+    larimer  2  damped_regression     0.8991  72.83      9     23.94
+    larimer  4  damped_regression     0.8990  75.33     18     24.85
+    larimer  8  decile_mean           0.8995  79.77      8     25.95
+    pueblo   2  damped_regression     0.8991  59.95     19     21.38
+    pueblo   4  damped_regression     0.8987  64.97     11     23.59
+    pueblo   8  decile_mean           0.8989  70.89     10     25.61
+
+Every cell is within **0.0013** of nominal 0.90, with longest miss runs of 8 to
+19. That is tighter than the ensemble-stream table, which ran 0.8966 to 0.9042
+with runs to 34.
+
+ACI on the same streams: 0.9320, 0.8961, 0.8057 on Larimer and 0.9019, 0.5970,
+0.6887 on Pueblo, with miss runs reaching 930 and 1860. The h8 collapse is not
+a Pueblo artefact; it appears on Larimer too, at 193.
+
+**This also removes the Larimer blocker.** The shipped forecast is computed
+directly from the feature store, so it needs no prediction parquets and no ML
+pipeline run. Both domains now have PID coverage on the forecast that actually
+ships, which is what the look-3 pre-registration needs.
+
+## Step 1 by domain, under the frozen family choices
+
+The family per target stays exactly as frozen; nothing was reselected per
+domain. What changes is only which domain the LODO score is computed on.
+
+    target            h  family      Brier_lar  Brier_pue   Res_lar   Res_pue
+    d_ge2_h2          2  markov        0.07999    0.04775   0.16729   0.17016
+    d_ge2_h4          4  markov        0.12794    0.08998   0.13329   0.12975
+    d_ge2_h8          8  markov        0.16973    0.18832   0.12952   0.05707
+    d_ge3_h2          2  markov        0.04398    0.04804   0.09416   0.05133
+    d_ge3_h4          4  markov        0.05900    0.08533   0.09727   0.02650
+    d_ge3_h8          8  markov        0.10173    0.11924   0.08826   0.00567
+    d_nochange_h4     4  markov        0.15401    0.19141   0.03544   0.01929
+    d_nochange_h8     8  markov        0.22508    0.26939   0.03490   0.04686
+    d_improve1_h8     8  markov        0.03511    0.10762   0.00002   0.04374
+    f_gt80_h2         2  transition    0.19889    0.25173   0.00600   0.00887
+    f_gt90_h8         8  transition    0.14498    0.14710   0.00343   0.00724
+    f_gt97_h8         8  damped        0.09427    0.05857   0.00488   0.00062
+
+(Full table in `artifacts/shipping/step1_by_domain.csv`.)
+
+**Eight targets have zero resolution in at least one domain, not four.** The
+pooled figures reported earlier hid Larimer-specific failures:
+
+    d_intensify1_h2   lar 0.000000  pue 0.000000
+    d_intensify2_h2   lar 0.000000  pue 0.000000
+    d_intensify2_h4   lar 0.000000  pue 0.000000
+    d_intensify2_h8   lar 0.000000  pue 0.000000
+    f_gt97_h2         lar 0.000000  pue 0.000946
+    d_intensify1_h4   lar 0.000000  pue 0.003613
+    f_gt97_h4         lar 0.000000  pue 0.000159
+    d_intensify1_h8   lar 0.000000  pue 0.012560
+
+Every `d_intensify` target has zero resolution on Larimer at every horizon. The
+Markov model there predicts the same intensification probability for every cell,
+which is what a transition matrix does when the conditioning variable carries no
+within-domain variation that survives the week gate.
+
+**Consequence for the product.** The zero-resolution list is domain dependent, so
+the Place Card rule cannot be a fixed list of four target names. It must read
+the per-domain resolution from `step1_by_domain.csv` and render a regional base
+rate wherever resolution is zero for the domain being displayed.
+
+**The resolution figures also bound what look 3 can test.** A target with zero
+resolution has no discrimination to confirm, so it can only be scored for
+calibration, which is what the pre-registration says.
