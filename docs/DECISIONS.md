@@ -1336,3 +1336,53 @@ Two of the conclusions those tables support are worth flagging as now resting
 on a flawed target: that the fire transition baseline absorbed every fire
 survivor, and that `f_gt90_h2` was the single SubX adoption. Both are plausible
 on their face and neither is confirmed. The extended rerun recomputes them.
+
+## Fit-window audit: one demonstrable leak, five unrecorded, none touching 2026
+
+**Gate: no artifact touches the sealed holdout.** The calibration JSONs contain
+the string "2026" only as digit substrings inside float residuals such as
+`32.4669475332026`, plus `seed: 2026`. No date field reaches the holdout year,
+so the audit continues rather than stopping.
+
+**The table**, split in effect 2007-01-01 to 2021-12-31:
+
+    artifact                            fit_start   fit_end      scope        verdict
+    training_stats.pkl (10 statistics)  unrecorded  2022-12-31   train        VIOLATION
+    calibration/conformal.json          unrecorded  unrecorded   calibration  unrecorded
+    calibration/bootstrap.json          unrecorded  unrecorded   calibration  unrecorded
+    shipping/choices.json               unrecorded  unrecorded   train        unrecorded
+    shipping/continuous_arms.json       unrecorded  unrecorded   train        unrecorded
+    shipping/subx_verdict.json          unrecorded  unrecorded   train        unrecorded
+
+**The leak is wider than `erc_pct`.** `training_stats.pkl` holds **ten** fitted
+statistics under one `train_end`, not one: `spi_gamma`, `spei_gamma`,
+`erc_by_woy`, `bi_by_woy`, `fm100_mean`, `fm1000_mean`, `tmmx_mean`,
+`tmmx_std`, `pr_roll13_mean`, `pr_roll13_std`. All were fitted through
+2022-12-31 against a split ending 2021.
+
+What each fed:
+
+- `erc_by_woy` gives `erc_pct`, which gives every fire target. Already recorded
+  as superseded.
+- `bi_by_woy` gives `bi_pct`, and `fm100_mean`, `fm1000_mean`, `tmmx_mean`,
+  `tmmx_std`, `pr_roll13_*` give the anomaly features. `spi_gamma` and
+  `spei_gamma` give SPI and SPEI.
+- Those anomaly and drought-index features feed the **ML arms only**. They are
+  not in configuration A, which reads USDM, ERC, `erc_pct` and calendar fields.
+
+**So the drought targets are unaffected.** They are built from USDM categories,
+which come from rasterised polygons rather than from any fitted statistic. The
+ML-arm ablation tables are affected, and they are already not shipped and not
+being re-run.
+
+**The five unrecorded artifacts are not cleared, only unproven.** Absence of a
+recorded window is not evidence of a clean fit, which is why
+`checked_load(strict=True)` now refuses an artifact that declares nothing. All
+five are regenerated in the rerun, with windows recorded.
+
+**The invariant.** `cofire/model/fit_window.py`: an artifact declares
+`[fit_start, fit_end]` and a scope, and the loader asserts the window lies
+inside the train split, or the calibration split for calibrators and controller
+warm-up state. It raises rather than warns, because a warning in a long
+unattended run is a log line nobody reads. Eight tests, including one that
+loads an artifact declaring `fit_end = 2022-12-31` and requires the failure.
