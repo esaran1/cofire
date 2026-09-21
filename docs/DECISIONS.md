@@ -832,3 +832,44 @@ result is confirmed; the custom implementation was simply a poor version of it.
 
 This is now the only positive methods result left in the project, and it
 survived being checked against the authors' code.
+
+## The operational benchmarks cannot be scored: neither archive exists
+
+Both were checked directly rather than assumed.
+
+**CPC Drought Outlooks.** Three candidate archives:
+
+    ftp.cpc.ncep.noaa.gov/GIS/droughtlook/    dated shapefiles, DO_polygons-YYYYMMDD.zip
+                                              92 issues, 2009-10-01 to 2013-07-18
+    ftp.cpc.ncep.noaa.gov/GIS/NIDIS/mdo/      MDO_GIS.zip, 209 MB, last modified 2019-08-10
+    ftp.cpc.ncep.noaa.gov/GIS/NIDIS/sdo/      SDO_GIS.zip, same structure
+
+The dated archive is real and has the right structure, but it **ends in July
+2013**, five years before the training window opens.
+
+The NIDIS zips are a single file geodatabase, not an archive. Opened and
+inspected: 11 layers, of which `DO_Merge` carries exactly the right schema,
+`FID_improv`, `FID_persis`, `FID_dev`, `FID_Remove`, which are the four outlook
+categories. But it holds **25 rows with `Fcst_Date` and `Target` both empty**:
+one undated outlook, a map-production artifact rather than a time series. The
+2019 modification date says it has not been updated in seven years.
+
+**NIFC Predictive Services.** The monthly significant wildland fire potential
+outlook is published as **PDF only**, at a fixed URL that is overwritten each
+month:
+
+    nifc.gov/nicc-files/predictive/outlooks/monthly_seasonal_outlook.pdf
+
+No shapefile, no GeoJSON, no ArcGIS REST service, and no dated archive. There is
+nothing to rasterize and nothing to score across a record.
+
+**Consequence.** The per-target winner table cannot include the operational
+products. The comparison the review wanted, which is the right comparison, is
+not available from published data for the training years. What can be said is
+that our model does not clear the appropriate statistical baselines, so the
+question of whether it clears the operational products is moot: something that
+loses to a decile lookup table is not a candidate to replace an expert forecast.
+
+The app should therefore not display a model forecast for these targets. It
+should link to the operational products, which is what a user should be reading
+anyway.
