@@ -791,3 +791,44 @@ domain as well, **the survivor count is 0**.
 
 There is currently no target on which this model demonstrates forecast skill
 over an appropriate baseline in both domains.
+
+## The reference conformal PID is better than the custom one on every metric
+
+Run on identical score streams, calibration plus validation, 2026 never opened.
+The reference is `quantile_integrator_log` from
+`aangelopoulos/conformal-time-series`, the paper's quantile-plus-integrator
+method with log saturation.
+
+    h  implementation              coverage   width   longest miss run
+    2  custom pid_p                 0.9007    87.66        168
+    2  reference                    0.8986    72.79         21
+    4  custom pid_p                 0.9003    90.03        288
+    4  reference                    0.8989    74.42         13
+    8  custom pid_p                 0.8990    85.63        209
+    8  reference                    0.9030    72.00         31
+    8  custom aci                   0.3630    43.75       1780
+
+The reference holds the same nominal coverage at roughly **18% narrower
+intervals**, and its longest run of consecutive misses is an order of magnitude
+shorter: 13 to 31 against 145 to 288. The miss-run figure is the one that
+matters operationally, because a forecast that is wrong for 288 consecutive
+cell-weeks is unusable however good its average coverage looks.
+
+**Why the custom version is worse.** Two differences. The reference saturates
+the integrator through a tangent of a log-scaled argument, which grows without
+bound as the error accumulates, where the custom `_saturate` is bounded at 10
+and so stops responding once it is saturated. And the reference scales its
+learning rate by the observed score range in a trailing window, so it adapts to
+the scale of the residuals instead of using a fixed step.
+
+**Decision: ship the reference implementation.** It wins on every metric at
+every horizon, which is not a close enough call to need a tie-break rule.
+
+**What survives of the PID finding.** The substantive claim was that ACI
+collapses at h8 while a PID controller holds coverage. That claim holds, and
+holds more strongly under the reference: ACI reaches 0.3630 coverage with a
+1780-week miss run, against the reference's 0.9030 and 31. The direction of the
+result is confirmed; the custom implementation was simply a poor version of it.
+
+This is now the only positive methods result left in the project, and it
+survived being checked against the authors' code.

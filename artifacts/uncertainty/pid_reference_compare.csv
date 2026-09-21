@@ -1,0 +1,16 @@
+horizon,impl,arm,coverage,mean_width,longest_miss_run
+2,custom,aci,0.8938,88.693,360
+2,custom,pid_p,0.9007,87.663,168
+2,custom,pid_pi,0.8729,77.864,244
+2,custom,pid_full,0.7611,65.55,145
+2,reference,quantile_integrator_log,0.8986,72.787,21
+4,custom,aci,0.9326,93.364,212
+4,custom,pid_p,0.9003,90.031,288
+4,custom,pid_pi,0.8739,79.699,225
+4,custom,pid_full,0.7607,66.695,152
+4,reference,quantile_integrator_log,0.8989,74.422,13
+8,custom,aci,0.363,43.746,1780
+8,custom,pid_p,0.899,85.626,209
+8,custom,pid_pi,0.873,75.897,224
+8,custom,pid_full,0.7851,64.658,156
+8,reference,quantile_integrator_log,0.903,72.004,31
