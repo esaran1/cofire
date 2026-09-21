@@ -129,6 +129,15 @@ class MarkovBaseline:
 
     horizon: int
     min_count: int = 30
+    # Laplace smoothing. The maximum-likelihood estimate cnt/cnt.sum() returns a
+    # hard 0 or 1 whenever a (category, month) cell happens to be unanimous, and
+    # min_count does not prevent that: 30 identical observations still estimate
+    # probability 1.0. A single such row that is wrong takes the full Brier
+    # penalty, which made the baseline score worse than a constant forecast and
+    # so flattered every model measured against it. Add one pseudo-count per
+    # outcome, which is the Bayesian estimate under a uniform prior, not a tuned
+    # parameter.
+    alpha: float = 1.0
     by_cat_month: dict[tuple[int, int], np.ndarray] = field(default_factory=dict)
     by_cat: dict[int, np.ndarray] = field(default_factory=dict)
     global_row: np.ndarray = field(default_factory=lambda: np.full(N_CATEGORIES, 1.0 / N_CATEGORIES))
@@ -142,18 +151,20 @@ class MarkovBaseline:
         fi = np.clip(np.round(fut[ok]), 0, N_CATEGORIES - 1).astype(int)
         mi = month[ok]
 
-        glob = np.bincount(fi, minlength=N_CATEGORIES).astype(float)
-        self.global_row = glob / max(glob.sum(), 1.0)
+        glob = np.bincount(fi, minlength=N_CATEGORIES).astype(float) + self.alpha
+        self.global_row = glob / glob.sum()
 
         for c in range(N_CATEGORIES):
             m = ci == c
             if m.sum() >= self.min_count:
-                cnt = np.bincount(fi[m], minlength=N_CATEGORIES).astype(float)
+                cnt = np.bincount(fi[m], minlength=N_CATEGORIES).astype(float) + self.alpha
                 self.by_cat[c] = cnt / cnt.sum()
             for mo in range(1, 13):
                 mm = m & (mi == mo)
                 if mm.sum() >= self.min_count:
-                    cnt = np.bincount(fi[mm], minlength=N_CATEGORIES).astype(float)
+                    cnt = (
+                        np.bincount(fi[mm], minlength=N_CATEGORIES).astype(float) + self.alpha
+                    )
                     self.by_cat_month[(c, mo)] = cnt / cnt.sum()
         return self
 
@@ -229,3 +240,24 @@ def persistence_event_baseline(frame: pd.DataFrame, target: str) -> np.ndarray:
         gt: np.ndarray = (np.nan_to_num(now) > thr).astype("float32")
         return gt
     return np.full(n, 0.5, dtype="float32")
+
+
+def constant_event_baseline(
+    train: pd.DataFrame, target: str, index: pd.DataFrame
+) -> np.ndarray:
+    """The training base rate, forecast everywhere.
+
+    The dullest possible forecast, and the one that matters most. Brier is
+    dominated by calibration rather than discrimination, so a constant at the
+    right level is extremely hard to beat on rare events: it has zero resolution
+    but also zero reliability error. A model that cannot beat it has bought
+    ranking ability at the cost of calibration, and the Brier score will say so
+    even when the AUC looks respectable.
+
+    Including this as a baseline is what stops "skill against Markov" from being
+    reported as skill when the real story is that Markov was miscalibrated.
+    """
+    rate = float(pd.to_numeric(train[target], errors="coerce").mean())
+    if not np.isfinite(rate):
+        rate = 0.0
+    return np.full(len(index), rate, dtype="float32")

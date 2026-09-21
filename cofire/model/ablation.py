@@ -29,6 +29,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -52,6 +53,7 @@ from cofire.model.targets import (  # noqa: E402
     MarkovBaseline,
     all_event_targets,
     climatology_event_baseline,
+    constant_event_baseline,
     persistence_event_baseline,
     target_names,
 )
@@ -74,14 +76,24 @@ class AblationConfig:
     targets: tuple[str, ...] = ()
 
 
+# Columns built by shifting a series backwards in time, i.e. the future values
+# the model is asked to predict. The regression feature store carries these as
+# `usdm_h4`, `erc_pct_h4` and so on, built with `shift(-h)`. They are targets,
+# never inputs: including them gave AUC 1.000 and Brier skill 0.995 against the
+# Markov baseline, which is what a leak looks like.
+FUTURE_SUFFIX = re.compile(r"_h\d+$")
+
+
 def feature_columns(frame: pd.DataFrame) -> list[str]:
-    """Numeric predictors, excluding every target and identifier."""
+    """Numeric predictors, excluding every target, leak and identifier."""
     tgt = set(target_names())
     out = []
     for c in frame.columns:
         if c in NON_FEATURES or c in tgt:
             continue
         if c.startswith(("d_", "f_")):  # event targets at any horizon
+            continue
+        if FUTURE_SUFFIX.search(c):  # future-dated: see FUTURE_SUFFIX
             continue
         if pd.api.types.is_numeric_dtype(frame[c]):
             out.append(c)
@@ -157,6 +169,7 @@ def run_domain(
                 "markov": mk_valid.get(tname, np.full(len(valid), np.nan)),
                 "climatology": climatology_event_baseline(train, tname, valid),
                 "persistence": persistence_event_baseline(valid, tname),
+                "constant": constant_event_baseline(train, tname, valid),
             }
             # Score the baselines themselves, so the table has a floor row.
             for bname, bp in baselines.items():
@@ -224,6 +237,13 @@ def lift_table(rows: list[dict[str, object]]) -> pd.DataFrame:
                 "bss_vs_markov": cur,
                 "bss_lo": float(by[s]["bss_vs_markov_lo"]),
                 "bss_hi": float(by[s]["bss_vs_markov_hi"]),
+                # Skill against a constant at the training base rate. This is
+                # the column to read first: Markov proved miscalibrated on the
+                # validation regime, so skill against it overstates the models.
+                "bss_vs_constant": float(by[s].get("bss_vs_constant", float("nan"))),
+                "bss_vs_constant_lo": float(by[s].get("bss_vs_constant_lo", float("nan"))),
+                "bss_vs_constant_hi": float(by[s].get("bss_vs_constant_hi", float("nan"))),
+                "brier": float(by[s]["brier"]),
                 "lift_over_previous": float("nan") if prev is None else cur - prev,
                 "roc_auc": float(by[s]["roc_auc"]),
                 "n_weeks": by[s].get("n_weeks"),

@@ -183,7 +183,9 @@ def block_bootstrap(
     both space and time; resampling rows would treat 100k correlated
     observations as 100k independent ones and report intervals far too narrow.
     """
-    uniq = np.array(sorted(set(weeks.tolist())))
+    # np.unique, not sorted(set(tolist())): tolist() on datetime64 yields ints,
+    # which then fail to compare against the datetime64 week labels downstream.
+    uniq = np.unique(weeks)
     rng = np.random.default_rng(seed)
     point = float(stat_fn(uniq))
     if uniq.size < 3:
@@ -198,7 +200,12 @@ def block_bootstrap(
         if good.size
         else (float("nan"), float("nan"))
     )
-    return BlockBootstrapResult(point, lo, hi, int(uniq.size), ar1_neff(uniq.astype(float)))
+    # Effective sample size must measure autocorrelation in the *statistic*
+    # week to week, not in the week labels: an evenly spaced calendar has
+    # rho ~ 1 and would report n_eff ~ 1.5 for any data at all. Recompute the
+    # statistic on each single week and measure the autocorrelation of that.
+    per_week = np.array([stat_fn(np.array([w])) for w in uniq], dtype=float)
+    return BlockBootstrapResult(point, lo, hi, int(uniq.size), ar1_neff(per_week))
 
 
 def evaluate_probabilistic(

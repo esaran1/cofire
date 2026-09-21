@@ -84,3 +84,59 @@ them. Pueblo, at 99.2% coverage, is close to a clean test of the ESI signal;
 Larimer is not. Agreement across the two domains is the evidence that a lift is
 real, which is why the brief requires both. Where Larimer shows lift and Pueblo
 does not, the finding is reported as confounded rather than as skill.
+
+## Phase 3: three corrections before any ablation number was believable
+
+The first ablation run reported ROC-AUC 1.000 and Brier skill 0.995 against the
+Markov baseline. Nothing about a four-week drought forecast is that easy, so
+the number was treated as a symptom rather than a result. Three separate
+defects came out of it.
+
+**1. Nine future-dated columns were being used as features.** The regression
+feature store carries `usdm_h2/h4/h8`, `erc_pct_h*` and `fire_index_h*`, built
+with `shift(-h)`. They are the prediction targets, shifted into the future.
+`feature_columns` excluded names starting with `d_` and `f_` but not these.
+`usdm_h4` correlated 0.38 with its own target. Excluded by an explicit
+`_h\d+$` rule, and AUC fell from 1.000 to about 0.60, which is a plausible
+range for this problem.
+
+**2. The effective sample size was computed on the calendar.** `block_bootstrap`
+passed the *week labels* to `ar1_neff`. Evenly spaced labels have an AR(1)
+coefficient near 1, so `n_eff` reported about 1.5 for 104 weeks regardless of
+the data, and would have appeared in every row of the results table. It now
+recomputes the statistic per week and measures the autocorrelation of that.
+Four tests pin the behaviour.
+
+**3. The Markov baseline was the worst forecast in the comparison.** Its Brier
+on Pueblo `d_intensify1_h4` was 0.2245 against persistence at 0.1016 and a
+constant at 0.0936. Two causes, one fixed and one recorded:
+
+- Unanimous (category, month) cells produced hard 0.0 and 1.0 probabilities
+  under the maximum-likelihood estimate, and `min_count=30` does not prevent
+  that. Fixed with Laplace smoothing (alpha=1), the Bayesian estimate under a
+  uniform prior rather than a tuned parameter. This moved Brier only 0.2254 to
+  0.2245, so it was not the main cause.
+- The real cause is a regime shift. Markov over-forecasts intensification by
+  2.2x on validation (predicted 0.220, actual 0.102), worst in category 1
+  (predicted 0.459, actual 0.170). The training years intensified; the
+  validation years did not. The baseline correctly encodes training-period
+  transition statistics that no longer held.
+
+**Consequence, and the honest headline.** Ranked by Brier on Pueblo
+`d_intensify1_h4`:
+
+    constant at train base rate   0.0936   AUC 0.500
+    LightGBM + isotonic           0.1127   AUC 0.598
+    LightGBM raw                  0.1577   AUC 0.594
+    Markov                        0.2245   AUC 0.515
+
+A constant forecast scores lower Brier than every model. The models carry
+real discrimination (AUC 0.598 is meaningfully above 0.5, so they rank cells
+correctly) but their
+calibration is worse than a constant, and Brier is dominated by calibration on
+rare events. Isotonic recalibration narrows the gap without closing it.
+
+The +0.50 "Brier skill against Markov" from the first clean run is therefore
+not evidence of skill. It is an artefact of measuring against the weakest
+forecast available. `constant_event_baseline` is now part of every comparison
+and `bss_vs_constant` is the column to read first in the lift table.
