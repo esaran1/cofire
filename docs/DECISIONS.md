@@ -140,3 +140,21 @@ The +0.50 "Brier skill against Markov" from the first clean run is therefore
 not evidence of skill. It is an artefact of measuring against the weakest
 forecast available. `constant_event_baseline` is now part of every comparison
 and `bss_vs_constant` is the column to read first in the lift table.
+
+## Phase 3: fire targets have no Markov baseline, by construction
+
+`MarkovBaseline.predict_events` returns only the `d_*` drought keys. It is an
+empirical USDM *category transition* matrix, and ERC percentile exceedance is
+not a USDM category transition, so there is nothing for it to return. The
+ablation therefore records `bss_vs_markov = nan` for every `f_gt*` target.
+
+This is left as `nan` rather than filled. A number there would have to come
+from some other baseline, and silently relabelling a different comparison as
+"skill against Markov" is exactly the kind of substitution that makes a results
+table untrustworthy.
+
+Fire targets are still floored: `constant_event_baseline` and
+`climatology_event_baseline` both cover them, and `bss_vs_constant` is the
+column the report reads first in any case. The fire rows are therefore scored
+against a constant at the training base rate and against per-cell
+week-of-year climatology, with the Markov column empty and visibly so.

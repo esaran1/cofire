@@ -4,6 +4,18 @@ Git `a3f212d083122dcf5b6d62efe2a574d7beb4c67b`. Dev subset: **Pueblo County** (`
 moved from Larimer this session. Displayed resolution 4000 m. **2026 hindcast remains sealed at 2
 looks** on config `0957e415fa7f3fad` — nothing in v0.6 evaluated on 2026.
 
+## Phase 4 pre-registration (v1.0, recorded before the first PID run)
+
+`docs/PREREGISTRATION_V1.md`, sha256 `83c712fbce88bfa3b9acc0d17122167c39cdbfc991a32fbbc7d96097c9e8568f`.
+
+Six arms fixed in advance: split conformal, ACI, PID-P, PID-PI, PID-full, CQR.
+Target coverage 0.90, both domains reported separately, horizons 2/4/8, PID
+gains taken from the reference construction and not searched. The adoption rule
+requires coverage deviation to improve by at least 0.01 *and* interval width to
+grow no more than 5%, on both domains, or the result is recorded as no
+improvement. The recorded prior is that PID does not help much here.
+
+
 ## Pool outcome: all six variants rejected, on both domains
 
 The multi-regime calibration experiment was pre-registered and hashed before it ran
