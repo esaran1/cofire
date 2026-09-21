@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -46,6 +47,23 @@ def assert_cutoff(frame: pd.DataFrame, issue: date) -> None:
 def config_hash(settings_blob: dict[str, object]) -> str:
     raw = json.dumps(settings_blob, sort_keys=True, default=str).encode()
     return hashlib.sha256(raw).hexdigest()[:16]
+
+
+# The holdout stands at this many looks. Going past it is a human decision.
+SEALED_LOOKS = 2
+
+
+def existing_looks(path: Path, cfg: str) -> int:
+    """How many looks this config has already had, without recording one."""
+    if not path.exists():
+        return 0
+    try:
+        records = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return 0
+    if not isinstance(records, list):
+        return 0
+    return sum(1 for r in records if isinstance(r, dict) and r.get("config_hash") == cfg)
 
 
 def append_run_log(path: Path, sha: str, cfg: str) -> int:
@@ -111,12 +129,29 @@ def run_hindcast() -> Path:
         }
     )
     log_path = settings.artifacts_dir / "hindcast" / "run_log.json"
+
+    # The holdout is sealed at a fixed number of looks and a further look is a
+    # human decision, not a side effect of re-running the pipeline. Warning was
+    # not enough: `make pipeline` includes this stage, so any routine re-run of
+    # the pipeline would have spent look 3 silently. Taking another look now
+    # requires COFIRE_ALLOW_LOOK=<n>, naming the look being authorised, so the
+    # authorisation cannot be given by accident or carried over from a
+    # previous run.
+    prior = existing_looks(log_path, cfg)
+    if prior >= SEALED_LOOKS:
+        allow = os.environ.get("COFIRE_ALLOW_LOOK", "")
+        if allow.strip() != str(prior + 1):
+            raise SystemExit(
+                f"hindcast would take look {prior + 1} on config {cfg}, which is "
+                f"sealed at {prior}. See docs/PREREGISTRATION_LOOK3.md. To take "
+                f"it deliberately, set COFIRE_ALLOW_LOOK={prior + 1}."
+            )
+        log.warning("look %s authorised explicitly via COFIRE_ALLOW_LOOK", prior + 1)
+
     n_looks = append_run_log(log_path, git_sha(), cfg)
     assert log_path.exists(), "hindcast run_log.json was not written"
     assert n_looks >= 1
     log.info("hindcast look #%s for config %s", n_looks, cfg)
-    if n_looks > 1:
-        log.warning("repeated hindcast peek for this config — recorded in run_log.json")
 
     cal_path = settings.artifacts_dir / "calibration"
     conformal = ConformalCalibrator.load(cal_path)

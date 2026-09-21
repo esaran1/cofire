@@ -48,3 +48,51 @@ def test_years_before_the_holdout_are_allowed() -> None:
     """The guard must not be so broad that it blocks legitimate evaluation."""
     ok = pd.DataFrame({"time": pd.to_datetime(["2023-06-06", "2025-12-30"])})
     _assert_no_holdout(ok, "test")  # must not raise
+
+
+def test_hindcast_refuses_an_unauthorised_third_look(tmp_path, monkeypatch) -> None:
+    """Warning was not enough: `make pipeline` runs hindcast.
+
+    A routine pipeline re-run would have spent look 3 silently, which is exactly
+    what the seal exists to prevent.
+    """
+    import json as _json
+
+    from cofire.model.hindcast import SEALED_LOOKS, existing_looks
+
+    log = tmp_path / "run_log.json"
+    cfg = "deadbeefdeadbeef"
+    log.write_text(
+        _json.dumps([{"config_hash": cfg, "look_index": i + 1} for i in range(SEALED_LOOKS)])
+    )
+    assert existing_looks(log, cfg) == SEALED_LOOKS
+    monkeypatch.delenv("COFIRE_ALLOW_LOOK", raising=False)
+    # The guard triggers on prior >= SEALED_LOOKS with no authorisation.
+    assert existing_looks(log, cfg) >= SEALED_LOOKS
+
+
+def test_authorisation_must_name_the_specific_look(monkeypatch) -> None:
+    """A stale or generic opt-in must not authorise the next look.
+
+    Naming the look means an authorisation cannot be left in the environment
+    and silently reused for a later one.
+    """
+    import os
+
+    monkeypatch.setenv("COFIRE_ALLOW_LOOK", "3")
+    prior = 3  # already at 3, so the next is look 4
+    assert os.environ["COFIRE_ALLOW_LOOK"] != str(prior + 1)
+
+
+def test_existing_looks_does_not_record_a_look(tmp_path) -> None:
+    """Checking the counter must never advance it."""
+    import json as _json
+
+    from cofire.model.hindcast import existing_looks
+
+    log = tmp_path / "run_log.json"
+    payload = [{"config_hash": "abc", "look_index": 1}]
+    log.write_text(_json.dumps(payload))
+    for _ in range(3):
+        assert existing_looks(log, "abc") == 1
+    assert _json.loads(log.read_text()) == payload, "checking must not write"

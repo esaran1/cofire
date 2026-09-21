@@ -326,3 +326,52 @@ full-record baseline would have credited ESI with a difference that belongs to
 the sample. On Pueblo the restriction keeps 99.2% of rows; on Larimer, where ESI
 coverage is elevation-limited, it will cost considerably more, and that cost is
 reported rather than hidden.
+
+## The ledger: corrected to measured bytes, by appending rather than rewriting
+
+**What the true figure is.** 555136 bytes per windowed ESI read, measured by
+issuing the exact byte ranges and counting what came back: 17 strips of 28800 B
+plus the 65536 B header GDAL reads before anything else. Larimer's window is one
+strip narrower at 526336 B; the larger figure is used so projections stay
+conservative.
+
+Three estimates have now been in the ledger, and all three are preserved in the
+entries that used them:
+
+    1930000 B  original guess, 3.5x too high
+     460800 B  strip count, correct but omitting the header
+     555136 B  measured over the wire
+
+**Recorded 2330.0 MB, true 862.9 MB, residual error 0.0 MB.** The overcharge was
+withholding about 1.6 GB of real headroom, which is what blocked the Larimer
+12WK series earlier and what would have blocked the 2010 backfill.
+
+**Why the entries were not rewritten.** An earlier attempt to retro-correct the
+1089 historical entries was refused as audit tampering, and that refusal was
+right. A download ledger is only worth keeping if it says what was recorded at
+the time. So `add_correction` appends a dated adjustment carrying its reason and
+its evidence, and the file serialises `recorded_bytes`, `correction_bytes` and
+`total_bytes` separately. A reader can see both what was charged and what it
+should have been, and can check the arithmetic.
+
+**A caveat on what "measured" means here.** The bytes are measured at the
+protocol level: the ranges a windowed read requires, fetched deliberately and
+counted. GDAL's own network counter was unavailable in this build, and the
+sandbox exposes only `lo0`, so this is not an observation of GDAL's actual
+socket traffic. If GDAL issues extra probes the true figure is slightly higher.
+The projection is conservative in the other direction by using the larger
+domain, and the whole backfill fits with about 1 GB to spare, so the residual
+uncertainty does not change any decision.
+
+## The ESI cache was not keyed by start year
+
+The first 2010-onward backfill reported `cache hit` for all four series and
+transferred nothing, because `_out_path` keyed only on product and stride. An
+extended fetch therefore silently returned the shorter cached series. The start
+year is now part of the key, with 2018 keeping the existing paths so no refetch
+was needed.
+
+This is the same class of bug as the subset-scoping failure in v0.6, where a
+Pueblo fetch re-served Larimer geography: a cache key that omits a dimension the
+data actually varies along. Worth noting because it is the third time this
+project has hit it.
