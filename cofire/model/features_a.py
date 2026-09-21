@@ -92,13 +92,18 @@ def weekly_erc(template: GridTemplate, settings: Settings | None = None) -> xr.D
     Years present in neither are absent from the result rather than filled.
     """
     settings = settings or get_settings()
+    # Extension first, processed store second. The dedup below keeps the LAST
+    # occurrence, so ordering the authoritative source last makes the store win
+    # any collision. The 2017 extension file resamples to a week labelled
+    # 2018-01-02 that covers only 27 to 31 December, and preferring it over the
+    # cube's complete week gave 35.2 where the store says 46.0.
     frames: list[xr.DataArray] = []
+    store_frames: list[xr.DataArray] = []
 
-    # 2018 onward: the processed weekly cubes.
     for p in sorted((settings.processed_dir / "gridmet").glob("weekly_*.nc")):
         with xr.open_dataset(p) as ds:
             if "erc" in ds.data_vars:
-                frames.append(ds["erc"].load())
+                store_frames.append(ds["erc"].load())
 
     # 2004 to 2017: the reconciled extension cache. Daily files are concatenated
     # *before* resampling, because a week spanning a year boundary would
@@ -120,11 +125,21 @@ def weekly_erc(template: GridTemplate, settings: Settings | None = None) -> xr.D
             daily.append(da.rename({"day": "time"}) if "day" in da.dims else da)
     if daily:
         joined = xr.concat(daily, dim="time").sortby("time")
+        # Drop any weekly bin the daily record cannot fill. A W-TUE bin needs
+        # seven days; the final bin of the extension holds however many days
+        # remain before the store takes over, and a partial mean is not the
+        # same quantity as a full one.
         # W-TUE is right-closed and right-labelled: the value at a Tuesday is
         # the mean of the week *ending* that Tuesday, which is the convention
         # the processed store uses. Verified against the store: 6.6667 for
         # 2023-01-03 matches the Dec 28 to Jan 3 window, not Jan 3 to Jan 9.
-        frames.append(joined.resample(time="W-TUE").mean().rename("erc"))
+        grouped = joined.resample(time="W-TUE")
+        weekly = grouped.mean().rename("erc")
+        counts = grouped.count(dim="time")
+        n_per_week = counts.max(dim=[d for d in counts.dims if d != "time"])
+        frames.append(weekly.isel(time=(n_per_week >= 7).values))
+
+    frames.extend(store_frames)
 
     if not frames:
         raise SystemExit("no ERC source found")

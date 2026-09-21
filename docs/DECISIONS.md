@@ -1208,3 +1208,55 @@ rerun supersedes those tables rather than correcting them.
 One consequence worth carrying forward: the single usable LODO fold reported
 earlier, 2020, follows directly from a 2018 to 2020 training window. The
 extended record should make 2012, 2018, 2020 and 2021 all usable.
+
+## The decoupled builder: usdm and erc reconcile exactly, erc_pct does not
+
+`features_a.py` builds configuration A's features from a coordinates-only grid
+template, so the record extends to 2007 using the ERC and USDM already fetched
+rather than the 189 MB of unused gridMET variables the full builder would have
+demanded against 86 MB of budget.
+
+**Reconciliation against the store, 2018 to 2025:**
+
+    column    larimer                    pueblo
+    usdm      max|diff| 0   n=200640     max|diff| 0   n=180576
+    erc       max|diff| 0   n=200640     max|diff| 0   n=180576
+    erc_pct   max|diff| 43.79            max|diff| 38.10
+
+**Three faults the gate caught on the way to erc matching**, none of which made
+a value look implausible:
+
+1. **Year-boundary duplicates.** The week ending 2023-01-03 exists in both
+   `weekly_2022.nc` and `weekly_2023.nc` with domain means 25.90 and 14.41. The
+   store resolves this with `drop_duplicates(keep="last")` at `features.py:127`
+   and `:293`. Keeping the first occurrence gave 50.25 where the store says
+   27.0.
+2. **Per-file resampling truncated cross-year weeks.** Daily extension files are
+   now concatenated before resampling.
+3. **A partial week from the extension outranked the store.** The 2017 file
+   resamples to a week labelled 2018-01-02 covering only 27 to 31 December, and
+   under `keep="last"` it beat the cube's complete week: 35.2 against the
+   store's 46.0. Fixed by ordering the authoritative store last and dropping any
+   weekly bin the daily record cannot fill with seven days.
+
+**erc_pct is a derived quantity and is expected to differ.** It is a percentile
+against the *training* distribution, and the extension changes that
+distribution: 213 distinct values against the store's 69, because fifteen
+training years resolve a percentile far better than three. That improvement is
+the point of the extension.
+
+**But the difference is not fully explained by the training window, and that is
+not resolved.** Recomputing `erc_pct` on the store's own 2018 to 2020 window
+still leaves max|diff| 47.4, and a hand calculation on one cell reproduces
+neither figure: the store reports 11.76 where a pooled +/-3 week window over
+that cell's training rows gives 27.27 and the decoupled builder gives 55.56. The
+store's 69 distinct values confirm it does use the widened window, so the
+remaining difference is in how the training pool is assembled, and
+`features.py` builds it through `TrainingStats` and `transform` rather than from
+the feature frame.
+
+**The gate is left failing on erc_pct.** `tests/test_features_a_reconcile.py`
+passes for `usdm` and `erc` on both domains and fails for `erc_pct`, which is
+the honest state. Nothing downstream has been run on this data. Resolving it
+means reading `fit_training_stats` and reproducing its pooling exactly, not
+relaxing the tolerance.
