@@ -535,3 +535,41 @@ weather behind it. With the percentile fix the three fire thresholds are now
 genuinely distinct targets, so this matters more than it did when they were one
 target: `f_gt97_h8` at a 5.3% base rate is being asked to anticipate weather
 eight weeks out from antecedent conditions alone.
+
+**3. SubX at the IRI Data Library: this one covers the training window.**
+
+    .SubX/.NCEP/.CFSv2/.hindcast/.pr    S = 27389 issues, 1999-01-01 .. 2017-09-30
+    .SubX/.NCEP/.CFSv2/.forecast/.pr    S issues,         2017-10-15 .. 2026-09-20
+
+The `.forecast` series begins the day after the hindcast ends and runs to the
+present, so together they cover the whole training record and the sealed 2026
+holdout. `S` is a true forecast-issue dimension with roughly daily issues,
+leads run to 44 days, and the server subsets in the URL. A both-domain box for
+January 2020 at leads 0 to 28 came back correctly shaped:
+
+    dims S=125 M=4 L=29 Y=4 X=3      698 KB in 113 s
+
+**Priced.** 96 months from 2018-01 to 2025-12: 67 MB per variable, 134 MB for
+two, against 385 MB of true remaining budget. The bytes fit comfortably.
+
+**The binding constraint is wall time, not bytes.** At 113 s per month-request,
+two variables is about 6 hours of requests. The standing rule is no single stage
+over 60 minutes, so this needs staging and checkpointing across several runs
+rather than one ingest, and it cannot be finished inside the remaining session
+time alongside the analysis sequence.
+
+**A caution found while pricing it.** The IRI server returns **HTTP 200 with an
+HTML error page** for a malformed path: a wrong `M/average` ordering produced
+1488 bytes, status 200, that turned out to be "Error 404: Bad Request". A byte
+count alone would have passed it. Any ingest here must verify that the payload
+actually opens as NetCDF before recording it in the ledger.
+
+Server-side ensemble averaging was tried as a way to cut the cost and does not
+help: `[M]average` over a single quarter timed out at 280 s having returned
+nothing, against 113 s for a full month of all four members. The aggregation
+costs more than it saves, so the 6 hour figure stands.
+
+**Status: found, priced, not ingested in this session.** This is the source a
+future session should use, and the reviewer was right that the product mattered:
+the raw-GRIB check was against the wrong thing, and the correct sources were
+reachable all along.
