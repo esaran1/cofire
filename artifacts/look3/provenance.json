@@ -1,0 +1,9 @@
+{
+  "holdout_year": 2026,
+  "look_index": 3,
+  "config_hash": "ed0c2079a5bc0eee1d0aa11869d3bc5eb0af671b9f30ee0c5114c3b9ca7be157",
+  "preregistration_sha256": "c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a",
+  "freeze_commit": "46c17ae4aac2bef2d1397e422755104284f71667",
+  "criteria_passed": 69,
+  "criteria_total": 84
+}
