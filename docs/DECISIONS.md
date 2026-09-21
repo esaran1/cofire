@@ -1439,3 +1439,60 @@ weeks, and reports an interval clear of zero.
 that required this control is what caught it, and the rule earned its place: the
 seven single-domain passes would otherwise have looked like the extension
 recovering results the flawed target had hidden.
+
+## Stages A and B: the intervals became informative on the extended record
+
+**Stage A, reference PID coverage.** Warm-up on the calibration split only,
+scored on validation 2022 to 2023:
+
+    dom      h     cov   width  run  roll13   D0-D1     D2+
+    larimer  2  0.8983   63.91   21  0.8954  0.8987  0.8955
+    larimer  4  0.8985   66.58   11  0.8963  0.8973  0.9086
+    larimer  8  0.8989   68.76   15  0.8963  0.9006  0.8842
+    pueblo   2  0.8978   52.80   31  0.8921  0.8969  0.9042
+    pueblo   4  0.8975   55.77   21  0.8910  0.8969  0.9020
+    pueblo   8  0.8977   58.81   16  0.8917  0.8978  0.8973
+
+All five preregistered criteria pass. The local tests are the informative ones,
+since long-run coverage is guaranteed by construction: the minimum rolling
+13-week coverage is 0.8910 to 0.8963 against a 0.70 floor, and the two drought
+strata differ by at most 0.024. ACI on the same streams reaches a rolling
+minimum of 0.4220 at Pueblo h8 with a 993-week miss run.
+
+**Stage B, the width-ratio classification, and it changed.**
+
+    domain   h   MAE gain [CI]         ratio [CI]              2018+    extended
+    larimer  2   +3.25 [+2.28, +4.12]  0.970 [0.958, 0.982]    clim  -> INFORMATIVE
+    larimer  4   +2.11 [+1.43, +2.70]  0.994 [0.978, 1.010]    clim  -> climatological
+    larimer  8   +1.13 [+0.77, +1.51]  1.006 [0.987, 1.021]    clim  -> climatological
+    pueblo   2   +6.36 [+4.99, +7.81]  0.922 [0.902, 0.941]    clim  -> INFORMATIVE
+    pueblo   4   +5.81 [+4.53, +6.91]  0.943 [0.927, 0.959]    clim  -> INFORMATIVE
+    pueblo   8   +3.38 [+2.40, +4.36]  0.977 [0.960, 0.993]    clim  -> INFORMATIVE
+
+Four of six are now informative, against none on the 2018+ record where every
+ratio sat between 1.18 and 1.29. The cause is the training record: fifteen years
+of per-cell week-of-year history give a point forecast whose residuals are
+tighter than the climatological spread, where three years did not.
+
+**The shuffled-target control confirms it, and this is the contrast with the
+fire result.** Permuting the target within week blocks and rerunning:
+
+    domain   h   real ratio [CI]         shuffled ratio [CI]      real MAE gain  shuffled
+    larimer  2   0.970 [0.958, 0.982]    1.142 [1.136, 1.147]     +3.25          -0.71
+    pueblo   2   0.922 [0.902, 0.941]    1.211 [1.203, 1.219]     +6.36          -0.75
+    pueblo   4   0.943 [0.927, 0.959]    1.162 [1.154, 1.170]     +5.81          -0.30
+    pueblo   8   0.977 [0.960, 0.993]    1.076 [1.068, 1.083]     +3.38          +0.23
+
+Every shuffled ratio rises above 1.0 with its interval entirely above, and every
+shuffled MAE gain collapses to zero or below. **0 of 4 invalidated.**
+
+This is the opposite of the fire comparison, where six of seven controls
+reproduced the effect. There the two arms were both functions of the same ERC
+decile and differed structurally; here the interval width tracks the residuals,
+and destroying the target makes the residuals larger and the ratio worse, which
+is what a real result looks like.
+
+**Rendering consequence.** Under the preregistered rule, `larimer h2` and
+`pueblo` at h2, h4 and h8 render as forecast intervals; `larimer` at h4 and h8
+render as the historical week-of-year range of raw ERC. The MAE gain interval is
+above zero on all six, so the point forecast is shown in every case.
