@@ -281,3 +281,21 @@
   check on the route itself, because the document is fine and only its assets are missing. Clearing
   `.next` on dev start makes the failure impossible rather than merely unlikely; `make web-build`
   does the same before a production build.
+
+## v1.0 (research-grade methodology, branch `v1-research`)
+
+- **Download budget allocated deliberately, not first-come.** Measured before fetching anything:
+  ESI is 86 MB per global GeoTIFF, but the server answers HTTP range requests (206), so
+  `/vsicurl/` windowed reads pull only the scanlines covering the domain. Measured 1.93 MB per file
+  for the union of the Larimer and Pueblo bboxes against 86 MB for the whole file, a 45x saving.
+  EDDI is CONUS-only ASCII grids at 1.77 MB per file with no compression offered and no subsetting
+  endpoint, so its cost is fixed. Full wish list priced at **5.12 GB against a 2.50 GB budget**, so
+  it does not fit and something had to be cut on purpose.
+  **Chosen: ESI 4WK (0.90 GB) + EDDI 04wk (0.83 GB) = 1.73 GB**, leaving headroom for retries.
+  **ESI 12WK dropped**: RCI is constructed from the weekly 4-week composite, so 12WK is a
+  slower-varying companion rather than a requirement, and Gate 1 requires *both* ESI and EDDI
+  present, which outranks a second ESI product. EDDI 04wk was chosen over the other windows because
+  it matches the ESI 4WK compositing period, so the two sources describe the same timescale from the
+  water-supply and the evaporative-demand side.
+- EDDI native resolution is 0.125 degrees (~12 km) against gridMET's 4 km, so it is upsampled onto
+  the gridMET grid and is recorded in `docs/DATA.md` as coarser support, not as 4 km information.

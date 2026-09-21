@@ -1,0 +1,56 @@
+{
+  "budget_bytes": 2500000000,
+  "total_bytes": 12858916,
+  "remaining_bytes": 2487141084,
+  "transfers": [
+    {
+      "source": "SERVIR ESI 4-week",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2020/DFPPM_4WK_2020008.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:08:03+00:00",
+      "note": "windowed 2020-01-14"
+    },
+    {
+      "source": "SERVIR ESI 4-week",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2020/DFPPM_4WK_2020015.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:08:03+00:00",
+      "note": "windowed 2020-01-21"
+    },
+    {
+      "source": "SERVIR ESI 4-week",
+      "url": "/vsicurl/https://gis1.servirglobal.net/data/esi/4WK/2020/DFPPM_4WK_2020022.tif",
+      "bytes": 1930000,
+      "timestamp": "2026-09-21T00:08:04+00:00",
+      "note": "windowed 2020-01-28"
+    },
+    {
+      "source": "NOAA EDDI 4-week",
+      "url": "https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/2020/EDDI_ETrs_04wk_20200107.asc",
+      "bytes": 1767229,
+      "timestamp": "2026-09-21T00:09:03+00:00",
+      "note": "2020-01-07 full CONUS"
+    },
+    {
+      "source": "NOAA EDDI 4-week",
+      "url": "https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/2020/EDDI_ETrs_04wk_20200114.asc",
+      "bytes": 1767229,
+      "timestamp": "2026-09-21T00:09:21+00:00",
+      "note": "2020-01-14 full CONUS"
+    },
+    {
+      "source": "NOAA EDDI 4-week",
+      "url": "https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/2020/EDDI_ETrs_04wk_20200121.asc",
+      "bytes": 1767229,
+      "timestamp": "2026-09-21T00:09:37+00:00",
+      "note": "2020-01-21 full CONUS"
+    },
+    {
+      "source": "NOAA EDDI 4-week",
+      "url": "https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/2020/EDDI_ETrs_04wk_20200128.asc",
+      "bytes": 1767229,
+      "timestamp": "2026-09-21T00:09:53+00:00",
+      "note": "2020-01-28 full CONUS"
+    }
+  ]
+}
