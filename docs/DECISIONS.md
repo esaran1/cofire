@@ -1386,3 +1386,56 @@ inside the train split, or the calibration split for calibrators and controller
 warm-up state. It raises rather than warns, because a warning in a long
 unattended run is a log line nobody reads. Eight tests, including one that
 loads an artifact declaring `fit_end = 2022-12-31` and requires the failure.
+
+## Step 3: the fire conclusion holds, and a shuffled control shows why
+
+**Family selection changed on 6 of 27 targets, all fire, all the same way.**
+Under the corrected `erc_pct` every fire target now selects the damped
+persistence logistic, 9 of 9, where the flawed target gave transition 6 and
+damped 3. Drought families are unchanged at markov 18 of 18, which is expected:
+they are built from USDM and never touched `erc_pct`.
+
+    target      h   2018+ family -> extended    2018+ Brier  extended Brier
+    f_gt80_h2   2   transition   -> damped          0.19159       0.18271
+    f_gt90_h2   2   transition   -> damped          0.12873       0.11565
+    f_gt97_h2   2   transition   -> damped          0.07567       0.04187
+    f_gt80_h4   4   transition   -> damped          0.19462       0.19447
+    f_gt90_h4   4   transition   -> damped          0.13356       0.12327
+    f_gt90_h8   8   transition   -> damped          0.12890       0.12714
+
+The continuous analogue also moved: h8 now selects damped regression where it
+previously selected the decile mean, and pooled selection wins 20 of 27 against
+21 of 27.
+
+**Re-tested conclusion: does the fire transition baseline still absorb every
+fire result? Yes.** Zero of 18 fire targets clear it in both domains. Seven
+clear it in a single domain, and the domains disagree about which horizons:
+Larimer at h2 and h4, Pueblo only at h8.
+
+**The shuffled-target control says those seven are artefacts.** Permuting the
+target within week blocks, preserving the marginal, and rerunning the identical
+comparison:
+
+    domain   target      h   real BSS [CI]            shuffled BSS [CI]
+    larimer  f_gt80_h2   2   +0.0234 [+0.001, +0.046]  +0.0252 [+0.012, +0.038]
+    larimer  f_gt80_h4   4   +0.0262 [+0.011, +0.042]  +0.0097 [+0.004, +0.015]
+    larimer  f_gt90_h4   4   +0.0298 [+0.011, +0.052]  +0.0249 [+0.010, +0.038]
+    larimer  f_gt97_h2   2   +0.0976 [+0.058, +0.170]  +0.0859 [+0.040, +0.123]
+    larimer  f_gt97_h4   4   +0.0554 [+0.003, +0.114]  +0.0693 [+0.009, +0.112]
+    pueblo   f_gt80_h8   8   +0.0632 [+0.014, +0.101]  +0.0291 [-0.006, +0.055]
+    pueblo   f_gt90_h8   8   +0.0415 [+0.016, +0.068]  +0.0165 [+0.001, +0.031]
+
+**Six of seven controls also show an interval above zero**, and on `f_gt97_h4`
+the shuffled control at +0.0693 *exceeds* the real result at +0.0554. A skill
+score that survives destroying the target is not measuring skill.
+
+The mechanism is that the damped logistic and the transition table are both
+functions of the same current ERC decile, so their Brier scores differ by a
+structural amount that has nothing to do with the outcome. The bootstrap then
+prices that structural difference tightly, because it is consistent across
+weeks, and reports an interval clear of zero.
+
+**Consequence.** No fire target ships as skillful. The failure-handling rule
+that required this control is what caught it, and the rule earned its place: the
+seven single-domain passes would otherwise have looked like the extension
+recovering results the flawed target had hidden.
