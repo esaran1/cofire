@@ -573,3 +573,46 @@ costs more than it saves, so the 6 hour figure stands.
 future session should use, and the reviewer was right that the product mattered:
 the raw-GRIB check was against the wrong thing, and the correct sources were
 reachable all along.
+
+## The two-stage result: stage 1 works where the diagnostic said it would
+
+The oracle decomposition named, per target, whether the remaining Brier gap was
+base rate or discrimination. Stage 1 predicts the level from slow climate state.
+If the diagnostic is sound, stage 1 should help on the base-rate targets and
+hurt on the others. That is exactly what it does:
+
+    dominant term    n    median recovery    lower Brier than constant
+    base_rate       35        +0.700             11/35
+    discrimination  16        -0.883              1/16
+
+Median recovery across all 51 is +0.458, and two-stage scores lower Brier than
+single-stage on 30 of 51, and lower than the constant on 12 of 51 against 5 of
+51 for the single-stage model. Imposing a level on a target whose level was
+never the problem costs skill, which is why the negative half of that table is
+a confirmation rather than a disappointment.
+
+**But almost none of it is separable from noise.** Only 4 of 51 targets have a
+block-bootstrap interval excluding zero:
+
+    pueblo  d_ge2_h2        BSS +0.3386  [+0.229, +0.447]  n_eff_weeks  25.2
+    larimer d_intensify2_h8 BSS +0.0636  [+0.018, +0.174]  n_eff_weeks  13.4
+    larimer d_intensify2_h4 BSS +0.0363  [+0.009, +0.140]  n_eff_weeks  27.8
+    larimer d_intensify2_h2 BSS +0.0092  [+0.002, +0.954]  n_eff_weeks 108.6
+
+The effective sample sizes are the reason. Thirteen effective weeks cannot
+support a confident claim, and that number is honest only because `ar1_neff`
+was fixed earlier in this session: it previously reported about 1.5 for any
+input, computed on the calendar rather than the data.
+
+**Predictor selection is spread evenly**, which is itself informative. Across
+51 fits: pdo 23, pr_deficit_12w 21, oni 19, esi_12wk 18, swe_pct_median 17. No
+predictor dominates, which is what one expects when each carries a little signal
+and the selection is largely choosing among noise. The four-predictor cap was
+fixed before fitting and is doing real work here.
+
+**Honest summary.** The mechanism is real and the diagnostic predicted where it
+would help. The magnitude, on this sample, is mostly indistinguishable from
+zero. `d_ge2_h2` on Pueblo is the one clear exception at BSS +0.34 with an
+interval well clear of zero, and it is also the target with the largest
+base-rate swing, which is consistent with the rest of the picture rather than
+a surprise.
