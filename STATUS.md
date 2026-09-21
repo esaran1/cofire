@@ -4,18 +4,28 @@ Git `a3f212d083122dcf5b6d62efe2a574d7beb4c67b`. Dev subset: **Pueblo County** (`
 moved from Larimer this session. Displayed resolution 4000 m. **2026 hindcast remains sealed at 2
 looks** on config `0957e415fa7f3fad` — nothing in v0.6 evaluated on 2026.
 
-## Look 3 pre-registration WITHDRAWN
+## Look 3 pre-registration (calibration only, not taken)
 
-The eight-target pre-registration (sha256 `88d8fdf7...`) is **withdrawn** and
-must not be acted on. Replacing the hand-rolled block bootstrap with
-`arch.bootstrap.CircularBlockBootstrap` widened every interval and flipped 6 of
-13 conclusions from significant to not significant. Three of the eight
-pre-registered targets lose significance outright.
+`docs/PREREGISTRATION_LOOK3.md`, sha256 `341b68e788b50b77226c965464fbcec594f20177d6d00a080a9405ff5001b0c0`.
+Configuration A sha256 `67da282e8b377ea0b59834372945e5071d5bab4774fd78172a43c432b00ad49b`.
 
-Under the library implementations: 7 of 13 still separate, 4 of those clear
-every baseline, 3 survive two-domain agreement. A replacement pre-registration
-follows the operational benchmarks, the fire transition baseline and the SubX
-arm.
+**There are no skill hypotheses.** Under correct references, a rare-event
+bootstrap, multiplicity control and the library implementations, the ML survivor
+count is zero, so the baselines ship and there is nothing to claim skill over.
+This look tests calibration only: reference-PID coverage within 0.05 of nominal
+with a miss-run bound of 200, and a reliability term below 0.01 per shipped
+probabilistic target and domain. Targets with zero LODO resolution are scored
+for calibration only.
+
+The SubX adoption rule is embedded: configuration B is adopted only if at least
+one target's BSS against A has a CI above zero in both domains, and only the
+passing targets switch.
+
+Recorded prediction: partially confirmed, with coverage passing and reliability
+degraded by the 2026 regime shift.
+
+The holdout remains at **2 looks**. This session took none.
+
 
 ## Superseded look 3 pre-registration (do not act on)
 

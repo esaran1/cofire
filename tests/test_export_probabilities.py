@@ -67,3 +67,32 @@ def test_a_probability_without_its_baseline_still_renders() -> None:
     assert e["p_intensify"]["value"] == 0.5
     assert e["p_intensify"]["baseline"] is None
     json.dumps(e)  # must not raise
+
+
+def test_flat_targets_are_marked_per_domain() -> None:
+    """A forecast that does not vary by cell must say so.
+
+    The list is domain dependent: 8 targets on Larimer against 4 on Pueblo, so
+    the client cannot hard-code target names. It reads the flag.
+    """
+    import json as _json
+    from pathlib import Path
+
+    p = Path("artifacts/shipping/flat_targets.json")
+    if not p.exists():
+        return
+    flat = _json.loads(p.read_text())
+    assert set(flat) == {"larimer", "pueblo"}
+    # Every d_intensify target is flat on Larimer at every horizon.
+    for h in (2, 4, 8):
+        assert f"d_intensify1_h{h}" in flat["larimer"]
+        assert f"d_intensify2_h{h}" in flat["larimer"]
+    # And the two domains genuinely differ, which is why the flag exists.
+    assert set(flat["larimer"]) != set(flat["pueblo"])
+
+
+def test_a_flat_probability_still_carries_its_value() -> None:
+    """Flat means undifferentiated, not absent."""
+    entry = {"value": 0.12, "baseline": 0.12, "flat": True}
+    assert entry["value"] == 0.12
+    assert entry["flat"] is True

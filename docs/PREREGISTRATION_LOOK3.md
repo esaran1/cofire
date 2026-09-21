@@ -1,146 +1,139 @@
 # Pre-registration: look 3 on the 2026 holdout
 
-**This session does not take this look.** It ends here, at a frozen
-specification, for a human to approve or reject. The holdout stands at **2
-looks** on config `0957e415fa7f3fad`, recorded in
-`artifacts/hindcast/run_log.json` and enforced by `tests/test_look_seal.py` and
-by `COFIRE_ALLOW_LOOK` in the hindcast stage.
+**This session does not take this look.** It ends here for a human to approve or
+reject. The holdout stands at **2 looks** on config `0957e415fa7f3fad`, recorded
+in `artifacts/hindcast/run_log.json` and enforced by `tests/test_look_seal.py`
+and `COFIRE_ALLOW_LOOK` in the hindcast stage.
 
-Everything below was decided before the look and is fixed. This document
-supersedes the earlier look-3 pre-registration, which named no specific targets
-and predated the corrections that changed which results exist at all.
+This supersedes the earlier eight-target pre-registration (sha256
+`88d8fdf7...`), which was withdrawn when the circular block bootstrap flipped 6
+of 13 conclusions.
 
-## What this look is for
+## What changed, and why this look is different
 
-Every number in this session is **exploratory**. The targets below survived a
-sequence of filters applied to validation data, and surviving a filter chosen
-after seeing data is not evidence. Look 3 exists to test a small, named set of
-claims on data that has never been used, once.
+The earlier pre-registration asked whether a machine-learning model showed skill
+against baselines. It does not. Under correct references, a rare-event
+bootstrap, multiplicity control and the library implementations, the survivor
+count is **zero**: no target where the ML model demonstrates skill over an
+appropriate baseline in both domains.
 
-## The claims
+So the baselines ship, and there is nothing left to claim skill over. This look
+tests **calibration**, not skill. There are no skill hypotheses in it, because
+the shipped forecast *is* the baseline.
 
-Eight target-and-domain pairs. Each is one hypothesis: that the frozen two-stage
-model achieves a positive Brier skill score against **week-of-year seasonal
-climatology** on 2026.
+## Configuration A, frozen
 
-    domain   target            h   validation BSS [95% CI]      persist  markov
-    pueblo   f_gt80_h2         2   +0.1215 [+0.034, +0.229]      +0.318     n/a
-    pueblo   f_gt80_h4         4   +0.1110 [+0.022, +0.243]      +0.397     n/a
-    pueblo   f_gt80_h8         8   +0.1041 [+0.029, +0.210]      +0.420     n/a
-    larimer  f_gt97_h4         4   +0.0993 [+0.052, +0.189]      +0.451     n/a
-    larimer  f_gt97_h2         2   +0.0901 [+0.046, +0.178]      +0.414     n/a
-    larimer  f_gt97_h8         8   +0.0883 [+0.052, +0.153]      +0.449     n/a
-    larimer  d_intensify1_h2   2   +0.0691 [+0.026, +0.133]      +0.006   +0.157
-    larimer  f_gt90_h8         8   +0.0531 [+0.018, +0.096]      +0.419     n/a
+sha256 `67da282e8b377ea0b59834372945e5071d5bab4774fd78172a43c432b00ad49b`,
+over `artifacts/shipping/choices.json`,
+`artifacts/shipping/continuous_arms.json` and the pinned constants below.
 
-These are what remained after: 51 targets, 40 estimable under the rare-event
-rule, 13 surviving Benjamini-Hochberg at q=0.10 with Holm within event family, 9
-clearing every applicable baseline, and 8 agreeing in sign across both domains.
+**Probabilistic targets**, 27 of them, one family each, frozen in
+`choices.json`: Markov 18, ERC-decile transition 6, damped-persistence logistic
+3. Pooled across domains with an indicator on 21 of 27, per domain otherwise.
+Markov settings: `min_weeks=32`, `prior_strength=4.0`,
+`persistence_weight=0.75`.
 
-## What is excluded, and why
+**Continuous ERC percentile**: `damped_regression` at h2 and h4, `decile_mean`
+at h8, chosen once on pooled LODO MAE.
 
-Recorded so the selection cannot be revisited after the look.
+**Intervals**: the vendored reference conformal PID,
+`quantile_integrator_log`, with the paper's gains `lr=0.1`, `Csat=2.0`,
+`KI=1.0`, `T_burnin=100`, target coverage 0.90. Gains are not searched.
 
-- **`d_nochange` at h2, h4, h8 (larimer).** Survived BH against climatology but
-  loses to the Markov baseline by -0.217, -0.359 and -0.515. A model that clears
-  climatology and loses to a transition matrix has no forecast skill for a
-  persistence-dominated target.
-- **`d_intensify2_h8` (pueblo).** Survived BH but loses to persistence at
-  -0.021.
-- **`d_intensify1_h4`.** The largest surviving effect at +0.1558 on Pueblo, and
-  **-0.5357 on Larimer**. The standing two-domain rule treats disagreement as
-  evidence of fitting one geography.
-- **Eleven targets not estimable.** Fewer than 12 positive domain-weeks in
-  validation, so no interval can be computed. `d_intensify2_h2` on Larimer has
-  three.
+## Configuration B, and the adoption rule
 
-## The frozen specification
+Configuration B is A plus SubX CFSv2 weeks 1 to 4 anomaly covariates, entering
+the conditional models as a logistic extension of the transition tables.
 
-No part of this may be refitted, retuned or reselected before the look.
+**The rule, stated exactly.** B is adopted **if and only if**, on pooled
+leave-one-drought-year-out with the circular block bootstrap, at least one
+target's Brier skill score against configuration A has a 95 percent confidence
+interval entirely above zero **in both domains**. If adopted, **only the targets
+that individually pass switch to B; every other target stays on A.**
 
-**Stage 1**, the domain event rate: ridge regression on the logit of the
-domain-week rate, predictors `oni, pdo, swe_pct_median, esi_12wk,
-pr_deficit_12w` plus `sin_doy` and `cos_doy`, **penalty 100**, chosen once on
-pooled LODO across all targets and both domains. Intercept unpenalised. Fitted
-on one row per domain-week, never per cell.
+The SubX run happens **once**, after the fetch completes and before look 3, with
+the rule applied mechanically. No iteration, no re-specification, no second run
+with different covariates. If the rule selects nothing, A is frozen unchanged
+and that is the recorded result.
 
-**Stage 2**, the cell ranking: LightGBM binary classifier on the v1 feature set,
-no class weighting, learning rate 0.05, 31 leaves, 150 rounds, seed 2026, one
-thread. Features exclude every `_h\d+$` column.
+## Confirmatory tests on 2026
 
-**Combination**: `stage1_logit + w * (cell_logit - mean(cell_logit))`, with `w`
-fitted by one-parameter logistic regression on pooled out-of-fold LODO
-predictions, floored at 0 and capped at 1.
+Applied to whichever configuration the rule selects.
 
-**Row set**: rows where every v1 source group is present, the same restriction
-used throughout.
+**1. Interval coverage.** Reference PID at h2, h4 and h8, per domain, on 2026
+issues.
 
-## Reference baseline
+- **Pass** if realised coverage is within **0.05** of nominal 0.90, that is
+  within [0.85, 0.95], **and** the longest run of consecutive misses is below
+  **200** cell-weeks.
+- The miss-run bound is set from the validation evidence: the observed runs are
+  8 to 19, and ACI's failures ran to 1860. A bound of 200 is roughly ten times
+  the worst observed value and an order of magnitude below the failure mode, so
+  it separates the two without being tuned to either.
 
-**Week-of-year seasonal climatology**, domain-wide, circular +/- 3 week window,
-shrunk toward the overall training rate, estimated on training years only. This
-is the primary and the only reference the pass rule uses.
+**2. ACI on the same streams**, recorded as the comparison. No pass criterion.
+Its validation values are 0.9320, 0.8961 and 0.8057 on Larimer and 0.9019,
+0.5970 and 0.6887 on Pueblo.
 
-Persistence, Markov and the flat constant are **reported** for every target but
-do not enter the rule. They were used to select the set; using them again to
-judge it would be scoring the same filter twice.
+**3. Reliability of every shipped probabilistic target**, per domain: the
+reliability term of the Murphy decomposition, plus a reliability diagram.
 
-## The bootstrap
+- **Pass** if the reliability term is below **0.01** for that target and domain.
+- Set from the validation evidence, where 24 of 27 pooled targets are below
+  0.01 and the worst is `d_ge2_h8` at 0.060. A threshold at 0.01 is the level
+  most of the shipped set already meets, so failure means a real degradation
+  rather than a stricter ruler.
 
-Stratified block bootstrap by week, 400 replicates, positive and negative weeks
-resampled separately to their own counts, 95 percent percentile interval. A
-target with fewer than **12 positive domain-weeks** in the 2026 evaluation
-window is reported **not estimable** and counts as neither a pass nor a failure.
+**4. Targets with zero LODO resolution are scored for calibration only.** Eight
+targets have zero resolution in at least one domain, listed in
+`artifacts/shipping/step1_by_domain.csv`. A forecast that does not vary between
+cells has no discrimination to confirm, so only its reliability term is tested
+and no discrimination claim is made for it.
 
-## The pass rule, fixed in advance
+**No skill claims against baselines.** The shipped forecast is the baseline.
 
-Per target: **pass** if the point BSS against seasonal climatology is positive
-**and** the lower bound of the 95 percent interval is above zero.
+## Overall outcome, fixed in advance
 
-Overall, stated before the look:
+- **Confirmed** if every coverage test passes and at least 80 percent of
+  target-and-domain reliability tests pass.
+- **Partially confirmed** if all coverage tests pass but reliability falls below
+  that share.
+- **Not confirmed** if any coverage test fails.
 
-- **Confirmed** if at least 5 of the 8 pass, and no target fails with an
-  interval entirely below zero.
-- **Partially confirmed** if 2 to 4 pass.
-- **Not confirmed** if 0 or 1 passes.
-- Any target reported not estimable is excluded from both the numerator and the
-  denominator, and the thresholds scale: at most 8 minus the not-estimable count
-  can pass, and the "confirmed" bar becomes a simple majority of the estimable
-  ones.
-
-Multiplicity is **not** reapplied at look 3. The set was already reduced by BH
-at q=0.10; applying it again to eight pre-registered hypotheses would be
-correcting twice for the same selection.
+Coverage is the gating criterion because it is what the product promises: an
+interval labelled 90 percent that contains the truth 60 percent of the time is a
+broken product, whatever the probabilities do.
 
 ## Recorded predictions
 
-So that a surprising result is visibly surprising rather than absorbed.
+- Coverage will pass at all three horizons on both domains. Validation holds
+  0.8987 to 0.8995 across six cells, and the conformal guarantee is
+  distribution-free, so 2026 being unusual should not break it. This is the
+  strongest prediction in the document.
+- ACI will fail at h8 on at least one domain, continuing its validation
+  collapse.
+- Reliability will be worse on 2026 than on validation, because the 2026 drought
+  base rate is 0.2745 for `d_intensify1_h4` on Pueblo against a 0.0114 to 0.1948
+  range in prior years, and an empirical conditional model fitted to those years
+  will be miscalibrated against a rate outside them. `d_ge2` at h4 and h8 is the
+  most likely reliability failure.
+- The expected overall outcome is **partially confirmed**: coverage passing,
+  reliability degraded by the regime shift.
+- SubX will not be adopted. The rule requires both domains, and nothing in this
+  project has cleared a both-domains bar yet.
 
-- The fire targets will do **worse** on 2026 than on validation. Their skill
-  comes from ranking fuel state, they have no forecast weather behind them
-  (SubX was located but not ingested), and 2026 has an unusually high drought
-  base rate at 0.2745 for `d_intensify1_h4` on Pueblo against a 0.0114 to
-  0.1948 range in prior years.
-- `d_intensify1_h2` on Larimer is the most likely single failure: its validation
-  margin over persistence is +0.006, which is within noise of zero.
-- The most likely overall outcome is **partially confirmed**, 2 to 4 passing.
-- Coverage of the shipping interval will still fail at h8, unchanged from the
-  earlier prediction and unaffected by anything in this document.
-
-If 7 or 8 pass, that is not a triumph to report as one. It would be more
-consistent with a leak than with genuine skill of this magnitude, and it should
-be investigated before it is believed.
+If coverage fails at h2, that is more consistent with a plumbing fault than with
+a real result, since the conformal guarantee is weakest at long leads and h2 is
+the easiest case. It should be investigated before it is believed.
 
 ## Stopping rule
 
 One run. The run log gains exactly one record, `look_index` 3. A technical
-failure is recorded and not retried until a human reviews the cause, because a
-retry after a partial look is a fourth look wearing the name of the third.
+failure is recorded and not retried until a human reviews the cause.
 
 ## What a human is approving
 
-That these eight claims, this specification, this baseline, this bootstrap and
-this pass rule are worth spending the third of a small number of looks on. The
-honest expected value is modest: the effects are small, the effective sample
-sizes run from 20 to 53 weeks, and the strongest single result was excluded for
-failing to replicate across domains.
+A calibration test of a forecast layer made of empirical conditional models and
+a vendored conformal controller. The honest summary is that the ambitious part
+of this project did not work, the modest part does, and this look asks only
+whether the modest part remains calibrated on a year it has never seen.

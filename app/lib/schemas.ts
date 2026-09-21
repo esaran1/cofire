@@ -38,6 +38,13 @@ export const WhyBarSchema = z.object({
 // crash, which is how the earlier null-SHAP bug took down a whole Place Card.
 export const ProbabilitySchema = z.object({
   value: maybeNumber,
+  // True when this target has zero LODO resolution in the displayed domain, so
+  // the probability is a regional base rate and is identical for every cell.
+  // The list is domain dependent, 8 targets on Larimer against 4 on Pueblo, so
+  // the client must read this flag rather than hard-code target names. The card
+  // renders these without per-cell styling, because per-cell styling would
+  // imply a spatial signal the forecast does not have.
+  flat: z.boolean().default(false),
   // The Markov transition baseline for the same event, shown beside the model
   // rather than behind it. Null for fire targets, which have no Markov
   // reference: an empirical USDM category transition matrix cannot forecast ERC

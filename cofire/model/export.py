@@ -112,6 +112,16 @@ def run_export() -> Path:
             why_lookup[(rec["cell_id"], rec["time"])] = rec["bars"]
 
     mapping = feature_to_group()
+    # Targets with zero LODO resolution in THIS domain. Domain dependent: 8 on
+    # Larimer against 4 on Pueblo, so it is read rather than hard-coded.
+    flat_targets: set[str] = set()
+    _flat_path = Path("artifacts/shipping/flat_targets.json")
+    if _flat_path.exists():
+        try:
+            flat_targets = set(json.loads(_flat_path.read_text()).get(settings.subset_name, []))
+        except (json.JSONDecodeError, OSError):
+            flat_targets = set()
+
     cells: list[dict[str, object]] = []
     for (cell_id, t), chunk in frame.groupby(["cell_id", "time"]):
         row = chunk.iloc[0]
@@ -149,14 +159,17 @@ def run_export() -> Path:
                 "p_intensify": {
                     "value": _finite(row.get(f"d_intensify1_h{h}_hat")),
                     "baseline": _finite(row.get(f"d_intensify1_h{h}_markov")),
+                    "flat": f"d_intensify1_h{h}" in flat_targets,
                 },
                 "p_d2plus": {
                     "value": _finite(row.get(f"d_ge2_h{h}_hat")),
                     "baseline": _finite(row.get(f"d_ge2_h{h}_markov")),
+                    "flat": f"d_ge2_h{h}" in flat_targets,
                 },
                 "p_fire_gt90": {
                     "value": _finite(row.get(f"f_gt90_h{h}_hat")),
                     "baseline": None,
+                    "flat": f"f_gt90_h{h}" in flat_targets,
                 },
             }
         cells.append(entry)
