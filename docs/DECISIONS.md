@@ -425,3 +425,113 @@ yet, and the model sees only antecedent conditions. Any apparent skill on
 `f_gt90_h4` and `f_gt90_h8` should be read as persistence of fuel state, not as
 weather forecasting, and the reported numbers for those targets should be
 interpreted with that ceiling in mind.
+
+## The fire targets were one target under three names
+
+`f_gt80`, `f_gt90` and `f_gt97` had **identical** values at every horizon.
+
+The cause is in `erc_pct`, which is a percentile of ERC against that cell's own
+week-of-year training distribution. The distribution held one value per training
+year, about **4 values**, and a percentile against 4 points can only return 0,
+25, 50, 75 or 100. Across the whole feature store `erc_pct` took **9 distinct
+values**, and 17.1% of them were exactly 100, so every threshold above 80
+selected the same rows.
+
+Fixed by pooling a circular +/- 3 week window when building the percentile
+climatology, giving about 28 values per cell-week. Measured after the rebuild:
+
+    distinct erc_pct values   9      ->  69
+    fraction exactly 100      0.171  ->  0.031
+    f_gt80_h4 rate            0.173  ->  0.189
+    f_gt90_h4 rate            0.173  ->  0.101
+    f_gt97_h4 rate            0.173  ->  0.053
+
+The rates now nest properly. Anomaly moments (fm100, fm1000, tmmx) stay on the
+single week: they are means rather than order statistics, so 4 values is
+adequate and widening them would blur a real seasonal signal.
+
+This invalidates every previously reported fire-target number. They were all
+measuring the same 17% exceedance event.
+
+## Seasonal climatology is a worse baseline here, and the reason is the finding
+
+The reviewer is right that a flat constant would credit a model for knowing the
+calendar, and these targets are seasonal *within* a year: on Pueblo the monthly
+rate of `f_gt90_h4` varies 4.5x and `d_intensify1_h4` 11.6x.
+
+But a week-of-year climatology fitted on training years scores **worse** than
+the flat constant on 24 of 27 targets. The reason is that the seasonal shape
+does not repeat. Correlation between the training and validation week-of-year
+profiles:
+
+    median -0.030, positive on 9 of 27 targets
+    d_ge2_h4  -0.893      d_ge2_h8  -0.869
+    d_nochange_h8 +0.663  d_nochange_h4 +0.393
+
+`d_ge2_h4` is the clearest case: training peaks in summer at 0.66 where
+validation is 0.000, and training sits at 0.045 in week 7 where validation is
+0.902. The two profiles are near-perfectly anti-correlated.
+
+**Interpretation.** What looks like a seasonal cycle within any one year is a
+drought episode that happened to occupy that part of that year. Drought in
+Colorado is not a calendar phenomenon at this sample size; it is an episodic one
+whose timing varies. Fitting a week-of-year profile on four training years
+imports the timing of those specific episodes.
+
+`d_nochange` is the exception, and consistently so: it is the complement of
+anything happening, so it tracks the genuinely seasonal quiescent period rather
+than episode timing.
+
+**Decision.** `seasonal_climatology_baseline` is implemented and reported for
+every target, because the reviewer's concern is legitimate and the reader should
+see the number. But the **flat training constant stays the primary reference**,
+since it is the harder opponent on 24 of 27 targets, and a skill score is only
+honest against the strongest available baseline. Reporting against seasonal
+climatology as primary would inflate every BSS in the table.
+
+## Forecast weather, checked properly this time
+
+The first check used `noaa-cfs-pds`, raw global GRIB, which was never the
+intended product. The reviewer named three better sources. All three were
+checked.
+
+**1. Climatology Lab CFSv2-gridMET: exists, but carries no historical issues.**
+
+The product is real and is the right one: CFSv2 downscaled onto the gridMET
+4 km grid, served over OPeNDAP at
+
+    https://thredds.northwestknowledge.net/thredds/dodsC/
+      NWCSC_INTEGRATED_SCENARIOS_ALL_CLIMATE/bcsd-nmme/dailyForecasts/
+      bcsd_nmme_metdata_CFSv2_forecast_{pr,pet,tasmax,tasmin,...}_daily.nc
+
+Grid 585 x 1386, which is CONUS at gridMET resolution, exactly the grid already
+in use. But the time axis is **212 consecutive days, 2026-10-01 to 2027-04-30**:
+one live forecast run, overwritten each cycle, with no issue-date dimension. The
+file server has `RangelandForecast/data/hindcasts/` and `.../forecasts/`, and
+**both directories are empty**. The THREDDS root carries seven sub-catalogs
+(MACA, TerraClimate, downscaled scenarios) and none is a forecast archive. The
+2011-2021 hindcasts from the skill study are not published here.
+
+**2. NMME at the IRI Data Library: has issue dates, wrong years.**
+
+Data requests work without authentication; only the HTML browse UI redirects to
+a login. A Colorado box comes back subset server-side, as the reviewer expected:
+
+    .NCEP-CFSv2/.HINDCAST/.MONTHLY/.prec  X -109/-102  Y 37/41
+    dims S=348 L=10 M=24 Y=5 X=8          13.4 MB
+
+`S` is the forecast issue dimension, 348 monthly issues. But it runs
+**1982-01 to 2010-12**, and `.MONTHLY` is the same range. CFSv2 has no
+`.FORECAST` or `.REALTIME` series at IRI: both return 404 while
+`CanSIPS-IC4/.FORECAST` returns data, so the pattern is right and CFSv2 simply
+does not have one. CanSIPS itself covers only 2024-07 onward, 27 issues, and is
+a different model.
+
+The training window is 2018 onward. A hindcast archive ending in 2010 cannot be
+joined to it.
+
+**Cost of the gap, restated.** Fire exceedance at h >= 4 still has no forecast
+weather behind it. With the percentile fix the three fire thresholds are now
+genuinely distinct targets, so this matters more than it did when they were one
+target: `f_gt97_h8` at a 5.3% base rate is being asked to anticipate weather
+eight weeks out from antecedent conditions alone.

@@ -382,3 +382,53 @@ def constant_event_baseline(
     if not np.isfinite(rate):
         rate = 0.0
     return np.full(len(index), rate, dtype="float32")
+
+
+def seasonal_climatology_baseline(
+    train: pd.DataFrame,
+    target: str,
+    index: pd.DataFrame,
+    half_window: int = 3,
+    min_positives: float = 5.0,
+) -> np.ndarray:
+    """Domain-wide week-of-year event rate, smoothed on the circle.
+
+    The right primary reference. A flat training constant credits a model for
+    knowing the calendar, and these targets are strongly seasonal even though
+    `erc_pct` is already week-of-year relative: measured on Pueblo, the monthly
+    rate of `f_gt90_h4` varies 4.5x and `d_intensify1_h4` 11.6x.
+
+    Domain-wide rather than per cell, for the same reason the Markov baseline
+    gates on weeks: within a week the cells are near duplicates, so a per-cell
+    week-of-year rate would rest on a handful of independent observations and
+    fit the episodes. Smoothed with a circular window because week 52 and week 1
+    are adjacent, and shrunk toward the overall training rate wherever a window
+    holds too few positives to estimate a rate at all.
+    """
+    tr = train[["time", target]].copy()
+    tr["woy"] = pd.to_datetime(tr["time"]).dt.isocalendar().week.astype(int).clip(1, 52)
+    y = pd.to_numeric(tr[target], errors="coerce")
+    tr = tr.assign(_y=y).dropna(subset=["_y"])
+    overall = float(tr["_y"].mean()) if len(tr) else 0.0
+
+    by_woy = tr.groupby("woy")["_y"].agg(["sum", "count"])
+    sums = np.zeros(53, dtype=float)
+    counts = np.zeros(53, dtype=float)
+    for w, row in by_woy.iterrows():
+        sums[int(w)] = float(row["sum"])
+        counts[int(w)] = float(row["count"])
+
+    rate = np.full(53, overall, dtype=float)
+    for w in range(1, 53):
+        # Circular window: weeks 52 and 1 are neighbours.
+        idx = [((w - 1 + d) % 52) + 1 for d in range(-half_window, half_window + 1)]
+        s = float(sums[idx].sum())
+        n = float(counts[idx].sum())
+        if n <= 0:
+            continue
+        # Shrink toward the overall rate when the window is thin on positives.
+        w_obs = s / max(s + min_positives, 1e-9)
+        rate[w] = w_obs * (s / n) + (1.0 - w_obs) * overall
+
+    woy_idx = pd.to_datetime(index["time"]).dt.isocalendar().week.astype(int).clip(1, 52)
+    return np.asarray(rate[woy_idx.to_numpy()], dtype="float32")

@@ -77,6 +77,12 @@ class TrainingStats:
     train_end: pd.Timestamp | None = None
 
 
+# Half-width of the circular week window used for percentile climatologies.
+# 3 gives 7 weeks x ~4 training years = ~28 values, enough to resolve a 97th
+# percentile. A single week gives ~4, which cannot.
+PCT_HALF_WINDOW = 3
+
+
 def _fit_gamma(values: np.ndarray) -> GammaParams:
     """McKee-style SPI gamma: zeros handled as a point mass, positives ~ Gamma."""
     x = values[np.isfinite(values)]
@@ -178,12 +184,35 @@ def fit_training_stats(frame: pd.DataFrame, train_end: pd.Timestamp) -> Training
                     stats_out.spei_gamma[cell_id][month_i][window] = GammaParams(
                         shape=gp.shape, loc=float(offset), scale=gp.scale, p_zero=gp.p_zero, n=gp.n
                     )
-        for woy, wchunk in chunk.groupby("woy"):
-            w = int(woy)
-            if "erc" in wchunk:
-                stats_out.erc_by_woy[cell_id][w] = np.sort(wchunk["erc"].dropna().to_numpy(dtype=float))
-            if "bi" in wchunk:
-                stats_out.bi_by_woy[cell_id][w] = np.sort(wchunk["bi"].dropna().to_numpy(dtype=float))
+        # A circular +/- PCT_HALF_WINDOW week window, not the single week. One
+        # week of training holds one value per training year, about 4, and a
+        # percentile against 4 points can only return 0, 25, 50, 75 or 100. That
+        # coarseness made f_gt80, f_gt90 and f_gt97 the identical target: 17.1%
+        # of erc_pct values sat at exactly 100, so every threshold above 80
+        # selected the same rows. Widening to +/-3 weeks gives about 28 values
+        # per cell-week, which resolves the upper tail the fire targets need.
+        woy_groups = {int(w): c for w, c in chunk.groupby("woy")}
+        for w in sorted(woy_groups):
+            weeks_in_window = [
+                ((w - 1 + d) % 52) + 1 for d in range(-PCT_HALF_WINDOW, PCT_HALF_WINDOW + 1)
+            ]
+            parts = [woy_groups[x] for x in weeks_in_window if x in woy_groups]
+            if not parts:
+                continue
+            pooled = pd.concat(parts)
+            if "erc" in pooled:
+                stats_out.erc_by_woy[cell_id][w] = np.sort(
+                    pooled["erc"].dropna().to_numpy(dtype=float)
+                )
+            if "bi" in pooled:
+                stats_out.bi_by_woy[cell_id][w] = np.sort(
+                    pooled["bi"].dropna().to_numpy(dtype=float)
+                )
+            # Anomaly moments stay on the single week. They are means, not
+            # order statistics, so the 4-value sample that ruins a 97th
+            # percentile is adequate for a mean, and widening them would blur a
+            # genuine seasonal signal.
+            wchunk = woy_groups[w]
             if "fm100" in wchunk:
                 stats_out.fm100_mean[cell_id][w] = float(wchunk["fm100"].mean())
             if "fm1000" in wchunk:
