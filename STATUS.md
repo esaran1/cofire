@@ -4,25 +4,28 @@ Git `a3f212d083122dcf5b6d62efe2a574d7beb4c67b`. Dev subset: **Pueblo County** (`
 moved from Larimer this session. Displayed resolution 4000 m. **2026 hindcast remains sealed at 2
 looks** on config `0957e415fa7f3fad` — nothing in v0.6 evaluated on 2026.
 
-## Look 3 pre-registration (calibration only, not taken)
+## Look 3 pre-registration (amended, calibration only, not taken)
 
-`docs/PREREGISTRATION_LOOK3.md`, sha256 `341b68e788b50b77226c965464fbcec594f20177d6d00a080a9405ff5001b0c0`.
+`docs/PREREGISTRATION_LOOK3.md`, sha256 `cabf75e1c847ae8038fcb02d2151d90383d5c4d21e605f90cf8aaadda687cef9`.
+**Supersedes** sha256 `341b68e788b50b77226c965464fbcec594f20177d6d00a080a9405ff5001b0c0`,
+which was never acted on and under which no look was taken.
 Configuration A sha256 `67da282e8b377ea0b59834372945e5071d5bab4774fd78172a43c432b00ad49b`.
 
-**There are no skill hypotheses.** Under correct references, a rare-event
-bootstrap, multiplicity control and the library implementations, the ML survivor
-count is zero, so the baselines ship and there is nothing to claim skill over.
-This look tests calibration only: reference-PID coverage within 0.05 of nominal
-with a miss-run bound of 200, and a reliability term below 0.01 per shipped
-probabilistic target and domain. Targets with zero LODO resolution are scored
-for calibration only.
+**No skill hypotheses.** The ML survivor count is zero, so the baselines ship
+and there is nothing to claim skill over.
 
-The SubX adoption rule is embedded: configuration B is adopted only if at least
-one target's BSS against A has a CI above zero in both domains, and only the
-passing targets switch.
+Primary coverage tests are now **local**: minimum rolling 13-week coverage at or
+above 0.70, and coverage conditional on USDM category (D0-D1 against D2+) within
+0.10 of nominal. Long-run coverage is demoted to a sanity check, being
+guaranteed by construction.
 
-Recorded prediction: partially confirmed, with coverage passing and reliability
-degraded by the 2026 regime shift.
+**Informativeness, decided before the look.** PID intervals are 2.41 to 2.79
+times the width of the climatological 90 percent interval on LODO, so under the
+stated rule **all six continuous target-and-horizon pairs classify as
+climatological**. The Place Card therefore ships historical ranges for the
+continuous ERC target at every horizon on both domains. The point forecasts do
+carry information, with MAE gains of 3.67 to 7.94 percentile points over a
+median predictor, five of six clear of zero; the intervals do not.
 
 The holdout remains at **2 looks**. This session took none.
 

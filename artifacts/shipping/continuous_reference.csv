@@ -1,0 +1,7 @@
+domain,horizon,arm,mae_model,mae_clim_median,mae_gain,gain_lo,gain_hi,pid_width,clim_width,width_ratio
+larimer,2,damped_regression,24.966,32.91,7.944,4.8024,10.7429,92.94,33.7,2.7577
+larimer,4,damped_regression,25.219,32.824,7.605,4.9466,10.246,91.46,32.73,2.7945
+larimer,8,decile_mean,26.64,32.023,5.383,2.2714,8.2713,94.51,34.07,2.7739
+pueblo,2,damped_regression,23.434,29.65,6.216,2.4948,9.8787,90.89,36.05,2.5213
+pueblo,4,damped_regression,23.247,29.61,6.363,2.1539,9.9668,93.12,35.24,2.6429
+pueblo,8,decile_mean,23.641,27.311,3.669,-0.627,6.9759,89.1,36.94,2.4122
