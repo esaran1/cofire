@@ -1,7 +1,8 @@
-# STATUS: frozen, awaiting look 3
+# STATUS: look 3 taken, counter at 3
 
-Branch `v1-research`. Holdout 2026 sealed at **2 looks**, counter keyed on the
-holdout year in `cofire/model/freeze.py`.
+Branch `v1-research`. Holdout 2026 **looked at 3 times**, the third under the preregistration below.
+The counter is keyed on the holdout year in `cofire/model/freeze.py`. No
+further look is authorised.
 
 ## Where the work stands
 
@@ -12,6 +13,7 @@ holdout year in `cofire/model/freeze.py`.
 | 1, multiplicity | 51 comparisons, 39 estimable, **12 survivors** |
 | 2, SubX | run once, **0 targets switch**; everything ships on configuration A |
 | 3, freeze | preregistration recorded, config hash fixed |
+| 4, look 3 | 69 of 84 criteria pass: **30 of 30 interval**, 39 of 54 reliability |
 
 ## The rule that governs every skill claim
 
@@ -56,9 +58,30 @@ model code had changed.
    that ran backwards in time; every conclusion held and the worst miss run
    improved from 31 to 14.
 
+## Look 3 results
+
+All thirty interval criteria pass on the sealed year. PID long-run coverage
+0.8975 to 0.8996, minimum rolling 13-week coverage 0.8944 to 0.8986 against a
+floor of 0.70, all twelve conditional strata within 0.0164 of 0.90, longest miss
+run 6 to 12 against a bound of 60. ACI reaches a rolling minimum of 0.6140 with
+a 264-week miss run on the same rows.
+
+Reliability passes 39 of 54 at the 0.05 threshold, and 9 of the 12 stage-1
+survivors. The failures concentrate at long horizons exactly as the recorded
+expectation said: mean reliability 0.0126 at h2, 0.0386 at h4, 0.0775 at h8, and
+13 of 15 failures at h4 or h8. Every h2 target passes on both domains.
+
+Width ratios on 2026 are 0.568 to 0.757, better than validation's 0.922 to
+1.006. By the rule fixed before the look this changes no rendering.
+
 ## Resume point
 
-Stage 3 complete. `FREEZE_COMMIT` is `46c17ae4aac2bef2d1397e422755104284f71667`, recorded in
-`artifacts/FREEZE_COMMIT`. Preregistration sha256 `c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a`. Next is
-stage 4, look 3, which runs only if the four preconditions in the
-preregistration verify in code.
+Stages 1 to 4 complete. `FREEZE_COMMIT` is `46c17ae4aac2bef2d1397e422755104284f71667`, recorded in
+`artifacts/FREEZE_COMMIT`. Preregistration sha256 `c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a`. Next is **stage 5, final artifacts**: export
+forecasts from the frozen configuration through 2026-09-22 via
+`forecast_issues`, apply the preregistered rendering rules mechanically, then
+`make facts` and `make demo-data`. Then stage 6 product wiring, stage 7
+verification, stage 8 merge.
+
+`tests/test_frozen_model.py` must stay green through all of them: nothing under
+`cofire/model/` changes from here.
