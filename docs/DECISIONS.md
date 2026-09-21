@@ -1161,3 +1161,50 @@ polygons, and WFS returns `InvalidParameterValue`. The county statistics API is
 5 kB per county-year but returns county-level area percentages, and the existing
 raster carries 2.14 distinct USDM values per week across 480 cells, so
 substituting it would redefine the target. The zips were used, as specified.
+
+## The split defect, and which earlier tables it touched
+
+**Two faults in `config.py`.**
+
+`apply_subset_defaults` forced `train 2019 to 2022` for every dev subset, and
+both domains run as dev subsets. That is the thin training window the 2007
+back-extension exists to fix, and it was in the configuration all along.
+
+Worse, the method is called by `get_settings()` and **not** by a bare
+`Settings()`, so the two constructors disagreed: bare gave `train_start=2004`,
+the factory gave `2019`. Analysis code in this project constructs both. A
+calibration path and an evaluation path could therefore run on different
+training windows without any error, which is the same class of fault as the
+original ACI bug.
+
+Both are fixed. The class default and the override now both read 2007 to 2021,
+and `tests/test_split_consistency.py` asserts the two paths agree for every
+domain, that the window is at least ten years, and that it never starts before
+the USDM record.
+
+**Which earlier tables were affected, audited rather than assumed.** Every
+analysis module, `confirm.py`, `two_stage.py`, `oracle_decomp.py`, `pooled.py`
+and `shipping.py`, constructs bare `Settings()`. They therefore used the class
+defaults, **not** the 2019 override:
+
+    reported and used:  train_end 2021, valid 2022 to 2023
+
+Measured on the realised splits, with the feature store starting in 2018:
+
+    train  74880 rows, years 2018, 2019, 2020
+    cal    25440 rows, years 2020, 2021
+    valid  49920 rows, years 2022, 2023
+
+So the effective training window was **three years**, 2018 to 2020, with a 2020
+to 2021 calibration carve-out, and validation was 2022 to 2023 exactly as
+reported.
+
+**No earlier table ran on a split other than the one it reported.** The
+disagreement between the constructors was real and dangerous, and it happened
+not to bite, because the modules that mattered all took the same branch. The
+thinness of the training window is the substantive problem, and the extended
+rerun supersedes those tables rather than correcting them.
+
+One consequence worth carrying forward: the single usable LODO fold reported
+earlier, 2020, follows directly from a 2018 to 2020 training window. The
+extended record should make 2012, 2018, 2020 and 2021 all usable.
