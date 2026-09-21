@@ -58,7 +58,7 @@ model code had changed.
 
 ## Resume point
 
-Stage 3 complete. `FREEZE_COMMIT` is `425bdedbf13c3e7ea8e5910b84749c75b7bfad18`, recorded in
-`artifacts/FREEZE_COMMIT`. Preregistration sha256 `33e0ee105eebd0517e08f73a4c7a5df4cfc5db444438cd7876da4fb01731cecc`. Next is
+Stage 3 complete. `FREEZE_COMMIT` is `46c17ae4aac2bef2d1397e422755104284f71667`, recorded in
+`artifacts/FREEZE_COMMIT`. Preregistration sha256 `c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a`. Next is
 stage 4, look 3, which runs only if the four preconditions in the
 preregistration verify in code.
