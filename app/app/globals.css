@@ -70,3 +70,43 @@
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Scroll reveal for the evidence sections.
+ *
+ * The content is never hidden. This animates a section slightly UP into place
+ * as it enters the viewport; it does not fade it in from nothing.
+ *
+ * That distinction is the whole lesson here. Four earlier versions faded in
+ * from `opacity: 0` (Motion whileInView, whileInView with amount 0, useInView
+ * with a ref, and a CSS entry-range fade). Every one of them left sections
+ * below the fold at zero opacity in any renderer that does not scroll like a
+ * human, so a full-page screenshot showed a finished-looking page with three of
+ * five sections missing. A reveal that can hide content is a reveal that will
+ * hide content.
+ *
+ * Transform-only means the worst case is a section sitting 10px low, which
+ * nobody notices, instead of a section that is not there.
+ */
+.reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    transform: translateY(10px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

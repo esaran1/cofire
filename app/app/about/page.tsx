@@ -1,19 +1,48 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
+import { Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
+import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
 
 /**
- * What ships, what it was built from, and what it is allowed to claim.
+ * What ships, and what it is allowed to claim.
  *
- * Every figure comes from facts.json, generated from artifacts. The survivor
- * list is stated plainly because it is the only place this project claims its
- * forecasts beat a baseline, and a reader should be able to check that claim
- * against the same list the copy lint checks against.
+ * The previous version was five tables, including raw target identifiers like
+ * `d_ge2` that mean nothing outside the codebase. A reader wants three things:
+ * what the thing does, where it is trustworthy, and where the data came from.
+ * Everything else is provenance and sits behind a disclosure.
  */
 
 const gb = (b: number) => `${(b / 1e9).toFixed(2)} GB`;
 
+/** Target identifiers are internal. Readers get the event they name. */
+const TARGET_LABELS: Record<string, string> = {
+  d_ge2: "Drought reaching D2 or worse",
+  d_ge3: "Drought reaching D3 or worse",
+  d_improve1: "Drought easing by a category",
+  d_intensify1: "Drought worsening by a category",
+  d_intensify2: "Drought worsening by two categories",
+  d_nochange: "Drought staying put",
+  f_gt80: "Fire-spread conditions past the 80th percentile",
+  f_gt90: "Fire-spread conditions past the 90th percentile",
+  f_gt97: "Fire-spread conditions past the 97th percentile",
+};
+
+const labelFor = (t: string) =>
+  TARGET_LABELS[t.replace(/_h\d+$/, "")] ?? t.replace(/_/g, " ");
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <Reveal className="border-rule mt-14 border-t pt-8">
+      <h2 className="text-xl font-medium">{title}</h2>
+      {children}
+    </Reveal>
+  );
+}
+
 export default function AboutPage() {
+  const reduce = useReducedMotion();
   const survivors = facts.survivors;
   const byDomain = survivors.reduce<Record<string, typeof survivors>>((acc, s) => {
     (acc[s.domain] ||= []).push(s);
@@ -21,135 +50,111 @@ export default function AboutPage() {
   }, {});
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-16 pt-6">
-      <h1 className="display text-4xl font-normal">About COFIRE</h1>
-      <p className="mt-4 text-lg leading-relaxed">
-        COFIRE forecasts drought and fire-spread conditions in two Colorado counties, 2 to 8 weeks
-        ahead, and states how uncertain each forecast is. Where the uncertainty cannot be supported
-        by the record, it says so and shows the historical range instead. It is not a forecast of
-        ignitions.
-      </p>
+    <div className="mx-auto max-w-3xl px-6 pb-20 pt-10">
+      <motion.header
+        initial={reduce ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <h1 className="display text-4xl font-normal md:text-5xl">How it works</h1>
+        <p className="text-ink-soft mt-3 max-w-[58ch] leading-relaxed">
+          Drought and fire-spread conditions for two Colorado counties, 2 to 8 weeks out, with an
+          honest account of how far to trust each number. Not a forecast of ignitions.
+        </p>
+      </motion.header>
 
-      <h2 className="mt-10 text-xl font-medium">What ships, by target family</h2>
-      <dl className="border-rule mt-3 divide-y divide-rule border-y text-sm">
-        {Object.entries(facts.configuration).map(([k, v]) => (
-          <div key={k} className="grid grid-cols-[10rem_1fr] gap-4 py-3">
-            <dt className="text-mute capitalize">{k.replace(/_/g, " ")}</dt>
-            <dd className="text-ink-soft">{v}</dd>
+      <div className="border-rule mt-10 grid gap-8 border-y py-8 sm:grid-cols-3">
+        <Verdict
+          value={String(survivors.length)}
+          label="forecasts beat their baseline"
+          sub={`of ${facts.multiplicity.n_comparisons} tested`}
+        />
+        <Verdict value={String(facts.hindcast_looks)} label="looks at the sealed year" sub="the last one pre-registered" />
+        <Verdict value={gb(facts.ledger.total_bytes)} label="data downloaded" sub={`against a ${gb(facts.ledger.budget_bytes)} cap`} />
+      </div>
+
+      <Section title="Where the forecasts beat their baselines">
+        <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">
+          Skill is claimed here and nowhere else. Each of these had to beat its own outcomes
+          shuffled in place, because a forecast can beat a baseline on spread alone.
+        </p>
+        {Object.entries(byDomain).map(([dom, rows]) => (
+          <div key={dom} className="mt-6">
+            <h3 className="text-mute text-xs capitalize">{dom}</h3>
+            <div className="mt-1">
+              {rows.map((s) => (
+                <StatRow
+                  key={s.target}
+                  label={`${labelFor(s.target)}, ${s.horizon}w`}
+                  value={s.paired_diff.toFixed(3)}
+                />
+              ))}
+            </div>
           </div>
         ))}
-      </dl>
-      <p className="text-ink-soft mt-3 text-sm leading-relaxed">
-        The forecasts are empirical conditional models, not machine learning. On this record a
-        transition table and a damped persistence rule beat every trained arm that was tried, so
-        those are what ship.
-      </p>
+      </Section>
 
-      <h2 className="mt-10 text-xl font-medium">Where the forecasts beat their baselines</h2>
-      <p className="text-ink-soft mt-2 text-sm leading-relaxed">
-        <span className="num text-ink">{survivors.length}</span> of{" "}
-        <span className="num text-ink">{facts.multiplicity.n_comparisons}</span> comparisons
-        survived, after multiplicity control at q={facts.multiplicity.q} and a shuffled-target
-        check. Skill is claimed here and nowhere else. A comparison had to beat its own targets
-        shuffled in place, because a forecast can beat a baseline through probability spread alone.
-      </p>
-      {Object.entries(byDomain).map(([dom, rows]) => (
-        <div key={dom} className="mt-4">
-          <h3 className="text-sm font-medium capitalize">{dom}</h3>
-          <table className="mt-1 w-full text-sm">
-            <thead className="text-mute border-rule border-b text-left text-xs">
-              <tr>
-                <th className="py-2 font-normal">Target</th>
-                <th className="py-2 font-normal">Range</th>
-                <th className="py-2 text-right font-normal">Margin over baseline</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((s) => (
-                <tr key={`${s.target}`} className="border-rule border-b">
-                  <td className="num py-2 text-xs">{s.target.replace(/_h\d+$/, "")}</td>
-                  <td className="py-2">{s.horizon}w</td>
-                  <td className="num py-2 text-right text-xs">
-                    {s.paired_diff.toFixed(3)}{" "}
-                    <span className="text-mute">
-                      [{s.paired_lo.toFixed(3)}, {s.paired_hi.toFixed(3)}]
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
-
-      <h2 className="mt-10 text-xl font-medium">Data sources</h2>
-      <table className="mt-3 w-full text-sm">
-        <thead className="text-mute border-rule border-b text-left text-xs">
-          <tr>
-            <th className="py-2 font-normal">Source</th>
-            <th className="py-2 font-normal">Record span</th>
-            <th className="py-2 font-normal">Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {facts.sources.map((s) => (
-            <tr key={s.name} className="border-rule border-b">
-              <td className="py-2">{s.name}</td>
-              <td className="num py-2 text-xs">{s.span}</td>
-              <td className="text-ink-soft py-2 text-xs">{s.role}</td>
-            </tr>
+      <Section title="What ships">
+        <dl className="border-rule mt-4 divide-y divide-rule border-y">
+          {Object.entries(facts.configuration).map(([k, v]) => (
+            <div key={k} className="grid gap-1 py-2.5 sm:grid-cols-[9rem_1fr] sm:gap-4">
+              <dt className="text-mute text-sm capitalize">{k.replace(/_/g, " ")}</dt>
+              <dd className="text-ink-soft text-sm">{String(v)}</dd>
+            </div>
           ))}
-        </tbody>
-      </table>
-      <p className="text-ink-soft mt-3 text-sm leading-relaxed">
-        A sub-seasonal weather model was evaluated once, by a rule fixed in advance:{" "}
-        <span className="num text-ink">{facts.subx.n_ci_above_zero}</span> of{" "}
-        <span className="num text-ink">{facts.subx.n_comparisons}</span> comparisons cleared zero in
-        one county and none cleared it in both, so{" "}
-        <span className="num text-ink">{facts.subx.n_switched}</span> targets adopted it.
-      </p>
+        </dl>
+        <p className="text-ink-soft mt-4 max-w-[58ch] text-sm leading-relaxed">
+          These are empirical conditional models, not machine learning. On this record a
+          transition table and a damped persistence rule beat every trained arm tried.
+        </p>
+      </Section>
 
-      <h2 className="mt-10 text-xl font-medium">Download ledger</h2>
-      <p className="text-ink-soft mt-2 text-sm leading-relaxed">
-        Every byte fetched over the network is recorded.{" "}
-        <span className="num text-ink">{gb(facts.ledger.total_bytes)}</span> across{" "}
-        <span className="num text-ink">{facts.ledger.n_transfers.toLocaleString()}</span> transfers,
-        against a <span className="num text-ink">{gb(facts.ledger.budget_bytes)}</span> cap. The
-        ledger is append-only: a mis-estimate is corrected by appending a correction with its
-        evidence, never by rewriting the original entry.
-      </p>
+      <Section title="Where the data comes from">
+        <div className="mt-4">
+          {facts.sources.map((s) => (
+            <StatRow key={s.name} label={s.name} value={s.span} />
+          ))}
+        </div>
+        <p className="text-ink-soft mt-4 max-w-[58ch] text-sm leading-relaxed">
+          A sub-seasonal weather model was tested once by a rule fixed in advance and did not
+          qualify, so no target uses it.
+        </p>
+      </Section>
 
-      <h2 className="mt-10 text-xl font-medium">Provenance</h2>
-      <dl className="border-rule mt-3 grid grid-cols-1 gap-y-3 border-y py-4 text-xs">
-        <div>
-          <dt className="text-mute">Splits</dt>
-          <dd className="num text-ink">
-            train {facts.split.train} · validate {facts.split.validate} · calibrate{" "}
-            {facts.split.calibrate} · holdout {facts.split.holdout}
-          </dd>
+      <Section title="Provenance">
+        <div className="mt-4">
+          <StatRow label="Training" value={facts.split.train} />
+          <StatRow label="Validation" value={facts.split.validate} />
+          <StatRow label="Calibration" value={facts.split.calibrate} />
+          <StatRow label="Held out" value={facts.split.holdout} />
         </div>
-        <div>
-          <dt className="text-mute">Looks at the sealed holdout</dt>
-          <dd className="num text-ink">{facts.hindcast_looks}</dd>
+        <div className="mt-4">
+          <Disclosure summary={<span className="sr-only">Hashes</span>} detail="Hashes and ledger">
+            <dl className="space-y-2">
+              <div>
+                <dt>Pre-registration sha256</dt>
+                <dd className="num text-ink break-all">{facts.preregistration_sha256}</dd>
+              </div>
+              <div>
+                <dt>Configuration hash</dt>
+                <dd className="num text-ink break-all">{facts.config_hash}</dd>
+              </div>
+              <div>
+                <dt>Freeze commit</dt>
+                <dd className="num text-ink break-all">{facts.freeze_commit}</dd>
+              </div>
+              <div>
+                <dt>Download ledger</dt>
+                <dd>
+                  {gb(facts.ledger.total_bytes)} across{" "}
+                  {facts.ledger.n_transfers.toLocaleString()} transfers. Append-only: a
+                  mis-estimate is corrected by appending evidence, never by rewriting an entry.
+                </dd>
+              </div>
+            </dl>
+          </Disclosure>
         </div>
-        <div>
-          <dt className="text-mute">Pre-registration sha256</dt>
-          <dd className="num text-ink break-all">{facts.preregistration_sha256}</dd>
-        </div>
-        <div>
-          <dt className="text-mute">Configuration hash</dt>
-          <dd className="num text-ink break-all">{facts.config_hash}</dd>
-        </div>
-        <div>
-          <dt className="text-mute">Freeze commit</dt>
-          <dd className="num text-ink break-all">{facts.freeze_commit}</dd>
-        </div>
-      </dl>
-      <p className="text-mute mt-4 text-xs leading-relaxed">
-        Not a forecast of ignitions. Forecasts are for {facts.domains.join(" and ")} counties at{" "}
-        {facts.resolution_m / 1000} km resolution, and the displayed value is the cell's own, not an
-        interpolation to a point.
-      </p>
+      </Section>
     </div>
   );
 }

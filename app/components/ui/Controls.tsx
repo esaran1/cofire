@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { ReactNode } from "react";
+import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "motion/react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 /**
  * Shared control layer. One radius rule (surfaces near-sharp at 2px,
@@ -185,4 +185,147 @@ export function PageHeader({ title, lede }: { title: ReactNode; lede: string }) 
 /** Standard content well, so every route shares one measure. */
 export function Well({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`mx-auto max-w-[1400px] px-6 py-12 ${className}`}>{children}</div>;
+}
+
+/**
+ * Progressive disclosure. The summary is always visible; the detail is one
+ * click away.
+ *
+ * This exists because the reason strings that justify every number are
+ * genuinely useful and genuinely long. Printing them inline repeated the same
+ * 30-word paragraph nine times on a single Place Card, which buried the
+ * numbers the card exists to show. A reader who wants the justification asks
+ * for it; a reader who does not gets a scannable page.
+ */
+export function Disclosure({
+  summary,
+  children,
+  detail,
+}: {
+  summary: ReactNode;
+  children: ReactNode;
+  /** Short label for the toggle, e.g. "Why". */
+  detail?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="min-w-0 flex-1">{summary}</div>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="text-mute hover:text-ink shrink-0 text-[11px] underline underline-offset-2 transition-colors"
+        >
+          {open ? "Hide" : (detail ?? "Why")}
+        </button>
+      </div>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={reduce ? false : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={reduce ? undefined : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="text-mute pt-2 text-[11px] leading-relaxed">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/**
+ * A headline result: the number, what it means, and whether it passed.
+ *
+ * Replaces the pattern of leading a section with a paragraph that the reader
+ * has to parse to find the verdict. The verdict is the first thing rendered.
+ */
+export function Verdict({
+  value,
+  label,
+  tone = "neutral",
+  sub,
+}: {
+  value: string;
+  label: string;
+  tone?: "pass" | "fail" | "neutral";
+  sub?: string;
+}) {
+  const color =
+    tone === "fail" ? "text-ember" : tone === "pass" ? "text-ink" : "text-ink";
+  return (
+    <div>
+      <div className={`display text-4xl font-normal md:text-5xl ${color}`}>{value}</div>
+      <div className="text-ink mt-1 text-sm">{label}</div>
+      {sub ? <div className="text-mute mt-0.5 text-xs">{sub}</div> : null}
+    </div>
+  );
+}
+
+/**
+ * One measurement in a scannable row. Used instead of a table when the reader
+ * needs to compare a handful of values rather than read a dataset.
+ */
+export function StatRow({
+  label,
+  value,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string;
+  tone?: "pass" | "fail" | "neutral";
+}) {
+  return (
+    <div className="border-rule flex items-baseline justify-between gap-4 border-b py-2 last:border-b-0">
+      <span className="text-ink-soft text-sm">{label}</span>
+      <span
+        className={`num text-sm ${tone === "fail" ? "text-ember" : "text-ink"}`}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * A number that counts up when it scrolls into view.
+ *
+ * Motivated, not decorative: it draws the eye to the headline verdict of a
+ * section before the reader starts scanning detail. Collapses to the final
+ * value instantly under reduced motion.
+ */
+export function CountUp({
+  to,
+  decimals = 0,
+  suffix = "",
+}: {
+  to: number;
+  decimals?: number;
+  suffix?: string;
+}) {
+  const reduce = useReducedMotion();
+  const [shown, setShown] = useState(reduce ? to : 0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.6 });
+
+  useEffect(() => {
+    if (reduce || !inView) return;
+    const controls = animate(0, to, {
+      duration: 0.9,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setShown(v),
+    });
+    return () => controls.stop();
+  }, [inView, to, reduce]);
+
+  return (
+    <span ref={ref} className="num">
+      {shown.toFixed(decimals)}
+      {suffix}
+    </span>
+  );
 }

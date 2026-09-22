@@ -87,8 +87,10 @@ test("a base-rate target says it is the same for every cell", async ({ page }) =
     const rows = card.locator('[data-testid="target-base-rate"]');
     await expect(rows.first()).toBeVisible();
     // The statement is the point: a number identical across cells must say so,
-    // or the reader will read spatial detail into it that is not there.
-    await expect(rows.first()).toContainText("same number for every cell");
+    // or the reader will read spatial detail into it that is not there. The
+    // marker is inline on the row, because it changes how the number should be
+    // read and so cannot sit behind the disclosure.
+    await expect(rows.first()).toContainText("same for the whole county");
   }
 });
 
@@ -96,5 +98,5 @@ test("the point forecast survives every state", async ({ page }) => {
   const card = await openPlaceCard(page);
   await expect(card).toBeVisible({ timeout: 15_000 });
   // Whatever happens to the band, the forecast itself is always shown.
-  await expect(card.getByText("How dry, for the time of year")).toBeVisible();
+  await expect(card.getByText("Dryness for this week")).toBeVisible();
 });

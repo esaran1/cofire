@@ -1,6 +1,7 @@
 "use client";
 
 import { Horizon, Place, Target } from "@/lib/api";
+import { Disclosure } from "./ui/Controls";
 import { UncertaintyBadge } from "./UncertaintyBadge";
 import { WhyBars } from "./WhyBars";
 
@@ -55,7 +56,14 @@ function horizonOf(name: string): string {
   return m ? m[1] : "";
 }
 
-/** The continuous ERC percentile, in whichever state the preregistration fixed. */
+/**
+ * The continuous ERC percentile, in whichever state the preregistration fixed.
+ *
+ * One sentence of plain meaning, then the band. The width-ratio arithmetic that
+ * justifies which band is shown is real, but it is a methodological note, not
+ * something a reader needs in order to read the number, so it sits behind a
+ * disclosure.
+ */
 function ErcBlock({ hz }: { hz: Horizon | undefined }) {
   const point = hz?.point;
   const state = hz?.state;
@@ -64,75 +72,106 @@ function ErcBlock({ hz }: { hz: Horizon | undefined }) {
     return <p className="text-ink-soft mt-2 text-xs">No forecast for this cell and range.</p>;
   }
 
+  const hasInterval =
+    state === "interval" && hz?.lo !== null && hz?.lo !== undefined && hz?.hi !== null && hz?.hi !== undefined;
+  const hasRange =
+    state === "historical_range" &&
+    hz?.range_lo !== null &&
+    hz?.range_lo !== undefined &&
+    hz?.range_hi !== null &&
+    hz?.range_hi !== undefined;
+
   return (
     <>
-      <p className="text-ember display text-4xl font-normal">{point.toFixed(0)}</p>
+      <p className="text-ember display text-5xl font-normal">{point.toFixed(0)}</p>
 
-      {state === "interval" && hz?.lo !== null && hz?.lo !== undefined && hz?.hi !== null && hz?.hi !== undefined ? (
-        <>
-          <div className="bg-paper-sunk relative mt-2 h-2 rounded-full">
+      {hasInterval ? (
+        <div data-testid="erc-interval">
+          <div className="bg-paper-sunk relative mt-3 h-2 rounded-full">
             <div
               className="bg-ember/60 absolute h-2 rounded-full"
-              style={{ left: `${hz.lo}%`, width: `${Math.max(2, hz.hi - hz.lo)}%` }}
+              style={{ left: `${hz!.lo}%`, width: `${Math.max(2, hz!.hi! - hz!.lo!)}%` }}
             />
           </div>
-          <p className="text-ink-soft mt-1 text-xs" data-testid="erc-interval">
-            Forecast interval {hz.lo.toFixed(0)} to {hz.hi.toFixed(0)}, on the 0 to 100 scale of how
-            dry this cell is for the time of year. Not an ignition forecast.
+          <p className="text-ink-soft mt-1.5 text-xs">
+            Forecast range {hz!.lo!.toFixed(0)} to {hz!.hi!.toFixed(0)} out of 100.
           </p>
-        </>
+        </div>
       ) : null}
 
-      {state === "historical_range" && hz?.range_lo !== null && hz?.range_lo !== undefined && hz?.range_hi !== null && hz?.range_hi !== undefined ? (
-        <>
-          <div className="bg-paper-sunk relative mt-2 h-2 rounded-full">
+      {hasRange ? (
+        <div data-testid="erc-historical-range">
+          <div className="bg-paper-sunk relative mt-3 h-2 rounded-full">
             <div
               className="bg-ink/20 absolute h-2 rounded-full"
-              style={{ left: `${hz.range_lo}%`, width: `${Math.max(2, hz.range_hi - hz.range_lo)}%` }}
+              style={{
+                left: `${hz!.range_lo}%`,
+                width: `${Math.max(2, hz!.range_hi! - hz!.range_lo!)}%` ,
+              }}
             />
           </div>
-          <p className="text-ink-soft mt-1 text-xs" data-testid="erc-historical-range">
-            {sentence(hz.range_label ?? "Historical range for this week of year")}:{" "}
-            {hz.range_lo.toFixed(0)} to {hz.range_hi.toFixed(0)}. A forecast interval is not shown
-            at this range because it is no narrower than this band. Not an ignition forecast.
+          <p className="text-ink-soft mt-1.5 text-xs">
+            Typical for this week: {hz!.range_lo!.toFixed(0)} to {hz!.range_hi!.toFixed(0)}. No
+            forecast band, because it would be no narrower than this.
           </p>
-        </>
+        </div>
       ) : null}
 
       {state === "uncalibrated" ? (
-        <p className="text-ink-soft mt-2 text-xs" data-testid="erc-uncalibrated">
-          Interval not shown: this range did not hold its coverage on the sealed year, so no band is
-          drawn. The point forecast still applies. Not an ignition forecast.
+        <p className="text-ink-soft mt-3 text-xs" data-testid="erc-uncalibrated">
+          No band shown: this range did not hold its coverage on the sealed year.
         </p>
       ) : null}
 
       {hz?.reason ? (
-        <p className="text-mute mt-1 text-[11px] leading-relaxed" data-testid="erc-reason">
-          {sentence(hz.reason)}
-        </p>
+        <div className="mt-2" data-testid="erc-reason">
+          <Disclosure
+            summary={<span className="text-mute text-[11px]">How this band was chosen</span>}
+            detail="Show"
+          >
+            {sentence(hz.reason)}
+          </Disclosure>
+        </div>
       ) : null}
     </>
   );
 }
 
-/** One probabilistic target: a per-cell probability, or the regional base rate. */
+/**
+ * One probabilistic target: a per-cell probability, or the regional base rate.
+ *
+ * The reason is real and worth keeping, but it ran to about 30 words and was
+ * printed on every row, so a card with nine targets repeated the same
+ * paragraph nine times and buried the numbers. The number leads; the reason is
+ * one click away. Base-rate rows keep a short inline marker, because "this is
+ * a county-wide number" changes how the value should be read and cannot wait
+ * for a click.
+ */
 function TargetRow({ name, t }: { name: string; t: Target }) {
   if (t.p === null || t.p === undefined) return null;
   const isBase = t.state === "base_rate";
   return (
-    <li className="border-rule border-t py-2" data-testid={isBase ? "target-base-rate" : "target-probability"}>
-      <div className="flex items-baseline justify-between gap-3">
-        <span className="text-sm">
-          {labelFor(name)}
-          <span className="text-mute text-xs"> · {horizonOf(name)} weeks</span>
-        </span>
-        <span className="num text-ink text-sm">{formatProbability(t.p)}</span>
-      </div>
-      <p className="text-mute mt-1 text-[11px] leading-relaxed">
+    <li
+      className="border-rule border-b py-2.5 last:border-b-0"
+      data-testid={isBase ? "target-base-rate" : "target-probability"}
+    >
+      <Disclosure
+        summary={
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="min-w-0">
+              <span className="block text-sm">{labelFor(name)}</span>
+              {isBase ? (
+                <span className="text-mute block text-[11px]">same for the whole county</span>
+              ) : null}
+            </span>
+            <span className="num text-ink text-sm">{formatProbability(t.p)}</span>
+          </div>
+        }
+      >
         {isBase
-          ? `This is the rate across the whole county, the same number for every cell here. ${sentence(t.reason ?? "")}`
+          ? `The same number for every cell in this county. ${sentence(t.reason ?? "")}`
           : sentence(t.reason ?? "")}
-      </p>
+      </Disclosure>
     </li>
   );
 }
@@ -171,8 +210,8 @@ export function PlaceCard({
         Close
       </button>
       <p className="text-ink-soft mt-1 text-xs">
-        {place.lat.toFixed(3)}, {place.lon.toFixed(3)} · {place.resolution_m} m cells · {place.issue}
-        {place.domain ? ` · ${place.domain}` : ""}
+        {place.domain ? `${place.domain} · ` : ""}
+        {place.issue}
       </p>
       <div className="mt-3 flex gap-2">
         {HCHIPS.map((h) => (
@@ -186,12 +225,12 @@ export function PlaceCard({
         ))}
       </div>
 
-      <h2 className="mt-4 text-2xl font-semibold">How dry, for the time of year</h2>
+      <h2 className="mt-4 text-xl font-semibold">Dryness for this week</h2>
       <ErcBlock hz={hz} />
 
       {place.usdm !== null && place.usdm !== undefined ? (
         <p className="text-ink-soft mt-3 text-xs">
-          Current drought category on this cell: D{Math.round(place.usdm)}.
+          Drought now: D{Math.round(place.usdm)}.
         </p>
       ) : null}
 

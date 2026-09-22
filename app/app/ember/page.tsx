@@ -100,23 +100,27 @@ export default function EmberPage() {
       .slice(0, 3);
   }, [data, state]);
 
+  // The full list excludes whatever is already surfaced above it. Printing the
+  // same three actions twice made the page look longer than it is and made the
+  // quick-wins block look like decoration rather than a shortcut.
   const groups = useMemo(() => {
     if (!data) return [];
+    const surfaced = new Set(quickWins.map((q) => q.id));
     const by = new Map<string, { label: string; items: EmberItem[] }>();
     for (const it of data.items) {
+      if (surfaced.has(it.id)) continue;
       const g = by.get(it.group) ?? { label: it.group_label, items: [] };
       g.items.push(it);
       by.set(it.group, g);
     }
     return [...by.values()];
-  }, [data]);
+  }, [data, quickWins]);
 
   return (
     <div className="mx-auto max-w-2xl px-6 pb-24 pt-12">
       <h1 className="display text-4xl">Ember Score</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
-        A bad outlook you can act on. Each item is weighted by how much it reduces ember ignition
-        risk, sourced from IBHS field research.
+        A bad outlook you can act on, weighted by how much each action cuts ember ignition risk.
       </p>
 
       {offline && (
@@ -148,7 +152,7 @@ export default function EmberPage() {
 
       {quickWins.length > 0 && (
         <>
-          <h2 className="mt-10 text-lg font-medium">Start here, these cost nothing</h2>
+          <h2 className="mt-10 text-lg font-medium">Start here. These are free.</h2>
           <div className="mt-3 space-y-2">
             {quickWins.map((i) => (
               <button
@@ -167,7 +171,7 @@ export default function EmberPage() {
         </>
       )}
 
-      <h2 className="mt-10 text-lg font-medium">Full checklist</h2>
+      <h2 className="mt-10 text-lg font-medium">Everything else</h2>
       <div className="mt-3 space-y-6">
         {data === null ? (
           <Skeleton rows={6} />
