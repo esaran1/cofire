@@ -2,6 +2,9 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  // The screenshot suite is run deliberately, not on every smoke run: it is
+  // slow and it writes into artifacts/.
+  testIgnore: process.env.SHOOT ? [] : ["**/screens.spec.ts"],
   timeout: 60_000,
   use: {
     baseURL: "http://127.0.0.1:3000",

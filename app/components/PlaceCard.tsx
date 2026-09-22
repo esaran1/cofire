@@ -31,6 +31,25 @@ function labelFor(name: string): string {
   return TARGET_LABELS[base] ?? base.replace(/_/g, " ");
 }
 
+/**
+ * A probability as a percentage, without asserting impossibility.
+ *
+ * Rounding 0.006% to "0%" says the event cannot happen, which is a stronger
+ * claim than the forecast makes and not one the record supports. A small
+ * non-zero probability reads as "<1%" instead; an exact zero, which the models
+ * do produce, still reads as "0%".
+ */
+function formatProbability(p: number): string {
+  if (p <= 0) return "0%";
+  if (p * 100 < 1) return "<1%";
+  return `${(p * 100).toFixed(0)}%`;
+}
+
+/** Reason strings are generated as sentence fragments; show them as sentences. */
+function sentence(text: string): string {
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
+}
+
 function horizonOf(name: string): string {
   const m = name.match(/_h(\d+)$/);
   return m ? m[1] : "";
@@ -73,7 +92,7 @@ function ErcBlock({ hz }: { hz: Horizon | undefined }) {
             />
           </div>
           <p className="text-ink-soft mt-1 text-xs" data-testid="erc-historical-range">
-            {hz.range_label ?? "Historical range for this week of year"}:{" "}
+            {sentence(hz.range_label ?? "Historical range for this week of year")}:{" "}
             {hz.range_lo.toFixed(0)} to {hz.range_hi.toFixed(0)}. A forecast interval is not shown
             at this range because it is no narrower than this band. Not an ignition forecast.
           </p>
@@ -89,7 +108,7 @@ function ErcBlock({ hz }: { hz: Horizon | undefined }) {
 
       {hz?.reason ? (
         <p className="text-mute mt-1 text-[11px] leading-relaxed" data-testid="erc-reason">
-          {hz.reason}
+          {sentence(hz.reason)}
         </p>
       ) : null}
     </>
@@ -107,12 +126,12 @@ function TargetRow({ name, t }: { name: string; t: Target }) {
           {labelFor(name)}
           <span className="text-mute text-xs"> · {horizonOf(name)} weeks</span>
         </span>
-        <span className="num text-ink text-sm">{(t.p * 100).toFixed(0)}%</span>
+        <span className="num text-ink text-sm">{formatProbability(t.p)}</span>
       </div>
       <p className="text-mute mt-1 text-[11px] leading-relaxed">
         {isBase
-          ? `This is the rate across the whole county, the same number for every cell here. ${t.reason ?? ""}`
-          : t.reason}
+          ? `This is the rate across the whole county, the same number for every cell here. ${sentence(t.reason ?? "")}`
+          : sentence(t.reason ?? "")}
       </p>
     </li>
   );
