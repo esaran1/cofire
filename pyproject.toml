@@ -115,6 +115,15 @@ follow_imports = "skip"
 ignore_errors = true
 disallow_untyped_calls = false
 
+[[tool.mypy.overrides]]
+# The wrapper around the vendored code carries a `type: ignore` for the untyped
+# upstream call. Whether that ignore is "used" depends on whether mypy is
+# following `reference_pid` on this invocation, which differs between checking
+# `cofire/model` alone and checking it through an importer. The file is inside
+# the frozen tree and cannot be edited, so the interaction is settled here.
+module = ["cofire.model.uncertainty.shipping_pid"]
+warn_unused_ignores = false
+
 
 [tool.ruff.lint.per-file-ignores]
 # Vendored third-party code, kept byte-identical to upstream.

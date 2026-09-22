@@ -28,6 +28,15 @@ hindcast:
 export:
 	$(PY) -m cofire.model.export
 
+# The shipped path: frozen configuration -> export -> rendering -> index.
+# cofire/model/ is frozen at FREEZE_COMMIT; everything here reads it.
+ship:
+	$(PY) -m cofire.ship.rendering
+	$(PY) -m cofire.ship.export
+	$(PY) -m cofire.ship.index_build
+	$(PY) -m cofire.ship.facts
+	$(PY) -m cofire.ship.demo
+
 pipeline:
 	$(PY) -m cofire.model.pipeline
 
@@ -38,11 +47,11 @@ lodo:
 # Freeze the committed demo fixture set (under 200 MB) so `make demo` runs the
 # full app offline from a clean clone, with real numbers and no pipeline run.
 demo-data:
-	$(PY) -m cofire.model.demo_data
+	$(PY) -m cofire.ship.demo
 
 # Regenerate the landing page's figures from artifacts. Never hand-edit facts.json.
 facts:
-	$(PY) -m cofire.model.site_facts
+	$(PY) -m cofire.ship.facts
 
 # Build the keyless self-hosted basemap extract (deployed builds).
 tiles:
@@ -106,5 +115,5 @@ test:
 
 lint:
 	$(UV) run ruff check cofire tests scripts
-	$(UV) run mypy --strict cofire/model
+	$(UV) run mypy --strict cofire/model cofire/ship
 	$(PY) scripts/check_copy.py

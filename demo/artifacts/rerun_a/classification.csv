@@ -1,0 +1,7 @@
+domain,horizon,arm,mae_model,mae_clim,mae_gain,mae_lo,mae_hi,pid_width,clim_width,ratio,ratio_lo,ratio_hi,classification,show_point
+larimer,2,damped_regression,22.722,25.971,3.249,2.2842,4.1186,84.5,87.09,0.9702,0.9578,0.9819,informative,True
+larimer,4,damped_regression,23.873,25.981,2.108,1.4348,2.6957,86.5,87.06,0.9936,0.9776,1.0099,climatological,True
+larimer,8,damped_regression,24.697,25.831,1.134,0.7722,1.5133,87.56,87.07,1.0055,0.9868,1.0212,climatological,True
+pueblo,2,damped_regression,20.75,27.107,6.357,4.991,7.8144,80.18,86.96,0.9221,0.902,0.9415,informative,True
+pueblo,4,damped_regression,21.473,27.284,5.812,4.5291,6.9145,81.87,86.82,0.943,0.9267,0.9594,informative,True
+pueblo,8,damped_regression,23.349,26.729,3.381,2.4045,4.3001,84.78,86.75,0.9774,0.9601,0.9928,informative,True
