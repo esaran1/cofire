@@ -1,6 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+
+/*
+ * Bars grow by transform, not by width.
+ *
+ * Animating `width` from 0 means the bar has no length until the animation
+ * runs, so any renderer that does not scroll shows an empty chart. Scaling a
+ * bar that already has its real width degrades to a correct, static chart.
+ */
 
 /**
  * PID against ACI on the sealed 2026 holdout, drawn from the look-3 artifacts.
@@ -23,7 +30,6 @@ export function PidVsAciFigure({
   target?: number;
   floor?: number;
 }) {
-  const reduce = useReducedMotion();
   const pairs = [...new Set(rows.map((r) => `${r.domain}|${r.horizon}`))].map((key) => {
     const [domain, horizon] = key.split("|");
     const pid = rows.find(
@@ -39,15 +45,11 @@ export function PidVsAciFigure({
     if (v === null) return null;
     const width = `${Math.max(0, Math.min(1, v)) * 100}%`;
     return (
-      <motion.div
-        initial={reduce ? false : { width: 0 }}
-        whileInView={{ width }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      <div
         className={
           tone === "pid"
-            ? "h-full rounded-r-sm bg-ink"
-            : "h-full rounded-r-sm bg-ember/40"
+            ? "bar-grow h-full origin-left rounded-r-sm bg-ink"
+            : "bar-grow h-full origin-left rounded-r-sm bg-ember/40"
         }
         style={{ width }}
       />
@@ -115,7 +117,6 @@ export function ReliabilityFigure({
   byHorizon: Record<string, { mean: number; max: number; n: number }>;
   threshold?: number;
 }) {
-  const reduce = useReducedMotion();
   const entries = Object.entries(byHorizon).sort((a, b) => Number(a[0]) - Number(b[0]));
   const scale = Math.max(threshold * 2, ...entries.map(([, v]) => v.max));
 
@@ -135,12 +136,12 @@ export function ReliabilityFigure({
               </span>
               <div className="flex items-center gap-2">
                 <div className="h-3 flex-1 bg-rule/40">
-                  <motion.div
-                    initial={reduce ? false : { width: 0 }}
-                    whileInView={{ width: `${(v.mean / scale) * 100}%` }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                    className={v.mean > threshold ? "h-full bg-ember" : "h-full bg-ink"}
+                  <div
+                    className={
+                      v.mean > threshold
+                        ? "bar-grow h-full origin-left bg-ember"
+                        : "bar-grow h-full origin-left bg-ink"
+                    }
                     style={{ width: `${(v.mean / scale) * 100}%` }}
                   />
                 </div>

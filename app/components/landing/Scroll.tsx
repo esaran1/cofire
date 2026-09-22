@@ -1,5 +1,15 @@
 "use client";
 
+/*
+ * Reveals here animate POSITION only, never opacity.
+ *
+ * Animating from `opacity: 0` with `whileInView` means anything that does not
+ * scroll the way a human does leaves the content permanently invisible: a
+ * full-page screenshot, print, reader mode. On this page that silently blanked
+ * two whole sections and a row of headline statistics while the DOM looked
+ * correct. A reveal that can hide content will hide content.
+ */
+
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { ReactNode, useRef } from "react";
 
@@ -71,9 +81,9 @@ export function LineReveal({
         <motion.span
           key={i}
           className="block"
-          initial={reduce ? false : { opacity: 0, y: "0.35em" }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
+          initial={reduce ? false : { y: "0.35em" }}
+          whileInView={{ y: 0 }}
+          viewport={{ once: true, amount: 0 }}
           transition={{ duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
         >
           {line}
@@ -127,9 +137,9 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
+      initial={reduce ? false : { y: 18 }}
+      whileInView={{ y: 0 }}
+      viewport={{ once: true, amount: 0 }}
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}

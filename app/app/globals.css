@@ -110,3 +110,18 @@
     transform: translateY(0);
   }
 }
+
+/*
+ * Chart bars are NOT animated, deliberately.
+ *
+ * Three attempts to animate them in all failed the same way: Motion animating
+ * `width` from 0, Motion animating `scaleX` from 0, and a CSS scroll-driven
+ * `scaleX`. Every one left bars below the fold at zero length, because a
+ * scroll-driven animation holds its start value until the element is scrolled
+ * into range, and here the start value hides the data.
+ *
+ * The rule this cost three tries to learn: never animate FROM a value that
+ * hides content. The bar's width is the measurement, so the measurement is
+ * never animated. The section it sits in still reveals via `.reveal`, which
+ * animates position only and so cannot hide anything.
+ */

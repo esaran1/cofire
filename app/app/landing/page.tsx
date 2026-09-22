@@ -111,106 +111,59 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* 5. The calibration story: ACI collapsed on the sealed year, PID held. */}
+      {/* 5. The calibration story. The charts are the evidence; the copy names
+          what they show and gets out of the way. */}
       <Section n="03" title="The honest part" tinted>
         <LineReveal
           className="display max-w-[24ch] text-4xl md:text-6xl"
           lines={[<>Most forecasts show a number.</>, <>This one says when the number</>, <><em>cannot be trusted</em>.</>]}
         />
 
-        <div className="mt-12 space-y-14">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-16">
+        <div className="mt-14 space-y-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start lg:gap-16">
             <div>
-              <h3 className="font-medium">One controller held its coverage. The other did not.</h3>
-              <p className="mt-3 leading-relaxed text-ink-soft">
-                An interval is only worth drawing if it contains the truth as often as it claims. On
-                the sealed 2026 year the adaptive method fell to{" "}
-                <span className="num text-ink">{look.aci.roll13_min.toFixed(3)}</span> coverage over
-                its worst thirteen weeks and was wrong{" "}
-                <span className="num text-ink">{look.aci.miss_run_max}</span> cell-weeks in a row.
-                The reference conformal PID controller, on the same rows, never fell below{" "}
-                <span className="num text-ink">{look.pid.roll13_min.toFixed(3)}</span> and was never
-                wrong more than <span className="num text-ink">{look.pid.miss_run_max}</span> in a
-                row.
-              </p>
-              <p className="mt-4 leading-relaxed text-ink-soft">
-                Every interval test written down before the look passed, on both counties and all
-                three ranges.
+              <h3 className="font-medium">Coverage held on the sealed year</h3>
+              <p className="text-ink-soft mt-3 leading-relaxed">
+                One controller stayed at{" "}
+                <span className="num text-ink">{look.pid.roll13_min.toFixed(3)}</span>. The other
+                fell to <span className="num text-ink">{look.aci.roll13_min.toFixed(3)}</span>.
               </p>
             </div>
             <PidVsAciFigure rows={look.coverage_series} />
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start lg:gap-16">
             <div>
-              <h3 className="font-medium">One test failed, which is why they are written down first</h3>
-              <p className="mt-3 leading-relaxed text-ink-soft">
-                A probability should be right as often as it says it is. That held at two weeks and
-                broke further out: mean reliability rises from{" "}
-                <span className="num text-ink">{look.reliability_by_horizon["2"].mean.toFixed(4)}</span>{" "}
-                at two weeks to{" "}
-                <span className="num text-ink">{look.reliability_by_horizon["8"].mean.toFixed(4)}</span>{" "}
-                at eight, against a threshold of 0.05 fixed before the look.{" "}
-                <span className="num text-ink">{look.by_test["5"].n_total - look.by_test["5"].n_pass}</span>{" "}
-                of <span className="num text-ink">{look.by_test["5"].n_total}</span> failed it.
-              </p>
-              <p className="mt-4 leading-relaxed text-ink-soft">
-                Those targets now show a regional base rate and state the reason, instead of a
-                per-cell number the year did not support. That consequence was decided in advance
-                too, so the result could not be argued into a better presentation afterwards.
+              <h3 className="font-medium">One test failed</h3>
+              <p className="text-ink-soft mt-3 leading-relaxed">
+                Reliability broke past two weeks.{" "}
+                <span className="num text-ink">
+                  {look.by_test["5"].n_total - look.by_test["5"].n_pass}
+                </span>{" "}
+                of <span className="num text-ink">{look.by_test["5"].n_total}</span> targets now
+                show a county rate instead.
               </p>
             </div>
             <ReliabilityFigure byHorizon={look.reliability_by_horizon} />
           </div>
         </div>
-
-        <div className="mt-14 border-t border-rule pt-10">
-          <LineReveal
-            className="display max-w-[30ch] text-2xl md:text-3xl"
-            lines={[
-              <>Nineteen years of record made the intervals worth showing.</>,
-              <>On three years they were no better than a climatology.</>,
-              <>The sealed year was opened once, under a frozen configuration.</>,
-            ]}
-          />
-          <p className="mt-6 max-w-prose leading-relaxed text-ink-soft">
-            Extending the record turned{" "}
-            <span className="num text-ink">{informative.length}</span> of six forecast horizons from
-            no better than the historical range into genuinely narrower than it. The other{" "}
-            <span className="num text-ink">{6 - informative.length}</span> show the historical range
-            instead, and say so on the card.
-          </p>
-        </div>
       </Section>
 
-      {/* 6. Discipline, as figures. Plain layout, no cards. */}
+      {/* 6. Discipline, as figures. */}
       <Section n="04" title="How it was tested">
         <dl className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat
-            v={String(facts.hindcast_looks)}
-            k="looks at the sealed 2026 holdout, the third under a pre-registered, hash-frozen configuration"
-          />
-          <Stat
-            v={`${look.criteria_passed}/${look.criteria_total}`}
-            k="pre-registered criteria passed, including every interval test on both counties"
-          />
+          <Stat v={String(facts.hindcast_looks)} k="looks at the sealed year" />
+          <Stat v={`${look.criteria_passed}/${look.criteria_total}`} k="pre-registered criteria passed" />
           <Stat
             v={String(survivors.length)}
-            k={`of ${facts.multiplicity.n_comparisons} comparisons beat their baseline, after multiplicity control and a shuffled-target check`}
+            k={`of ${facts.multiplicity.n_comparisons} forecasts beat their baseline`}
           />
-          <Stat
-            v={String(facts.subx.n_switched)}
-            k="targets adopted a forecast-weather model, from one run judged by a rule fixed beforehand"
-            tone="ember"
-          />
+          <Stat v={String(facts.subx.n_switched)} k="weather models adopted" tone="ember" />
         </dl>
 
-        <p className="mt-12 max-w-prose leading-relaxed text-ink-soft">
-          COFIRE claims skill only where it survived the test: {survivors.length} target and county
-          pairs, mostly drought transitions at two and four weeks. A raw skill score was not enough
-          to earn that, because a forecast can beat a baseline through spread alone. Each claim had
-          to beat its own targets shuffled in place, which removed five that would otherwise have
-          been reported as skill.
+        <p className="text-ink-soft mt-12 max-w-[46ch] leading-relaxed">
+          Skill is claimed for {survivors.length} of {facts.multiplicity.n_comparisons}, and
+          nowhere else.
         </p>
       </Section>
 
