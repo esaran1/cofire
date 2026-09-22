@@ -95,7 +95,7 @@ function BeatInner() {
   const streak = mine?.length ?? 0;
 
   return (
-    <div className="mx-auto max-w-2xl px-6 pb-24 pt-12">
+    <div className="reading px-6 pb-24 pt-12">
       <h1 className="display text-4xl">Beat the Model</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
         Lock your call for 4 weeks out before you see the model&apos;s. Both are scored against

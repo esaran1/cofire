@@ -174,7 +174,7 @@ export function OfflineNote() {
 export function PageHeader({ title, lede }: { title: ReactNode; lede: string }) {
   return (
     <header className="border-b border-rule bg-paper-raised">
-      <div className="mx-auto max-w-[1400px] px-6 py-12 md:py-16">
+      <div className="measure px-6 py-12 md:py-16">
         <h1 className="display max-w-[18ch] text-4xl md:text-5xl">{title}</h1>
         <p className="mt-4 max-w-prose leading-relaxed text-ink-soft">{lede}</p>
       </div>
@@ -184,7 +184,7 @@ export function PageHeader({ title, lede }: { title: ReactNode; lede: string }) 
 
 /** Standard content well, so every route shares one measure. */
 export function Well({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto max-w-[1400px] px-6 py-12 ${className}`}>{children}</div>;
+  return <div className={`measure px-6 py-12 ${className}`}>{children}</div>;
 }
 
 /**

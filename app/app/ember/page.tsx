@@ -117,7 +117,7 @@ export default function EmberPage() {
   }, [data, quickWins]);
 
   return (
-    <div className="mx-auto max-w-2xl px-6 pb-24 pt-12">
+    <div className="reading px-6 pb-24 pt-12">
       <h1 className="display text-4xl">Ember Score</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
         A bad outlook you can act on, weighted by how much each action cuts ember ignition risk.

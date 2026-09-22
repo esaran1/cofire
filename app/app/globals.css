@@ -34,6 +34,56 @@
     padding-bottom: 0.06em;
   }
 
+  /*
+   * The page measure.
+   *
+   * A fixed 1400px cap left a 2560px display showing a narrow column adrift in
+   * empty margins, which reads as the whole site being zoomed out. The measure
+   * now grows with the viewport and stops at a width where a line of text is
+   * still comfortable to read.
+   *
+   * Type scales with it, so headings and body keep their relationship to the
+   * column instead of shrinking against it on a large screen.
+   */
+  :root {
+    --measure: min(92vw, 1400px);
+  }
+
+  @media (min-width: 1600px) {
+    :root {
+      --measure: min(88vw, 1680px);
+    }
+    html {
+      font-size: 17px;
+    }
+  }
+
+  @media (min-width: 2100px) {
+    :root {
+      --measure: min(86vw, 1960px);
+    }
+    html {
+      font-size: 18px;
+    }
+  }
+
+  /*
+   * A reading column. Prose should not stretch the full measure, but a fixed
+   * rem cap does not grow at all on a large display, which is part of what made
+   * the app read as zoomed out. This grows a little and then stops.
+   */
+  .reading {
+    width: 100%;
+    max-width: min(94vw, 52rem);
+    margin-inline: auto;
+  }
+
+  .measure {
+    width: 100%;
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
   :focus-visible {
     outline: 2px solid #b33a1a;
     outline-offset: 2px;

@@ -28,7 +28,7 @@ export default function LandingPage() {
           initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="display text-6xl md:text-8xl"
+          className="display text-[clamp(3.5rem,11vw,11rem)] leading-[0.95]"
         >
           CO<em>FIRE</em>
         </motion.h1>
@@ -36,7 +36,7 @@ export default function LandingPage() {
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.25 }}
-          className="mt-6 text-[11px] uppercase tracking-[0.2em] text-mute sm:rule-flank sm:tracking-[0.24em]"
+          className="mt-6 text-[clamp(0.7rem,0.85vw,0.95rem)] uppercase tracking-[0.2em] text-mute sm:rule-flank sm:tracking-[0.24em]"
         >
           <span className="sm:hidden">Drought and fire-spread conditions</span>
           <span className="hidden sm:inline">Colorado drought and fire-spread conditions</span>
@@ -120,7 +120,7 @@ export default function LandingPage() {
         />
 
         <div className="mt-14 space-y-16">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start lg:gap-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-20">
             <div>
               <h3 className="font-medium">Coverage held on the sealed year</h3>
               <p className="text-ink-soft mt-3 leading-relaxed">
@@ -132,7 +132,7 @@ export default function LandingPage() {
             <PidVsAciFigure rows={look.coverage_series} />
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start lg:gap-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-20">
             <div>
               <h3 className="font-medium">One test failed</h3>
               <p className="text-ink-soft mt-3 leading-relaxed">
@@ -169,7 +169,7 @@ export default function LandingPage() {
 
       {/* 7. Close. */}
       <section className="border-t border-rule bg-ink px-6 py-20 text-paper">
-        <div className="mx-auto max-w-[1400px]">
+        <div className="measure">
           <LineReveal
             className="display max-w-[20ch] text-4xl text-paper md:text-6xl"
             lines={[<>Open it on Pueblo County.</>]}
@@ -206,7 +206,7 @@ function Section({
 }) {
   return (
     <section className={`border-t border-rule px-6 py-20 md:py-28 ${tinted ? "bg-paper-raised" : ""}`}>
-      <div className="mx-auto max-w-[1400px]">
+      <div className="measure">
         <Reveal>
           <p className="num mb-10 text-xs text-mute">
             {n} <span className="mx-2 text-rule">/</span> {title}

@@ -37,7 +37,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function HindcastPage() {
   const reduce = useReducedMotion();
   return (
-    <div className="mx-auto max-w-3xl px-6 pb-20 pt-10">
+    <div className="reading px-6 pb-20 pt-10">
       <motion.header
         initial={reduce ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}

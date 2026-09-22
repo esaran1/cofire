@@ -118,7 +118,7 @@ export function ParallaxFigure({
           className="absolute inset-0 h-[126%] w-full object-cover"
         />
       </div>
-      <figcaption className="mx-auto max-w-[1400px] px-6 py-3 text-xs text-mute">{caption}</figcaption>
+      <figcaption className="measure px-6 py-3 text-xs text-mute">{caption}</figcaption>
     </figure>
   );
 }

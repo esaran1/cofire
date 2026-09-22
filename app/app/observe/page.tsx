@@ -93,7 +93,7 @@ function ObserveInner() {
   const rank = count >= 12 ? "Sentinel" : count >= 4 ? "Ranger" : count >= 1 ? "Scout" : "n/a";
 
   return (
-    <div className="mx-auto max-w-2xl px-6 pb-24 pt-12">
+    <div className="reading px-6 pb-24 pt-12">
       <h1 className="display text-4xl">Observer Streaks</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
         What the satellite cannot see from orbit. Ground reports adjust the local forecast by a
