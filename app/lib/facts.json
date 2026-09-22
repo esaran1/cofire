@@ -1,150 +1,1887 @@
 {
   "generated_from": "artifacts/",
-  "note": "Every figure on the landing page is written here from artifacts. Do not hard-code numbers in components.",
-  "shipping_arm": "ensemble",
-  "git_sha": "a3f212d083122dcf5b6d62efe2a574d7beb4c67b",
-  "manifest_hash": "ec21777b791c57a0295143b43cf551652c08149efe52a05354b00bddd414d18c",
+  "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
+  "git_sha": "07c4cad303f194f44ed36b744db80d70843559e8",
   "resolution_m": 4000,
-  "n_train": 112752,
-  "effective_n": {
-    "usdm": null,
-    "erc": null
+  "domains": [
+    "larimer",
+    "pueblo"
+  ],
+  "split": {
+    "train": "2007-01-01 to 2021-12-31",
+    "validate": "2022 to 2023",
+    "calibrate": "2024 to 2025",
+    "holdout": "2026"
   },
-  "hindcast_looks": 2,
-  "config_hash": "0957e415fa7f3fad",
-  "calibration": {
-    "larimer": {
-      "variants": [
-        {
-          "label": "base",
-          "mean": 0.409,
-          "worst": 0.348
-        },
-        {
-          "label": "c(k=2)",
-          "mean": 0.409,
-          "worst": 0.38
-        },
-        {
-          "label": "c(k=3)",
-          "mean": 0.409,
-          "worst": 0.369
-        },
-        {
-          "label": "d",
-          "mean": 0.404,
-          "worst": 0.365
-        },
-        {
-          "label": "a",
-          "mean": 0.403,
-          "worst": 0.361
-        },
-        {
-          "label": "b",
-          "mean": 0.403,
-          "worst": 0.363
-        }
-      ],
-      "best": {
-        "label": "base",
-        "mean": 0.409,
-        "worst": 0.348
-      },
-      "baseline": {
-        "label": "base",
-        "mean": 0.409,
-        "worst": 0.348
-      },
-      "improvement": 0.0,
-      "gap_to_target": 0.491,
-      "n_variants": 6
+  "configuration": {
+    "drought": "Markov transition baseline, 18 of 18 targets",
+    "fire": "damped-persistence logistic, 9 of 9 targets",
+    "continuous": "damped regression at h2, h4, h8",
+    "intervals": "reference conformal PID",
+    "forecast_weather": "none; SubX was evaluated once and did not qualify"
+  },
+  "hindcast_looks": 3,
+  "preregistration_sha256": "c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a",
+  "freeze_commit": "46c17ae4aac2bef2d1397e422755104284f71667",
+  "config_hash": "ed0c2079a5bc0eee1d0aa11869d3bc5eb0af671b9f30ee0c5114c3b9ca7be157",
+  "multiplicity": {
+    "n_comparisons": 51,
+    "n_estimable": 39,
+    "n_survivors": 12,
+    "q": 0.1,
+    "min_positive_weeks": 12,
+    "rule": "paired difference between the statistic on real targets and on targets shuffled within the same circular blocks, CI above zero"
+  },
+  "survivors": [
+    {
+      "domain": "larimer",
+      "target": "d_ge2_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.7917,
+      "paired_lo": 0.19126,
+      "paired_hi": 1.14111,
+      "n_positive_weeks": 22
     },
-    "pueblo": {
-      "variants": [
-        {
-          "label": "base",
-          "mean": 0.331,
-          "worst": 0.249
-        },
-        {
-          "label": "d",
-          "mean": 0.31,
-          "worst": 0.189
-        },
-        {
-          "label": "a",
-          "mean": 0.303,
-          "worst": 0.228
-        },
-        {
-          "label": "c(k=3)",
-          "mean": 0.303,
-          "worst": 0.218
-        },
-        {
-          "label": "c(k=2)",
-          "mean": 0.301,
-          "worst": 0.215
-        },
-        {
-          "label": "b",
-          "mean": 0.287,
-          "worst": 0.211
-        }
-      ],
-      "best": {
-        "label": "base",
-        "mean": 0.331,
-        "worst": 0.249
-      },
-      "baseline": {
-        "label": "base",
-        "mean": 0.331,
-        "worst": 0.249
-      },
-      "improvement": 0.0,
-      "gap_to_target": 0.569,
-      "n_variants": 6
-    }
-  },
-  "lodo": {
-    "larimer": {
-      "n_folds": 4,
-      "level_mean_skill": -0.0264,
-      "delta_mean_skill": -0.0201
+    {
+      "domain": "larimer",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.43014,
+      "paired_lo": 0.02642,
+      "paired_hi": 0.8058,
+      "n_positive_weeks": 22
     },
-    "pueblo": {
-      "n_folds": 4,
-      "level_mean_skill": -0.0619,
-      "delta_mean_skill": -0.0382
+    {
+      "domain": "larimer",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.21116,
+      "paired_lo": 0.1089,
+      "paired_hi": 0.33808,
+      "n_positive_weeks": 32
+    },
+    {
+      "domain": "larimer",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.33888,
+      "paired_lo": 0.1952,
+      "paired_hi": 0.52801,
+      "n_positive_weeks": 38
+    },
+    {
+      "domain": "larimer",
+      "target": "d_improve1_h8",
+      "horizon": 8,
+      "arm": "markov",
+      "paired_diff": 0.40189,
+      "paired_lo": 0.27331,
+      "paired_hi": 0.60681,
+      "n_positive_weeks": 43
+    },
+    {
+      "domain": "larimer",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.158,
+      "paired_lo": 0.05691,
+      "paired_hi": 0.26649,
+      "n_positive_weeks": 104
+    },
+    {
+      "domain": "larimer",
+      "target": "d_nochange_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.23913,
+      "paired_lo": 0.07661,
+      "paired_hi": 0.39682,
+      "n_positive_weeks": 104
+    },
+    {
+      "domain": "larimer",
+      "target": "d_nochange_h8",
+      "horizon": 8,
+      "arm": "markov",
+      "paired_diff": 0.32384,
+      "paired_lo": 0.17417,
+      "paired_hi": 0.48135,
+      "n_positive_weeks": 104
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge2_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.30472,
+      "paired_lo": 0.0774,
+      "paired_hi": 0.51482,
+      "n_positive_weeks": 39
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.21925,
+      "paired_lo": 0.01109,
+      "paired_hi": 0.36934,
+      "n_positive_weeks": 37
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "arm": "damped",
+      "paired_diff": 0.04105,
+      "paired_lo": 0.01374,
+      "paired_hi": 0.062,
+      "n_positive_weeks": 34
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt90_h8",
+      "horizon": 8,
+      "arm": "damped",
+      "paired_diff": 0.02451,
+      "paired_lo": 0.00375,
+      "paired_hi": 0.04237,
+      "n_positive_weeks": 19
     }
+  ],
+  "subx": {
+    "n_comparisons": 51,
+    "n_estimable": 39,
+    "n_ci_above_zero": 1,
+    "n_switched": 0,
+    "verdict": "no target switches to configuration B; everything ships on A",
+    "coverage_note": "Cached SubX is the CFSv2 forecast series only, 2018-01 to 2025-12, 96 months each of pr and tas. The hindcast series (1999 to 2017-09-30) was not ingested, so configuration B can see no row before 2018. The restored split trains on 2007 to 2021 and validates on 2022 to 2023, so the whole validation period lies inside SubX coverage and both arms score the same rows, while B's own fit draws only on the 2018 to 2021 part of the training split. Ensemble size and configuration differ between the hindcast and forecast series, which is why subx_is_forecast travels with the data.\n\nSuperseded note, kept because earlier artifacts quote it:\nSubX CFSv2 has no hindcast coverage inside the training split: the hindcast series ends 2017-09-30 and the training split begins 2018, so configuration B draws only on the forecast series. With a 2018 to 2020 training split and one year held out, B is trained on at most 2 years per fold, and on at most 7 years were the split extended to 2025. Ensemble size and configuration differ between the hindcast and forecast series, which is why subx_is_forecast travels with the data."
   },
-  "pool": {
-    "years": [
-      2018,
-      2019,
-      2020,
-      2021,
-      2022,
-      2023,
-      2024,
-      2025
+  "look3": {
+    "look_index": 3,
+    "config_hash": "ed0c2079a5bc0eee1d0aa11869d3bc5eb0af671b9f30ee0c5114c3b9ca7be157",
+    "preregistration_sha256": "c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a",
+    "freeze_commit": "46c17ae4aac2bef2d1397e422755104284f71667",
+    "criteria_passed": 69,
+    "criteria_total": 84,
+    "by_test": {
+      "1": {
+        "name": "1 long-run coverage (sanity)",
+        "threshold": "reported only",
+        "n_pass": 6,
+        "n_total": 6
+      },
+      "2": {
+        "name": "2 min rolling 13-week coverage",
+        "threshold": ">= 0.7",
+        "n_pass": 6,
+        "n_total": 6
+      },
+      "3": {
+        "name": "3 coverage | D0-D1",
+        "threshold": "within 0.05 of 0.9",
+        "n_pass": 12,
+        "n_total": 12
+      },
+      "4": {
+        "name": "4 longest miss run",
+        "threshold": "<= 60",
+        "n_pass": 6,
+        "n_total": 6
+      },
+      "5": {
+        "name": "5 reliability term",
+        "threshold": "<= 0.05",
+        "n_pass": 39,
+        "n_total": 54
+      }
+    },
+    "interval_tests_all_pass": true,
+    "pid": {
+      "coverage_min": 0.8975,
+      "coverage_max": 0.8996,
+      "roll13_min": 0.8944,
+      "miss_run_max": 12
+    },
+    "aci": {
+      "coverage_min": 0.749,
+      "roll13_min": 0.614,
+      "miss_run_max": 264
+    },
+    "coverage_series": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "impl": "reference_pid",
+        "n": 17280,
+        "coverage": 0.8988,
+        "width": 59.9,
+        "miss_run": 8,
+        "roll13_min": 0.8974,
+        "cov_d01": 0.8859,
+        "cov_d2p": 0.9021,
+        "n_d01": 3452,
+        "n_d2p": 13828
+      },
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "impl": "aci",
+        "n": 17280,
+        "coverage": 0.9558,
+        "width": 75.63,
+        "miss_run": 27,
+        "roll13_min": 0.9412,
+        "cov_d01": 0.9421,
+        "cov_d2p": 0.9592,
+        "n_d01": 3452,
+        "n_d2p": 13828
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "impl": "reference_pid",
+        "n": 16320,
+        "coverage": 0.8991,
+        "width": 65.46,
+        "miss_run": 12,
+        "roll13_min": 0.8978,
+        "cov_d01": 0.8927,
+        "cov_d2p": 0.9009,
+        "n_d01": 3430,
+        "n_d2p": 12890
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "impl": "aci",
+        "n": 16320,
+        "coverage": 0.9094,
+        "width": 69.8,
+        "miss_run": 16,
+        "roll13_min": 0.8987,
+        "cov_d01": 0.8778,
+        "cov_d2p": 0.9178,
+        "n_d01": 3430,
+        "n_d2p": 12890
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "impl": "reference_pid",
+        "n": 14400,
+        "coverage": 0.8996,
+        "width": 66.45,
+        "miss_run": 6,
+        "roll13_min": 0.8986,
+        "cov_d01": 0.8836,
+        "cov_d2p": 0.9045,
+        "n_d01": 3386,
+        "n_d2p": 11014
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "impl": "aci",
+        "n": 14400,
+        "coverage": 0.9124,
+        "width": 71.47,
+        "miss_run": 28,
+        "roll13_min": 0.9027,
+        "cov_d01": 0.8751,
+        "cov_d2p": 0.9238,
+        "n_d01": 3386,
+        "n_d2p": 11014
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "impl": "reference_pid",
+        "n": 15552,
+        "coverage": 0.8984,
+        "width": 49.75,
+        "miss_run": 12,
+        "roll13_min": 0.8957,
+        "cov_d01": 0.9033,
+        "cov_d2p": 0.89,
+        "n_d01": 9833,
+        "n_d2p": 5719
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "impl": "aci",
+        "n": 15552,
+        "coverage": 0.9015,
+        "width": 61.99,
+        "miss_run": 195,
+        "roll13_min": 0.8574,
+        "cov_d01": 0.8938,
+        "cov_d2p": 0.9147,
+        "n_d01": 9833,
+        "n_d2p": 5719
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "impl": "reference_pid",
+        "n": 14688,
+        "coverage": 0.8975,
+        "width": 53.97,
+        "miss_run": 12,
+        "roll13_min": 0.8944,
+        "cov_d01": 0.8935,
+        "cov_d2p": 0.9048,
+        "n_d01": 9509,
+        "n_d2p": 5179
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "impl": "aci",
+        "n": 14688,
+        "coverage": 0.8963,
+        "width": 64.02,
+        "miss_run": 156,
+        "roll13_min": 0.8381,
+        "cov_d01": 0.883,
+        "cov_d2p": 0.9208,
+        "n_d01": 9509,
+        "n_d2p": 5179
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "impl": "reference_pid",
+        "n": 12960,
+        "coverage": 0.8996,
+        "width": 55.53,
+        "miss_run": 12,
+        "roll13_min": 0.8971,
+        "cov_d01": 0.9053,
+        "cov_d2p": 0.8877,
+        "n_d01": 8757,
+        "n_d2p": 4203
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "impl": "aci",
+        "n": 12960,
+        "coverage": 0.749,
+        "width": 54.63,
+        "miss_run": 264,
+        "roll13_min": 0.614,
+        "cov_d01": 0.704,
+        "cov_d2p": 0.8427,
+        "n_d01": 8757,
+        "n_d2p": 4203
+      }
     ],
-    "usdm_min": 0.017,
-    "usdm_max": 2.058,
-    "measured_coverage": 0.331
+    "reliability": [
+      {
+        "domain": "larimer",
+        "target": "d_ge2_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 17280,
+        "n_positive_weeks": 35,
+        "base_rate": 0.80457,
+        "brier": 0.13647,
+        "reliability": 0.029465,
+        "resolution": 0.052326
+      },
+      {
+        "domain": "larimer",
+        "target": "d_ge2_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 16320,
+        "n_positive_weeks": 33,
+        "base_rate": 0.82776,
+        "brier": 0.24755,
+        "reliability": 0.112661,
+        "resolution": 0.006902
+      },
+      {
+        "domain": "larimer",
+        "target": "d_ge2_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 14400,
+        "n_positive_weeks": 29,
+        "base_rate": 0.84083,
+        "brier": 0.35414,
+        "reliability": 0.240743,
+        "resolution": 0.019773
+      },
+      {
+        "domain": "larimer",
+        "target": "d_ge3_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 17280,
+        "n_positive_weeks": 35,
+        "base_rate": 0.35463,
+        "brier": 0.11943,
+        "reliability": 0.004301,
+        "resolution": 0.112866
+      },
+      {
+        "domain": "larimer",
+        "target": "d_ge3_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 16320,
+        "n_positive_weeks": 33,
+        "base_rate": 0.36605,
+        "brier": 0.2082,
+        "reliability": 0.049479,
+        "resolution": 0.071854
+      },
+      {
+        "domain": "larimer",
+        "target": "d_ge3_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 14400,
+        "n_positive_weeks": 29,
+        "base_rate": 0.39347,
+        "brier": 0.37148,
+        "reliability": 0.152021,
+        "resolution": 0.020893
+      },
+      {
+        "domain": "larimer",
+        "target": "d_improve1_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 17280,
+        "n_positive_weeks": 8,
+        "base_rate": 0.12182,
+        "brier": 0.1047,
+        "reliability": 0.005049,
+        "resolution": 0.008311
+      },
+      {
+        "domain": "larimer",
+        "target": "d_improve1_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 16320,
+        "n_positive_weeks": 8,
+        "base_rate": 0.17763,
+        "brier": 0.1722,
+        "reliability": 0.040123,
+        "resolution": 0.011098
+      },
+      {
+        "domain": "larimer",
+        "target": "d_improve1_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 14400,
+        "n_positive_weeks": 11,
+        "base_rate": 0.28049,
+        "brier": 0.27196,
+        "reliability": 0.113215,
+        "resolution": 0.048964
+      },
+      {
+        "domain": "larimer",
+        "target": "d_intensify1_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 17280,
+        "n_positive_weeks": 19,
+        "base_rate": 0.16609,
+        "brier": 0.14551,
+        "reliability": 0.025729,
+        "resolution": 0.017749
+      },
+      {
+        "domain": "larimer",
+        "target": "d_intensify1_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 16320,
+        "n_positive_weeks": 22,
+        "base_rate": 0.32494,
+        "brier": 0.26036,
+        "reliability": 0.122967,
+        "resolution": 0.079671
+      },
+      {
+        "domain": "larimer",
+        "target": "d_intensify1_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 14400,
+        "n_positive_weeks": 22,
+        "base_rate": 0.46944,
+        "brier": 0.35865,
+        "reliability": 0.149219,
+        "resolution": 0.032966
+      },
+      {
+        "domain": "larimer",
+        "target": "d_intensify2_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 17280,
+        "n_positive_weeks": 1,
+        "base_rate": 0.00671,
+        "brier": 0.00673,
+        "reliability": 3.2e-05,
+        "resolution": 0.0
+      },
+      {
+        "domain": "larimer",
+        "target": "d_intensify2_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 16320,
+        "n_positive_weeks": 5,
+        "base_rate": 0.03039,
+        "brier": 0.02968,
+        "reliability": 0.000644,
+        "resolution": 0.0
+      },
+      {
+        "domain": "larimer",
+        "target": "d_intensify2_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 14400,
+        "n_positive_weeks": 12,
+        "base_rate": 0.14521,
+        "brier": 0.14077,
+        "reliability": 0.019292,
+        "resolution": 0.0
+      },
+      {
+        "domain": "larimer",
+        "target": "d_nochange_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 17280,
+        "n_positive_weeks": 33,
+        "base_rate": 0.71209,
+        "brier": 0.19339,
+        "reliability": 0.008442,
+        "resolution": 0.022283
+      },
+      {
+        "domain": "larimer",
+        "target": "d_nochange_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 16320,
+        "n_positive_weeks": 27,
+        "base_rate": 0.49743,
+        "brier": 0.23654,
+        "reliability": 0.041359,
+        "resolution": 0.055908
+      },
+      {
+        "domain": "larimer",
+        "target": "d_nochange_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 14400,
+        "n_positive_weeks": 17,
+        "base_rate": 0.25007,
+        "brier": 0.28336,
+        "reliability": 0.130095,
+        "resolution": 0.028584
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt80_h2",
+        "horizon": 2,
+        "family": "damped",
+        "n": 17280,
+        "n_positive_weeks": 30,
+        "base_rate": 0.50266,
+        "brier": 0.26537,
+        "reliability": 0.032438,
+        "resolution": 0.01528
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt80_h4",
+        "horizon": 4,
+        "family": "damped",
+        "n": 16320,
+        "n_positive_weeks": 28,
+        "base_rate": 0.49749,
+        "brier": 0.2953,
+        "reliability": 0.053904,
+        "resolution": 0.008
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt80_h8",
+        "horizon": 8,
+        "family": "damped",
+        "n": 14400,
+        "n_positive_weeks": 24,
+        "base_rate": 0.45792,
+        "brier": 0.29742,
+        "reliability": 0.05353,
+        "resolution": 0.003722
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt90_h2",
+        "horizon": 2,
+        "family": "damped",
+        "n": 17280,
+        "n_positive_weeks": 24,
+        "base_rate": 0.36499,
+        "brier": 0.25172,
+        "reliability": 0.037732,
+        "resolution": 0.016763
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt90_h4",
+        "horizon": 4,
+        "family": "damped",
+        "n": 16320,
+        "n_positive_weeks": 22,
+        "base_rate": 0.36391,
+        "brier": 0.27547,
+        "reliability": 0.050167,
+        "resolution": 0.004955
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt90_h8",
+        "horizon": 8,
+        "family": "damped",
+        "n": 14400,
+        "n_positive_weeks": 18,
+        "base_rate": 0.32576,
+        "brier": 0.26038,
+        "reliability": 0.0442,
+        "resolution": 0.002193
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt97_h2",
+        "horizon": 2,
+        "family": "damped",
+        "n": 17280,
+        "n_positive_weeks": 19,
+        "base_rate": 0.1669,
+        "brier": 0.14338,
+        "reliability": 0.012031,
+        "resolution": 0.005608
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt97_h4",
+        "horizon": 4,
+        "family": "damped",
+        "n": 16320,
+        "n_positive_weeks": 17,
+        "base_rate": 0.1614,
+        "brier": 0.14505,
+        "reliability": 0.013308,
+        "resolution": 0.0
+      },
+      {
+        "domain": "larimer",
+        "target": "f_gt97_h8",
+        "horizon": 8,
+        "family": "damped",
+        "n": 14400,
+        "n_positive_weeks": 13,
+        "base_rate": 0.11826,
+        "brier": 0.10986,
+        "reliability": 0.006539,
+        "resolution": 0.0
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_ge2_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 15552,
+        "n_positive_weeks": 27,
+        "base_rate": 0.3851,
+        "brier": 0.09766,
+        "reliability": 0.005495,
+        "resolution": 0.140817
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_ge2_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 14688,
+        "n_positive_weeks": 27,
+        "base_rate": 0.40775,
+        "brier": 0.16676,
+        "reliability": 0.021144,
+        "resolution": 0.092609
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_ge2_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 12960,
+        "n_positive_weeks": 27,
+        "base_rate": 0.46211,
+        "brier": 0.27333,
+        "reliability": 0.069795,
+        "resolution": 0.041975
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_ge3_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 15552,
+        "n_positive_weeks": 25,
+        "base_rate": 0.11426,
+        "brier": 0.03669,
+        "reliability": 0.002574,
+        "resolution": 0.066332
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_ge3_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 14688,
+        "n_positive_weeks": 25,
+        "base_rate": 0.12098,
+        "brier": 0.06524,
+        "reliability": 0.007916,
+        "resolution": 0.048611
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_ge3_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 12960,
+        "n_positive_weeks": 25,
+        "base_rate": 0.13711,
+        "brier": 0.11136,
+        "reliability": 0.015767,
+        "resolution": 0.022498
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_improve1_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 15552,
+        "n_positive_weeks": 15,
+        "base_rate": 0.08224,
+        "brier": 0.0849,
+        "reliability": 0.012669,
+        "resolution": 0.000951
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_improve1_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 14688,
+        "n_positive_weeks": 18,
+        "base_rate": 0.12207,
+        "brier": 0.12385,
+        "reliability": 0.028184,
+        "resolution": 0.005608
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_improve1_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 12960,
+        "n_positive_weeks": 15,
+        "base_rate": 0.13233,
+        "brier": 0.156,
+        "reliability": 0.065762,
+        "resolution": 0.023206
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_intensify1_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 15552,
+        "n_positive_weeks": 26,
+        "base_rate": 0.15104,
+        "brier": 0.13312,
+        "reliability": 0.007808,
+        "resolution": 1.1e-05
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_intensify1_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 14688,
+        "n_positive_weeks": 29,
+        "base_rate": 0.26641,
+        "brier": 0.2151,
+        "reliability": 0.044813,
+        "resolution": 0.026999
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_intensify1_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 12960,
+        "n_positive_weeks": 28,
+        "base_rate": 0.45332,
+        "brier": 0.33365,
+        "reliability": 0.112399,
+        "resolution": 0.014487
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_intensify2_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 15552,
+        "n_positive_weeks": 1,
+        "base_rate": 0.00739,
+        "brier": 0.00786,
+        "reliability": 0.0,
+        "resolution": 0.0
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_intensify2_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 14688,
+        "n_positive_weeks": 14,
+        "base_rate": 0.05147,
+        "brier": 0.05102,
+        "reliability": 0.003477,
+        "resolution": 9.2e-05
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_intensify2_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 12960,
+        "n_positive_weeks": 21,
+        "base_rate": 0.14475,
+        "brier": 0.13147,
+        "reliability": 0.01061,
+        "resolution": 0.004416
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_nochange_h2",
+        "horizon": 2,
+        "family": "markov",
+        "n": 15552,
+        "n_positive_weeks": 35,
+        "base_rate": 0.76672,
+        "brier": 0.19498,
+        "reliability": 0.019057,
+        "resolution": 0.001186
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_nochange_h4",
+        "horizon": 4,
+        "family": "markov",
+        "n": 14688,
+        "n_positive_weeks": 33,
+        "base_rate": 0.61152,
+        "brier": 0.26614,
+        "reliability": 0.054075,
+        "resolution": 0.026143
+      },
+      {
+        "domain": "pueblo",
+        "target": "d_nochange_h8",
+        "horizon": 8,
+        "family": "markov",
+        "n": 12960,
+        "n_positive_weeks": 28,
+        "base_rate": 0.41435,
+        "brier": 0.35105,
+        "reliability": 0.141163,
+        "resolution": 0.024548
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt80_h2",
+        "horizon": 2,
+        "family": "damped",
+        "n": 15552,
+        "n_positive_weeks": 23,
+        "base_rate": 0.32697,
+        "brier": 0.20045,
+        "reliability": 0.00605,
+        "resolution": 0.028859
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt80_h4",
+        "horizon": 4,
+        "family": "damped",
+        "n": 14688,
+        "n_positive_weeks": 22,
+        "base_rate": 0.32605,
+        "brier": 0.23201,
+        "reliability": 0.032685,
+        "resolution": 0.019924
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt80_h8",
+        "horizon": 8,
+        "family": "damped",
+        "n": 12960,
+        "n_positive_weeks": 18,
+        "base_rate": 0.32855,
+        "brier": 0.24292,
+        "reliability": 0.030674,
+        "resolution": 0.011429
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt90_h2",
+        "horizon": 2,
+        "family": "damped",
+        "n": 15552,
+        "n_positive_weeks": 12,
+        "base_rate": 0.19715,
+        "brier": 0.13968,
+        "reliability": 0.007947,
+        "resolution": 0.027712
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt90_h4",
+        "horizon": 4,
+        "family": "damped",
+        "n": 14688,
+        "n_positive_weeks": 11,
+        "base_rate": 0.20479,
+        "brier": 0.16661,
+        "reliability": 0.01378,
+        "resolution": 0.008992
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt90_h8",
+        "horizon": 8,
+        "family": "damped",
+        "n": 12960,
+        "n_positive_weeks": 10,
+        "base_rate": 0.22168,
+        "brier": 0.19454,
+        "reliability": 0.035376,
+        "resolution": 0.014144
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt97_h2",
+        "horizon": 2,
+        "family": "damped",
+        "n": 15552,
+        "n_positive_weeks": 9,
+        "base_rate": 0.09324,
+        "brier": 0.07677,
+        "reliability": 0.010062,
+        "resolution": 0.018029
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt97_h4",
+        "horizon": 4,
+        "family": "damped",
+        "n": 14688,
+        "n_positive_weeks": 9,
+        "base_rate": 0.09872,
+        "brier": 0.08873,
+        "reliability": 0.003827,
+        "resolution": 0.000204
+      },
+      {
+        "domain": "pueblo",
+        "target": "f_gt97_h8",
+        "horizon": 8,
+        "family": "damped",
+        "n": 12960,
+        "n_positive_weeks": 8,
+        "base_rate": 0.1108,
+        "brier": 0.1048,
+        "reliability": 0.00503,
+        "resolution": 0.0
+      }
+    ],
+    "reliability_by_horizon": {
+      "2": {
+        "mean": 0.0126,
+        "max": 0.0377,
+        "n": 18
+      },
+      "4": {
+        "mean": 0.0386,
+        "max": 0.123,
+        "n": 18
+      },
+      "8": {
+        "mean": 0.0775,
+        "max": 0.2407,
+        "n": 18
+      }
+    },
+    "width_ratio": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "pid_width": 59.9,
+        "clim_width": 87.78,
+        "ratio": 0.6824,
+        "ratio_lo": 0.6161,
+        "ratio_hi": 0.7455
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "pid_width": 65.46,
+        "clim_width": 87.72,
+        "ratio": 0.7462,
+        "ratio_lo": 0.6831,
+        "ratio_hi": 0.8096
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "pid_width": 66.45,
+        "clim_width": 87.84,
+        "ratio": 0.7566,
+        "ratio_lo": 0.682,
+        "ratio_hi": 0.8251
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "pid_width": 49.75,
+        "clim_width": 87.46,
+        "ratio": 0.5689,
+        "ratio_lo": 0.521,
+        "ratio_hi": 0.614
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "pid_width": 53.97,
+        "clim_width": 87.49,
+        "ratio": 0.6169,
+        "ratio_lo": 0.55,
+        "ratio_hi": 0.674
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "pid_width": 55.53,
+        "clim_width": 87.67,
+        "ratio": 0.6334,
+        "ratio_lo": 0.5387,
+        "ratio_hi": 0.7262
+      }
+    ]
   },
-  "fires": {
-    "total": 25,
-    "in_domain": 2,
-    "in_domain_acres": 109408,
-    "largest": "Aspen Acres",
-    "largest_acres": 102003,
-    "control_mean_rank": {
-      "h2": 49.930078125,
-      "h4": 50.000651041666664,
-      "h8": 49.995138888888896
+  "stage_ab": {
+    "validation_coverage": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "arm": "damped_regression",
+        "impl": "reference_pid",
+        "coverage": 0.8985,
+        "width": 63.9,
+        "miss_run": 11,
+        "roll13_min": 0.8954,
+        "cov_d01": 0.8988,
+        "cov_d2p": 0.8964,
+        "n_d01": 88420,
+        "n_d2p": 10840
+      },
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "arm": "damped_regression",
+        "impl": "aci",
+        "coverage": 0.9386,
+        "width": 76.99,
+        "miss_run": 30,
+        "roll13_min": 0.8824,
+        "cov_d01": 0.9399,
+        "cov_d2p": 0.9272,
+        "n_d01": 88420,
+        "n_d2p": 10840
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "arm": "damped_regression",
+        "impl": "reference_pid",
+        "coverage": 0.8987,
+        "width": 66.58,
+        "miss_run": 11,
+        "roll13_min": 0.8963,
+        "cov_d01": 0.8974,
+        "cov_d2p": 0.9093,
+        "n_d01": 87822,
+        "n_d2p": 10478
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "arm": "damped_regression",
+        "impl": "aci",
+        "coverage": 0.8952,
+        "width": 70.65,
+        "miss_run": 49,
+        "roll13_min": 0.8351,
+        "cov_d01": 0.8959,
+        "cov_d2p": 0.8893,
+        "n_d01": 87822,
+        "n_d2p": 10478
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "arm": "damped_regression",
+        "impl": "reference_pid",
+        "coverage": 0.8991,
+        "width": 68.76,
+        "miss_run": 11,
+        "roll13_min": 0.8963,
+        "cov_d01": 0.9008,
+        "cov_d2p": 0.8853,
+        "n_d01": 86149,
+        "n_d2p": 10231
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "arm": "damped_regression",
+        "impl": "aci",
+        "coverage": 0.8657,
+        "width": 72.38,
+        "miss_run": 171,
+        "roll13_min": 0.753,
+        "cov_d01": 0.8689,
+        "cov_d2p": 0.839,
+        "n_d01": 86149,
+        "n_d2p": 10231
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "arm": "damped_regression",
+        "impl": "reference_pid",
+        "coverage": 0.8982,
+        "width": 52.8,
+        "miss_run": 14,
+        "roll13_min": 0.8944,
+        "cov_d01": 0.8969,
+        "cov_d2p": 0.9074,
+        "n_d01": 78015,
+        "n_d2p": 11309
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "arm": "damped_regression",
+        "impl": "aci",
+        "coverage": 0.84,
+        "width": 63.13,
+        "miss_run": 519,
+        "roll13_min": 0.7073,
+        "cov_d01": 0.8429,
+        "cov_d2p": 0.8201,
+        "n_d01": 78015,
+        "n_d2p": 11309
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "arm": "damped_regression",
+        "impl": "reference_pid",
+        "coverage": 0.8978,
+        "width": 55.77,
+        "miss_run": 12,
+        "roll13_min": 0.891,
+        "cov_d01": 0.8969,
+        "cov_d2p": 0.9038,
+        "n_d01": 77151,
+        "n_d2p": 11309
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "arm": "damped_regression",
+        "impl": "aci",
+        "coverage": 0.8284,
+        "width": 65.51,
+        "miss_run": 443,
+        "roll13_min": 0.5272,
+        "cov_d01": 0.839,
+        "cov_d2p": 0.7559,
+        "n_d01": 77151,
+        "n_d2p": 11309
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "arm": "damped_regression",
+        "impl": "reference_pid",
+        "coverage": 0.898,
+        "width": 58.81,
+        "miss_run": 12,
+        "roll13_min": 0.8917,
+        "cov_d01": 0.8978,
+        "cov_d2p": 0.8992,
+        "n_d01": 75423,
+        "n_d2p": 11309
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "arm": "damped_regression",
+        "impl": "aci",
+        "coverage": 0.7767,
+        "width": 57.21,
+        "miss_run": 993,
+        "roll13_min": 0.422,
+        "cov_d01": 0.8036,
+        "cov_d2p": 0.5976,
+        "n_d01": 75423,
+        "n_d2p": 11309
+      }
+    ],
+    "classification": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "arm": "damped_regression",
+        "mae_model": 22.722,
+        "mae_clim": 25.971,
+        "mae_gain": 3.249,
+        "mae_lo": 2.2842,
+        "mae_hi": 4.1186,
+        "pid_width": 84.5,
+        "clim_width": 87.09,
+        "ratio": 0.9702,
+        "ratio_lo": 0.9578,
+        "ratio_hi": 0.9819,
+        "classification": "informative",
+        "show_point": true
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "arm": "damped_regression",
+        "mae_model": 23.873,
+        "mae_clim": 25.981,
+        "mae_gain": 2.108,
+        "mae_lo": 1.4348,
+        "mae_hi": 2.6957,
+        "pid_width": 86.5,
+        "clim_width": 87.06,
+        "ratio": 0.9936,
+        "ratio_lo": 0.9776,
+        "ratio_hi": 1.0099,
+        "classification": "climatological",
+        "show_point": true
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "arm": "damped_regression",
+        "mae_model": 24.697,
+        "mae_clim": 25.831,
+        "mae_gain": 1.134,
+        "mae_lo": 0.7722,
+        "mae_hi": 1.5133,
+        "pid_width": 87.56,
+        "clim_width": 87.07,
+        "ratio": 1.0055,
+        "ratio_lo": 0.9868,
+        "ratio_hi": 1.0212,
+        "classification": "climatological",
+        "show_point": true
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "arm": "damped_regression",
+        "mae_model": 20.75,
+        "mae_clim": 27.107,
+        "mae_gain": 6.357,
+        "mae_lo": 4.991,
+        "mae_hi": 7.8144,
+        "pid_width": 80.18,
+        "clim_width": 86.96,
+        "ratio": 0.9221,
+        "ratio_lo": 0.902,
+        "ratio_hi": 0.9415,
+        "classification": "informative",
+        "show_point": true
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "arm": "damped_regression",
+        "mae_model": 21.473,
+        "mae_clim": 27.284,
+        "mae_gain": 5.812,
+        "mae_lo": 4.5291,
+        "mae_hi": 6.9145,
+        "pid_width": 81.87,
+        "clim_width": 86.82,
+        "ratio": 0.943,
+        "ratio_lo": 0.9267,
+        "ratio_hi": 0.9594,
+        "classification": "informative",
+        "show_point": true
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "arm": "damped_regression",
+        "mae_model": 23.349,
+        "mae_clim": 26.729,
+        "mae_gain": 3.381,
+        "mae_lo": 2.4045,
+        "mae_hi": 4.3001,
+        "pid_width": 84.78,
+        "clim_width": 86.75,
+        "ratio": 0.9774,
+        "ratio_lo": 0.9601,
+        "ratio_hi": 0.9928,
+        "classification": "informative",
+        "show_point": true
+      }
+    ],
+    "classification_control": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "real_ratio": 0.9702,
+        "real_lo": 0.9578,
+        "real_hi": 0.9819,
+        "shuf_ratio": 1.142,
+        "shuf_lo": 1.1361,
+        "shuf_hi": 1.1473,
+        "real_mae_gain": 3.249,
+        "shuf_mae_gain": -0.71,
+        "shuf_mae_lo": -0.9257
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "real_ratio": 0.9221,
+        "real_lo": 0.902,
+        "real_hi": 0.9415,
+        "shuf_ratio": 1.2109,
+        "shuf_lo": 1.2027,
+        "shuf_hi": 1.2188,
+        "real_mae_gain": 6.357,
+        "shuf_mae_gain": -0.754,
+        "shuf_mae_lo": -1.2613
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "real_ratio": 0.943,
+        "real_lo": 0.9267,
+        "real_hi": 0.9594,
+        "shuf_ratio": 1.1621,
+        "shuf_lo": 1.1536,
+        "shuf_hi": 1.1696,
+        "real_mae_gain": 5.812,
+        "shuf_mae_gain": -0.295,
+        "shuf_mae_lo": -0.7177
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "real_ratio": 0.9774,
+        "real_lo": 0.9601,
+        "real_hi": 0.9928,
+        "shuf_ratio": 1.076,
+        "shuf_lo": 1.0678,
+        "shuf_hi": 1.0828,
+        "real_mae_gain": 3.381,
+        "shuf_mae_gain": 0.23,
+        "shuf_mae_lo": -0.0844
+      }
+    ]
+  },
+  "rendering": [
+    {
+      "domain": "larimer",
+      "target": "d_ge2_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1127, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_ge2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.2407, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_ge3_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_ge3_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_ge3_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1520, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_improve1_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1132, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_intensify1_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_intensify1_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1230, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_intensify1_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1492, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_intensify2_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_intensify2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_intensify2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_nochange_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "larimer",
+      "target": "d_nochange_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1301, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "erc_pct",
+      "horizon": 2,
+      "state": "interval",
+      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.970 [0.958, 0.982]"
+    },
+    {
+      "domain": "larimer",
+      "target": "erc_pct",
+      "horizon": 4,
+      "state": "historical_range",
+      "reason": "the forecast interval is no narrower than the historical range: width ratio 0.994 [0.978, 1.010], so the historical week-of-year range is shown instead"
+    },
+    {
+      "domain": "larimer",
+      "target": "erc_pct",
+      "horizon": 8,
+      "state": "historical_range",
+      "reason": "the forecast interval is no narrower than the historical range: width ratio 1.006 [0.987, 1.021], so the historical week-of-year range is shown instead"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt80_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt80_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0539, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0535, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt90_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt90_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0502, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt90_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt97_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt97_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "larimer",
+      "target": "f_gt97_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge2_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0698, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge3_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge3_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge3_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_improve1_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0658, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_intensify1_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000011, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_intensify1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_intensify1_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1124, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_intensify2_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_intensify2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000092, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_intensify2_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_nochange_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0541, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_nochange_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1412, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+    },
+    {
+      "domain": "pueblo",
+      "target": "erc_pct",
+      "horizon": 2,
+      "state": "interval",
+      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.922 [0.902, 0.942]"
+    },
+    {
+      "domain": "pueblo",
+      "target": "erc_pct",
+      "horizon": 4,
+      "state": "interval",
+      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.943 [0.927, 0.959]"
+    },
+    {
+      "domain": "pueblo",
+      "target": "erc_pct",
+      "horizon": 8,
+      "state": "interval",
+      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.977 [0.960, 0.993]"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt80_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt80_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt90_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt90_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt90_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt97_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt97_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+    },
+    {
+      "domain": "pueblo",
+      "target": "f_gt97_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
     }
-  }
+  ],
+  "ledger": {
+    "total_bytes": 2914326823,
+    "budget_bytes": 3000000000,
+    "remaining_bytes": 85673177,
+    "total_gb": 2.914,
+    "n_transfers": 4040,
+    "n_corrections": 1
+  },
+  "sources": [
+    {
+      "name": "gridMET ERC",
+      "span": "2007 to 2026",
+      "role": "fuel dryness, the forecast target"
+    },
+    {
+      "name": "US Drought Monitor",
+      "span": "2007 to 2026",
+      "role": "drought category, the event targets"
+    },
+    {
+      "name": "SubX CFSv2",
+      "span": "2018 to 2025",
+      "role": "evaluated once, not adopted"
+    }
+  ]
 }

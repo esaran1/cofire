@@ -281,3 +281,43 @@
   check on the route itself, because the document is fine and only its assets are missing. Clearing
   `.next` on dev start makes the failure impossible rather than merely unlikely; `make web-build`
   does the same before a production build.
+
+## v1.0 (research-grade methodology, branch `v1-research`)
+
+- **Download budget allocated deliberately, not first-come.** Measured before fetching anything:
+  ESI is 86 MB per global GeoTIFF, but the server answers HTTP range requests (206), so
+  `/vsicurl/` windowed reads pull only the scanlines covering the domain. Measured 1.93 MB per file
+  for the union of the Larimer and Pueblo bboxes against 86 MB for the whole file, a 45x saving.
+  EDDI is CONUS-only ASCII grids at 1.77 MB per file with no compression offered and no subsetting
+  endpoint, so its cost is fixed. Full wish list priced at **5.12 GB against a 2.50 GB budget**, so
+  it does not fit and something had to be cut on purpose.
+  **Chosen: ESI 4WK (0.90 GB) + EDDI 04wk (0.83 GB) = 1.73 GB**, leaving headroom for retries.
+  **ESI 12WK dropped**: RCI is constructed from the weekly 4-week composite, so 12WK is a
+  slower-varying companion rather than a requirement, and Gate 1 requires *both* ESI and EDDI
+  present, which outranks a second ESI product. EDDI 04wk was chosen over the other windows because
+  it matches the ESI 4WK compositing period, so the two sources describe the same timescale from the
+  water-supply and the evaporative-demand side.
+- EDDI native resolution is 0.125 degrees (~12 km) against gridMET's 4 km, so it is upsampled onto
+  the gridMET grid and is recorded in `docs/DATA.md` as coarser support, not as 4 km information.
+- **Gate 1 amendment: ESI 12WK restored, EDDI dropped.** The amendment is right that dropping the
+  12-week composite trades away the only long-timescale stress signal, and that a missing 12-week
+  composite is the first thing that would explain a null result at h=8. Re-pricing with real measured
+  costs rather than the earlier estimate changed the arithmetic: the ESI 4WK fetch used the
+  **per-domain** bbox, not the union I had priced, so Larimer needs its own pass. Measured 1.93 MB
+  per file for Pueblo's 16 rows; a union read spanning both domains plus the gap between them costs
+  8.08 MB per file, so per-domain reads are 4.2x cheaper than one union read and the union idea was
+  wrong.
+  Remaining options, against 824 MB already spent:
+    A  ESI 4WK + ESI 12WK biweekly, both domains, no EDDI      2.274 GB  fits
+    B  ESI 4WK + ESI 12WK biweekly, Pueblo only, EDDI weekly   1.957 GB  fits
+    C  everything, EDDI trimmed to 2022-2026                   2.642 GB  over
+  **Chosen A.** Both domains reporting every experiment is a standing rule, so B fails it. EDDI's
+  4-week evaporative demand largely duplicates what gridMET already carries through VPD, reference
+  ET and precipitation deficits, whereas the 12-week ESI composite is the only slow-accumulation
+  signal available and is what should move USDM categories at 4 to 8 week leads. Trimming EDDI to
+  fit (option C) would leave 132 affordable weeks, too short to span the training window, which makes
+  it useless as a training feature rather than merely weaker.
+  **Gate 1 is therefore closed on ESI 4WK + ESI 12WK rather than on ESI + EDDI.** That is a
+  deviation from the original gate wording, taken because the amendment reprioritised the 12-week
+  composite above EDDI explicitly. The 13 EDDI files already fetched are retained and the source
+  class is kept working, so EDDI can be added in a later session with its own budget.

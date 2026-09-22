@@ -1,13 +1,14 @@
 """Interval suppression must be driven by the uncertainty status.
 
-The failure mode this guards against: 2026 intervals exist in the payload
-(`fire_lo`/`fire_hi` are non-null, because `forecast_issues` attaches them from
-the frozen calibrate pool) while the calibration diagnostics say those intervals
-are not supported. If the UI keyed off the presence of interval columns, or off
-the issue date, it would draw a band the record cannot back.
+The failure mode this guards against: a client deciding whether to draw a band
+by looking at which keys happen to be present in the payload. It would then draw
+a band wherever interval data existed, including where the record does not
+support one.
 
-The contract asserted here is: `show_interval` is a pure function of `status`,
-and `status` is a pure function of the calibration diagnostics.
+The contract asserted here is that the payload NAMES the state rather than
+leaving it to be inferred, that the state was fixed before the sealed year was
+opened, and that a horizon not in the `interval` state carries no bounds at all,
+so there is nothing to draw by mistake.
 """
 
 from __future__ import annotations
@@ -107,8 +108,15 @@ def test_interval_columns_may_be_present_while_suppressed() -> None:
     lon, lat = feats[0]["geometry"]["coordinates"]
     body = client.get("/forecast", params={"lat": lat, "lon": lon, "issue": y2026[-1]}).json()
     hz = body["horizons"]["4"]
-    u = body["uncertainty"]
-    if u["status"] == "uncalibrated":
-        # Columns present, band suppressed: exactly the case this guards.
-        assert u["show_interval"] is False
-        assert "fire_lo" in hz and "fire_hi" in hz
+
+    # The principle is unchanged; the contract that carries it is not. The
+    # shipped payload names the state instead of leaving the client to infer one
+    # from which keys happen to be present, which is what this test was written
+    # to catch. A horizon that is not in the `interval` state must carry no
+    # bounds at all, so there is nothing for a client to draw by mistake.
+    assert hz["state"] in {"interval", "historical_range", "uncalibrated"}
+    if hz["state"] == "interval":
+        assert hz.get("lo") is not None and hz.get("hi") is not None
+    else:
+        assert hz.get("lo") is None and hz.get("hi") is None
+        assert hz["reason"], "a suppressed interval must say why"

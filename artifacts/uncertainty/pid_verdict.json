@@ -1,0 +1,12 @@
+{
+  "pueblo": {
+    "dev_improvement": 0.1179,
+    "width_ratio": 0.872,
+    "meets_rule": true
+  },
+  "domains_evaluated": [
+    "pueblo"
+  ],
+  "adopted": false,
+  "note": "not adopted: larimer not evaluated, and the rule requires both domains. See STATUS.md."
+}

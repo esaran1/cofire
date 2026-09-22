@@ -37,6 +37,9 @@ dependencies = [
   "pillow>=10.3",
   "aiohttp>=3.14.3",
   "h5py>=3.16.0",
+  "arch>=8.0.0",
+  "statsmodels>=0.15.0",
+  "climate-indices>=2.4.0",
 ]
 
 [project.optional-dependencies]
@@ -79,6 +82,9 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 module = [
   "lightgbm.*",
+  "statsmodels.*",
+  "arch.*",
+  "climate_indices.*",
   "geopandas.*",
   "rioxarray.*",
   "rio_tiler.*",
@@ -100,6 +106,28 @@ module = [
   "shap.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Vendored third-party code, kept byte-identical to upstream so the shipping
+# path runs the authors' implementation rather than a reimplementation.
+module = ["cofire.model.uncertainty.reference_pid"]
+follow_imports = "skip"
+ignore_errors = true
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+# The wrapper around the vendored code carries a `type: ignore` for the untyped
+# upstream call. Whether that ignore is "used" depends on whether mypy is
+# following `reference_pid` on this invocation, which differs between checking
+# `cofire/model` alone and checking it through an importer. The file is inside
+# the frozen tree and cannot be edited, so the interaction is settled here.
+module = ["cofire.model.uncertainty.shipping_pid"]
+warn_unused_ignores = false
+
+
+[tool.ruff.lint.per-file-ignores]
+# Vendored third-party code, kept byte-identical to upstream.
+"cofire/model/uncertainty/reference_pid.py" = ["ALL"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

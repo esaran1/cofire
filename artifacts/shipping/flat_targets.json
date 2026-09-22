@@ -1,0 +1,18 @@
+{
+  "larimer": [
+    "d_intensify1_h2",
+    "d_intensify1_h4",
+    "d_intensify1_h8",
+    "d_intensify2_h2",
+    "d_intensify2_h4",
+    "d_intensify2_h8",
+    "f_gt97_h2",
+    "f_gt97_h4"
+  ],
+  "pueblo": [
+    "d_intensify1_h2",
+    "d_intensify2_h2",
+    "d_intensify2_h4",
+    "d_intensify2_h8"
+  ]
+}

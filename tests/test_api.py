@@ -28,9 +28,21 @@ def test_forecast_contract() -> None:
     body = r.json()
     assert "horizons" in body
     assert "4" in body["horizons"]
-    assert "why" in body
     assert body["resolution_m"] == 4000
-    assert len(body["why"]) == 5
+
+    # The shipped contract: every horizon declares the state it renders in and
+    # why. The state was fixed in the preregistration before the sealed year was
+    # opened, so a payload without it would let the client decide, which is the
+    # thing the preregistration exists to prevent.
+    hz = body["horizons"]["4"]
+    assert hz["state"] in {"interval", "historical_range", "uncalibrated"}
+    assert hz["reason"], "a rendering state without a reason is a number with no account of itself"
+    assert "point" in hz
+
+    # `why` is absent by design. The shipped configuration is a transition table
+    # and a damped persistence rule, neither of which has a per-feature
+    # attribution; an empty or invented driver list would be worse than none.
+    assert not body.get("why")
 
 
 def test_issues() -> None:

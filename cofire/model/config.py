@@ -70,7 +70,14 @@ class Settings(BaseSettings):
     api_host: str = "127.0.0.1"
     api_port: int = 8000
 
-    train_start: date = date(2004, 1, 1)
+    # 2007 because USDM reaches 2007 and no further. ERC goes back to 2004, but
+    # a drought target cannot be built without its label. Kept identical to the
+    # value `apply_subset_defaults` sets, so a bare `Settings()` and a
+    # `get_settings()` cannot disagree about the split: analysis code
+    # constructs both, and a silent split difference between the calibration
+    # path and the evaluation path is exactly the class of bug that produced
+    # the original ACI failure.
+    train_start: date = date(2007, 1, 1)
     train_end: date = date(2021, 12, 31)
     valid_start: date = date(2022, 1, 1)
     valid_end: date = date(2023, 12, 31)
@@ -92,12 +99,21 @@ class Settings(BaseSettings):
         return SUBSETS[self.subset_name][1] if self.dev_subset else None
 
     def apply_subset_defaults(self) -> None:
-        """Remap date splits when running the Larimer vertical slice."""
+        """Remap date splits when running a dev subset.
+
+        The extended record restores the full split. This override previously
+        forced train 2019 to 2022, which left a *two-year* effective training
+        window once the LODO folds were carved out, and that thinness was what
+        the 2007 back-extension exists to fix.
+
+        The start is 2007 because USDM reaches 2007 and no further: ERC goes
+        back to 2004, but a drought target cannot be built without its label.
+        """
         if not self.dev_subset:
             return
-        self.train_start = date(2019, 1, 1)
-        self.train_end = date(2022, 12, 31)
-        self.valid_start = date(2023, 1, 1)
+        self.train_start = date(2007, 1, 1)
+        self.train_end = date(2021, 12, 31)
+        self.valid_start = date(2022, 1, 1)
         self.valid_end = date(2023, 12, 31)
         self.calibrate_start = date(2024, 1, 1)
         self.calibrate_end = date(2025, 12, 31)

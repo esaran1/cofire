@@ -1,0 +1,7 @@
+artifact,path,fit_start,fit_end,scope,feeds
+training_stats.pkl (10 statistics),artifacts/training_stats.pkl,unrecorded,2022-12-31,train,"erc_pct -> every fire target; spi/spei, fm/tmmx anomalies -> ML arms"
+conformal.json,artifacts/calibration/conformal.json,unrecorded,unrecorded,calibration,interval arms in the v0.x uncertainty layer
+bootstrap.json,artifacts/calibration/bootstrap.json,unrecorded,unrecorded,calibration,interval arms in the v0.x uncertainty layer
+choices.json,artifacts/shipping/choices.json,unrecorded,unrecorded,train,step-1 family per target
+continuous_arms.json,artifacts/shipping/continuous_arms.json,unrecorded,unrecorded,train,continuous analogue per horizon
+subx_verdict.json,artifacts/shipping/subx_verdict.json,unrecorded,unrecorded,train,configuration B adoption

@@ -1,9 +1,0 @@
-{
-  "n": 200,
-  "mean_pct_rank": {
-    "h2": 49.930078125,
-    "h4": 50.000651041666664,
-    "h8": 49.995138888888896
-  },
-  "note": "Random non-fire cells in the current domain, matched to fire issue dates. Mean rank should sit near 50 if the fire sample is unremarkable."
-}

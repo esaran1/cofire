@@ -1,0 +1,6 @@
+{
+  "adopted": [
+    "f_gt90_h2"
+  ],
+  "rule": "CI above zero in both domains"
+}

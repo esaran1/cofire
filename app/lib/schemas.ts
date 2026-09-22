@@ -31,7 +31,61 @@ export const WhyBarSchema = z.object({
   source: z.string().nullish(),
 });
 
+// Probabilistic outputs are optional at the schema level because a cell can
+// legitimately lack them: a target is skipped where the event never occurs in
+// the training window, and a Markov reference does not exist for fire targets
+// at all. Parsing them as required would turn an absent forecast into a client
+// crash, which is how the earlier null-SHAP bug took down a whole Place Card.
+export const ProbabilitySchema = z.object({
+  value: maybeNumber,
+  // True when this target has zero LODO resolution in the displayed domain, so
+  // the probability is a regional base rate and is identical for every cell.
+  // The list is domain dependent, 8 targets on Larimer against 4 on Pueblo, so
+  // the client must read this flag rather than hard-code target names. The card
+  // renders these without per-cell styling, because per-cell styling would
+  // imply a spatial signal the forecast does not have.
+  flat: z.boolean().default(false),
+  // The Markov transition baseline for the same event, shown beside the model
+  // rather than behind it. Null for fire targets, which have no Markov
+  // reference: an empirical USDM category transition matrix cannot forecast ERC
+  // exceedance. See docs/DECISIONS.md.
+  baseline: maybeNumber,
+});
+
+/**
+ * How a number is allowed to be shown. Decided in the preregistration before
+ * look 3 and stored per target, horizon and domain in the export, so the client
+ * reads the decision rather than making one.
+ *
+ *  interval          point forecast plus the PID interval
+ *  historical_range  point forecast plus the labelled historical week-of-year
+ *                    range; the interval is not shown because it is no narrower
+ *  base_rate         one regional number, identical for every cell
+ *  probability       a per-cell probability
+ *  uncalibrated      no interval at all, with the reason shown
+ */
+export const RenderStateSchema = z.enum([
+  "interval",
+  "historical_range",
+  "base_rate",
+  "probability",
+  "uncalibrated",
+]);
+
 export const HorizonSchema = z.object({
+  // v1 shipped continuous forecast: the ERC week-of-year percentile.
+  point: maybeNumber,
+  state: RenderStateSchema.nullish(),
+  reason: z.string().nullish(),
+  // Present only in the `interval` state.
+  lo: maybeNumber,
+  hi: maybeNumber,
+  // Present only in the `historical_range` state.
+  range_lo: maybeNumber,
+  range_hi: maybeNumber,
+  range_label: z.string().nullish(),
+
+  // v0.6 fields, still emitted by the legacy export path.
   drought_point: maybeNumber,
   drought_set: z.array(z.number()).default([]),
   fire_index: maybeNumber,
@@ -39,6 +93,16 @@ export const HorizonSchema = z.object({
   fire_hi: maybeNumber,
   confidence: maybeNumber,
   alpha: maybeNumber,
+  p_intensify: ProbabilitySchema.nullish(),
+  p_d2plus: ProbabilitySchema.nullish(),
+  p_fire_gt90: ProbabilitySchema.nullish(),
+});
+
+/** One probabilistic target, with the rendering decision that governs it. */
+export const TargetSchema = z.object({
+  p: maybeNumber,
+  state: RenderStateSchema.nullish(),
+  reason: z.string().nullish(),
 });
 
 export const UncertaintySchema = z.object({
@@ -64,6 +128,12 @@ export const PlaceSchema = z.object({
   shipping_arm: z.string().default("unknown"),
   why: z.array(WhyBarSchema).default([]),
   horizons: z.record(z.string(), HorizonSchema).default({}),
+  // v1 probabilistic targets, keyed by target name, each carrying its state.
+  targets: z.record(z.string(), TargetSchema).default({}),
+  domain: z.string().nullish(),
+  erc: maybeNumber,
+  erc_pct: maybeNumber,
+  usdm: maybeNumber,
   uncertainty: UncertaintySchema.nullish(),
 });
 
@@ -209,8 +279,11 @@ export const GridSchema = z.object({
 });
 
 // Types are derived, never hand-declared.
+export type Probability = z.infer<typeof ProbabilitySchema>;
 export type WhyBar = z.infer<typeof WhyBarSchema>;
 export type Horizon = z.infer<typeof HorizonSchema>;
+export type RenderState = z.infer<typeof RenderStateSchema>;
+export type Target = z.infer<typeof TargetSchema>;
 export type UncertaintyStatus = z.infer<typeof UncertaintySchema>;
 export type Place = z.infer<typeof PlaceSchema>;
 export type Meta = z.infer<typeof MetaSchema>;

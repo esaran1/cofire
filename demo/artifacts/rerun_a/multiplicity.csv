@@ -1,0 +1,52 @@
+domain,target,horizon,family,arm,ref,n_positive_weeks,estimable,paired_diff,paired_lo,paired_hi,ci_above_zero,pvalue,reason,bh_reject,holm_reject,survivor
+larimer,d_ge2_h2,2,d_ge2,markov,seasonal,22,True,0.7917,0.19126,1.14111,True,0.001086,,True,True,True
+larimer,d_ge2_h4,4,d_ge2,markov,seasonal,22,True,0.43014,0.02642,0.8058,True,0.030511,,True,True,True
+larimer,d_ge2_h8,8,d_ge2,markov,seasonal,22,True,0.08229,-0.04709,0.18647,False,0.16727,,False,False,False
+larimer,d_improve1_h2,2,d_improve1,markov,seasonal,32,True,0.21116,0.1089,0.33808,True,0.000304,,True,True,True
+larimer,d_improve1_h4,4,d_improve1,markov,seasonal,38,True,0.33888,0.1952,0.52801,True,6.6e-05,,True,True,True
+larimer,d_improve1_h8,8,d_improve1,markov,seasonal,43,True,0.40189,0.27331,0.60681,True,2e-06,,True,True,True
+larimer,d_intensify1_h2,2,d_intensify1,markov,seasonal,20,True,-0.00033,-0.01881,0.02719,False,0.977543,,False,False,False
+larimer,d_intensify1_h4,4,d_intensify1,markov,seasonal,29,True,-0.02855,-0.068,-0.00058,False,0.09696,,False,False,False
+larimer,d_intensify1_h8,8,d_intensify1,markov,seasonal,37,True,-0.03058,-0.07879,-0.0043,False,0.10751,,False,False,False
+larimer,d_intensify2_h2,2,d_intensify2,markov,seasonal,3,False,,,,False,,3 positive weeks is below the 12 needed,False,False,False
+larimer,d_intensify2_h4,4,d_intensify2,markov,seasonal,10,False,,,,False,,10 positive weeks is below the 12 needed,False,False,False
+larimer,d_intensify2_h8,8,d_intensify2,markov,seasonal,10,False,,,,False,,10 positive weeks is below the 12 needed,False,False,False
+larimer,d_nochange_h2,2,d_nochange,markov,seasonal,104,True,0.158,0.05691,0.26649,True,0.003124,,True,True,True
+larimer,d_nochange_h4,4,d_nochange,markov,seasonal,104,True,0.23913,0.07661,0.39682,True,0.003418,,True,True,True
+larimer,d_nochange_h8,8,d_nochange,markov,seasonal,104,True,0.32384,0.17417,0.48135,True,3.6e-05,,True,True,True
+larimer,f_gt80_h2,2,f_gt80,damped,transition,64,True,0.00458,-0.02107,0.03709,False,0.757323,,False,False,False
+larimer,f_gt80_h4,4,f_gt80,damped,transition,62,True,0.01218,-0.00222,0.0258,False,0.088331,,False,False,False
+larimer,f_gt80_h8,8,f_gt80,damped,transition,62,True,0.00919,-0.00818,0.02499,False,0.277596,,False,False,False
+larimer,f_gt90_h2,2,f_gt90,damped,transition,36,True,-0.0098,-0.04295,0.02717,False,0.583687,,False,False,False
+larimer,f_gt90_h4,4,f_gt90,damped,transition,35,True,0.00957,-0.01064,0.02779,False,0.32898,,False,False,False
+larimer,f_gt90_h8,8,f_gt90,damped,transition,31,True,0.00338,-0.0269,0.02189,False,0.785715,,False,False,False
+larimer,f_gt97_h2,2,f_gt97,damped,transition,13,True,0.01244,-0.02021,0.04438,False,0.450126,,False,False,False
+larimer,f_gt97_h4,4,f_gt97,damped,transition,12,True,-0.00838,-0.04338,0.0296,False,0.652822,,False,False,False
+larimer,f_gt97_h8,8,f_gt97,damped,transition,9,False,,,,False,,9 positive weeks is below the 12 needed,False,False,False
+pueblo,d_ge2_h2,2,d_ge2,markov,seasonal,39,True,0.30472,0.0774,0.51482,True,0.006318,,True,True,True
+pueblo,d_ge2_h4,4,d_ge2,markov,seasonal,37,True,0.21925,0.01109,0.36934,True,0.016436,,True,True,True
+pueblo,d_ge2_h8,8,d_ge2,markov,seasonal,33,True,0.13534,-0.07026,0.25568,False,0.103589,,False,False,False
+pueblo,d_ge3_h2,2,d_ge3,markov,seasonal,3,False,,,,False,,3 positive weeks is below the 12 needed,False,False,False
+pueblo,d_ge3_h4,4,d_ge3,markov,seasonal,3,False,,,,False,,3 positive weeks is below the 12 needed,False,False,False
+pueblo,d_ge3_h8,8,d_ge3,markov,seasonal,3,False,,,,False,,3 positive weeks is below the 12 needed,False,False,False
+pueblo,d_improve1_h2,2,d_improve1,markov,seasonal,29,True,0.0635,-0.03354,0.14053,False,0.152684,,False,False,False
+pueblo,d_improve1_h4,4,d_improve1,markov,seasonal,38,True,0.04969,-0.06666,0.20341,False,0.470761,,False,False,False
+pueblo,d_improve1_h8,8,d_improve1,markov,seasonal,54,True,0.10866,-0.01544,0.34111,False,0.232253,,False,False,False
+pueblo,d_intensify1_h2,2,d_intensify1,markov,seasonal,33,True,0.01441,-0.02661,0.05439,False,0.485536,,False,False,False
+pueblo,d_intensify1_h4,4,d_intensify1,markov,seasonal,42,True,0.03321,-0.01252,0.08426,False,0.178562,,False,False,False
+pueblo,d_intensify1_h8,8,d_intensify1,markov,seasonal,40,True,-0.00016,-0.08121,0.05843,False,0.996334,,False,False,False
+pueblo,d_intensify2_h2,2,d_intensify2,markov,seasonal,2,False,,,,False,,2 positive weeks is below the 12 needed,False,False,False
+pueblo,d_intensify2_h4,4,d_intensify2,markov,seasonal,6,False,,,,False,,6 positive weeks is below the 12 needed,False,False,False
+pueblo,d_intensify2_h8,8,d_intensify2,markov,seasonal,14,True,0.00938,-0.14655,0.06981,False,0.865039,,False,False,False
+pueblo,d_nochange_h2,2,d_nochange,markov,seasonal,102,True,0.04937,-0.02268,0.13348,False,0.215252,,False,False,False
+pueblo,d_nochange_h4,4,d_nochange,markov,seasonal,100,True,0.06534,-0.02788,0.18826,False,0.236021,,False,False,False
+pueblo,d_nochange_h8,8,d_nochange,markov,seasonal,99,True,0.09491,-0.0151,0.259,False,0.174652,,False,False,False
+pueblo,f_gt80_h2,2,f_gt80,damped,transition,35,True,-0.00277,-0.0325,0.03442,False,0.871009,,False,False,False
+pueblo,f_gt80_h4,4,f_gt80,damped,transition,34,True,0.00801,-0.0057,0.02391,False,0.288943,,False,False,False
+pueblo,f_gt80_h8,8,f_gt80,damped,transition,34,True,0.04105,0.01374,0.062,True,0.000857,,True,True,True
+pueblo,f_gt90_h2,2,f_gt90,damped,transition,20,True,0.00068,-0.05883,0.04274,False,0.979006,,False,False,False
+pueblo,f_gt90_h4,4,f_gt90,damped,transition,19,True,0.00628,-0.00599,0.02264,False,0.390233,,False,False,False
+pueblo,f_gt90_h8,8,f_gt90,damped,transition,19,True,0.02451,0.00375,0.04237,True,0.012864,,True,True,True
+pueblo,f_gt97_h2,2,f_gt97,damped,transition,6,False,,,,False,,6 positive weeks is below the 12 needed,False,False,False
+pueblo,f_gt97_h4,4,f_gt97,damped,transition,6,False,,,,False,,6 positive weeks is below the 12 needed,False,False,False
+pueblo,f_gt97_h8,8,f_gt97,damped,transition,6,False,,,,False,,6 positive weeks is below the 12 needed,False,False,False

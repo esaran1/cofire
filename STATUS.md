@@ -1,115 +1,87 @@
-# STATUS: No-go (point forecast) — uncertainty layer now honest and shipping
+# STATUS: look 3 taken, counter at 3
 
-Git `a3f212d083122dcf5b6d62efe2a574d7beb4c67b`. Dev subset: **Pueblo County** (`COFIRE_SUBSET_NAME=pueblo`),
-moved from Larimer this session. Displayed resolution 4000 m. **2026 hindcast remains sealed at 2
-looks** on config `0957e415fa7f3fad` — nothing in v0.6 evaluated on 2026.
+Branch `v1-research`. Holdout 2026 **looked at 3 times**, the third under the preregistration below.
+The counter is keyed on the holdout year in `cofire/model/freeze.py`. No
+further look is authorised.
 
-## Pool outcome: all six variants rejected, on both domains
+## Where the work stands
 
-The multi-regime calibration experiment was pre-registered and hashed before it ran
-(`docs/PREREGISTRATION_CALIBRATION.md`, sha256 `6a69e9a2076f79421611e0852742b57eb8fedece0225e93aa75bf370121e0dd1`),
-with the variant list, covariates, width cap and acceptance criteria fixed in advance.
+| stage | result |
+|---|---|
+| A, PID coverage | all five preregistered criteria pass, both domains, three horizons |
+| B, width ratio | 4 of 6 informative: Larimer h2, Pueblo h2, h4, h8 |
+| 1, multiplicity | 51 comparisons, 39 estimable, **12 survivors** |
+| 2, SubX | run once, **0 targets switch**; everything ships on configuration A |
+| 3, freeze | preregistration recorded, config hash fixed |
+| 4, look 3 | 69 of 84 criteria pass: **30 of 30 interval**, 39 of 54 reliability |
 
-| domain | best variant | best coverage | baseline | improvement | residual gap to 0.90 |
-| --- | --- | --- | --- | --- | --- |
-| Larimer | base / c(k=2) / c(k=3) (tied) | 0.409 | 0.409 | **+0.000** | **49 points** |
-| Pueblo | base (single-year) | 0.331 | 0.331 | **+0.000** | **57 points** |
+## The rule that governs every skill claim
 
-Not one variant met even the provisional bar. On Pueblo every pooling variant is *worse* than the
-single-year baseline it was meant to improve. All six are reported with their numbers in
-`artifacts/uncertainty/multiregime.md`; none was tuned toward 0.90 and none was added after results
-were seen.
+A skill claim is the **paired difference between the statistic on real targets
+and on targets shuffled within the same circular blocks**, bootstrapped jointly,
+CI above zero. A raw skill-score interval does not establish skill, because two
+models that are both functions of the same input differ in Brier on shuffled
+labels through probability spread alone.
 
-**Why.** Every held-out year carries the same **~2.4x residual inflation**, and a leakage audit
-ruled out contamination on all three checks (`artifacts/uncertainty/leak_check.md`). Measured under
-the original splits at ERC h=4, absolute residual p90:
+Applied to the fire results, this removes five of the seven targets that passed
+an unpaired interval, which are exactly the five whose ad-hoc shuffled control
+had already reproduced the effect.
 
-| year | 2018 | 2019 | 2020 | 2021 | 2022 | **2023** | **2024** | **2025** |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| p90 | 20.59 | 24.94 | 25.06 | 23.77 | 26.38 | **59.16** | **60.59** | **62.66** |
+## Configuration
 
-Training years sit at 20 to 26. Held-out 2023, 2024 and 2025 sit at 59 to 63. This is an **in-sample
-versus out-of-sample** gap, not a seen-year versus unseen-year one, and a leak would make the
-held-out residuals *small*, not large.
+Train 2007-01-01 to 2021-12-31, validate 2022 to 2023, calibrate 2024 to 2025,
+holdout 2026. Drought targets Markov 18 of 18, fire exceedance targets
+damped-persistence logistic 9 of 9, continuous `erc_pct` damped regression,
+intervals from the reference conformal PID. No forecast weather: SubX did not
+qualify.
 
-That is precisely why pool construction cannot help. **The inflation is constant across pool years,
-so no reweighting of those years can recover it.** Variants (b), (c) and (d) all reweight, select or
-rescale by regime, and regime does not predict the quantity they need
-(`corr(usdm_mean, residual_p90) = 0.487`). Adding ACI does not rescue it either: the best pool
-reaches 0.52 to 0.60 and beats the baseline on only 2 of 4 folds.
+## Pre-registration
 
-**What the second domain proved.** On Larimer, 2026 sits 3.7 pool SD past the record maximum, which
-invites the explanation "no analog in the record". On Pueblo that explanation **fails**: 2018 (mean
-USDM 2.058) is drier than 2026 (1.109), so 2026 falls *inside* the pool range and passes the regime
-gate outright — and the intervals are still not calibrated (0.331). Having an analog year is **not
-sufficient**. Only running both domains could distinguish "no analog" from "unseen-year penalty",
-and it is the latter.
+`docs/PREREGISTRATION_LOOK3.md`. Supersedes
+`f9b3212c2454bb1afec2c67b084f60bf0ac1d471c29bde13f30385277807b584` and every
+earlier one; no look was taken under any of them.
 
-## Three-state uncertainty status: shipping
+The config hash now covers every file under `cofire/model/` plus every fitted
+artifact the shipped path loads and its fit-window sidecar. The previous hash
+covered a handful of hyperparameters and would not have moved if every line of
+model code had changed.
 
-Computed from diagnostics in `cofire/model/uncertainty/status.py`, never hand-set, with **two
-independent gates** that must both pass:
+## Two seal defects found and closed
 
-| state | condition | behaviour |
-| --- | --- | --- |
-| **calibrated** | regime inside pool range **and** pool coverage >= 0.60 | interval shown |
-| **extrapolating** | regime exceeds pool max by <= 2 pool SD | interval widened (clipped to the pre-registered [0.5, 3.0]) + visible caveat |
-| **uncalibrated** | pool coverage < 0.60 **or** regime exceeds pool by > 2 pool SD | **interval suppressed**; point forecast + Why drivers still shown |
+1. **The look counter was keyed on the config hash.** Changing the
+   configuration reset it to zero, which would have handed back a fresh set of
+   looks at data already seen twice. It is now keyed on the holdout year, and
+   the two looks already taken are carried forward.
+2. **Stages A and B ran from scratch scripts**, so the numbers in the
+   preregistration came from code the hash did not cover. Both are now in
+   `cofire/model/calibration_stages.py`. Promoting Stage A corrected a stream
+   that ran backwards in time; every conclusion held and the worst miss run
+   improved from 31 to 14.
 
-Shipped in `/uncertainty/status`, an `uncertainty` block on `/forecast`, the Place Card (interval
-replaced by an explanation) and the map legend (status chip). Verified in a real browser: the legend
-renders "UNCALIBRATED · intervals hidden" and `/forecast` returns `show_interval: false`. 18 tests
-cover the classifier and the API contract, including that the status never becomes less cautious as
-drought worsens.
+## Look 3 results
 
-**Current state on both domains: `uncalibrated`** — for different reasons. Larimer fails both gates;
-Pueblo passes the regime gate and fails the coverage floor (0.331 < 0.60). The app therefore hides
-intervals today. That is the honest behaviour and the intended outcome of the feature, not a defect.
+All thirty interval criteria pass on the sealed year. PID long-run coverage
+0.8975 to 0.8996, minimum rolling 13-week coverage 0.8944 to 0.8986 against a
+floor of 0.70, all twelve conditional strata within 0.0164 of 0.90, longest miss
+run 6 to 12 against a bound of 60. ACI reaches a rolling minimum of 0.6140 with
+a 264-week miss run on the same rows.
 
-## Subset move: fire evaluation unblocked
+Reliability passes 39 of 54 at the 0.05 threshold, and 9 of the 12 stage-1
+survivors. The failures concentrate at long horizons exactly as the recorded
+expectation said: mean reliability 0.0126 at h2, 0.0386 at h4, 0.0775 at h8, and
+13 of 15 failures at h4 or h8. Every h2 target passes on both domains.
 
-Pueblo County contains **2 in-domain 2026 perimeters totalling 109,408 acres**, including **Aspen
-Acres at 102,003 acres — the largest Colorado perimeter of 2026**. Larimer contained **0**, which
-left the fire evaluation empty from v0.2 through v0.5. 484 cells against Larimer's 494, so runtimes
-stay comparable.
+Width ratios on 2026 are 0.568 to 0.757, better than validation's 0.922 to
+1.006. By the rule fixed before the look this changes no rendering.
 
-Moving the subset exposed **two silent cache-scoping bugs**: the raw gridMET extracts and the raw
-elevation GeoTIFF are bbox-clipped *at download time* but were cached at subset-agnostic paths, so
-the first Pueblo fetch re-served **Larimer geography under the Pueblo name** (identical ERC across
-all 9 years). Caught by checking that the new domain's weather actually differed rather than
-trusting the fetch log. All paths are now subset-scoped; Larimer's data is preserved byte-identical
-at the legacy paths (verified: 2021 mean USDM still 0.916).
+## Resume point
 
-## Domain comparison: skill and coverage do not differ materially
+Stages 1 to 4 complete. `FREEZE_COMMIT` is `46c17ae4aac2bef2d1397e422755104284f71667`, recorded in
+`artifacts/FREEZE_COMMIT`. Preregistration sha256 `c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a`. Next is **stage 5, final artifacts**: export
+forecasts from the frozen configuration through 2026-09-22 via
+`forecast_issues`, apply the preregistered rendering rules mechanically, then
+`make facts` and `make demo-data`. Then stage 6 product wiring, stage 7
+verification, stage 8 merge.
 
-Both domains were re-run on identical folds and methods so the move is not confounded with a method
-change. ERC-percentile MAE at h=4 (raw, no ratio): Larimer 30.25 vs persistence 30.22; Pueblo 30.00
-vs 28.82. Median LODO skill on ERC: Larimer +1.3% (level) / +0.1% (delta), Pueblo −4.5% / −3.7%.
-Static conformal coverage: Larimer 0.409, Pueblo 0.331. **The No-go and the calibration failure both
-transfer.**
-
-One reporting caveat: Pueblo's *mean* USDM skill reads −220%, which overstates it. Pueblo 2024/2025
-are nearly drought-free (mean USDM 0.017/0.065), so persistence MAE falls to 0.013 and the ratio
-explodes (−562% on one fold). The median, −94.6%, is the honest summary — the same denominator trap
-recorded for Larimer 2023 in the v0.3 sanity gates. Drought loses decisively on both domains either
-way.
-
-## Claim reframed
-
-README, the new `docs/DESIGN.md`, and the About screen now state: COFIRE forecasts drought and
-fire-spread conditions, states how uncertain each forecast is, says when that uncertainty itself
-cannot be trusted, and turns the result into a decision. The copy lint fails the build on superiority
-phrases anywhere in `app/` and `docs/`; `artifacts/` is deliberately not scanned so the persistence
-comparison can still be reported as the negative result it is. The lint immediately caught a
-surviving superiority claim in the About screen.
-
-The persistence gap is settled and no longer being pursued: ERC delta is indistinguishable from level
-and from persistence; drought loses decisively under both parameterisations.
-
-## Still deferred
-
-- **Statewide**: not run. Staged planner (`make statewide`) reports 7.55 h with `train_pi` the only
-  stop-rule breach, split into 7 tile-block chunks.
-- **Look 3**: not taken. `docs/PREREGISTRATION.md` binds it and its trigger — delta closing the
-  persistence gap — remains unmet.
-- **Demo freeze**: still blocked behind statewide.
+`tests/test_frozen_model.py` must stay green through all of them: nothing under
+`cofire/model/` changes from here.

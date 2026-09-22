@@ -28,6 +28,15 @@ hindcast:
 export:
 	$(PY) -m cofire.model.export
 
+# The shipped path: frozen configuration -> export -> rendering -> index.
+# cofire/model/ is frozen at FREEZE_COMMIT; everything here reads it.
+ship:
+	$(PY) -m cofire.ship.rendering
+	$(PY) -m cofire.ship.export
+	$(PY) -m cofire.ship.index_build
+	$(PY) -m cofire.ship.facts
+	$(PY) -m cofire.ship.demo
+
 pipeline:
 	$(PY) -m cofire.model.pipeline
 
@@ -38,11 +47,11 @@ lodo:
 # Freeze the committed demo fixture set (under 200 MB) so `make demo` runs the
 # full app offline from a clean clone, with real numbers and no pipeline run.
 demo-data:
-	$(PY) -m cofire.model.demo_data
+	$(PY) -m cofire.ship.demo
 
 # Regenerate the landing page's figures from artifacts. Never hand-edit facts.json.
 facts:
-	$(PY) -m cofire.model.site_facts
+	$(PY) -m cofire.ship.facts
 
 # Build the keyless self-hosted basemap extract (deployed builds).
 tiles:
@@ -96,11 +105,15 @@ demo: setup
 	$(UV) run uvicorn cofire.api.main:app --host $(API_HOST) --port $(API_PORT) & \
 	cd app && npm run dev -- --port 3000
 
+# torch and LightGBM must not share a process on macOS: mixing their OpenMP
+# runtimes segfaults the interpreter mid-suite. Run the torch tests in their
+# own process. See DECISIONS.md.
 test:
-	$(PY) -m pytest
+	OMP_NUM_THREADS=1 $(PY) -m pytest --ignore=tests/test_pi_convlstm.py
+	OMP_NUM_THREADS=1 $(PY) -m pytest tests/test_pi_convlstm.py
 	cd app && npx tsc --noEmit
 
 lint:
 	$(UV) run ruff check cofire tests scripts
-	$(UV) run mypy --strict cofire/model
+	$(UV) run mypy --strict cofire/model cofire/ship
 	$(PY) scripts/check_copy.py
