@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "@phosphor-icons/react";
 import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigure";
+import { Stage } from "@/components/landing/Stage";
 import { LineReveal, ParallaxFigure, ReadingProgress, RecedingHero, Reveal } from "@/components/landing/Scroll";
 import { Numeral } from "@/components/ui/Controls";
 import facts from "@/lib/facts.json";
@@ -111,61 +112,75 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* 5. The calibration story. The charts are the evidence; the copy names
-          what they show and gets out of the way. */}
-      <Section n="03" title="The honest part" tinted>
-        <LineReveal
-          className="display max-w-[24ch] text-4xl md:text-6xl"
-          lines={[<>Most forecasts show a number.</>, <>This one says when the number</>, <><em>cannot be trusted</em>.</>]}
-        />
-
-        <div className="mt-14 space-y-16">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-20">
-            <div>
-              <h3 className="font-medium">Coverage held on the sealed year</h3>
-              <p className="text-ink-soft mt-3 leading-relaxed">
-                One controller stayed at{" "}
-                <span className="num text-ink">{look.pid.roll13_min.toFixed(3)}</span>. The other
-                fell to <span className="num text-ink">{look.aci.roll13_min.toFixed(3)}</span>.
-              </p>
-            </div>
-            <PidVsAciFigure rows={look.coverage_series} />
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-20">
-            <div>
-              <h3 className="font-medium">One test failed</h3>
-              <p className="text-ink-soft mt-3 leading-relaxed">
-                Reliability broke past two weeks.{" "}
-                <span className="num text-ink">
-                  {look.by_test["5"].n_total - look.by_test["5"].n_pass}
-                </span>{" "}
-                of <span className="num text-ink">{look.by_test["5"].n_total}</span> targets now
-                show a county rate instead.
-              </p>
-            </div>
-            <ReliabilityFigure byHorizon={look.reliability_by_horizon} />
-          </div>
-        </div>
-      </Section>
-
-      {/* 6. Discipline, as figures. */}
-      <Section n="04" title="How it was tested">
-        <dl className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat v={String(facts.hindcast_looks)} k="looks at the sealed year" />
-          <Stat v={`${look.criteria_passed}/${look.criteria_total}`} k="pre-registered criteria passed" />
-          <Stat
-            v={String(survivors.length)}
-            k={`of ${facts.multiplicity.n_comparisons} forecasts beat their baseline`}
+      {/* 5. The claim that the evidence answers. One screen, type only. */}
+      <section className="flex min-h-[70dvh] items-center border-t border-rule bg-paper-sunk px-6 py-24">
+        <div className="measure">
+          <LineReveal
+            className="display max-w-[22ch] text-5xl md:text-7xl"
+            lines={[
+              <>Most forecasts show a number.</>,
+              <>This one says when the number</>,
+              <><em>cannot be trusted</em>.</>,
+            ]}
           />
-          <Stat v={String(facts.subx.n_switched)} k="weather models adopted" tone="ember" />
-        </dl>
+        </div>
+      </section>
 
-        <p className="text-ink-soft mt-12 max-w-[46ch] leading-relaxed">
-          Skill is claimed for {survivors.length} of {facts.multiplicity.n_comparisons}, and
-          nowhere else.
-        </p>
-      </Section>
+      {/* 6. One figure, one screen. */}
+      <Stage
+        tinted
+        claim={<>Coverage held on the sealed year.</>}
+        detail={
+          <>
+            One controller stayed at{" "}
+            <span className="num text-ink">{look.pid.roll13_min.toFixed(3)}</span>. The other fell
+            to <span className="num text-ink">{look.aci.roll13_min.toFixed(3)}</span>.
+          </>
+        }
+      >
+        <PidVsAciFigure rows={look.coverage_series} />
+      </Stage>
+
+      <Stage
+        claim={<>One test failed.</>}
+        detail={
+          <>
+            Reliability broke past two weeks.{" "}
+            <span className="num text-ink">
+              {look.by_test["5"].n_total - look.by_test["5"].n_pass}
+            </span>{" "}
+            of <span className="num text-ink">{look.by_test["5"].n_total}</span> targets now show a
+            county rate instead.
+          </>
+        }
+      >
+        <ReliabilityFigure byHorizon={look.reliability_by_horizon} />
+      </Stage>
+
+      {/* 7. The discipline, as four numbers on their own screen. */}
+      <section className="flex min-h-[80dvh] items-center border-t border-rule bg-paper-sunk px-6 py-24">
+        <div className="measure reveal">
+          <h3 className="display max-w-[18ch] text-4xl leading-[1.15] md:text-6xl">
+            How it was tested.
+          </h3>
+          <dl className="mt-16 grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+            <Stat v={String(facts.hindcast_looks)} k="looks at the sealed year" />
+            <Stat
+              v={`${look.criteria_passed}/${look.criteria_total}`}
+              k="pre-registered criteria passed"
+            />
+            <Stat
+              v={String(survivors.length)}
+              k={`of ${facts.multiplicity.n_comparisons} forecasts beat their baseline`}
+            />
+            <Stat v={String(facts.subx.n_switched)} k="weather models adopted" tone="ember" />
+          </dl>
+          <p className="text-ink-soft mt-16 max-w-[46ch] text-lg leading-relaxed">
+            Skill is claimed for {survivors.length} of {facts.multiplicity.n_comparisons}, and
+            nowhere else.
+          </p>
+        </div>
+      </section>
 
       {/* 7. Close. */}
       <section className="border-t border-rule bg-ink px-6 py-20 text-paper">

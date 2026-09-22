@@ -30,6 +30,7 @@ export function PidVsAciFigure({
   target?: number;
   floor?: number;
 }) {
+  const axisMin = floor;
   const pairs = [...new Set(rows.map((r) => `${r.domain}|${r.horizon}`))].map((key) => {
     const [domain, horizon] = key.split("|");
     const pid = rows.find(
@@ -43,7 +44,15 @@ export function PidVsAciFigure({
 
   const bar = (v: number | null, tone: "pid" | "aci") => {
     if (v === null) return null;
-    const width = `${Math.max(0, Math.min(1, v)) * 100}%`;
+    // The axis starts at the pre-registered floor, not at zero.
+    //
+    // Every value here sits between 0.61 and 0.94, so a 0-to-1 axis pushes the
+    // entire comparison into the right-hand third of the chart and the bars
+    // read as identical. The floor is the number the forecast had to clear, so
+    // starting there is the honest frame as well as the legible one, and the
+    // caption states it.
+    const span = 1 - axisMin;
+    const width = `${Math.max(0, Math.min(1, (v - axisMin) / span)) * 100}%`;
     return (
       <div
         className={
@@ -58,33 +67,29 @@ export function PidVsAciFigure({
 
   return (
     <figure className="w-full">
-      <div className="relative border-y border-rule py-6">
+      <div className="relative border-y border-rule py-8 md:py-10">
         <div
-          className="pointer-events-none absolute inset-y-6 border-l border-dashed border-ink/40"
-          style={{ left: `${target * 100}%` }}
+          className="pointer-events-none absolute inset-y-8 border-l border-dashed border-ink/40"
+          style={{ left: `${((target - axisMin) / (1 - axisMin)) * 100}%` }}
           aria-hidden
         />
-        <div
-          className="pointer-events-none absolute inset-y-6 border-l border-dashed border-ember/50"
-          style={{ left: `${floor * 100}%` }}
-          aria-hidden
-        />
-        <ul className="space-y-3">
+
+        <ul className="space-y-5">
           {pairs.map((p) => (
-            <li key={`${p.domain}-${p.horizon}`} className="grid grid-cols-[7rem_1fr] items-center gap-3">
-              <span className="text-[11px] uppercase tracking-wider text-mute">
+            <li key={`${p.domain}-${p.horizon}`} className="grid grid-cols-[6rem_1fr] items-center gap-5 md:grid-cols-[9rem_1fr]">
+              <span className="text-xs uppercase tracking-wider text-mute md:text-sm">
                 {p.domain} h{p.horizon}
               </span>
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 flex-1 bg-rule/40">{bar(p.pid, "pid")}</div>
-                  <span className="num w-14 text-right text-[11px] text-ink">
+                <div className="flex items-center gap-3">
+                  <div className="h-5 flex-1 bg-rule/40 md:h-6">{bar(p.pid, "pid")}</div>
+                  <span className="num w-16 text-right text-sm text-ink md:text-base">
                     {p.pid === null ? "n/a" : p.pid.toFixed(3)}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 flex-1 bg-rule/40">{bar(p.aci, "aci")}</div>
-                  <span className="num w-14 text-right text-[11px] text-mute">
+                <div className="flex items-center gap-3">
+                  <div className="h-5 flex-1 bg-rule/40 md:h-6">{bar(p.aci, "aci")}</div>
+                  <span className="num w-16 text-right text-sm text-mute md:text-base">
                     {p.aci === null ? "n/a" : p.aci.toFixed(3)}
                   </span>
                 </div>
@@ -93,10 +98,10 @@ export function PidVsAciFigure({
           ))}
         </ul>
       </div>
-      <figcaption className="mt-3 text-[11px] leading-relaxed text-mute">
+      <figcaption className="mt-5 max-w-[68ch] text-xs leading-relaxed text-mute md:text-sm">
         Worst rolling 13-week coverage on the sealed 2026 holdout. Dark is the reference
-        conformal PID controller, pale is ACI on the same rows. Solid target 0.90, the
-        pre-registered floor 0.70.
+        conformal PID controller, pale is ACI on the same rows. The axis starts at the
+        pre-registered floor of 0.70; the dashed line is the 0.90 target.
       </figcaption>
     </figure>
   );
@@ -122,20 +127,20 @@ export function ReliabilityFigure({
 
   return (
     <figure className="w-full">
-      <div className="relative border-y border-rule py-6">
+      <div className="relative border-y border-rule py-8 md:py-10">
         <div
-          className="pointer-events-none absolute inset-y-6 border-l border-dashed border-ember"
+          className="pointer-events-none absolute inset-y-8 border-l border-dashed border-ember"
           style={{ left: `${(threshold / scale) * 100}%` }}
           aria-hidden
         />
-        <ul className="space-y-4">
+        <ul className="space-y-6">
           {entries.map(([h, v]) => (
-            <li key={h} className="grid grid-cols-[5rem_1fr] items-center gap-3">
-              <span className="text-[11px] uppercase tracking-wider text-mute">
+            <li key={h} className="grid grid-cols-[6rem_1fr] items-center gap-5 md:grid-cols-[9rem_1fr]">
+              <span className="text-xs uppercase tracking-wider text-mute md:text-sm">
                 {h} weeks
               </span>
-              <div className="flex items-center gap-2">
-                <div className="h-3 flex-1 bg-rule/40">
+              <div className="flex items-center gap-3">
+                <div className="h-5 flex-1 bg-rule/40 md:h-6">
                   <div
                     className={
                       v.mean > threshold
@@ -145,7 +150,7 @@ export function ReliabilityFigure({
                     style={{ width: `${(v.mean / scale) * 100}%` }}
                   />
                 </div>
-                <span className="num w-16 text-right text-[11px] text-ink">
+                <span className="num w-20 text-right text-sm text-ink md:text-base">
                   {v.mean.toFixed(4)}
                 </span>
               </div>
@@ -153,7 +158,7 @@ export function ReliabilityFigure({
           ))}
         </ul>
       </div>
-      <figcaption className="mt-3 text-[11px] leading-relaxed text-mute">
+      <figcaption className="mt-5 max-w-[68ch] text-xs leading-relaxed text-mute md:text-sm">
         Mean reliability term by horizon on the sealed 2026 holdout, lower is better. The
         dashed line is the 0.05 threshold set before the look. Two-week forecasts pass on
         both domains; the longer horizons are where it breaks.
