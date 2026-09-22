@@ -1,4 +1,4 @@
-# STATUS: look 3 taken, counter at 3
+# STATUS: merged to main, v1 complete
 
 Branch `v1-research`. Holdout 2026 **looked at 3 times**, the third under the preregistration below.
 The counter is keyed on the holdout year in `cofire/model/freeze.py`. No
@@ -14,6 +14,10 @@ further look is authorised.
 | 2, SubX | run once, **0 targets switch**; everything ships on configuration A |
 | 3, freeze | preregistration recorded, config hash fixed |
 | 4, look 3 | 69 of 84 criteria pass: **30 of 30 interval**, 39 of 54 reliability |
+| 5, artifacts | 34656 rows, 38 issues to 2026-09-22, rendering stored per target |
+| 6, product | every figure from artifacts, contamination-era content removed |
+| 7, verification | all checks green, clone to running 201s, 20 screenshots |
+| 8, merge | `daee4a8`, pushed to origin/main |
 
 ## The rule that governs every skill claim
 
@@ -74,14 +78,23 @@ expectation said: mean reliability 0.0126 at h2, 0.0386 at h4, 0.0775 at h8, and
 Width ratios on 2026 are 0.568 to 0.757, better than validation's 0.922 to
 1.006. By the rule fixed before the look this changes no rendering.
 
-## Resume point
+## Rendering, per target and horizon
 
-Stages 1 to 4 complete. `FREEZE_COMMIT` is `46c17ae4aac2bef2d1397e422755104284f71667`, recorded in
-`artifacts/FREEZE_COMMIT`. Preregistration sha256 `c5ca907cae475c94f85928e129514593a3e1b9496c80cac45b0e68f9314a9d9a`. Next is **stage 5, final artifacts**: export
-forecasts from the frozen configuration through 2026-09-22 via
-`forecast_issues`, apply the preregistered rendering rules mechanically, then
-`make facts` and `make demo-data`. Then stage 6 product wiring, stage 7
-verification, stage 8 merge.
+Fixed in the preregistration before look 3, applied mechanically from artifacts.
 
-`tests/test_frozen_model.py` must stay green through all of them: nothing under
-`cofire/model/` changes from here.
+| county | h2 | h4 | h8 |
+|---|---|---|---|
+| larimer | interval | historical range | historical range |
+| pueblo | interval | interval | interval |
+
+Probabilistic targets: 30 render as per-cell probabilities, 24 as a regional
+base rate identical across cells, being the 15 that failed the look-3
+reliability criterion plus 9 with no resolution to offer. No horizon failed a
+PID test, so nothing renders `uncalibrated`; the path exists and is exercised by
+the rule.
+
+## What ships
+
+`cofire/model/` is frozen at `46c17ae` and `tests/test_frozen_model.py` holds it
+there. `cofire/ship/` reads the frozen model and fits nothing. Any further work
+on the model requires a new preregistration; the current one is spent.
