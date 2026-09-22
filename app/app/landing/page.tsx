@@ -3,35 +3,18 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "@phosphor-icons/react";
-import { CoverageFigure, InflationFigure } from "@/components/landing/CoverageFigure";
+import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigure";
 import { LineReveal, ParallaxFigure, ReadingProgress, RecedingHero, Reveal } from "@/components/landing/Scroll";
 import { Numeral } from "@/components/ui/Controls";
 import facts from "@/lib/facts.json";
 
 const pct = (v: number | null | undefined) => (v === null || v === undefined ? "n/a" : `${(v * 100).toFixed(1)}%`);
 
-/** Residual p90 by year, from artifacts/uncertainty/leak_check.md. */
-const INFLATION = [
-  { year: 2018, p90: 20.59, heldOut: false },
-  { year: 2019, p90: 24.94, heldOut: false },
-  { year: 2020, p90: 25.06, heldOut: false },
-  { year: 2021, p90: 23.77, heldOut: false },
-  { year: 2022, p90: 26.38, heldOut: false },
-  { year: 2023, p90: 59.16, heldOut: true },
-  { year: 2024, p90: 60.59, heldOut: true },
-  { year: 2025, p90: 62.66, heldOut: true },
-];
-
 export default function LandingPage() {
   const reduce = useReducedMotion();
-  const cal = facts.calibration as Record<
-    string,
-    { best: { mean: number; label: string }; baseline: { mean: number }; improvement: number; n_variants: number; variants: { label: string; mean: number }[] }
-  >;
-  const pueblo = cal?.pueblo;
-  const pool = facts.pool as { usdm_max: number; measured_coverage: number; years: number[] } | undefined;
-  const lodo = (facts.lodo as Record<string, { level_mean_skill: number; n_folds: number }>)?.pueblo;
-  const fires = facts.fires as { in_domain: number; in_domain_acres: number; largest: string } | undefined;
+  const look = facts.look3;
+  const informative = facts.stage_ab.classification.filter((c) => c.classification === "informative");
+  const survivors = facts.survivors;
 
   return (
     <>
@@ -128,7 +111,7 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* 5. The calibration story, carried by two real charts. */}
+      {/* 5. The calibration story: ACI collapsed on the sealed year, PID held. */}
       <Section n="03" title="The honest part" tinted>
         <LineReveal
           className="display max-w-[24ch] text-4xl md:text-6xl"
@@ -138,38 +121,46 @@ export default function LandingPage() {
         <div className="mt-12 space-y-14">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-16">
             <div>
-              <h3 className="font-medium">The interval was wrong, and it was our bug</h3>
+              <h3 className="font-medium">One controller held its coverage. The other did not.</h3>
               <p className="mt-3 leading-relaxed text-ink-soft">
-                The adaptive update aimed at the coverage rate where it needed the miss rate. Its
-                only stable point was a 90% miss rate, so intervals shrank the more they were wrong.
-                One split ran the online update and the other did not, which is why it hid for so
-                long. Ten regression tests now fail on the old code.
+                An interval is only worth drawing if it contains the truth as often as it claims. On
+                the sealed 2026 year the adaptive method fell to{" "}
+                <span className="num text-ink">{look.aci.roll13_min.toFixed(3)}</span> coverage over
+                its worst thirteen weeks and was wrong{" "}
+                <span className="num text-ink">{look.aci.miss_run_max}</span> cell-weeks in a row.
+                The reference conformal PID controller, on the same rows, never fell below{" "}
+                <span className="num text-ink">{look.pid.roll13_min.toFixed(3)}</span> and was never
+                wrong more than <span className="num text-ink">{look.pid.miss_run_max}</span> in a
+                row.
               </p>
               <p className="mt-4 leading-relaxed text-ink-soft">
-                Fixing it was not enough. We pre-registered {pueblo?.n_variants ?? 6} ways to rebuild
-                the calibration pool, wrote the acceptance bar down first, and hashed the document so
-                the goalposts could not move. Every one was rejected, with an improvement over the
-                simplest baseline of exactly{" "}
-                <span className="num text-ink">
-                  {pueblo ? `${pueblo.improvement >= 0 ? "+" : ""}${(pueblo.improvement * 100).toFixed(1)}%` : "n/a"}
-                </span>
-                .
+                Every interval test written down before the look passed, on both counties and all
+                three ranges.
               </p>
             </div>
-            {pueblo?.variants && <CoverageFigure variants={pueblo.variants} />}
+            <PidVsAciFigure rows={look.coverage_series} />
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start lg:gap-16">
             <div>
-              <h3 className="font-medium">Why no pool can fix it</h3>
+              <h3 className="font-medium">One test failed, which is why they are written down first</h3>
               <p className="mt-3 leading-relaxed text-ink-soft">
-                Forecast error does not track how dry a year was. It tracks whether that year was
-                held out of training, and every held-out year is inflated by the same amount. A pool
-                built from those years inherits the inflation uniformly, so reweighting them moves
-                nothing.
+                A probability should be right as often as it says it is. That held at two weeks and
+                broke further out: mean reliability rises from{" "}
+                <span className="num text-ink">{look.reliability_by_horizon["2"].mean.toFixed(4)}</span>{" "}
+                at two weeks to{" "}
+                <span className="num text-ink">{look.reliability_by_horizon["8"].mean.toFixed(4)}</span>{" "}
+                at eight, against a threshold of 0.05 fixed before the look.{" "}
+                <span className="num text-ink">{look.by_test["5"].n_total - look.by_test["5"].n_pass}</span>{" "}
+                of <span className="num text-ink">{look.by_test["5"].n_total}</span> failed it.
+              </p>
+              <p className="mt-4 leading-relaxed text-ink-soft">
+                Those targets now show a regional base rate and state the reason, instead of a
+                per-cell number the year did not support. That consequence was decided in advance
+                too, so the result could not be argued into a better presentation afterwards.
               </p>
             </div>
-            <InflationFigure series={INFLATION} />
+            <ReliabilityFigure byHorizon={look.reliability_by_horizon} />
           </div>
         </div>
 
@@ -177,44 +168,49 @@ export default function LandingPage() {
           <LineReveal
             className="display max-w-[30ch] text-2xl md:text-3xl"
             lines={[
-              <>Every held-out year carries the same <em>2.4x</em> error inflation.</>,
-              <>A leakage audit ruled out contamination.</>,
-              <>Because that inflation is constant across the pool years,</>,
-              <>no reweighting of them can recover it.</>,
+              <>Nineteen years of record made the intervals worth showing.</>,
+              <>On three years they were no better than a climatology.</>,
+              <>The sealed year was opened once, under a frozen configuration.</>,
             ]}
           />
           <p className="mt-6 max-w-prose leading-relaxed text-ink-soft">
-            So the app hides the interval and states the reason, rather than drawing a band the
-            record cannot back. Measured coverage on the shipping pool is{" "}
-            <span className="num text-ink">{pool ? pct(pool.measured_coverage) : "n/a"}</span> against
-            a 0.90 target.
+            Extending the record turned{" "}
+            <span className="num text-ink">{informative.length}</span> of six forecast horizons from
+            no better than the historical range into genuinely narrower than it. The other{" "}
+            <span className="num text-ink">{6 - informative.length}</span> show the historical range
+            instead, and say so on the card.
           </p>
         </div>
       </Section>
 
-      {/* 6. Discipline, as figures. Plain layout, no cards (skill 4.4). */}
+      {/* 6. Discipline, as figures. Plain layout, no cards. */}
       <Section n="04" title="How it was tested">
         <dl className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <Stat
-            v={String(facts.hindcast_looks ?? "n/a")}
-            k="looks at the sealed 2026 holdout, each logged with a git SHA and a config hash"
+            v={String(facts.hindcast_looks)}
+            k="looks at the sealed 2026 holdout, the third under a pre-registered, hash-frozen configuration"
           />
           <Stat
-            v={facts.effective_n?.usdm ? String(facts.effective_n.usdm) : "n/a"}
-            k="effective sample size for drought, not the 112,752 rows it superficially looks like"
+            v={`${look.criteria_passed}/${look.criteria_total}`}
+            k="pre-registered criteria passed, including every interval test on both counties"
           />
-          <Stat v={String(lodo?.n_folds ?? "n/a")} k="leave-one-year-out folds, so method changes cost no holdout budget" />
           <Stat
-            v={pct(lodo?.level_mean_skill)}
-            k="mean skill against a persistence baseline. It is negative, and it is published"
+            v={String(survivors.length)}
+            k={`of ${facts.multiplicity.n_comparisons} comparisons beat their baseline, after multiplicity control and a shuffled-target check`}
+          />
+          <Stat
+            v={String(facts.subx.n_switched)}
+            k="targets adopted a forecast-weather model, from one run judged by a rule fixed beforehand"
             tone="ember"
           />
         </dl>
 
         <p className="mt-12 max-w-prose leading-relaxed text-ink-soft">
-          COFIRE does not claim better forecast skill than persistence, because it does not have it.
-          What it has is an audit trail: pre-registered experiments, a public look counter on the
-          holdout, and an uncertainty layer that reports its own failure.
+          COFIRE claims skill only where it survived the test: {survivors.length} target and county
+          pairs, mostly drought transitions at two and four weeks. A raw skill score was not enough
+          to earn that, because a forecast can beat a baseline through spread alone. Each claim had
+          to beat its own targets shuffled in place, which removed five that would otherwise have
+          been reported as skill.
         </p>
       </Section>
 
@@ -225,13 +221,11 @@ export default function LandingPage() {
             className="display max-w-[20ch] text-4xl text-paper md:text-6xl"
             lines={[<>Open it on Pueblo County.</>]}
           />
-          {fires && fires.in_domain > 0 && (
-            <p className="mt-5 max-w-prose leading-relaxed text-paper/70">
-              The domain contains {fires.in_domain} qualifying 2026 perimeters totalling{" "}
-              <span className="num">{fires.in_domain_acres.toLocaleString()}</span> acres, including{" "}
-              {fires.largest}.
-            </p>
-          )}
+          <p className="mt-5 max-w-prose leading-relaxed text-paper/70">
+            Forecasts run through {facts.split.holdout} on {facts.domains.length} counties at{" "}
+            <span className="num">{facts.resolution_m / 1000}</span> km cells, from a configuration
+            frozen before the sealed year was opened.
+          </p>
           <Link
             href="/"
             className="mt-10 inline-flex items-center gap-2 rounded-full bg-ember px-6 py-3 font-medium text-paper transition-transform active:scale-[0.98]"

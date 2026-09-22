@@ -54,6 +54,8 @@ export type {
   ObservationAck,
   Place,
   Prediction,
+  RenderState,
+  Target,
   UncertaintyStatus,
   WhyBar,
 } from "./schemas";

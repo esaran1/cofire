@@ -1,110 +1,154 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Meta, getParsed } from "@/lib/api";
-import { MetaSchema } from "@/lib/schemas";
+import facts from "@/lib/facts.json";
+
+/**
+ * What ships, what it was built from, and what it is allowed to claim.
+ *
+ * Every figure comes from facts.json, generated from artifacts. The survivor
+ * list is stated plainly because it is the only place this project claims its
+ * forecasts beat a baseline, and a reader should be able to check that claim
+ * against the same list the copy lint checks against.
+ */
+
+const gb = (b: number) => `${(b / 1e9).toFixed(2)} GB`;
 
 export default function AboutPage() {
-  const [meta, setMeta] = useState<Meta | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-
-  useEffect(() => {
-    getParsed("/meta", MetaSchema)
-      .then(setMeta)
-      .catch((e: Error) => setErr(e.message));
-  }, []);
+  const survivors = facts.survivors;
+  const byDomain = survivors.reduce<Record<string, typeof survivors>>((acc, s) => {
+    (acc[s.domain] ||= []).push(s);
+    return acc;
+  }, {});
 
   return (
-    <div className="px-4 pt-6 max-w-xl mx-auto pb-10">
+    <div className="mx-auto max-w-3xl px-4 pb-16 pt-6">
       <h1 className="display text-4xl font-normal">About COFIRE</h1>
       <p className="mt-4 text-lg leading-relaxed">
-        COFIRE forecasts drought and fire-spread conditions across Colorado 2 to 8 weeks ahead,
-        states how uncertain each forecast is, says when that uncertainty itself cannot be trusted,
-        and turns the result into a decision: predict (Beat the Model), observe (Observer Streaks),
-        and harden (Ember Score).
+        COFIRE forecasts drought and fire-spread conditions in two Colorado counties, 2 to 8 weeks
+        ahead, and states how uncertain each forecast is. Where the uncertainty cannot be supported
+        by the record, it says so and shows the historical range instead. It is not a forecast of
+        ignitions.
       </p>
-      <p className="mt-4 text-mute">{meta?.disclaimer}</p>
-      {err && <p className="text-ember mt-2">{err}</p>}
-      <h2 className="text-xl mt-8">Shipping model</h2>
-      <p className="mt-1">
-        <span className="text-paper font-medium">{meta?.shipping_arm ?? "-"}</span> - {meta?.shipping_arm_basis ?? "chosen on validation"}.
-      </p>
-      {meta?.status && (
-        <p className="mt-2 text-sm">
-          Build status:{" "}
-          <span className={meta.status === "No-go" ? "text-ember font-medium" : "text-paper font-medium"}>
-            {meta.status}
-          </span>
-          {meta.status === "No-go" && (
-            <span className="text-ink-soft">
-              {" "}- on this domain and record, no trained arm improves on a persistence baseline at
-              4 or 8 weeks. That negative result is reported in artifacts/metrics.md rather than
-              hidden. Statewide is not started. See STATUS.md.
-            </span>
-          )}
-        </p>
-      )}
-      {(meta?.hindcast_looks ?? []).length > 0 && (
-        <p className="mt-2 text-sm text-mute">
-          Locked 2026 holdout: {meta!.hindcast_looks.length} look
-          {meta!.hindcast_looks.length === 1 ? "" : "s"} at config{" "}
-          <code className="text-xs">{meta!.hindcast_looks[meta!.hindcast_looks.length - 1].config_hash}</code>
-          {meta!.hindcast_looks.length > 1 && " - repeat looks are reported as contaminated"}.
-        </p>
-      )}
 
-      <h2 className="text-xl mt-8">Provenance</h2>
-      <dl className="mt-1 text-sm space-y-1">
+      <h2 className="mt-10 text-xl font-medium">What ships, by target family</h2>
+      <dl className="border-rule mt-3 divide-y divide-rule border-y text-sm">
+        {Object.entries(facts.configuration).map(([k, v]) => (
+          <div key={k} className="grid grid-cols-[10rem_1fr] gap-4 py-3">
+            <dt className="text-mute capitalize">{k.replace(/_/g, " ")}</dt>
+            <dd className="text-ink-soft">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="text-ink-soft mt-3 text-sm leading-relaxed">
+        The forecasts are empirical conditional models, not machine learning. On this record a
+        transition table and a damped persistence rule beat every trained arm that was tried, so
+        those are what ship.
+      </p>
+
+      <h2 className="mt-10 text-xl font-medium">Where the forecasts beat their baselines</h2>
+      <p className="text-ink-soft mt-2 text-sm leading-relaxed">
+        <span className="num text-ink">{survivors.length}</span> of{" "}
+        <span className="num text-ink">{facts.multiplicity.n_comparisons}</span> comparisons
+        survived, after multiplicity control at q={facts.multiplicity.q} and a shuffled-target
+        check. Skill is claimed here and nowhere else. A comparison had to beat its own targets
+        shuffled in place, because a forecast can beat a baseline through probability spread alone.
+      </p>
+      {Object.entries(byDomain).map(([dom, rows]) => (
+        <div key={dom} className="mt-4">
+          <h3 className="text-sm font-medium capitalize">{dom}</h3>
+          <table className="mt-1 w-full text-sm">
+            <thead className="text-mute border-rule border-b text-left text-xs">
+              <tr>
+                <th className="py-2 font-normal">Target</th>
+                <th className="py-2 font-normal">Range</th>
+                <th className="py-2 text-right font-normal">Margin over baseline</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((s) => (
+                <tr key={`${s.target}`} className="border-rule border-b">
+                  <td className="num py-2 text-xs">{s.target.replace(/_h\d+$/, "")}</td>
+                  <td className="py-2">{s.horizon}w</td>
+                  <td className="num py-2 text-right text-xs">
+                    {s.paired_diff.toFixed(3)}{" "}
+                    <span className="text-mute">
+                      [{s.paired_lo.toFixed(3)}, {s.paired_hi.toFixed(3)}]
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+
+      <h2 className="mt-10 text-xl font-medium">Data sources</h2>
+      <table className="mt-3 w-full text-sm">
+        <thead className="text-mute border-rule border-b text-left text-xs">
+          <tr>
+            <th className="py-2 font-normal">Source</th>
+            <th className="py-2 font-normal">Record span</th>
+            <th className="py-2 font-normal">Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {facts.sources.map((s) => (
+            <tr key={s.name} className="border-rule border-b">
+              <td className="py-2">{s.name}</td>
+              <td className="num py-2 text-xs">{s.span}</td>
+              <td className="text-ink-soft py-2 text-xs">{s.role}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="text-ink-soft mt-3 text-sm leading-relaxed">
+        A sub-seasonal weather model was evaluated once, by a rule fixed in advance:{" "}
+        <span className="num text-ink">{facts.subx.n_ci_above_zero}</span> of{" "}
+        <span className="num text-ink">{facts.subx.n_comparisons}</span> comparisons cleared zero in
+        one county and none cleared it in both, so{" "}
+        <span className="num text-ink">{facts.subx.n_switched}</span> targets adopted it.
+      </p>
+
+      <h2 className="mt-10 text-xl font-medium">Download ledger</h2>
+      <p className="text-ink-soft mt-2 text-sm leading-relaxed">
+        Every byte fetched over the network is recorded.{" "}
+        <span className="num text-ink">{gb(facts.ledger.total_bytes)}</span> across{" "}
+        <span className="num text-ink">{facts.ledger.n_transfers.toLocaleString()}</span> transfers,
+        against a <span className="num text-ink">{gb(facts.ledger.budget_bytes)}</span> cap. The
+        ledger is append-only: a mis-estimate is corrected by appending a correction with its
+        evidence, never by rewriting the original entry.
+      </p>
+
+      <h2 className="mt-10 text-xl font-medium">Provenance</h2>
+      <dl className="border-rule mt-3 grid grid-cols-1 gap-y-3 border-y py-4 text-xs">
         <div>
-          <dt className="text-ink-soft inline">Git commit: </dt>
-          <dd className="inline"><code className="text-xs break-all">{meta?.git_sha ?? "-"}</code></dd>
+          <dt className="text-mute">Splits</dt>
+          <dd className="num text-ink">
+            train {facts.split.train} · validate {facts.split.validate} · calibrate{" "}
+            {facts.split.calibrate} · holdout {facts.split.holdout}
+          </dd>
         </div>
         <div>
-          <dt className="text-ink-soft inline">MANIFEST hash: </dt>
-          <dd className="inline"><code className="text-xs break-all">{meta?.manifest_hash ?? "-"}</code></dd>
+          <dt className="text-mute">Looks at the sealed holdout</dt>
+          <dd className="num text-ink">{facts.hindcast_looks}</dd>
+        </div>
+        <div>
+          <dt className="text-mute">Pre-registration sha256</dt>
+          <dd className="num text-ink break-all">{facts.preregistration_sha256}</dd>
+        </div>
+        <div>
+          <dt className="text-mute">Configuration hash</dt>
+          <dd className="num text-ink break-all">{facts.config_hash}</dd>
+        </div>
+        <div>
+          <dt className="text-mute">Freeze commit</dt>
+          <dd className="num text-ink break-all">{facts.freeze_commit}</dd>
         </div>
       </dl>
-      <p className="text-ink-soft text-xs mt-1">
-        The MANIFEST hash covers the input data sources. Metrics on this build were produced from
-        exactly these inputs at exactly this commit.
-      </p>
-      <h2 className="text-xl mt-8">Resolution</h2>
-      <p className="mt-1">
-        Displayed layer: {meta?.resolution_m ?? 4000} m. {meta?.resolution_note}
-      </p>
-      <h2 className="text-xl mt-8">Data sources</h2>
-      <ul className="mt-2 space-y-2 text-sm">
-        {(meta?.manifest.sources ?? []).length === 0 && <li className="text-ink-soft">Run `make data` to fill MANIFEST.json.</li>}
-        {(meta?.manifest.sources ?? []).map((s) => (
-          <li key={s.name}>
-            <span className="text-paper">{s.name}</span> · {s.state}
-            {s.state === "source unavailable" ? " - source unavailable" : ""}
-            <span className="text-ink-soft"> {s.note}</span>
-          </li>
-        ))}
-      </ul>
-      <h2 className="text-xl mt-8">Why the intervals are hidden</h2>
-      <p className="text-ink-soft text-sm mt-1 leading-relaxed">
-        Every year held out of training carries the same ~2.4x inflation in forecast error: the
-        years the model trained on sit at a 90th-percentile error of 20 to 26 ERC points, while
-        held-out 2023, 2024 and 2025 all sit at 59 to 63. A three-part leakage audit ruled out
-        contamination. Because that inflation is constant across the pool years, no reweighting of
-        those years can recover it, which is why all six pre-registered calibration variants
-        returned no improvement at all. COFIRE therefore suppresses the interval rather than drawing
-        one the record cannot back.
-      </p>
-
-      <h2 className="text-xl mt-8">Prior art</h2>
-      <p className="text-ink-soft text-sm mt-1">
-        A separate 2020-2025 science-fair project (Beyond the Forecast) is cited in docs/PRIOR_ART.md as
-        precedent for a physics-informed ConvLSTM loss and an anti-leakage protocol. Nothing from it is
-        copied. COFIRE&apos;s models are implemented from scratch on Colorado data, with a fuel-moisture
-        constraint, conformal calibration, and this public app.
-      </p>
-      <h2 className="text-xl mt-8">AI usage</h2>
-      <p className="text-ink-soft text-sm mt-1">
-        See AI_USAGE.md. Feature engineering, conformal calibration, model training, and the
-        physics-informed ConvLSTM are marked for student rewrite.
+      <p className="text-mute mt-4 text-xs leading-relaxed">
+        Not a forecast of ignitions. Forecasts are for {facts.domains.join(" and ")} counties at{" "}
+        {facts.resolution_m / 1000} km resolution, and the displayed value is the cell's own, not an
+        interpolation to a point.
       </p>
     </div>
   );
