@@ -5,7 +5,7 @@ import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { API, LeaderRow, getParsed, postParsed } from "@/lib/api";
-import { LeaderRowSchema, MetaSchema, PredictionSchema } from "@/lib/schemas";
+import { LeaderRowSchema, MetaSchema, PlaceSchema, PredictionSchema } from "@/lib/schemas";
 import { z } from "zod";
 import { deviceId } from "@/lib/device";
 import {
@@ -51,16 +51,34 @@ function BeatInner() {
       .catch(() => setBoard([]));
   }, []);
 
+  // Resolve the pick to a real forecast cell.
+  //
+  // The default used to be a string built from the map's centre,
+  // "39.3792_-105.1208". That point sits between the two counties, and the
+  // string is not the ID of any cell, so a pick locked against it could never
+  // be scored. Asking the API for the nearest cell snaps to one that exists,
+  // and gives a name to show instead of the raw ID.
+  const [where, setWhere] = useState<{ domain: string; lat: number; lon: number } | null>(null);
   useEffect(() => {
-    if (!cell) {
-      getParsed("/meta", MetaSchema)
-        .then((m) => {
-          if (m.center) setCell(`${m.center[1].toFixed(4)}_${m.center[0].toFixed(4)}`);
+    const fromCell = cell.match(/^(-?[\d.]+)_(-?[\d.]+)$/);
+    const resolve = (lat: number, lon: number) =>
+      getParsed(`/forecast?lat=${lat}&lon=${lon}`, PlaceSchema)
+        .then((p) => {
+          setWhere({ domain: p.domain ?? "", lat: p.lat, lon: p.lon });
+          if (p.cell_id !== cell) setCell(p.cell_id);
         })
+        .catch(() => undefined);
+    if (fromCell) {
+      void resolve(Number(fromCell[1]), Number(fromCell[2]));
+    } else {
+      getParsed("/meta", MetaSchema)
+        .then((m) => (m.center ? resolve(m.center[1], m.center[0]) : undefined))
         .catch(() => undefined);
     }
     refresh();
   }, [cell, refresh]);
+
+  const me = deviceId();
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -88,7 +106,7 @@ function BeatInner() {
       <h1 className="display text-4xl">Beat the Model</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
         Lock your call for 4 weeks out before you see the model&apos;s. Both are scored against
-        realized USDM and ERC once those weeks arrive.
+        what actually happens once those weeks arrive.
       </p>
 
       {offline && (
@@ -105,11 +123,26 @@ function BeatInner() {
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
         <Segmented label="Drought category" options={CATEGORIES} value={cat} onChange={setCat} tone="ochre" />
         <Segmented label="Fire-spread condition" options={BANDS} value={band} onChange={setBand} />
-        <div className="flex items-center gap-3">
-          <Action type="submit" busy={busy} disabled={!cell}>
+        <div className="flex flex-wrap items-center gap-3">
+          <Action type="submit" busy={busy} disabled={!where}>
             {locked ? "Lock another" : "Lock my pick"}
           </Action>
-          <span className="font-mono text-xs text-ink-soft">{cell || "locating"}</span>
+          <span className="text-sm text-ink-soft">
+            {where ? (
+              <>
+                for the {where.domain.charAt(0).toUpperCase() + where.domain.slice(1)} cell at{" "}
+                <span className="num text-ink">
+                  {where.lat.toFixed(2)}, {where.lon.toFixed(2)}
+                </span>
+                .{" "}
+                <a href="/" className="text-ember underline underline-offset-2">
+                  Pick another on the map
+                </a>
+              </>
+            ) : (
+              "Finding the nearest forecast cell"
+            )}
+          </span>
         </div>
       </form>
 
@@ -184,7 +217,9 @@ function BeatInner() {
               <li key={r.device_id} className="flex items-center justify-between px-4 py-3">
                 <span className="flex items-center gap-3">
                   <Numeral value={i + 1} size="sm" tone="mute" />
-                  <span className="font-mono text-sm">{r.device_id}</span>
+                  <span className="font-mono text-sm">
+                    {r.device_id === me || me.startsWith(r.device_id) ? "You" : `Player ${r.device_id.slice(0, 4)}`}
+                  </span>
                 </span>
                 <Numeral value={r.picks} size="sm" />
               </li>

@@ -37,7 +37,7 @@ export class RouteError extends Component<
         </p>
         <button
           onClick={() => this.setState({ error: null })}
-          className="mt-3 text-xs text-paper underline underline-offset-4"
+          className="mt-3 text-xs text-ember underline underline-offset-4"
         >
           Try again
         </button>

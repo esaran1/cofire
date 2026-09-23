@@ -69,7 +69,26 @@ def test_ember_and_observation() -> None:
         },
     )
     assert obs.status_code == 200
-    assert "nudge" in obs.json()
+    body = obs.json()
+    # A report does not change the forecast, and the response must not claim it
+    # does. This used to check only that a "nudge" key existed, which let a
+    # hardcoded +0.05 / +1.2 "effect" through to every user who filed one.
+    assert body["changes_forecast"] is False
+    assert body["nudge"] is None
+    # Fort Collins sits inside the Larimer forecast area, so the report is
+    # attached to a real cell and says which.
+    assert body["cell"] is not None
+    assert body["cell"]["domain"] == "larimer"
+
+
+def test_a_report_outside_both_areas_is_not_attached() -> None:
+    """The map centre lies between the counties, where there is no forecast."""
+    r = client.post(
+        "/observations",
+        json={"device_id": "t-outside", "lat": 39.379, "lon": -105.121, "type": "creek_low", "note": ""},
+    )
+    assert r.status_code == 200
+    assert r.json()["cell"] is None
 
 
 def test_beat_the_model() -> None:

@@ -1,6 +1,7 @@
 "use client";
 
 import { Horizon, Place, Target } from "@/lib/api";
+import { targetHorizon, targetLabel } from "@/lib/targets";
 import { Disclosure } from "./ui/Controls";
 import { UncertaintyBadge } from "./UncertaintyBadge";
 import { WhyBars } from "./WhyBars";
@@ -14,31 +15,12 @@ const HCHIPS = ["2", "4", "8"] as const;
  * component renders the decision and its reason; it never infers one.
  */
 
-/** Human labels for the probabilistic target names in the export. */
-const TARGET_LABELS: Record<string, string> = {
-  d_ge2: "Drought reaching D2 or worse",
-  d_ge3: "Drought reaching D3 or worse",
-  d_improve1: "Drought easing by a category",
-  d_intensify1: "Drought worsening by a category",
-  d_intensify2: "Drought worsening by two categories",
-  d_nochange: "Drought staying where it is",
-  f_gt80: "Fire-spread conditions above the 80th percentile",
-  f_gt90: "Fire-spread conditions above the 90th percentile",
-  f_gt97: "Fire-spread conditions above the 97th percentile",
-};
-
-function labelFor(name: string): string {
-  const base = name.replace(/_h\d+$/, "");
-  return TARGET_LABELS[base] ?? base.replace(/_/g, " ");
-}
-
 /**
  * A probability as a percentage, without asserting impossibility.
  *
  * Rounding 0.006% to "0%" says the event cannot happen, which is a stronger
- * claim than the forecast makes and not one the record supports. A small
- * non-zero probability reads as "<1%" instead; an exact zero, which the models
- * do produce, still reads as "0%".
+ * claim than the forecast makes. A small non-zero probability reads as "<1%";
+ * an exact zero, which these models do produce, still reads as "0%".
  */
 function formatProbability(p: number): string {
   if (p <= 0) return "0%";
@@ -51,10 +33,6 @@ function sentence(text: string): string {
   return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 }
 
-function horizonOf(name: string): string {
-  const m = name.match(/_h(\d+)$/);
-  return m ? m[1] : "";
-}
 
 /**
  * The continuous ERC percentile, in whichever state the preregistration fixed.
@@ -159,7 +137,7 @@ function TargetRow({ name, t }: { name: string; t: Target }) {
         summary={
           <div className="flex items-baseline justify-between gap-3">
             <span className="min-w-0">
-              <span className="block text-sm">{labelFor(name)}</span>
+              <span className="block text-sm">{targetLabel(name)}</span>
               {isBase ? (
                 <span className="text-mute block text-[11px]">same for the whole county</span>
               ) : null}
@@ -203,7 +181,7 @@ export function PlaceCard({
   const hz: Horizon | undefined = place.horizons[horizon];
   const u = place.uncertainty;
   const targets = Object.entries(place.targets ?? {})
-    .filter(([name]) => horizonOf(name) === horizon)
+    .filter(([name]) => targetHorizon(name) === horizon)
     .sort(([a], [b]) => a.localeCompare(b));
 
   return (

@@ -248,11 +248,25 @@ export const NudgeSchema = z.object({
 
 export const ObservationAckSchema = z.object({
   id: z.string().nullish(),
+  // Legacy field, always null now: the API used to return a hardcoded "effect"
+  // that nothing computed. The shipped model does not read ground reports.
   nudge: NudgeSchema.nullish(),
+  // The forecast cell the report was logged against, or null when the point is
+  // outside both forecast areas.
+  cell: z
+    .object({
+      cell_id: z.string(),
+      lat: z.number(),
+      lon: z.number(),
+      domain: z.string().nullish(),
+    })
+    .nullish(),
+  changes_forecast: z.boolean().default(false),
 });
 
 export const ObservationSchema = z.object({
   id: z.string(),
+  device_id: z.string().nullish(),
   lat: z.number(),
   lon: z.number(),
   type: z.string().default(""),
@@ -295,6 +309,7 @@ export type EmberItem = z.infer<typeof EmberItemSchema>;
 export type Prediction = z.infer<typeof PredictionSchema>;
 export type Nudge = z.infer<typeof NudgeSchema>;
 export type ObservationAck = z.infer<typeof ObservationAckSchema>;
+export type ObservationCell = NonNullable<ObservationAck["cell"]>;
 export type Observation = z.infer<typeof ObservationSchema>;
 export type LeaderRow = z.infer<typeof LeaderRowSchema>;
 export type Grid = z.infer<typeof GridSchema>;

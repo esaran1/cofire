@@ -73,7 +73,7 @@ a 264-week miss run on the same rows.
 Reliability passes 39 of 54 at the 0.05 threshold, and 9 of the 12 stage-1
 survivors. The failures concentrate at long horizons exactly as the recorded
 expectation said: mean reliability 0.0126 at h2, 0.0386 at h4, 0.0775 at h8, and
-13 of 15 failures at h4 or h8. Every h2 target passes on both domains.
+all 15 failures at h4 or h8 (5 and 10). Every h2 target passes on both domains; the worst h2 reliability is 0.0377.
 
 Width ratios on 2026 are 0.568 to 0.757, better than validation's 0.922 to
 1.006. By the rule fixed before the look this changes no rendering.

@@ -118,3 +118,28 @@ def test_every_shown_target_has_a_state_and_reason() -> None:
         key = col[: -len("_p")]
         assert f"{key}_state" in frame.columns, f"{key} has no rendering state"
         assert frame[f"{key}_reason"].notna().all(), f"{key} has rows without a reason"
+
+
+def test_hindcast_criteria_labels_state_the_recorded_thresholds() -> None:
+    """The plain-language test names must carry the thresholds the look used.
+
+    The Hindcast page rewrites each pre-registered test in plain words, which
+    means the threshold is written there as well as in the artifact. If the two
+    ever disagree the page describes a test that was not run.
+    """
+    import json
+    import re
+
+    facts = json.loads(Path("app/lib/facts.json").read_text())
+    page = Path("app/app/hindcast/page.tsx").read_text()
+    block = page[page.index("const CRITERIA") : page.index("};", page.index("const CRITERIA"))]
+    labels = dict(re.findall(r'"(\d)":\s*"([^"]+)"', block))
+    by_test = facts["look3"]["by_test"]
+    assert set(labels) == set(by_test), "every recorded test needs a label, and no more"
+    for k, t in by_test.items():
+        nums = re.findall(r"\d+(?:\.\d+)?", t["threshold"])
+        for n in nums:
+            want = f"{float(n):.2f}".rstrip("0").rstrip(".") if "." in n else n
+            assert want in labels[k] or n in labels[k] or f"{float(n):.2f}" in labels[k], (
+                f"test {k} threshold {t['threshold']!r} is not stated in {labels[k]!r}"
+            )

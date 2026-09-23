@@ -5,6 +5,7 @@ import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigur
 import { CountUp, Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
 import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
+import { countyName, targetHorizon, targetLabel } from "@/lib/targets";
 
 /**
  * Look 3 on the sealed 2026 holdout.
@@ -19,6 +20,21 @@ import facts from "@/lib/facts.json";
  */
 
 const look = facts.look3;
+
+/**
+ * The pre-registered tests in plain words, keyed by test number.
+ *
+ * The artifact names each group after its first row, which mislabelled test 3
+ * as "coverage | D0-D1" although its twelve checks cover both drought levels.
+ * These say what each test actually checked.
+ */
+const CRITERIA: Record<string, string> = {
+  "1": "Overall coverage (reported, not tested)",
+  "2": "Worst 13-week coverage stays at or above 0.70",
+  "3": "Coverage within 0.05 of 0.90 in mild and in severe drought",
+  "4": "Longest run of misses is 60 weeks or fewer",
+  "5": "Stated odds match what happened (reliability 0.05 or less)",
+};
 const cov = look.coverage_series;
 const rel = look.reliability;
 const pid = cov.filter((r) => r.impl === "reference_pid");
@@ -114,7 +130,7 @@ export default function HindcastPage() {
               {failures.map((r) => (
                 <StatRow
                   key={`${r.domain}-${r.target}`}
-                  label={`${r.domain} · ${r.target}`}
+                  label={`${countyName(r.domain)}: ${targetLabel(r.target)}, ${targetHorizon(r.target)}w`}
                   value={r.reliability.toFixed(4)}
                   tone="fail"
                 />
@@ -129,7 +145,7 @@ export default function HindcastPage() {
           {Object.entries(look.by_test).map(([k, t]) => (
             <StatRow
               key={k}
-              label={t.name.replace(/^\d+\s/, "")}
+              label={CRITERIA[k] ?? t.name.replace(/^\d+\s/, "")}
               value={`${t.n_pass}/${t.n_total}`}
               tone={t.n_pass === t.n_total ? "pass" : "fail"}
             />

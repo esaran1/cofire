@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
 import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
+import { targetLabel } from "@/lib/targets";
 
 /**
  * What ships, and what it is allowed to claim.
@@ -15,22 +16,6 @@ import facts from "@/lib/facts.json";
  */
 
 const gb = (b: number) => `${(b / 1e9).toFixed(2)} GB`;
-
-/** Target identifiers are internal. Readers get the event they name. */
-const TARGET_LABELS: Record<string, string> = {
-  d_ge2: "Drought reaching D2 or worse",
-  d_ge3: "Drought reaching D3 or worse",
-  d_improve1: "Drought easing by a category",
-  d_intensify1: "Drought worsening by a category",
-  d_intensify2: "Drought worsening by two categories",
-  d_nochange: "Drought staying put",
-  f_gt80: "Fire-spread conditions past the 80th percentile",
-  f_gt90: "Fire-spread conditions past the 90th percentile",
-  f_gt97: "Fire-spread conditions past the 97th percentile",
-};
-
-const labelFor = (t: string) =>
-  TARGET_LABELS[t.replace(/_h\d+$/, "")] ?? t.replace(/_/g, " ");
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -85,7 +70,7 @@ export default function AboutPage() {
               {rows.map((s) => (
                 <StatRow
                   key={s.target}
-                  label={`${labelFor(s.target)}, ${s.horizon}w`}
+                  label={`${targetLabel(s.target)}, ${s.horizon}w`}
                   value={s.paired_diff.toFixed(3)}
                 />
               ))}

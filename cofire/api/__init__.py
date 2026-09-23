@@ -112,6 +112,11 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 DEMO_ROOT = Path(os.environ.get("COFIRE_DEMO_DIR") or (_REPO_ROOT / "demo"))
 
 
+# A report within this distance of a forecast cell centre is attached to that
+# cell. gridMET cells are 1/24 degree, so this is about one and a half cells.
+OBS_ATTACH_DEG = 0.06
+
+
 def art_path(rel: str) -> Path:
     """Artifact path, preferring the committed demo fixture when present."""
     demo = DEMO_ROOT / "artifacts" / rel
@@ -436,13 +441,29 @@ def post_observation(body: ObservationIn) -> dict[str, Any]:
     with Session(engine) as session:
         session.add(row)
         session.commit()
-    # Cached what-if: look up precomputed nudge on the nearest cell if present.
+    # Say what actually happened to the report, and nothing more.
+    #
+    # This used to return a "nudge" of +0.05 drought and +1.2 fire, hardcoded,
+    # labelled "documented feature weight x cached model delta", and the Observe
+    # page displayed it as the report's effect on the forecast. Nothing computed
+    # it. The shipped configuration never reads ground reports, so there is no
+    # effect to report, and inventing one was a false claim to every user who
+    # filed. The report is logged against its nearest forecast cell, and the
+    # response says which one, or that it fell outside both forecast areas.
     index = load_index()
     cell = nearest_cell(body.lat, body.lon, index)
-    nudge = {"delta_drought": 0.05 if body.type != "vegetation_green" else -0.04, "delta_fire": 1.2 if body.type != "vegetation_green" else -0.8, "source": "documented feature weight × cached model delta"}
-    if cell and cell.get("nudge"):
-        nudge = cell["nudge"].get(body.type, nudge)  # type: ignore[assignment]
-    return {"id": oid, "nudge": nudge}
+    attached = None
+    if cell is not None:
+        dist = ((float(cell["lat"]) - body.lat) ** 2 + (float(cell["lon"]) - body.lon) ** 2) ** 0.5
+        # Within one cell's width of a forecast cell centre counts as inside.
+        if dist <= OBS_ATTACH_DEG:
+            attached = {
+                "cell_id": cell["cell_id"],
+                "lat": cell["lat"],
+                "lon": cell["lon"],
+                "domain": cell.get("domain"),
+            }
+    return {"id": oid, "nudge": None, "cell": attached, "changes_forecast": False}
 
 
 @app.get("/observations")

@@ -4,8 +4,9 @@ import { OBSERVATION_TYPES } from "@/lib/options";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { API, Nudge, Observation, getParsed, postParsed } from "@/lib/api";
-import { ObservationAckSchema, ObservationSchema, MetaSchema } from "@/lib/schemas";
+import { API, Observation, getParsed, postParsed } from "@/lib/api";
+import { MetaSchema, ObservationAckSchema, ObservationSchema, PlaceSchema } from "@/lib/schemas";
+import type { ObservationCell } from "@/lib/schemas";
 import { z } from "zod";
 import { deviceId } from "@/lib/device";
 import {
@@ -31,7 +32,9 @@ function ObserveInner() {
   const [type, setType] = useState("lawn_crispy");
   const [note, setNote] = useState("");
   const [photo, setPhoto] = useState<string>("");
-  const [nudge, setNudge] = useState<Nudge | null>(null);
+  // What happened to the last report: attached to a cell, or outside both areas.
+  const [filed, setFiled] = useState<{ cell: ObservationCell | null } | null>(null);
+  const [locating, setLocating] = useState(false);
   const [rows, setRows] = useState<Observation[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
@@ -49,19 +52,44 @@ function ObserveInner() {
       });
   }, []);
 
+  // Default to a real forecast cell. The map's centre sits between the two
+  // counties, where there is no forecast, so it used to be the default point
+  // and every report filed without editing it landed outside both areas.
+  // Asking the API for the nearest cell to the centre snaps to one that exists.
   useEffect(() => {
     if (!lat || !lon) {
       getParsed("/meta", MetaSchema)
         .then((m) => {
-          if (m.center) {
-            setLon(m.center[0].toFixed(3));
-            setLat(m.center[1].toFixed(3));
-          }
+          if (!m.center) return;
+          return getParsed(`/forecast?lat=${m.center[1]}&lon=${m.center[0]}`, PlaceSchema).then((p) => {
+            setLat(p.lat.toFixed(3));
+            setLon(p.lon.toFixed(3));
+          });
         })
         .catch(() => undefined);
     }
     load();
   }, [lat, lon, load]);
+
+  function useMyLocation() {
+    if (!("geolocation" in navigator)) {
+      setErr("This browser cannot share its location. Enter coordinates instead.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLat(pos.coords.latitude.toFixed(3));
+        setLon(pos.coords.longitude.toFixed(3));
+        setLocating(false);
+      },
+      () => {
+        setErr("Location was not shared. Enter coordinates instead.");
+        setLocating(false);
+      },
+      { enableHighAccuracy: false, timeout: 8000 },
+    );
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -73,7 +101,7 @@ function ObserveInner() {
         { device_id: deviceId(), lat: Number(lat), lon: Number(lon), type, note, photo_path: photo },
         ObservationAckSchema,
       );
-      setNudge(body.nudge ?? null);
+      setFiled({ cell: body.cell ?? null });
       setNote("");
       setPhoto("");
       load();
@@ -84,15 +112,18 @@ function ObserveInner() {
     }
   }
 
-  const count = rows?.length ?? 0;
-  const rank = count >= 12 ? "Sentinel" : count >= 4 ? "Ranger" : count >= 1 ? "Scout" : "n/a";
+  // Your own reports. The rank used to count every report in the database,
+  // so a new visitor inherited everyone else's total.
+  const me = deviceId();
+  const count = rows?.filter((r) => r.device_id === me).length ?? 0;
+  const rank = count >= 12 ? "Sentinel" : count >= 4 ? "Ranger" : count >= 1 ? "Scout" : "Not ranked yet";
 
   return (
     <div className="reading px-6 pb-24 pt-12">
       <h1 className="display text-4xl">Observer Streaks</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
-        What the satellite cannot see from orbit. Ground reports adjust the local forecast by a
-        documented amount.
+        Report what the satellite cannot see. Reports are logged against their forecast cell for
+        anyone reading it. They do not change the forecast.
       </p>
 
       {offline && (
@@ -118,7 +149,7 @@ function ObserveInner() {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            className="rounded-lg border border-rule bg-transparent px-3 py-2 text-paper placeholder:text-mute focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+            className="rounded-lg border border-rule bg-paper-raised px-3 py-2 text-ink placeholder:text-mute focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
             placeholder="Optional detail, e.g. third week with no runoff"
           />
           <p className="text-xs text-ink-soft">Optional. Helps the next person reading this cell.</p>
@@ -133,7 +164,7 @@ function ObserveInner() {
             type="file"
             accept="image/*"
             onChange={(e) => setPhoto(e.target.files?.[0]?.name ?? "")}
-            className="text-sm text-mute file:mr-3 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:text-paper"
+            className="text-sm text-mute file:mr-3 file:rounded-full file:border-0 file:bg-paper-sunk file:px-4 file:py-2 file:text-sm file:text-ink hover:file:bg-rule"
           />
           <p className="text-xs text-ink-soft">Optional. Stored on this device for the demo.</p>
         </div>
@@ -148,7 +179,7 @@ function ObserveInner() {
               value={lat}
               onChange={(e) => setLat(e.target.value)}
               inputMode="decimal"
-              className="rounded-lg border border-rule bg-transparent px-3 py-2 font-mono text-paper focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+              className="rounded-lg border border-rule bg-paper-raised px-3 py-2 font-mono text-ink focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -160,48 +191,45 @@ function ObserveInner() {
               value={lon}
               onChange={(e) => setLon(e.target.value)}
               inputMode="decimal"
-              className="rounded-lg border border-rule bg-transparent px-3 py-2 font-mono text-paper focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+              className="rounded-lg border border-rule bg-paper-raised px-3 py-2 font-mono text-ink focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
             />
           </div>
         </div>
 
-        <Action type="submit" busy={busy} disabled={!lat || !lon}>
-          File this report
-        </Action>
+        <div className="flex flex-wrap items-center gap-3">
+          <Action type="submit" busy={busy} disabled={!lat || !lon}>
+            File this report
+          </Action>
+          <button
+            type="button"
+            onClick={useMyLocation}
+            disabled={locating}
+            className="rounded-full border border-rule px-5 py-2.5 text-sm text-ink transition-colors hover:bg-paper-sunk active:scale-[0.98] disabled:opacity-60"
+          >
+            {locating ? "Finding you" : "Use my location"}
+          </button>
+        </div>
       </form>
 
-      {/* The delta is computed server-side from a documented feature weight. It is
-          never decoration: if the API returns nothing, nothing is shown. */}
+      {/* What happened to the report, stated plainly. There used to be an
+          "effect on this cell" here built from a hardcoded constant; the model
+          does not read reports, so the honest thing to show is where it went. */}
       <AnimatePresence>
-        {nudge && (
+        {filed && (
           <motion.div
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+            initial={reduce ? false : { y: 12 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="mt-8"
+            role="status"
           >
             <Panel>
-              <p className="text-sm font-medium text-ink">Effect on this cell</p>
-              <div className="mt-3 grid grid-cols-2 gap-4">
-                <div>
-                  <Numeral
-                    value={`${nudge.delta_drought >= 0 ? "+" : ""}${nudge.delta_drought.toFixed(2)}`}
-                    tone="ochre"
-                    size="xl"
-                  />
-                  <p className="mt-1 text-xs text-ink-soft">drought category</p>
-                </div>
-                <div>
-                  <Numeral
-                    value={`${nudge.delta_fire >= 0 ? "+" : ""}${nudge.delta_fire.toFixed(1)}`}
-                    tone="ember"
-                    size="xl"
-                  />
-                  <p className="mt-1 text-xs text-ink-soft">fire-spread index</p>
-                </div>
-              </div>
-              <p className="mt-4 text-xs leading-relaxed text-ink-soft">Source: {nudge.source}.</p>
+              <p className="text-sm font-medium text-ink">Report filed</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                {filed.cell
+                  ? `Logged against the ${filed.cell.domain ? filed.cell.domain.charAt(0).toUpperCase() + filed.cell.domain.slice(1) : ""} cell at ${filed.cell.lat.toFixed(2)}, ${filed.cell.lon.toFixed(2)}. Anyone reading that cell will see it.`
+                  : "Logged. This point is outside both forecast areas, so it is not attached to a forecast cell."}
+              </p>
             </Panel>
           </motion.div>
         )}
