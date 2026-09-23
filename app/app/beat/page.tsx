@@ -1,5 +1,6 @@
 "use client";
 
+import { DROUGHT_CATEGORIES, FIRE_BANDS } from "@/lib/options";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -18,20 +19,8 @@ import {
   Skeleton,
 } from "@/components/ui/Controls";
 
-const CATEGORIES = [
-  { value: 0, label: "None", hint: "no drought" },
-  { value: 1, label: "D1", hint: "moderate" },
-  { value: 2, label: "D2", hint: "severe" },
-  { value: 3, label: "D3", hint: "extreme" },
-  { value: 4, label: "D4", hint: "exceptional" },
-];
-
-const BANDS = [
-  { value: "low", label: "Low" },
-  { value: "moderate", label: "Moderate" },
-  { value: "high", label: "High" },
-  { value: "very_high", label: "Very high" },
-];
+const CATEGORIES = DROUGHT_CATEGORIES;
+const BANDS = FIRE_BANDS;
 
 type Pick = { cell_id: string; horizon: number; drought_category: number; fire_band: string; issue: string };
 type Locked = { drought_point?: number | null; fire_index?: number | null };

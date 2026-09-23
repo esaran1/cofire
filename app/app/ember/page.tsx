@@ -162,7 +162,7 @@ export default function EmberPage() {
               >
                 <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-ember/60" />
                 <span>
-                  <span className="block text-sm text-ink">{i.label}</span>
+                  <span className="block text-sm text-ink">{i.label.replace(/\u2013/g, " to ")}</span>
                   <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{i.rationale}</span>
                 </span>
               </button>
@@ -197,7 +197,7 @@ export default function EmberPage() {
                         </span>
                         <span className="flex-1">
                           <span className={`block text-sm ${done ? "text-mute line-through" : "text-paper"}`}>
-                            {i.label}
+                            {i.label.replace(/\u2013/g, " to ")}
                           </span>
                           <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{i.rationale}</span>
                           <span className="mt-1 block text-xs text-mute">

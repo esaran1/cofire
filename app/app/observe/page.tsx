@@ -1,5 +1,6 @@
 "use client";
 
+import { OBSERVATION_TYPES } from "@/lib/options";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -18,13 +19,7 @@ import {
   Skeleton,
 } from "@/components/ui/Controls";
 
-const TYPES = [
-  { value: "stock_tank_dry", label: "Stock tank dry" },
-  { value: "creek_low", label: "Creek low" },
-  { value: "lawn_crispy", label: "Grass crisp" },
-  { value: "soil_cracked", label: "Soil cracked" },
-  { value: "vegetation_green", label: "Still green" },
-];
+const TYPES = OBSERVATION_TYPES;
 
 
 

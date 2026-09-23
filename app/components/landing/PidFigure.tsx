@@ -25,12 +25,16 @@ export function PidVsAciFigure({
   rows,
   target = 0.9,
   floor = 0.7,
+  caption,
 }: {
   rows: { domain: string; horizon: number; impl: string; roll13_min: number }[];
   target?: number;
   floor?: number;
+  /** Plain-language caption for the story; the default is the technical one. */
+  caption?: string;
 }) {
   const axisMin = floor;
+  const targetAt = (target - axisMin) / (1 - axisMin);
   const pairs = [...new Set(rows.map((r) => `${r.domain}|${r.horizon}`))].map((key) => {
     const [domain, horizon] = key.split("|");
     const pid = rows.find(
@@ -68,12 +72,6 @@ export function PidVsAciFigure({
   return (
     <figure className="w-full">
       <div className="relative border-y border-rule py-8 md:py-10">
-        <div
-          className="pointer-events-none absolute inset-y-8 border-l border-dashed border-ink/40"
-          style={{ left: `${((target - axisMin) / (1 - axisMin)) * 100}%` }}
-          aria-hidden
-        />
-
         <ul className="space-y-5">
           {pairs.map((p) => (
             <li key={`${p.domain}-${p.horizon}`} className="grid grid-cols-[6rem_1fr] items-center gap-5 md:grid-cols-[9rem_1fr]">
@@ -82,13 +80,13 @@ export function PidVsAciFigure({
               </span>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                  <div className="h-5 flex-1 bg-rule/40 md:h-6">{bar(p.pid, "pid")}</div>
+                  <Track at={targetAt} tone="ink">{bar(p.pid, "pid")}</Track>
                   <span className="num w-16 text-right text-sm text-ink md:text-base">
                     {p.pid === null ? "n/a" : p.pid.toFixed(3)}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-5 flex-1 bg-rule/40 md:h-6">{bar(p.aci, "aci")}</div>
+                  <Track at={targetAt} tone="ink">{bar(p.aci, "aci")}</Track>
                   <span className="num w-16 text-right text-sm text-mute md:text-base">
                     {p.aci === null ? "n/a" : p.aci.toFixed(3)}
                   </span>
@@ -99,9 +97,8 @@ export function PidVsAciFigure({
         </ul>
       </div>
       <figcaption className="mt-5 max-w-[68ch] text-xs leading-relaxed text-mute md:text-sm">
-        Worst rolling 13-week coverage on the sealed 2026 holdout. Dark is the reference
-        conformal PID controller, pale is ACI on the same rows. The axis starts at the
-        pre-registered floor of 0.70; the dashed line is the 0.90 target.
+        {caption ??
+          "Worst rolling 13-week coverage on the sealed 2026 holdout. Dark is the reference conformal PID controller, pale is ACI on the same rows. The axis starts at the pre-registered floor of 0.70; the dashed line is the 0.90 target."}
       </figcaption>
     </figure>
   );
@@ -118,9 +115,11 @@ export function PidVsAciFigure({
 export function ReliabilityFigure({
   byHorizon,
   threshold = 0.05,
+  caption,
 }: {
   byHorizon: Record<string, { mean: number; max: number; n: number }>;
   threshold?: number;
+  caption?: string;
 }) {
   const entries = Object.entries(byHorizon).sort((a, b) => Number(a[0]) - Number(b[0]));
   const scale = Math.max(threshold * 2, ...entries.map(([, v]) => v.max));
@@ -128,11 +127,6 @@ export function ReliabilityFigure({
   return (
     <figure className="w-full">
       <div className="relative border-y border-rule py-8 md:py-10">
-        <div
-          className="pointer-events-none absolute inset-y-8 border-l border-dashed border-ember"
-          style={{ left: `${(threshold / scale) * 100}%` }}
-          aria-hidden
-        />
         <ul className="space-y-6">
           {entries.map(([h, v]) => (
             <li key={h} className="grid grid-cols-[6rem_1fr] items-center gap-5 md:grid-cols-[9rem_1fr]">
@@ -140,7 +134,7 @@ export function ReliabilityFigure({
                 {h} weeks
               </span>
               <div className="flex items-center gap-3">
-                <div className="h-5 flex-1 bg-rule/40 md:h-6">
+                <Track at={threshold / scale} tone="ember">
                   <div
                     className={
                       v.mean > threshold
@@ -149,7 +143,7 @@ export function ReliabilityFigure({
                     }
                     style={{ width: `${(v.mean / scale) * 100}%` }}
                   />
-                </div>
+                </Track>
                 <span className="num w-20 text-right text-sm text-ink md:text-base">
                   {v.mean.toFixed(4)}
                 </span>
@@ -159,10 +153,41 @@ export function ReliabilityFigure({
         </ul>
       </div>
       <figcaption className="mt-5 max-w-[68ch] text-xs leading-relaxed text-mute md:text-sm">
-        Mean reliability term by horizon on the sealed 2026 holdout, lower is better. The
-        dashed line is the 0.05 threshold set before the look. Two-week forecasts pass on
-        both domains; the longer horizons are where it breaks.
+        {caption ??
+          "Mean reliability term by horizon on the sealed 2026 holdout, lower is better. The dashed line is the 0.05 threshold set before the look. Two-week forecasts pass on both domains; the longer horizons are where it breaks."}
       </figcaption>
     </figure>
+  );
+}
+
+/**
+ * A bar's track, with the reference line drawn inside it.
+ *
+ * The line used to be positioned against the whole figure, label column
+ * included, while the bars were positioned against this track. The two scales
+ * disagreed, and on the reliability chart the 0.05 line landed left of where it
+ * belonged, so the 4-week bar (0.0386, a pass) appeared to cross it and fail.
+ * Drawing the line in the same box as the bar makes that impossible.
+ */
+function Track({
+  at,
+  tone,
+  children,
+}: {
+  at: number;
+  tone: "ink" | "ember";
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative h-5 flex-1 bg-rule/40 md:h-6">
+      {children}
+      <div
+        className={`pointer-events-none absolute -inset-y-1.5 border-l border-dashed ${
+          tone === "ember" ? "border-ember" : "border-ink/45"
+        }`}
+        style={{ left: `${Math.max(0, Math.min(1, at)) * 100}%` }}
+        aria-hidden
+      />
+    </div>
   );
 }

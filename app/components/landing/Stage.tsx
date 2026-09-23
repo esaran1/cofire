@@ -38,7 +38,7 @@ export function Stage({
     >
       <div className="measure w-full">
         <div className="reveal">
-          <h3 className="display max-w-[20ch] text-3xl leading-[1.15] md:text-5xl">{claim}</h3>
+          <h3 className="display max-w-[24ch] text-3xl leading-[1.15] [text-wrap:balance] md:text-5xl">{claim}</h3>
           {detail ? (
             <p className="text-ink-soft mt-4 max-w-[52ch] text-base leading-relaxed md:text-lg">
               {detail}

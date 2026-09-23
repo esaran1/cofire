@@ -184,14 +184,21 @@ export function PlaceCard({
   onAdopt,
   onPredict,
   onReport,
+  embedded = false,
 }: {
   place: Place;
   horizon: string;
   onHorizon: (h: string) => void;
-  onClose: () => void;
-  onAdopt: () => void;
-  onPredict: () => void;
-  onReport: () => void;
+  onClose?: () => void;
+  onAdopt?: () => void;
+  onPredict?: () => void;
+  onReport?: () => void;
+  /**
+   * Render inline, as a picture of the product inside the landing story,
+   * rather than as the map's bottom sheet. Drops the close and action buttons,
+   * which do nothing outside the map.
+   */
+  embedded?: boolean;
 }) {
   const hz: Horizon | undefined = place.horizons[horizon];
   const u = place.uncertainty;
@@ -204,13 +211,19 @@ export function PlaceCard({
       data-testid="place-card"
       /* Mobile: a bottom sheet over the map. Desktop: it is rendered inside the
          reading panel, so it must be a plain block there and not cover the map. */
-      className="border-rule bg-paper-raised fixed inset-x-0 bottom-0 z-30 max-h-[70dvh] overflow-y-auto border-t p-5 shadow-[0_-2px_24px_rgba(23,24,27,0.12)] lg:static lg:max-h-none lg:border-0 lg:border-t lg:px-6 lg:pb-8 lg:pt-6 lg:shadow-none"
+      className={
+        embedded
+          ? "border-rule bg-paper-raised border p-5 md:p-6"
+          : "border-rule bg-paper-raised fixed inset-x-0 bottom-0 z-30 max-h-[70dvh] overflow-y-auto border-t p-5 shadow-[0_-2px_24px_rgba(23,24,27,0.12)] lg:static lg:max-h-none lg:border-0 lg:border-t lg:px-6 lg:pb-8 lg:pt-6 lg:shadow-none"
+      }
     >
-      <button className="text-ink-soft text-sm" onClick={onClose}>
-        Close
-      </button>
+      {!embedded ? (
+        <button className="text-ink-soft text-sm" onClick={onClose}>
+          Close
+        </button>
+      ) : null}
       <p className="text-ink-soft mt-1 text-xs">
-        {place.domain ? `${place.domain} · ` : ""}
+        {place.domain ? `${place.domain.charAt(0).toUpperCase()}${place.domain.slice(1)} · ` : ""}
         {place.issue}
       </p>
       <div className="mt-3 flex gap-2">
@@ -252,17 +265,19 @@ export function PlaceCard({
           <WhyBars bars={place.why ?? []} />
         </>
       ) : null}
-      <div className="mt-5 grid grid-cols-3 gap-2">
-        <button onClick={onAdopt} className="bg-paper-sunk rounded-lg py-3 text-sm">
-          Adopt
-        </button>
-        <button onClick={onPredict} className="bg-paper-sunk rounded-lg py-3 text-sm">
-          Predict here
-        </button>
-        <button onClick={onReport} className="bg-paper-sunk rounded-lg py-3 text-sm">
-          Report here
-        </button>
-      </div>
+      {!embedded ? (
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <button onClick={onAdopt} className="bg-paper-sunk rounded-lg py-3 text-sm">
+            Adopt
+          </button>
+          <button onClick={onPredict} className="bg-paper-sunk rounded-lg py-3 text-sm">
+            Predict here
+          </button>
+          <button onClick={onReport} className="bg-paper-sunk rounded-lg py-3 text-sm">
+            Report here
+          </button>
+        </div>
+      ) : null}
     </aside>
   );
 }

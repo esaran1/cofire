@@ -35,6 +35,7 @@ ship:
 	$(PY) -m cofire.ship.export
 	$(PY) -m cofire.ship.index_build
 	$(PY) -m cofire.ship.facts
+	$(PY) -m cofire.ship.story
 	$(PY) -m cofire.ship.demo
 
 pipeline:
