@@ -24,8 +24,31 @@ def _freeze_commit() -> str:
     return FREEZE_FILE.read_text().strip()
 
 
+def _require_commit(ref: str) -> None:
+    """Fail clearly if the freeze commit is not in this checkout's history.
+
+    `model_files_match` reports any git failure as a changed file, so a shallow
+    clone without the freeze commit read as "the model changed" when nothing
+    had. That helper is inside the frozen tree and cannot be edited, so the
+    check happens here. It fails rather than skips: a guard that quietly skips
+    when it cannot run is not a guard.
+    """
+    import subprocess
+
+    found = subprocess.run(
+        ["git", "cat-file", "-e", f"{ref}^{{commit}}"], capture_output=True
+    ).returncode == 0
+    assert found, (
+        f"FREEZE_COMMIT {ref[:12]} is not in this checkout's history, so the "
+        "frozen model cannot be checked. This is a shallow clone, not a model "
+        "change: fetch full history (actions/checkout with fetch-depth: 0, or "
+        "`git fetch --unshallow`)."
+    )
+
+
 def test_no_model_file_differs_from_the_freeze() -> None:
     ref = _freeze_commit()
+    _require_commit(ref)
     ok, changed = model_files_match(ref)
     assert ok, (
         "these files under cofire/model/ differ from FREEZE_COMMIT "

@@ -9,6 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history. tests/test_frozen_model.py diffs cofire/model/ against
+          # FREEZE_COMMIT, and the default shallow checkout (one commit) does not
+          # contain it, so git exited 128 and the guard failed on every push
+          # since the freeze without any model file having changed.
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v4
       - uses: actions/setup-python@v5
         with:
@@ -18,7 +24,7 @@ jobs:
           node-version: "20"
       - run: uv sync --extra dev
       - run: uv run ruff check cofire tests scripts
-      - run: uv run mypy --strict cofire/model
+      - run: uv run mypy --strict cofire/model cofire/ship
       - run: uv run python scripts/check_copy.py
       - run: uv run pytest -q
         env:
