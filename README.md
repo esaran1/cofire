@@ -8,7 +8,7 @@ It does **not** predict ignitions or where a fire will occur.
 
 ### What COFIRE claims, and what it does not
 
-- **Skill** is claimed for 12 of 51 target and county pairs, the ones that beat their baseline after multiplicity control and a shuffled-target check. Nowhere else.
+- **Skill** is claimed for 11 of 51 target and county pairs, the ones that beat their baseline after multiplicity control and a shuffled-target check, and still do when refit with training labels kept out of the evaluation period. Nowhere else. A twelfth passed the original test and was withdrawn by the refit; see [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md).
 - **Probabilities** were tested once on the sealed 2026 year against pre-registered criteria: 39 of 54 passed reliability. Where a target failed, the app shows the county's historical rate for that time of year instead of a per-cell number.
 - **Forecast ranges are not shown.** The pre-registered interval tests passed, but the test was flawed: it updated each forecast with outcomes from the same week, which a real forecast would not know for 2 to 8 weeks. Run with the real delay, the method is unstable. The results are void and the app draws no band. See [`docs/CORRECTION_LOOK3.md`](docs/CORRECTION_LOOK3.md), beside the unedited [`docs/PREREGISTRATION_LOOK3.md`](docs/PREREGISTRATION_LOOK3.md), and the follow-up sweep for the same class of fault in [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md).
 

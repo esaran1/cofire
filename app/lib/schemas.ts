@@ -84,6 +84,12 @@ export const HorizonSchema = z.object({
   range_lo: maybeNumber,
   range_hi: maybeNumber,
   range_label: z.string().nullish(),
+  // History, not a forecast: the usual raw ERC for the week this horizon
+  // forecasts, from the training years only. Present in every state.
+  hist_lo: maybeNumber,
+  hist_hi: maybeNumber,
+  hist_years: z.string().nullish(),
+  target_week: z.string().nullish(),
 
   // v0.6 fields, still emitted by the legacy export path.
   drought_point: maybeNumber,

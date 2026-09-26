@@ -63,6 +63,14 @@ export default function AboutPage() {
           Skill is claimed here and nowhere else. Each of these had to beat its own outcomes
           shuffled in place, because a forecast can beat a baseline on spread alone.
         </p>
+        {facts.multiplicity.withdrawn_by_leak_free_refit.length > 0 ? (
+          <p className="text-mute mt-2 max-w-[58ch] text-xs leading-relaxed">
+            {facts.multiplicity.n_survivors_original} passed the original test.{" "}
+            {facts.multiplicity.withdrawn_by_leak_free_refit.length} no longer passes once training
+            labels are kept out of the evaluation period, so it is not claimed:{" "}
+            {facts.multiplicity.withdrawn_by_leak_free_refit.join(", ")}.
+          </p>
+        ) : null}
         {Object.entries(byDomain).map(([dom, rows]) => (
           <div key={dom} className="mt-6">
             <h3 className="text-mute text-xs capitalize">{dom}</h3>

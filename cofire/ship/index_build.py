@@ -21,6 +21,8 @@ LOGGER = logging.getLogger("cofire.ship.index_build")
 EXPORT = Path("artifacts/ship/forecast_issues.parquet")
 OUT = Path("artifacts/forecast_index.json")
 HORIZONS = (2, 4, 8)
+# The years the historical range is drawn from: the training split.
+HISTORY_YEARS = "2007 to 2021"
 
 
 def _clean(v: Any) -> Any:
@@ -49,6 +51,15 @@ def continuous_block(row: pd.Series, h: int) -> dict[str, Any]:
         "state": state,
         "reason": row.get(f"erc_pct_h{h}_reason"),
     }
+    # History, not a forecast: the usual raw ERC for the week this horizon
+    # forecasts, from the training years only. Present in every state.
+    h_lo = _clean(row.get(f"erc_h{h}_hist_lo"))
+    h_hi = _clean(row.get(f"erc_h{h}_hist_hi"))
+    if h_lo is not None and h_hi is not None:
+        out["hist_lo"] = round(h_lo, 1)
+        out["hist_hi"] = round(h_hi, 1)
+        out["hist_years"] = HISTORY_YEARS
+        out["target_week"] = (pd.Timestamp(row["time"]) + pd.Timedelta(weeks=h)).strftime("%Y-%m-%d")
     if state == "interval":
         radius = _clean(row.get(f"erc_pct_h{h}_radius"))
         if point is not None and radius is not None:

@@ -121,6 +121,73 @@ def climatological_bounds(
     return out_lo, out_hi
 
 
+HISTORY_LAST_ALLOWED = pd.Timestamp("2023-12-31")
+
+
+def historical_erc_range(
+    train: pd.DataFrame,
+    index: pd.DataFrame,
+    horizon: int,
+    train_end: pd.Timestamp,
+    lo: float = 5.0,
+    hi: float = 95.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """The usual range of raw ERC for the week a horizon forecasts, from history.
+
+    For each row, the week being forecast is the issue week plus `horizon`.
+    The range is the 5th to 95th percentile of this cell's raw weekly ERC over
+    the training years, pooled over weeks of year within +/- 3 of that week,
+    with at least 10 values, else the domain-wide pool for that window.
+
+    Training years only, asserted: every value in any pool must fall on or
+    before `train_end`, and `train_end` must fall before 2024, so nothing from
+    the calibration split or the sealed year can enter. It is history, not a
+    forecast, and the Place Card labels it that way.
+    """
+    from cofire.model.erc_pct import window_weeks
+
+    times = pd.to_datetime(train["time"])
+    if train_end > HISTORY_LAST_ALLOWED:
+        raise AssertionError(f"history window ends {train_end.date()}, after 2023")
+    if (times > train_end).any():
+        raise AssertionError(
+            f"historical ERC range was handed rows up to {times.max().date()}, "
+            f"past the training end {train_end.date()}"
+        )
+    v = pd.to_numeric(train["erc"], errors="coerce").to_numpy(dtype=float)
+    ok = np.isfinite(v)
+    cells = train["cell_id"].astype(str).to_numpy()[ok]
+    tw = _woy(train["time"])[ok]
+    vals = v[ok]
+    by_cell: dict[tuple[str, int], np.ndarray] = {
+        (str(c), int(w)): g.to_numpy()
+        for (c, w), g in pd.Series(vals).groupby([cells, tw])
+    }
+    by_week: dict[int, np.ndarray] = {int(w): g.to_numpy() for w, g in pd.Series(vals).groupby(tw)}
+    target = pd.to_datetime(index["time"]) + pd.Timedelta(weeks=horizon)
+    iw = _woy(pd.Series(target))
+    icells = index["cell_id"].astype(str).to_numpy()
+    out_lo = np.full(len(index), np.nan)
+    out_hi = np.full(len(index), np.nan)
+    cache: dict[tuple[str, int], tuple[float, float]] = {}
+    for i, (c, w) in enumerate(zip(icells, iw, strict=True)):
+        key = (c, int(w))
+        if key not in cache:
+            win = window_weeks(int(w))
+            parts = [by_cell[(c, x)] for x in win if (c, x) in by_cell]
+            pool = np.concatenate(parts) if parts else np.array([])
+            if pool.size < 10:
+                wide = [by_week[x] for x in win if x in by_week]
+                pool = np.concatenate(wide) if wide else np.array([])
+            cache[key] = (
+                (float(np.percentile(pool, lo)), float(np.percentile(pool, hi)))
+                if pool.size
+                else (float("nan"), float("nan"))
+            )
+        out_lo[i], out_hi[i] = cache[key]
+    return out_lo, out_hi
+
+
 def build_export() -> pd.DataFrame:
     """Every issue through 2026-09-22, both domains, from the frozen model."""
     from cofire.model.calibration_stages import arms
@@ -162,6 +229,9 @@ def build_export() -> pd.DataFrame:
             # the delayed-feedback gate shows leaks, and nothing renders a band.
             per_issue[f"erc_pct_h{h}_clim_median"] = climatological_median(train, h, issues)
             per_issue[f"erc_pct_h{h}_clim_width"] = climatological_width(train, h, issues)
+            e_lo, e_hi = historical_erc_range(train, issues, h, pd.Timestamp(st.train_end))
+            per_issue[f"erc_h{h}_hist_lo"] = e_lo
+            per_issue[f"erc_h{h}_hist_hi"] = e_hi
             b_lo, b_hi = climatological_bounds(train, h, issues)
             per_issue[f"erc_pct_h{h}_clim_lo"] = b_lo
             per_issue[f"erc_pct_h{h}_clim_hi"] = b_hi

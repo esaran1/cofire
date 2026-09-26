@@ -21,6 +21,24 @@ Branch `v1-research`. Holdout 2026 **looked at 3 times**, the third under the pr
 The counter is keyed on the holdout year in `cofire/model/freeze.py`. No
 further look is authorised.
 
+**Holdout information reached a shipped artifact.** The forecast ranges the app
+displayed for 2026 were a single radius per horizon, taken from the final state
+of a PID run whose last labels were January and February 2026 outcomes, the
+sealed year. No evaluation, test result or reported number was derived from
+that radius; the look-3 figures come from `cofire/model/look3.py`, which was
+run once and is unaffected. The artifact is withdrawn: the export no longer
+computes it and the app draws no band. The values are retained only as a
+historical record in `artifacts/audit/shown_radius.json`. The look count is
+unchanged at 3: displaying a radius is not a look, because no one read 2026
+outcomes to learn anything from it. Details: [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md).
+
+**Survivors after a leak-free refit: 11, not 12.** Refit outside the frozen
+path with an h-week label embargo and per-fold `erc_pct`, the stage 1 test
+keeps 11 of the 12 survivors. Pueblo `d_ge2_h4` falls (lower bound +0.011 to
+-0.002) and is no longer claimed. The fire conclusion is unchanged, and the
+fire family choice is unchanged in all 9 targets. Record in
+`docs/LEAK_SWEEP.md`; diagnostic in `cofire/ship/sensitivity.py`.
+
 ## Where the work stands
 
 | stage | result |

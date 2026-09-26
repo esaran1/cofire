@@ -42,7 +42,11 @@ function sentence(text: string): string {
  * something a reader needs in order to read the number, so it sits behind a
  * disclosure.
  */
-function ErcBlock({ hz }: { hz: Horizon | undefined }) {
+function formatWeek(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric" });
+}
+
+function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null }) {
   const point = hz?.point;
   const state = hz?.state;
 
@@ -91,6 +95,28 @@ function ErcBlock({ hz }: { hz: Horizon | undefined }) {
           <p className="text-ink-soft mt-1.5 text-xs">
             Typical for this week: {hz!.range_lo!.toFixed(0)} to {hz!.range_hi!.toFixed(0)}. No
             forecast band, because it would be no narrower than this.
+          </p>
+        </div>
+      ) : null}
+
+      {hz?.hist_lo !== null && hz?.hist_lo !== undefined && hz?.hist_hi !== null && hz?.hist_hi !== undefined ? (
+        // History, in raw ERC units, kept apart from the percentile above so
+        // the two scales are never drawn against each other.
+        <div className="border-rule mt-3 border-l-2 pl-3" data-testid="erc-history">
+          <p className="text-mute text-[11px] uppercase tracking-wide">History, not a forecast</p>
+          <p className="text-ink-soft mt-1 text-xs leading-relaxed">
+            In {hz.hist_years ?? "past years"}, raw ERC in this cell around{" "}
+            {hz.target_week ? formatWeek(hz.target_week) : "this week"} was usually{" "}
+            <span className="num text-ink">
+              {hz.hist_lo.toFixed(0)} to {hz.hist_hi.toFixed(0)}
+            </span>
+            {erc !== null && erc !== undefined ? (
+              <>
+                . It is <span className="num text-ink">{erc.toFixed(0)}</span> now.
+              </>
+            ) : (
+              "."
+            )}
           </p>
         </div>
       ) : null}
@@ -217,7 +243,7 @@ export function PlaceCard({
       </div>
 
       <h2 className="mt-4 text-xl font-semibold">Dryness for this week</h2>
-      <ErcBlock hz={hz} />
+      <ErcBlock hz={hz} erc={place.erc} />
 
       {place.usdm !== null && place.usdm !== undefined ? (
         <p className="text-ink-soft mt-3 text-xs">

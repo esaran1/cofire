@@ -119,3 +119,50 @@ percentiles. Clean.
 The rejected multi-regime variants (`cofire/model/uncertainty/multiregime.py`)
 pool residuals from the most similar years, which can be later years. They do
 not ship. Recorded for completeness.
+
+
+## Sensitivity: the stage 1 survivors under a leak-free refit
+
+Added 2026-09-26. `cofire/ship/sensitivity.py`, a diagnostic outside the frozen
+path; nothing ships from it.
+
+Every fit, the models and the reference baselines alike, dropped training rows
+whose h-week label lands after 2021-12-31, and the stage 1 test was rerun
+exactly as before: paired real-minus-shuffled BSS, circular block bootstrap,
+BH at q=0.10, Holm within families, 12 positive weeks minimum. For stage 1's
+single split the stored `erc_pct` was asserted equal to a training-years-only
+recomputation, and it is: the self-inclusion fault is inside the folds only.
+
+| county | target | before [95% CI] | after [95% CI] | survives |
+|---|---|---|---|---|
+| larimer | d_ge2_h2 | +0.792 [+0.191, +1.141] | +0.833 [+0.167, +1.196] | yes |
+| larimer | d_ge2_h4 | +0.430 [+0.026, +0.806] | +0.486 [+0.017, +0.870] | yes |
+| larimer | d_improve1_h2 | +0.211 [+0.109, +0.338] | +0.205 [+0.100, +0.326] | yes |
+| larimer | d_improve1_h4 | +0.339 [+0.195, +0.528] | +0.327 [+0.182, +0.511] | yes |
+| larimer | d_improve1_h8 | +0.402 [+0.273, +0.607] | +0.371 [+0.240, +0.562] | yes |
+| larimer | d_nochange_h2 | +0.158 [+0.057, +0.266] | +0.165 [+0.064, +0.278] | yes |
+| larimer | d_nochange_h4 | +0.239 [+0.077, +0.397] | +0.255 [+0.095, +0.424] | yes |
+| larimer | d_nochange_h8 | +0.324 [+0.174, +0.481] | +0.348 [+0.174, +0.501] | yes |
+| pueblo | d_ge2_h2 | +0.305 [+0.077, +0.515] | +0.305 [+0.091, +0.513] | yes |
+| pueblo | d_ge2_h4 | +0.219 [+0.011, +0.369] | +0.216 [-0.002, +0.373] | **no** |
+| pueblo | f_gt80_h8 | +0.041 [+0.014, +0.062] | +0.040 [+0.012, +0.068] | yes |
+| pueblo | f_gt90_h8 | +0.025 [+0.004, +0.042] | +0.024 [+0.003, +0.045] | yes |
+
+11 of 12 survive. Pueblo `d_ge2_h4` falls, its lower bound moving from +0.011 to
+-0.002 while the point estimate barely moves; it was marginal. Across all
+estimable comparisons the median shift in the paired difference is
+0.0033 and the largest 0.0560. Estimable comparisons fall from
+39 to 38: Larimer `f_gt97_h4` drops from 12 positive weeks to 11, because the
+embargoed fit leaves one ERC state unseen and one positive week's rows get no
+prediction; it was not a survivor before.
+
+The fire conclusion is unchanged: no fire target beats the ERC-decile
+transition baseline in both counties. The two fire survivors are both Pueblo
+at 8 weeks, as before.
+
+The fire family choice, the one fold-based decision that feeds stage 1, was
+redone with `erc_pct` recomputed per fold from that fold's training years and
+an h-week embargo before each held-out year. The damped logistic beats the
+transition table in all 9 fire targets, matching the shipped choice.
+
+The app now claims only the 11 that survive both tests.

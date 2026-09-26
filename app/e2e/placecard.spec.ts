@@ -100,3 +100,14 @@ test("the point forecast survives every state", async ({ page }) => {
   // Whatever happens to the band, the forecast itself is always shown.
   await expect(card.getByText("Dryness for this week")).toBeVisible();
 });
+
+test("the historical ERC range is shown, labelled as history", async ({ page }) => {
+  const card = await openPlaceCard(page);
+  await expect(card).toBeVisible({ timeout: 15_000 });
+  const hist = card.locator('[data-testid="erc-history"]');
+  await expect(hist).toBeVisible();
+  // It must say it is history, and the years it comes from, so it cannot be
+  // read as a forecast band.
+  await expect(hist).toContainText("History, not a forecast");
+  await expect(hist).toContainText("2007 to 2021");
+});

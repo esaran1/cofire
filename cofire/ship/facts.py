@@ -41,12 +41,34 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else ""
 
 
+EMBARGOED = ART / "audit" / "survivors_embargoed.csv"
+
+
+def _survivor_frame() -> pd.DataFrame:
+    """Survivors of the original test and, when it exists, the leak-free refit.
+
+    The leak sweep found training labels carrying outcomes from the evaluation
+    period (no embargo). `cofire.ship.sensitivity` refits without that leak and
+    reruns the same test. A pair is claimed only if it survives both, and the
+    numbers shown are the leak-free ones.
+    """
+    orig = pd.read_csv(RERUN / "multiplicity.csv")
+    keys = ["domain", "target", "horizon"]
+    if not EMBARGOED.exists():
+        return orig[orig["survivor"].astype(bool)]
+    clean = pd.read_csv(EMBARGOED)
+    both = orig[keys + ["survivor"]].merge(
+        clean[keys + ["survivor", "arm", "paired_diff", "paired_lo", "paired_hi", "n_positive_weeks"]],
+        on=keys, suffixes=("_orig", ""),
+    )
+    return both[both["survivor_orig"].astype(bool) & both["survivor"].astype(bool)]
+
+
 def _survivors() -> list[dict[str, Any]]:
     path = RERUN / "multiplicity.csv"
     if not path.exists():
         return []
-    m = pd.read_csv(path)
-    s = m[m["survivor"].astype(bool)]
+    s = _survivor_frame()
     return [
         {
             "domain": str(r["domain"]), "target": str(r["target"]),
@@ -67,7 +89,17 @@ def _multiplicity_summary() -> dict[str, Any]:
     return {
         "n_comparisons": int(len(m)),
         "n_estimable": int(m["estimable"].sum()),
-        "n_survivors": int(m["survivor"].sum()),
+        "n_survivors": len(_survivor_frame()),
+        "n_survivors_original": int(m["survivor"].sum()),
+        "withdrawn_by_leak_free_refit": (
+            [
+                f"{r['domain']} {r['target']}"
+                for _, r in m[m["survivor"].astype(bool)].iterrows()
+                if (r["domain"], r["target"]) not in {
+                    (x["domain"], x["target"]) for _, x in _survivor_frame().iterrows()
+                }
+            ]
+        ),
         "q": 0.10,
         "min_positive_weeks": 12,
         "rule": (

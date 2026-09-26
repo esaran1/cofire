@@ -1,7 +1,7 @@
 {
   "generated_from": "artifacts/",
   "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
-  "git_sha": "1e31eba4b9cd8aa813feb83ecbe275532bdc29f2",
+  "git_sha": "fc50d5d051240ced1e2fdd0e4c4ed00c4dc7fd88",
   "resolution_m": 4000,
   "domains": [
     "larimer",
@@ -27,7 +27,11 @@
   "multiplicity": {
     "n_comparisons": 51,
     "n_estimable": 39,
-    "n_survivors": 12,
+    "n_survivors": 11,
+    "n_survivors_original": 12,
+    "withdrawn_by_leak_free_refit": [
+      "pueblo d_ge2_h4"
+    ],
     "q": 0.1,
     "min_positive_weeks": 12,
     "rule": "paired difference between the statistic on real targets and on targets shuffled within the same circular blocks, CI above zero"
@@ -38,29 +42,29 @@
       "target": "d_ge2_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.7917,
-      "paired_lo": 0.19126,
-      "paired_hi": 1.14111,
-      "n_positive_weeks": 22
+      "paired_diff": 0.8330849647363536,
+      "paired_lo": 0.1667820481580218,
+      "paired_hi": 1.195929544331739,
+      "n_positive_weeks": 21
     },
     {
       "domain": "larimer",
       "target": "d_ge2_h4",
       "horizon": 4,
       "arm": "markov",
-      "paired_diff": 0.43014,
-      "paired_lo": 0.02642,
-      "paired_hi": 0.8058,
-      "n_positive_weeks": 22
+      "paired_diff": 0.4860935219634647,
+      "paired_lo": 0.0173902397303135,
+      "paired_hi": 0.8697255141956929,
+      "n_positive_weeks": 19
     },
     {
       "domain": "larimer",
       "target": "d_improve1_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.21116,
-      "paired_lo": 0.1089,
-      "paired_hi": 0.33808,
+      "paired_diff": 0.205007123343725,
+      "paired_lo": 0.0996339873484016,
+      "paired_hi": 0.3261843262223467,
       "n_positive_weeks": 32
     },
     {
@@ -68,89 +72,79 @@
       "target": "d_improve1_h4",
       "horizon": 4,
       "arm": "markov",
-      "paired_diff": 0.33888,
-      "paired_lo": 0.1952,
-      "paired_hi": 0.52801,
-      "n_positive_weeks": 38
+      "paired_diff": 0.3265846926139537,
+      "paired_lo": 0.1821754273738761,
+      "paired_hi": 0.5114748115792779,
+      "n_positive_weeks": 36
     },
     {
       "domain": "larimer",
       "target": "d_improve1_h8",
       "horizon": 8,
       "arm": "markov",
-      "paired_diff": 0.40189,
-      "paired_lo": 0.27331,
-      "paired_hi": 0.60681,
-      "n_positive_weeks": 43
+      "paired_diff": 0.3712671423579232,
+      "paired_lo": 0.2401466718430714,
+      "paired_hi": 0.5623577343044323,
+      "n_positive_weeks": 40
     },
     {
       "domain": "larimer",
       "target": "d_nochange_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.158,
-      "paired_lo": 0.05691,
-      "paired_hi": 0.26649,
-      "n_positive_weeks": 104
+      "paired_diff": 0.1654221902897368,
+      "paired_lo": 0.0641576406059173,
+      "paired_hi": 0.2783720805187624,
+      "n_positive_weeks": 102
     },
     {
       "domain": "larimer",
       "target": "d_nochange_h4",
       "horizon": 4,
       "arm": "markov",
-      "paired_diff": 0.23913,
-      "paired_lo": 0.07661,
-      "paired_hi": 0.39682,
-      "n_positive_weeks": 104
+      "paired_diff": 0.255376171134009,
+      "paired_lo": 0.094603923791998,
+      "paired_hi": 0.4240137181318725,
+      "n_positive_weeks": 100
     },
     {
       "domain": "larimer",
       "target": "d_nochange_h8",
       "horizon": 8,
       "arm": "markov",
-      "paired_diff": 0.32384,
-      "paired_lo": 0.17417,
-      "paired_hi": 0.48135,
-      "n_positive_weeks": 104
+      "paired_diff": 0.3478297924360328,
+      "paired_lo": 0.1738485273176199,
+      "paired_hi": 0.5006696632465352,
+      "n_positive_weeks": 96
     },
     {
       "domain": "pueblo",
       "target": "d_ge2_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.30472,
-      "paired_lo": 0.0774,
-      "paired_hi": 0.51482,
+      "paired_diff": 0.3047553823535788,
+      "paired_lo": 0.0913215838089347,
+      "paired_hi": 0.513395368575741,
       "n_positive_weeks": 39
-    },
-    {
-      "domain": "pueblo",
-      "target": "d_ge2_h4",
-      "horizon": 4,
-      "arm": "markov",
-      "paired_diff": 0.21925,
-      "paired_lo": 0.01109,
-      "paired_hi": 0.36934,
-      "n_positive_weeks": 37
     },
     {
       "domain": "pueblo",
       "target": "f_gt80_h8",
       "horizon": 8,
       "arm": "damped",
-      "paired_diff": 0.04105,
-      "paired_lo": 0.01374,
-      "paired_hi": 0.062,
-      "n_positive_weeks": 34
+      "paired_diff": 0.0400016023536288,
+      "paired_lo": 0.0124450999744675,
+      "paired_hi": 0.0678943730848556,
+      "n_positive_weeks": 33
     },
     {
       "domain": "pueblo",
       "target": "f_gt90_h8",
       "horizon": 8,
       "arm": "damped",
-      "paired_diff": 0.02451,
-      "paired_lo": 0.00375,
-      "paired_hi": 0.04237,
+      "paired_diff": 0.0241758146728719,
+      "paired_lo": 0.0025582555481282,
+      "paired_hi": 0.0454639812246869,
       "n_positive_weeks": 19
     }
   ],
