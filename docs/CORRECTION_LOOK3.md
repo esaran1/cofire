@@ -85,3 +85,18 @@ controller.
 
 Restoring a forecast band needs a method that is valid with the real delay,
 evaluated under a new pre-registration.
+
+## Addendum, 2026-09-26: the "real delay" run was not fully causal
+
+The delayed-feedback gate (`cofire/ship/leak_gate.py`, `docs/LEAK_SWEEP.md`)
+found that the reference controller scales its step size from the most recent
+100 scores at every step, regardless of `ahead`. The lagged run above therefore
+applied the delay to the controller's updates but not to its step size, and
+same-week information still entered through the step size. It is a better
+approximation of real time than `ahead=1`, not an exact one. The conclusion is
+unchanged: the look-3 interval results are void because of `ahead=1`, and no
+band is shown.
+
+The sweep also found that the radius the app displayed was computed from a
+stream whose last labels were January and February 2026 outcomes. That radius
+is no longer computed; see `docs/LEAK_SWEEP.md`.

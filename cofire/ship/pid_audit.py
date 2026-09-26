@@ -8,9 +8,13 @@ What this found, and why it drives the rendering:
    week, whose outcome does not exist until 2 to 8 weeks later. That is
    information a real forecaster cannot have. It affects Stage A, Stage B and
    the look-3 interval results, which are void as real-time evidence.
-2. Run with the honest lag, `ahead = h weeks x cells per week`, the configured
-   PID controller is unstable: integrator windup under delayed feedback, with
-   radii swinging to large negative and positive values.
+2. Run with the lag applied to its updates, `ahead = h weeks x cells per
+   week`, the configured PID controller is unstable: integrator windup under
+   delayed feedback, with radii swinging to large negative and positive values.
+   That run is not fully causal either. The delayed-feedback gate later showed
+   the reference implementation scales its step size from the most recent 100
+   scores regardless of `ahead`, so same-week information still enters through
+   the step size (cofire/ship/leak_gate.py).
 3. The radius the export applied to every 2026 forecast was the leaky
    controller's final state. Scored on 2024-2025 it covers well under 90%.
 4. Split conformal, a fixed 90th percentile of 2022-2023 errors, is valid in
@@ -40,7 +44,6 @@ import pandas as pd  # noqa: E402
 LOGGER = logging.getLogger("cofire.ship.pid_audit")
 
 OUT = Path("artifacts/audit")
-EXPORT = Path("artifacts/ship/forecast_issues.parquet")
 COVERAGE_TARGET = 0.90
 ROLL13_FLOOR = 0.70
 
@@ -62,7 +65,8 @@ def run() -> dict[str, Any]:
     from cofire.model.calibration_stages import arms, domain_frame, rolling_min_cov
     from cofire.model.uncertainty.shipping_pid import T_BURNIN, longest_miss_run, run_reference_pid
 
-    shown = pd.read_parquet(EXPORT) if EXPORT.exists() else None
+    shown_path = OUT / "shown_radius.json"
+    shown = json.loads(shown_path.read_text()) if shown_path.exists() else None
     arm_by_h = arms()
     rows: list[dict[str, Any]] = []
 
@@ -106,8 +110,12 @@ def run() -> dict[str, Any]:
             n = s_fit.size
             q = float(np.quantile(s_fit, min(1.0, np.ceil((n + 1) * COVERAGE_TARGET) / n)))
             record(dom, h, "split conformal", s_ev <= q, wk_ev, q)
+            # The radius the export applied to every 2026 forecast, restored from
+            # the last export that carried it. It cannot be recomputed from this
+            # stream: the export's stream ran through 2026, so its last labels
+            # were sealed-year outcomes, which this audit does not read.
             if shown is not None:
-                r_shown = float(shown.loc[shown["domain"] == dom, f"erc_pct_h{h}_radius"].iloc[0])
+                r_shown = float(shown["radius"][f"{dom}|{h}"])
                 record(dom, h, "radius the app showed", s_ev <= r_shown, wk_ev, r_shown)
 
     frame_out = pd.DataFrame(rows)

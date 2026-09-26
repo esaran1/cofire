@@ -7,7 +7,7 @@ forecaster cannot make (`ahead=1` over a week-then-cell stream). With the honest
 lag the PID controller is unstable on 2022 to 2025, worst 13-week coverage down
 to 0.27, and the radius the export had applied covers 43 to 72%. Per the
 pre-registered consequence of a failed interval test, all six continuous
-horizons now render `uncalibrated`. Full record: `docs/CORRECTION_LOOK3.md`;
+horizons now render `uncalibrated`. Full record: [`docs/CORRECTION_LOOK3.md`](docs/CORRECTION_LOOK3.md), beside the unedited pre-registration; follow-up sweep: [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md);
 reproducible audit: `cofire/ship/pid_audit.py`. Probability results and the 12
 skill survivors are unaffected.
 

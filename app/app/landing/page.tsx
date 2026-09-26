@@ -116,8 +116,8 @@ export default function LandingPage() {
         claim={<>Then we found a flaw in our own test.</>}
         detail={
           <>
-            The range test used outcomes a real forecast would not have yet. Run properly, its worst
-            stretch fell to{" "}
+            The range test used outcomes a real forecast would not have yet. With the real delay, its
+            worst stretch fell to{" "}
             <span className="num text-ember">{audit.real_time_roll13_min?.toFixed(2)}</span>. So the
             app draws no range rather than a wrong one.
           </>

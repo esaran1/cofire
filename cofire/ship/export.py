@@ -133,7 +133,6 @@ def build_export() -> pd.DataFrame:
         continuous_predict,
     )
     from cofire.model.shipping import load as load_choices
-    from cofire.model.uncertainty.shipping_pid import run_reference_pid
 
     choices = load_choices(out_dir=Path("artifacts/rerun_a"))
     arm_by_h = arms()
@@ -158,16 +157,9 @@ def build_export() -> pd.DataFrame:
             arm = arm_by_h[str(h)]
             pred = continuous_predict(arm, train, h, issues)
             per_issue[f"erc_pct_h{h}_point"] = pred
-            # The interval radius is the controller's frozen state at the end
-            # of calibration, not re-derived from 2026 outcomes.
-            cal = frame[
-                (t >= pd.Timestamp(st.valid_start)) & (t <= pd.Timestamp(st.calibrate_end))
-            ].sort_values(["time", "cell_id"])
-            y_cal = pd.to_numeric(cal[f"erc_pct_h{h}"], errors="coerce").to_numpy(float)
-            p_cal = continuous_predict(arm, train, h, cal)
-            k = np.isfinite(y_cal) & np.isfinite(p_cal)
-            radius = float(run_reference_pid(np.abs(y_cal[k] - p_cal[k])).radii[-1])
-            per_issue[f"erc_pct_h{h}_radius"] = np.full(len(issues), radius)
+            # No interval radius is carried into the export. It used to be the
+            # last state of a PID controller run with same-week updates, which
+            # the delayed-feedback gate shows leaks, and nothing renders a band.
             per_issue[f"erc_pct_h{h}_clim_median"] = climatological_median(train, h, issues)
             per_issue[f"erc_pct_h{h}_clim_width"] = climatological_width(train, h, issues)
             b_lo, b_hi = climatological_bounds(train, h, issues)

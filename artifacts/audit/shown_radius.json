@@ -1,0 +1,12 @@
+{
+  "source": "artifacts/ship/forecast_issues.parquet at commit 1e31eba, the last export that carried a radius",
+  "note": "The radius applied to every 2026 forecast before the correction. It was the final state of a PID run with same-week updates over 2022 to 2025, and that run's last labels were outcomes from January and February 2026.",
+  "radius": {
+    "larimer|2": 32.1634,
+    "larimer|4": 29.3071,
+    "larimer|8": 31.0358,
+    "pueblo|2": 16.116,
+    "pueblo|4": 23.7465,
+    "pueblo|8": 17.9269
+  }
+}

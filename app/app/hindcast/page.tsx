@@ -72,16 +72,17 @@ export default function HindcastPage() {
       {/* The correction comes first. The look-3 interval results passed, but the
           test behind them used outcomes a real forecast would not have yet, so
           they are void as evidence. The record is kept below, labelled as such. */}
-      <div role="note" className="border-ember/40 bg-ember/5 mt-8 border p-5">
-        <p className="text-ember font-medium">Correction: the interval results below are void</p>
-        <p className="text-ink-soft mt-2 max-w-[62ch] text-sm leading-relaxed">
-          The interval test updated each forecast using outcomes from the same week, which a real
-          forecast would not know for 2 to 8 weeks. Re-run with that delay on 2022 to 2025, the
-          method is unstable and its worst 13-week coverage falls to{" "}
-          <span className="num text-ink">{audit.real_time_roll13_min?.toFixed(2)}</span>. The app
-          therefore draws no forecast range. The probability results are unaffected.
-        </p>
-      </div>
+      {audit.retraction ? (
+        <div role="note" className="border-ember/40 bg-ember/5 mt-8 border p-5">
+          <p className="text-ember font-medium">{audit.retraction.title}</p>
+          <p className="text-ink-soft mt-2 max-w-[62ch] text-sm leading-relaxed">
+            {audit.retraction.summary}
+          </p>
+          <p className="text-mute mt-3 text-xs">
+            Full record: {audit.retraction.doc}, and the follow-up sweep in {audit.retraction.sweep}.
+          </p>
+        </div>
+      ) : null}
 
       <div className="border-rule mt-10 grid gap-8 border-y py-8 sm:grid-cols-3">
         <Verdict
@@ -89,7 +90,11 @@ export default function HindcastPage() {
           label="probability tests passed"
           sub="written down before the look"
         />
-        <Verdict value="void" label="interval tests" sub="the test itself was flawed" tone="fail" />
+        {audit.retraction ? (
+          <Verdict value="void" label="interval tests" sub="the test itself was flawed" tone="fail" />
+        ) : (
+          <Verdict value="30/30" label="interval tests passed" sub="both counties, all ranges" />
+        )}
         <Verdict
           value={`${failures.length}`}
           label="reliability failures"

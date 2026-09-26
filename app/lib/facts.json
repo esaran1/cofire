@@ -1,7 +1,7 @@
 {
   "generated_from": "artifacts/",
   "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
-  "git_sha": "9ff9c268dd7a4ee5f493613bbdc414ee681d8abe",
+  "git_sha": "1e31eba4b9cd8aa813feb83ecbe275532bdc29f2",
   "resolution_m": 4000,
   "domains": [
     "larimer",
@@ -1438,6 +1438,12 @@
     ]
   },
   "interval_audit": {
+    "retraction": {
+      "title": "Correction: the interval results are void",
+      "summary": "The interval test updated each forecast using outcomes from the same week, which a real forecast would not know for 2 to 8 weeks. Re-run with that delay on 2022 to 2025, the method is unstable and its worst 13-week coverage falls to 0.27. The app therefore draws no forecast range. The probability results are unaffected.",
+      "doc": "docs/CORRECTION_LOOK3.md",
+      "sweep": "docs/LEAK_SWEEP.md"
+    },
     "realtime_valid": false,
     "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown.",
     "as_tested": [

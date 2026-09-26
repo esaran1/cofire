@@ -121,7 +121,7 @@ disallow_untyped_calls = false
 # following `reference_pid` on this invocation, which differs between checking
 # `cofire/model` alone and checking it through an importer. The file is inside
 # the frozen tree and cannot be edited, so the interaction is settled here.
-module = ["cofire.model.uncertainty.shipping_pid"]
+module = ["cofire.model.uncertainty.shipping_pid", "cofire.ship.leak_gate"]
 warn_unused_ignores = false
 
 

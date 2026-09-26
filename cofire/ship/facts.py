@@ -174,7 +174,23 @@ def _interval_audit() -> dict[str, Any]:
     tested = pick("PID as tested (ahead=1)")
     real = pick("PID in real time (lagged)")
     shown = pick("radius the app showed")
+    worst = min(r["roll13_min"] for r in real) if real else None
+    retraction = None
+    if not d["verdict"]["realtime_valid"]:
+        retraction = {
+            "title": "Correction: the interval results are void",
+            "summary": (
+                "The interval test updated each forecast using outcomes from the same "
+                "week, which a real forecast would not know for 2 to 8 weeks. Re-run "
+                "with that delay on 2022 to 2025, the method is unstable and its worst "
+                f"13-week coverage falls to {worst:.2f}. The app therefore draws no "
+                "forecast range. The probability results are unaffected."
+            ),
+            "doc": "docs/CORRECTION_LOOK3.md",
+            "sweep": "docs/LEAK_SWEEP.md",
+        }
     return {
+        "retraction": retraction,
         "realtime_valid": bool(d["verdict"]["realtime_valid"]),
         "reason": str(d["verdict"]["reason"]),
         "as_tested": tested,

@@ -79,6 +79,18 @@ export default function AboutPage() {
         ))}
       </Section>
 
+      {facts.interval_audit.retraction ? (
+        <Section title={facts.interval_audit.retraction.title}>
+          <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">
+            {facts.interval_audit.retraction.summary}
+          </p>
+          <p className="text-mute mt-3 text-xs">
+            Full record: {facts.interval_audit.retraction.doc}, and{" "}
+            {facts.interval_audit.retraction.sweep}.
+          </p>
+        </Section>
+      ) : null}
+
       <Section title="What ships">
         <dl className="border-rule mt-4 divide-y divide-rule border-y">
           {Object.entries(facts.configuration).map(([k, v]) => (
