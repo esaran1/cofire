@@ -124,7 +124,14 @@ def test_base_rate_is_the_training_record_rate_for_the_season() -> None:
     from cofire.model.erc_pct import window_weeks
     from cofire.model.targets import HORIZONS, all_event_targets
 
-    frame, st = domain_frame("larimer")
+    # The training feature store is built locally and not committed, so a clean
+    # checkout (CI) has the export but nothing to recompute the rate from.
+    try:
+        frame, st = domain_frame("larimer")
+    except (KeyError, SystemExit):
+        pytest.skip("training feature store not built in this checkout")
+    if frame.empty:
+        pytest.skip("training feature store not built in this checkout")
     frame = all_event_targets(frame, HORIZONS)
     train = frame[frame["time"] <= pd.Timestamp(st.train_end)]
     issue = pd.Timestamp("2026-09-22")
