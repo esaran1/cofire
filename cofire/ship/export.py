@@ -53,6 +53,74 @@ def assert_no_scoring(frame: pd.DataFrame) -> None:
         )
 
 
+def _woy(times: pd.Series) -> np.ndarray:
+    weeks: np.ndarray = (
+        pd.to_datetime(times).dt.isocalendar().week.astype(int).clip(1, 52).to_numpy()
+    )
+    return weeks
+
+
+def regional_base_rate(train: pd.DataFrame, target: str, index: pd.DataFrame) -> np.ndarray:
+    """How often the event happened in this county at this time of year.
+
+    The training-era (train split only) share of cell-weeks where `target`
+    occurred, pooled over the whole domain and over weeks of year within the
+    project's usual +/- 3 week window of each issue. One number per issue,
+    identical across cells.
+
+    This replaces the average of the model's own 2026 predictions over every
+    issue, which is not a base rate and mixed seasons: it showed a 64% chance
+    of Larimer reaching D2 within four weeks on 22 September, where the record
+    for late September says 11%.
+    """
+    from cofire.model.erc_pct import window_weeks
+
+    y = pd.to_numeric(train[target], errors="coerce")
+    tw = _woy(train["time"])
+    ok = np.isfinite(y.to_numpy(dtype=float))
+    rate_by_woy: dict[int, float] = {}
+    for w in range(1, 53):
+        m = ok & np.isin(tw, window_weeks(w))
+        rate_by_woy[w] = float(y.to_numpy(dtype=float)[m].mean()) if m.any() else float("nan")
+    return np.array([rate_by_woy[int(w)] for w in _woy(index["time"])])
+
+
+def climatological_bounds(
+    train: pd.DataFrame, horizon: int, index: pd.DataFrame, lo: float = 5.0, hi: float = 95.0
+) -> tuple[np.ndarray, np.ndarray]:
+    """The actual 5th and 95th percentiles of the typical range, per cell and week.
+
+    Same pooling as `climatological_width`: a cell's training values within
+    +/- 3 weeks of year, at least 10 of them, else the domain-wide pool. The
+    Place Card used to draw the range as median +/- half the width, which is
+    only right for a symmetric distribution; these are the real bounds.
+    """
+    from cofire.model.erc_pct import window_weeks
+
+    col = f"erc_pct_h{horizon}"
+    v = pd.to_numeric(train[col], errors="coerce").to_numpy(dtype=float)
+    cells = train["cell_id"].astype(str).to_numpy()
+    tw = _woy(train["time"])
+    ok = np.isfinite(v)
+    pools: dict[tuple[str, int], np.ndarray] = {}
+    frame = pd.DataFrame({"c": cells[ok], "w": tw[ok], "v": v[ok]})
+    by = {(c, int(w)): g["v"].to_numpy() for (c, w), g in frame.groupby(["c", "w"])}
+    g_lo, g_hi = np.percentile(v[ok], lo), np.percentile(v[ok], hi)
+    out_lo = np.full(len(index), g_lo)
+    out_hi = np.full(len(index), g_hi)
+    icells = index["cell_id"].astype(str).to_numpy()
+    iw = _woy(index["time"])
+    for i, (c, w) in enumerate(zip(icells, iw, strict=True)):
+        key = (c, int(w))
+        if key not in pools:
+            parts = [by[(c, x)] for x in window_weeks(int(w)) if (c, x) in by]
+            pools[key] = np.concatenate(parts) if parts else np.array([])
+        pool = pools[key]
+        if pool.size >= 10:
+            out_lo[i], out_hi[i] = np.percentile(pool, lo), np.percentile(pool, hi)
+    return out_lo, out_hi
+
+
 def build_export() -> pd.DataFrame:
     """Every issue through 2026-09-22, both domains, from the frozen model."""
     from cofire.model.calibration_stages import arms
@@ -102,6 +170,9 @@ def build_export() -> pd.DataFrame:
             per_issue[f"erc_pct_h{h}_radius"] = np.full(len(issues), radius)
             per_issue[f"erc_pct_h{h}_clim_median"] = climatological_median(train, h, issues)
             per_issue[f"erc_pct_h{h}_clim_width"] = climatological_width(train, h, issues)
+            b_lo, b_hi = climatological_bounds(train, h, issues)
+            per_issue[f"erc_pct_h{h}_clim_lo"] = b_lo
+            per_issue[f"erc_pct_h{h}_clim_hi"] = b_hi
 
         # Probabilistic targets.
         for (target, h), c in sorted(choices.items()):
@@ -111,6 +182,7 @@ def build_export() -> pd.DataFrame:
                 else _fire_prediction(c.family, train, target, issues)
             )
             per_issue[f"{target}_p"] = pred
+            per_issue[f"{target}_base_rate"] = regional_base_rate(train, target, issues)
 
         for col, vals in per_issue.items():
             base[col] = vals
@@ -145,18 +217,18 @@ def attach_rendering(frame: pd.DataFrame, decisions: pd.DataFrame) -> pd.DataFra
         out.loc[m, f"{key}_state"] = state
         out.loc[m, f"{key}_reason"] = reason
 
-    # A base-rate target shows one number for the whole domain, so compute it
-    # once per domain and write it to every cell: identical by construction
-    # rather than identical by coincidence.
+    # A base-rate target shows the regional base rate: how often the event
+    # happened in this county at this time of year in the training record.
+    # Identical across cells by construction, and seasonal, so it moves with
+    # the issue date instead of being one number for the whole year.
     for col in [c for c in out.columns if c.endswith("_state")]:
         key = col[: -len("_state")]
-        pcol = f"{key}_p"
-        if pcol not in out.columns:
+        pcol, bcol = f"{key}_p", f"{key}_base_rate"
+        if pcol not in out.columns or bcol not in out.columns:
             continue
-        for dom in DOMAINS:
-            m = (out["domain"] == dom) & (out[col] == BASE_RATE)
-            if m.any():
-                out.loc[m, pcol] = float(np.nanmean(out.loc[m, pcol].to_numpy(float)))
+        m = out[col] == BASE_RATE
+        out[pcol] = out[pcol].astype("float64")
+        out.loc[m, pcol] = out.loc[m, bcol].astype("float64")
     return out
 
 

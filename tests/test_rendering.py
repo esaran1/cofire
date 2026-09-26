@@ -32,8 +32,22 @@ def test_reliability_threshold_matches_the_model_constant() -> None:
     assert RELIABILITY_MAX == MODEL_MAX
 
 
-def test_continuous_rendering_matches_the_preregistration() -> None:
-    """Larimer h2 and Pueblo h2/h4/h8 show intervals; Larimer h4/h8 do not."""
+def test_continuous_rendering_follows_the_preregistration_and_the_audit() -> None:
+    """Pre-registered states, unless the real-time interval audit says otherwise.
+
+    The look-3 interval tests passed under same-week updates a real forecaster
+    cannot make. Where the real-time audit finds the intervals invalid, the
+    pre-registered consequence of a failed interval test applies to every
+    horizon: `uncalibrated`, with the audit's reason.
+    """
+    import json
+
+    audit = Path("artifacts/audit/pid_realtime.json")
+    got = {(d.domain, d.horizon): d for d in continuous_decisions()}
+    if audit.exists() and not json.loads(audit.read_text())["verdict"]["realtime_valid"]:
+        assert {d.state for d in got.values()} == {"uncalibrated"}
+        assert all("real-time" in d.reason for d in got.values())
+        return
     expected = {
         ("larimer", 2): INTERVAL,
         ("larimer", 4): HISTORICAL_RANGE,
@@ -42,8 +56,7 @@ def test_continuous_rendering_matches_the_preregistration() -> None:
         ("pueblo", 4): INTERVAL,
         ("pueblo", 8): INTERVAL,
     }
-    got = {(d.domain, d.horizon): d.state for d in continuous_decisions()}
-    assert got == expected
+    assert {k: d.state for k, d in got.items()} == expected
 
 
 def test_the_document_states_the_same_six() -> None:
@@ -76,8 +89,13 @@ def test_reliability_failures_render_as_base_rate() -> None:
 
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
-def test_base_rate_targets_are_identical_across_cells() -> None:
-    """'Visibly identical across cells' has to be true of the numbers, not the caption."""
+def test_base_rate_targets_are_identical_across_cells_within_an_issue() -> None:
+    """One number per county and issue, and it moves with the season.
+
+    The earlier version of this test checked identity across every issue at
+    once, which a single year-round number passes. That is how a base rate
+    computed as the average of a year of model predictions got through.
+    """
     frame = pd.read_parquet(EXPORT)
     checked = 0
     for col in [c for c in frame.columns if c.endswith("_state")]:
@@ -85,14 +103,49 @@ def test_base_rate_targets_are_identical_across_cells() -> None:
         pcol = f"{key}_p"
         if pcol not in frame.columns:
             continue
-        for dom in ("larimer", "pueblo"):
-            m = (frame["domain"] == dom) & (frame[col] == BASE_RATE)
-            if not m.any():
-                continue
-            vals = frame.loc[m, pcol].to_numpy(dtype=float)
-            assert np.nanstd(vals) < 1e-12, f"{dom} {key} varies across cells"
-            checked += 1
+        sel = frame[frame[col] == BASE_RATE]
+        if sel.empty:
+            continue
+        spread = sel.groupby(["domain", "time"])[pcol].agg(lambda v: float(np.nanstd(v)))
+        assert (spread < 1e-12).all(), f"{key} varies across cells within an issue"
+        checked += 1
     assert checked > 0
+
+
+@pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
+def test_base_rate_is_the_training_record_rate_for_the_season() -> None:
+    """The shown base rate equals how often the event happened, not a model mean.
+
+    Recomputed independently from the training split for one target and issue.
+    On 22 September the shown value for Larimer D2-or-worse in 4 weeks was 0.644
+    before this was fixed; the record for late September says about 0.11.
+    """
+    from cofire.model.calibration_stages import domain_frame
+    from cofire.model.erc_pct import window_weeks
+    from cofire.model.targets import HORIZONS, all_event_targets
+
+    frame, st = domain_frame("larimer")
+    frame = all_event_targets(frame, HORIZONS)
+    train = frame[frame["time"] <= pd.Timestamp(st.train_end)]
+    issue = pd.Timestamp("2026-09-22")
+    woy = train["time"].dt.isocalendar().week.astype(int).clip(1, 52)
+    y = pd.to_numeric(train.loc[woy.isin(window_weeks(issue.isocalendar().week)), "d_ge2_h4"], errors="coerce")
+    expected = float(y.dropna().mean())
+
+    exp = pd.read_parquet(EXPORT)
+    row = exp[(exp["domain"] == "larimer") & (exp["time"] == issue)].iloc[0]
+    assert row["d_ge2_h4_state"] == BASE_RATE
+    # float32 storage in the export; a probability needs no more than 1e-6.
+    assert abs(float(row["d_ge2_h4_p"]) - expected) < 1e-6
+
+
+@pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
+def test_the_typical_range_uses_real_percentiles() -> None:
+    """Bounds must be ordered and inside 0 to 100, not median plus or minus half a width."""
+    frame = pd.read_parquet(EXPORT)
+    for h in (2, 4, 8):
+        lo, hi = frame[f"erc_pct_h{h}_clim_lo"], frame[f"erc_pct_h{h}_clim_hi"]
+        assert (lo < hi).all() and (lo >= 0).all() and (hi <= 100).all()
 
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")

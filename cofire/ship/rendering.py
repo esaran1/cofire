@@ -105,6 +105,24 @@ def _zero_resolution() -> dict[tuple[str, str], float]:
     }
 
 
+def _realtime_verdict() -> dict[str, object] | None:
+    """The real-time interval audit, if it has been run.
+
+    The look-3 interval tests passed, but they were computed with same-week
+    updates a real-time forecaster cannot make (see cofire/ship/pid_audit.py).
+    A test that was invalid cannot count as a pass, and the valid version
+    fails, so the pre-registered consequence of a failed interval test applies:
+    `uncalibrated`, no band, reason stated.
+    """
+    import json
+
+    path = ART / "audit" / "pid_realtime.json"
+    if not path.exists():
+        return None
+    verdict: dict[str, object] = json.loads(path.read_text())["verdict"]
+    return verdict
+
+
 def continuous_decisions() -> list[Decision]:
     """One decision per domain and horizon for the continuous ERC forecast.
 
@@ -113,12 +131,16 @@ def continuous_decisions() -> list[Decision]:
     """
     cls = pd.read_csv(RERUN / "classification.csv")
     failures = _interval_failures()
+    realtime = _realtime_verdict()
     out: list[Decision] = []
     for _, row in cls.iterrows():
         dom, h = str(row["domain"]), int(row["horizon"])
         informative = str(row["classification"]) == "informative"
         if (dom, h) in failures:
             out.append(Decision(dom, "erc_pct", h, UNCALIBRATED, failures[(dom, h)]))
+            continue
+        if realtime is not None and not realtime["realtime_valid"]:
+            out.append(Decision(dom, "erc_pct", h, UNCALIBRATED, str(realtime["reason"])))
             continue
         if informative:
             reason = (

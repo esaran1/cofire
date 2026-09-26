@@ -1,5 +1,22 @@
 # STATUS: merged to main, v1 complete
 
+## Correction, 2026-09-26: interval results void, no forecast band shown
+
+The look-3 interval tests (30 of 30 passed) used same-week updates a real-time
+forecaster cannot make (`ahead=1` over a week-then-cell stream). With the honest
+lag the PID controller is unstable on 2022 to 2025, worst 13-week coverage down
+to 0.27, and the radius the export had applied covers 43 to 72%. Per the
+pre-registered consequence of a failed interval test, all six continuous
+horizons now render `uncalibrated`. Full record: `docs/CORRECTION_LOOK3.md`;
+reproducible audit: `cofire/ship/pid_audit.py`. Probability results and the 12
+skill survivors are unaffected.
+
+Also fixed in the same audit: base-rate targets showed the average of a year of
+model predictions (64% for Larimer D2-or-worse on 22 September) instead of the
+training-record rate for the season (11%); the typical range used median plus
+or minus half the width instead of real percentiles; `/forecast` without an
+issue returned the oldest issue.
+
 Branch `v1-research`. Holdout 2026 **looked at 3 times**, the third under the preregistration below.
 The counter is keyed on the holdout year in `cofire/model/freeze.py`. No
 further look is authorised.

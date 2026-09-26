@@ -16,6 +16,7 @@ import facts from "@/lib/facts.json";
 export default function LandingPage() {
   const reduce = useReducedMotion();
   const look = facts.look3;
+  const audit = facts.interval_audit;
 
   return (
     <>
@@ -106,32 +107,27 @@ export default function LandingPage() {
         line={<>Every method was chosen and frozen before 2026 was opened, once.</>}
       >
         <SealedTimeline />
-        <div className="mt-16 flex items-baseline gap-5">
-          <span className="display text-6xl md:text-8xl">
-            {look.criteria_passed}
-            <span className="text-mute">/{look.criteria_total}</span>
-          </span>
-          <span className="text-ink-soft max-w-[18ch] text-lg leading-snug">
-            tests passed, all written down before the look
-          </span>
-        </div>
       </Chapter>
 
-      {/* 6. The proof that the ranges are honest. */}
+      {/* 6. The correction. The interval test as it was run, against the same
+          test with the delay a real forecaster faces. */}
       <Stage
         tinted
-        claim={<>When it promised 90%, it held.</>}
+        claim={<>Then we found a flaw in our own test.</>}
         detail={
           <>
-            In its worst 13 weeks the shipped method held{" "}
-            <span className="num text-ink">{look.pid.roll13_min.toFixed(3)}</span>. The alternative
-            fell to <span className="num text-ember">{look.aci.roll13_min.toFixed(3)}</span>.
+            The range test used outcomes a real forecast would not have yet. Run properly, its worst
+            stretch fell to{" "}
+            <span className="num text-ember">{audit.real_time_roll13_min?.toFixed(2)}</span>. So the
+            app draws no range rather than a wrong one.
           </>
         }
       >
         <PidVsAciFigure
-          rows={look.coverage_series}
-          caption="How often the truth landed inside the forecast range, in each method's worst 13 weeks of 2026. Dark is the method that ships, pale is the alternative on the same cells. The dashed line is the 90% it promised."
+          rows={[...audit.as_tested.map((r) => ({ ...r, impl: "reference_pid" })), ...audit.real_time.map((r) => ({ ...r, impl: "aci" }))]}
+          floor={0}
+          target={0.7}
+          caption="Worst 13-week coverage on 2022 to 2025, the years before the sealed one. Dark is the test as it was run; pale is the same test with the real delay of 2 to 8 weeks before an outcome is known. The dashed line is the 0.70 floor set in advance."
         />
       </Stage>
 

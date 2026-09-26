@@ -55,11 +55,13 @@ def continuous_block(row: pd.Series, h: int) -> dict[str, Any]:
             out["lo"] = round(max(0.0, point - radius), 6)
             out["hi"] = round(min(100.0, point + radius), 6)
     elif state == "historical_range":
-        med = _clean(row.get(f"erc_pct_h{h}_clim_median"))
-        width = _clean(row.get(f"erc_pct_h{h}_clim_width"))
-        if med is not None and width is not None:
-            out["range_lo"] = round(max(0.0, med - width / 2), 6)
-            out["range_hi"] = round(min(100.0, med + width / 2), 6)
+        # The real 5th and 95th percentiles of the typical range. This used to
+        # be median +/- half the width, which assumes a symmetric distribution.
+        lo = _clean(row.get(f"erc_pct_h{h}_clim_lo"))
+        hi = _clean(row.get(f"erc_pct_h{h}_clim_hi"))
+        if lo is not None and hi is not None:
+            out["range_lo"] = round(lo, 6)
+            out["range_hi"] = round(hi, 6)
             out["range_label"] = "historical range for this week of year"
     return out
 

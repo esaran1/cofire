@@ -20,6 +20,7 @@ import { countyName, targetHorizon, targetLabel } from "@/lib/targets";
  */
 
 const look = facts.look3;
+const audit = facts.interval_audit;
 
 /**
  * The pre-registered tests in plain words, keyed by test number.
@@ -29,10 +30,10 @@ const look = facts.look3;
  * These say what each test actually checked.
  */
 const CRITERIA: Record<string, string> = {
-  "1": "Overall coverage (reported, not tested)",
-  "2": "Worst 13-week coverage stays at or above 0.70",
-  "3": "Coverage within 0.05 of 0.90 in mild and in severe drought",
-  "4": "Longest run of misses is 60 weeks or fewer",
+  "1": "Overall coverage (reported, not tested), void",
+  "2": "Worst 13-week coverage stays at or above 0.70, void",
+  "3": "Coverage within 0.05 of 0.90 in mild and in severe drought, void",
+  "4": "Longest run of misses is 60 weeks or fewer, void",
   "5": "Stated odds match what happened (reliability 0.05 or less)",
 };
 const cov = look.coverage_series;
@@ -68,13 +69,27 @@ export default function HindcastPage() {
         </p>
       </motion.header>
 
+      {/* The correction comes first. The look-3 interval results passed, but the
+          test behind them used outcomes a real forecast would not have yet, so
+          they are void as evidence. The record is kept below, labelled as such. */}
+      <div role="note" className="border-ember/40 bg-ember/5 mt-8 border p-5">
+        <p className="text-ember font-medium">Correction: the interval results below are void</p>
+        <p className="text-ink-soft mt-2 max-w-[62ch] text-sm leading-relaxed">
+          The interval test updated each forecast using outcomes from the same week, which a real
+          forecast would not know for 2 to 8 weeks. Re-run with that delay on 2022 to 2025, the
+          method is unstable and its worst 13-week coverage falls to{" "}
+          <span className="num text-ink">{audit.real_time_roll13_min?.toFixed(2)}</span>. The app
+          therefore draws no forecast range. The probability results are unaffected.
+        </p>
+      </div>
+
       <div className="border-rule mt-10 grid gap-8 border-y py-8 sm:grid-cols-3">
         <Verdict
-          value={`${look.criteria_passed}/${look.criteria_total}`}
-          label="criteria passed"
+          value={`${look.by_test["5"].n_pass}/${look.by_test["5"].n_total}`}
+          label="probability tests passed"
           sub="written down before the look"
         />
-        <Verdict value="30/30" label="interval tests passed" sub="both counties, all ranges" />
+        <Verdict value="void" label="interval tests" sub="the test itself was flawed" tone="fail" />
         <Verdict
           value={`${failures.length}`}
           label="reliability failures"
@@ -83,31 +98,31 @@ export default function HindcastPage() {
         />
       </div>
 
-      <Section title="Coverage held. The alternative collapsed.">
+      <Section title="Interval coverage: as tested, and in real time">
         <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">
-          Both controllers ran on identical rows. The adaptive method dropped to{" "}
+          On the unsealed years 2022 to 2025, the test as run never fell below{" "}
           <span className="num text-ink">
-            <CountUp to={look.aci.roll13_min} decimals={4} />
-          </span>{" "}
-          coverage at its worst stretch and was wrong{" "}
-          <span className="num text-ink">{look.aci.miss_run_max}</span> weeks running. The one
-          that ships never fell below{" "}
-          <span className="num text-ink">
-            <CountUp to={look.pid.roll13_min} decimals={4} />
+            {Math.min(...audit.as_tested.map((r) => r.roll13_min)).toFixed(4)}
           </span>
-          .
+          . With the delay a real forecaster faces, the same controller fell to{" "}
+          <span className="num text-ember">{audit.real_time_roll13_min?.toFixed(4)}</span>.
         </p>
         <div className="mt-6">
-          <PidVsAciFigure rows={cov} />
+          <PidVsAciFigure
+            rows={[...audit.as_tested.map((r) => ({ ...r, impl: "reference_pid" })), ...audit.real_time.map((r) => ({ ...r, impl: "aci" }))]}
+            floor={0}
+            target={0.7}
+            caption="Worst 13-week coverage on 2022 to 2025. Dark is the test as it was run, pale is the same test with the real 2 to 8 week delay. The dashed line is the 0.70 floor set in advance."
+          />
         </div>
         <div className="mt-4">
-          <Disclosure summary={<span className="sr-only">Coverage detail</span>} detail="Per-county numbers">
+          <Disclosure summary={<span className="sr-only">As-tested detail</span>} detail="The void 2026 numbers">
             <div className="mt-2">
               {pid.map((r) => (
                 <StatRow
                   key={`${r.domain}-${r.horizon}`}
-                  label={`${r.domain} ${r.horizon}w`}
-                  value={`${r.coverage.toFixed(4)} overall · ${r.roll13_min.toFixed(4)} worst · ${r.miss_run} longest miss`}
+                  label={`${r.domain} ${r.horizon}w, as tested`}
+                  value={`${r.coverage.toFixed(4)} overall · ${r.roll13_min.toFixed(4)} worst`}
                 />
               ))}
             </div>
@@ -147,7 +162,7 @@ export default function HindcastPage() {
               key={k}
               label={CRITERIA[k] ?? t.name.replace(/^\d+\s/, "")}
               value={`${t.n_pass}/${t.n_total}`}
-              tone={t.n_pass === t.n_total ? "pass" : "fail"}
+              tone={k !== "5" || t.n_pass !== t.n_total ? "fail" : "pass"}
             />
           ))}
         </div>

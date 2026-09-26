@@ -106,3 +106,10 @@ def test_beat_the_model() -> None:
     assert r.status_code == 200
     me = client.get("/predictions/me", params={"device_id": "dev1"})
     assert len(me.json()) >= 1
+
+
+def test_forecast_defaults_to_the_latest_issue() -> None:
+    """With no issue named, the answer is the newest forecast, not the oldest."""
+    issues = client.get("/forecast/issues").json()["issues"]
+    body = client.get("/forecast", params={"lat": 40.55, "lon": -105.08}).json()
+    assert body["issue"] == max(issues)

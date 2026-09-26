@@ -1,7 +1,7 @@
 {
   "generated_from": "artifacts/",
   "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
-  "git_sha": "07c4cad303f194f44ed36b744db80d70843559e8",
+  "git_sha": "9ff9c268dd7a4ee5f493613bbdc414ee681d8abe",
   "resolution_m": 4000,
   "domains": [
     "larimer",
@@ -1437,6 +1437,189 @@
       }
     ]
   },
+  "interval_audit": {
+    "realtime_valid": false,
+    "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown.",
+    "as_tested": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "impl": "PID as tested (ahead=1)",
+        "roll13_min": 0.8954,
+        "coverage": 0.8985
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "impl": "PID as tested (ahead=1)",
+        "roll13_min": 0.8963,
+        "coverage": 0.8987
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "impl": "PID as tested (ahead=1)",
+        "roll13_min": 0.8963,
+        "coverage": 0.8991
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "impl": "PID as tested (ahead=1)",
+        "roll13_min": 0.8944,
+        "coverage": 0.8982
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "impl": "PID as tested (ahead=1)",
+        "roll13_min": 0.891,
+        "coverage": 0.8978
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "impl": "PID as tested (ahead=1)",
+        "roll13_min": 0.8917,
+        "coverage": 0.898
+      }
+    ],
+    "real_time": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "impl": "PID in real time (lagged)",
+        "roll13_min": 0.8162,
+        "coverage": 0.9019
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "impl": "PID in real time (lagged)",
+        "roll13_min": 0.6407,
+        "coverage": 0.9115
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "impl": "PID in real time (lagged)",
+        "roll13_min": 0.3115,
+        "coverage": 0.9314
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "impl": "PID in real time (lagged)",
+        "roll13_min": 0.8189,
+        "coverage": 0.9123
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "impl": "PID in real time (lagged)",
+        "roll13_min": 0.646,
+        "coverage": 0.9113
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "impl": "PID in real time (lagged)",
+        "roll13_min": 0.2735,
+        "coverage": 0.9063
+      }
+    ],
+    "shown": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "impl": "radius the app showed",
+        "roll13_min": 0.5984,
+        "coverage": 0.717
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "impl": "radius the app showed",
+        "roll13_min": 0.2723,
+        "coverage": 0.5902
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "impl": "radius the app showed",
+        "roll13_min": 0.2463,
+        "coverage": 0.5814
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "impl": "radius the app showed",
+        "roll13_min": 0.3123,
+        "coverage": 0.4341
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "impl": "radius the app showed",
+        "roll13_min": 0.4163,
+        "coverage": 0.6015
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "impl": "radius the app showed",
+        "roll13_min": 0.2691,
+        "coverage": 0.4565
+      }
+    ],
+    "split_conformal": [
+      {
+        "domain": "larimer",
+        "horizon": 2,
+        "impl": "split conformal",
+        "roll13_min": 0.7675,
+        "coverage": 0.8631
+      },
+      {
+        "domain": "larimer",
+        "horizon": 4,
+        "impl": "split conformal",
+        "roll13_min": 0.6221,
+        "coverage": 0.8355
+      },
+      {
+        "domain": "larimer",
+        "horizon": 8,
+        "impl": "split conformal",
+        "roll13_min": 0.5362,
+        "coverage": 0.8274
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 2,
+        "impl": "split conformal",
+        "roll13_min": 0.7495,
+        "coverage": 0.8687
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 4,
+        "impl": "split conformal",
+        "roll13_min": 0.7894,
+        "coverage": 0.9221
+      },
+      {
+        "domain": "pueblo",
+        "horizon": 8,
+        "impl": "split conformal",
+        "roll13_min": 0.8114,
+        "coverage": 0.9271
+      }
+    ],
+    "real_time_roll13_min": 0.2735,
+    "shown_coverage_min": 0.4341,
+    "shown_coverage_max": 0.717
+  },
   "rendering": [
     {
       "domain": "larimer",
@@ -1568,22 +1751,22 @@
       "domain": "larimer",
       "target": "erc_pct",
       "horizon": 2,
-      "state": "interval",
-      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.970 [0.958, 0.982]"
+      "state": "uncalibrated",
+      "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
     },
     {
       "domain": "larimer",
       "target": "erc_pct",
       "horizon": 4,
-      "state": "historical_range",
-      "reason": "the forecast interval is no narrower than the historical range: width ratio 0.994 [0.978, 1.010], so the historical week-of-year range is shown instead"
+      "state": "uncalibrated",
+      "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
     },
     {
       "domain": "larimer",
       "target": "erc_pct",
       "horizon": 8,
-      "state": "historical_range",
-      "reason": "the forecast interval is no narrower than the historical range: width ratio 1.006 [0.987, 1.021], so the historical week-of-year range is shown instead"
+      "state": "uncalibrated",
+      "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
     },
     {
       "domain": "larimer",
@@ -1778,22 +1961,22 @@
       "domain": "pueblo",
       "target": "erc_pct",
       "horizon": 2,
-      "state": "interval",
-      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.922 [0.902, 0.942]"
+      "state": "uncalibrated",
+      "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
     },
     {
       "domain": "pueblo",
       "target": "erc_pct",
       "horizon": 4,
-      "state": "interval",
-      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.943 [0.927, 0.959]"
+      "state": "uncalibrated",
+      "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
     },
     {
       "domain": "pueblo",
       "target": "erc_pct",
       "horizon": 8,
-      "state": "interval",
-      "reason": "PID interval is narrower than the historical range on the training record: width ratio 0.977 [0.960, 0.993]"
+      "state": "uncalibrated",
+      "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
     },
     {
       "domain": "pueblo",

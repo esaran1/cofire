@@ -6,53 +6,56 @@ import { PlaceSchema } from "@/lib/schemas";
 import story from "@/lib/story.json";
 
 /**
- * The idea of the whole app, shown through the app.
+ * The idea of the whole app, shown through one real Place Card.
  *
- * Two real Place Cards for real cells from the latest issue. One is in a place
- * and range where the forecast is sharper than history, so it draws a range.
- * The other is not, so it says so and shows the historical range instead. The
- * reader sees the difference instead of being told about it.
+ * The card is for a real cell from the latest issue, validated through
+ * PlaceSchema. Beside it, three notes point at what the card does: it shows a
+ * point forecast, it withholds the forecast band because no band has held up
+ * in real time, and it separates the probabilities it will stand behind per
+ * cell from the ones where it falls back to how often the event happens in the
+ * county at this time of year.
  *
- * The cells are chosen by `cofire.ship.story`, which refuses to build if either
- * card would claim a rendering state the export does not produce. Both payloads
- * are validated through PlaceSchema, the same schema the map uses.
+ * The counts in the notes come from the card itself, via cofire.ship.story,
+ * which refuses to build if the cell stops carrying both kinds of row.
  */
 
-const LABELS: Record<string, { head: string; body: string }> = {
-  interval: {
-    head: "Sharper than history",
-    body: "So it draws a forecast range.",
-  },
-  historical_range: {
-    head: "No sharper than history",
-    body: "So it says so, and shows what is typical instead.",
-  },
-};
-
-function EmbeddedCard({ state }: { state: "interval" | "historical_range" }) {
-  const entry = story.cards[state];
+export function CardPair() {
+  const entry = story.card;
   const place = PlaceSchema.parse(entry.place);
   const [horizon, setHorizon] = useState(entry.horizon);
-  const label = LABELS[state];
+
+  const notes = [
+    {
+      head: "A forecast, not a guess",
+      body: "How dry this cell will be for the time of year, 2 to 8 weeks out.",
+    },
+    {
+      head: "No band it cannot back",
+      body: "The range method we shipped failed in real time, so no range is drawn.",
+    },
+    {
+      head: `${entry.n_probability} numbers it stands behind, ${entry.n_base_rate} it does not`,
+      body: "Where the odds proved unreliable, it shows how often that happens here instead.",
+    },
+  ];
+
   return (
-    <div>
-      <p className="text-ink text-lg font-medium">{label.head}</p>
-      <p className="text-ink-soft mt-1">{label.body}</p>
-      {/* Clipped with a fade so the card reads as a picture of the product,
-          not a second page. The part that carries the argument, the band, is
-          at the top and always visible. */}
-      <div className="relative mt-6 max-h-[23rem] overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent)]">
+    <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
+      <ol className="order-2 space-y-10 lg:order-1">
+        {notes.map((n, i) => (
+          <li key={n.head} className="grid grid-cols-[2.5rem_1fr] gap-4">
+            <span className="display text-ember text-3xl leading-none">{i + 1}</span>
+            <div>
+              <p className="text-ink text-lg font-medium md:text-xl">{n.head}</p>
+              <p className="text-ink-soft mt-1.5 leading-relaxed">{n.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {/* Clipped with a fade so the card reads as a picture of the product. */}
+      <div className="relative order-1 max-h-[36rem] overflow-hidden [mask-image:linear-gradient(to_bottom,black_80%,transparent)] lg:order-2">
         <PlaceCard place={place} horizon={horizon} onHorizon={setHorizon} embedded />
       </div>
-    </div>
-  );
-}
-
-export function CardPair() {
-  return (
-    <div className="grid gap-12 md:grid-cols-2 md:gap-10">
-      <EmbeddedCard state="interval" />
-      <EmbeddedCard state="historical_range" />
     </div>
   );
 }

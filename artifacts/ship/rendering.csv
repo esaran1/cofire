@@ -17,9 +17,9 @@ larimer,d_intensify2_h8,8,base_rate,"the forecast does not separate events from 
 larimer,d_nochange_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on the training record
 larimer,d_nochange_h4,4,probability,calibrated on the 2026 holdout and beats its baseline on the training record
 larimer,d_nochange_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1301, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
-larimer,erc_pct,2,interval,"PID interval is narrower than the historical range on the training record: width ratio 0.970 [0.958, 0.982]"
-larimer,erc_pct,4,historical_range,"the forecast interval is no narrower than the historical range: width ratio 0.994 [0.978, 1.010], so the historical week-of-year range is shown instead"
-larimer,erc_pct,8,historical_range,"the forecast interval is no narrower than the historical range: width ratio 1.006 [0.987, 1.021], so the historical week-of-year range is shown instead"
+larimer,erc_pct,2,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
+larimer,erc_pct,4,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
+larimer,erc_pct,8,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
 larimer,f_gt80_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 larimer,f_gt80_h4,4,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0539, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
 larimer,f_gt80_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0535, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
@@ -47,9 +47,9 @@ pueblo,d_intensify2_h8,8,probability,"calibrated on the 2026 holdout; it does no
 pueblo,d_nochange_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,d_nochange_h4,4,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0541, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
 pueblo,d_nochange_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1412, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
-pueblo,erc_pct,2,interval,"PID interval is narrower than the historical range on the training record: width ratio 0.922 [0.902, 0.942]"
-pueblo,erc_pct,4,interval,"PID interval is narrower than the historical range on the training record: width ratio 0.943 [0.927, 0.959]"
-pueblo,erc_pct,8,interval,"PID interval is narrower than the historical range on the training record: width ratio 0.977 [0.960, 0.993]"
+pueblo,erc_pct,2,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
+pueblo,erc_pct,4,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
+pueblo,erc_pct,8,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
 pueblo,f_gt80_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,f_gt80_h4,4,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,f_gt80_h8,8,probability,calibrated on the 2026 holdout and beats its baseline on the training record

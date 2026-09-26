@@ -152,6 +152,41 @@ def _look3() -> dict[str, Any]:
     }
 
 
+def _interval_audit() -> dict[str, Any]:
+    """The real-time interval audit, carried next to the look-3 results.
+
+    The look-3 interval tests passed under same-week updates a real-time
+    forecaster cannot make. Any page quoting that pass must have this beside it.
+    """
+    path = ART / "audit" / "pid_realtime.json"
+    if not path.exists():
+        return {}
+    d = json.loads(path.read_text())
+    rows = d["rows"]
+
+    def pick(method: str) -> list[dict[str, Any]]:
+        return [
+            {"domain": r["domain"], "horizon": r["horizon"], "impl": method,
+             "roll13_min": r["roll13_min"], "coverage": r["coverage"]}
+            for r in rows if r["method"] == method
+        ]
+
+    tested = pick("PID as tested (ahead=1)")
+    real = pick("PID in real time (lagged)")
+    shown = pick("radius the app showed")
+    return {
+        "realtime_valid": bool(d["verdict"]["realtime_valid"]),
+        "reason": str(d["verdict"]["reason"]),
+        "as_tested": tested,
+        "real_time": real,
+        "shown": shown,
+        "split_conformal": pick("split conformal"),
+        "real_time_roll13_min": min(r["roll13_min"] for r in real) if real else None,
+        "shown_coverage_min": min(r["coverage"] for r in shown) if shown else None,
+        "shown_coverage_max": max(r["coverage"] for r in shown) if shown else None,
+    }
+
+
 def _stage_ab() -> dict[str, Any]:
     out: dict[str, Any] = {}
     if (RERUN / "pid_coverage.csv").exists():
@@ -220,7 +255,12 @@ def build() -> dict[str, Any]:
             "drought": "Markov transition baseline, 18 of 18 targets",
             "fire": "damped-persistence logistic, 9 of 9 targets",
             "continuous": "damped regression at h2, h4, h8",
-            "intervals": "reference conformal PID",
+            "intervals": (
+                "none shown: the conformal PID controller was found unstable "
+                "in real time, so no forecast band is drawn"
+                if not _interval_audit().get("realtime_valid", True)
+                else "reference conformal PID"
+            ),
             "forecast_weather": "none; SubX was evaluated once and did not qualify",
         },
         "hindcast_looks": 3,
@@ -234,6 +274,7 @@ def build() -> dict[str, Any]:
         "subx": _subx(),
         "look3": _look3(),
         "stage_ab": _stage_ab(),
+        "interval_audit": _interval_audit(),
         "rendering": _rendering(),
         "ledger": _ledger(),
         "sources": _sources(),

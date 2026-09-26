@@ -97,14 +97,14 @@ function ErcBlock({ hz }: { hz: Horizon | undefined }) {
 
       {state === "uncalibrated" ? (
         <p className="text-ink-soft mt-3 text-xs" data-testid="erc-uncalibrated">
-          No band shown: this range did not hold its coverage on the sealed year.
+          No forecast band: the range method we shipped did not hold up in real time, so none is drawn.
         </p>
       ) : null}
 
       {hz?.reason ? (
         <div className="mt-2" data-testid="erc-reason">
           <Disclosure
-            summary={<span className="text-mute text-[11px]">How this band was chosen</span>}
+            summary={<span className="text-mute text-[11px]">{state === "uncalibrated" ? "Why there is no band" : "How this band was chosen"}</span>}
             detail="Show"
           >
             {sentence(hz.reason)}

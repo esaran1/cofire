@@ -137,6 +137,11 @@ def load_index() -> dict[str, Any]:
 
 def nearest_cell(lat: float, lon: float, index: dict[str, Any], issue: str | None = None) -> dict[str, Any] | None:
     cells = index.get("cells") or []
+    # With no issue named, answer with the latest one. Every issue has a cell at
+    # every location, so the unfiltered minimum used to return whichever issue
+    # came first in the index, which was the oldest.
+    if not issue and index.get("issues"):
+        issue = max(index["issues"])
     if issue:
         cells = [c for c in cells if c.get("issue") == issue]
     if not cells:

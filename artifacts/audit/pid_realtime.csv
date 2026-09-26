@@ -1,0 +1,25 @@
+domain,horizon,method,coverage,roll13_min,miss_run,radius,unstable,radius_min,radius_max
+larimer,2,PID as tested (ahead=1),0.8985,0.8954,11,,False,,
+larimer,2,PID in real time (lagged),0.9019,0.8162,1104,,True,-349.7,61758.4
+larimer,2,split conformal,0.8631,0.7675,246,38.18,,,
+larimer,2,radius the app showed,0.717,0.5984,501,32.16,,,
+larimer,4,PID as tested (ahead=1),0.8987,0.8963,11,,False,,
+larimer,4,PID in real time (lagged),0.9115,0.6407,2192,,True,-675.7,8339.9
+larimer,4,split conformal,0.8355,0.6221,400,39.15,,,
+larimer,4,radius the app showed,0.5902,0.2723,1132,29.31,,,
+larimer,8,PID as tested (ahead=1),0.8991,0.8963,11,,False,,
+larimer,8,PID in real time (lagged),0.9314,0.3115,4249,,True,-1487.5,32446.7
+larimer,8,split conformal,0.8274,0.5362,607,41.84,,,
+larimer,8,radius the app showed,0.5814,0.2463,1132,31.04,,,
+pueblo,2,PID as tested (ahead=1),0.8982,0.8944,14,,False,,
+pueblo,2,PID in real time (lagged),0.9123,0.8189,1002,,True,-247.9,3115.9
+pueblo,2,split conformal,0.8687,0.7495,433,38.24,,,
+pueblo,2,radius the app showed,0.4341,0.3123,1317,16.12,,,
+pueblo,4,PID as tested (ahead=1),0.8978,0.891,12,,False,,
+pueblo,4,PID in real time (lagged),0.9113,0.646,1951,,True,-547.2,6044.2
+pueblo,4,split conformal,0.9221,0.7894,436,42.62,,,
+pueblo,4,radius the app showed,0.6015,0.4163,871,23.75,,,
+pueblo,8,PID as tested (ahead=1),0.898,0.8917,12,,False,,
+pueblo,8,PID in real time (lagged),0.9063,0.2735,4040,,True,-699.0,24615.6
+pueblo,8,split conformal,0.9271,0.8114,432,45.25,,,
+pueblo,8,radius the app showed,0.4565,0.2691,987,17.93,,,

@@ -1,0 +1,248 @@
+{
+  "verdict": {
+    "realtime_valid": false,
+    "reason": "The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
+  },
+  "rows": [
+    {
+      "domain": "larimer",
+      "horizon": 2,
+      "method": "PID as tested (ahead=1)",
+      "coverage": 0.8985,
+      "roll13_min": 0.8954,
+      "miss_run": 11,
+      "radius": null,
+      "unstable": false
+    },
+    {
+      "domain": "larimer",
+      "horizon": 2,
+      "method": "PID in real time (lagged)",
+      "coverage": 0.9019,
+      "roll13_min": 0.8162,
+      "miss_run": 1104,
+      "radius": null,
+      "radius_min": -349.7,
+      "radius_max": 61758.4,
+      "unstable": true
+    },
+    {
+      "domain": "larimer",
+      "horizon": 2,
+      "method": "split conformal",
+      "coverage": 0.8631,
+      "roll13_min": 0.7675,
+      "miss_run": 246,
+      "radius": 38.18
+    },
+    {
+      "domain": "larimer",
+      "horizon": 2,
+      "method": "radius the app showed",
+      "coverage": 0.717,
+      "roll13_min": 0.5984,
+      "miss_run": 501,
+      "radius": 32.16
+    },
+    {
+      "domain": "larimer",
+      "horizon": 4,
+      "method": "PID as tested (ahead=1)",
+      "coverage": 0.8987,
+      "roll13_min": 0.8963,
+      "miss_run": 11,
+      "radius": null,
+      "unstable": false
+    },
+    {
+      "domain": "larimer",
+      "horizon": 4,
+      "method": "PID in real time (lagged)",
+      "coverage": 0.9115,
+      "roll13_min": 0.6407,
+      "miss_run": 2192,
+      "radius": null,
+      "radius_min": -675.7,
+      "radius_max": 8339.9,
+      "unstable": true
+    },
+    {
+      "domain": "larimer",
+      "horizon": 4,
+      "method": "split conformal",
+      "coverage": 0.8355,
+      "roll13_min": 0.6221,
+      "miss_run": 400,
+      "radius": 39.15
+    },
+    {
+      "domain": "larimer",
+      "horizon": 4,
+      "method": "radius the app showed",
+      "coverage": 0.5902,
+      "roll13_min": 0.2723,
+      "miss_run": 1132,
+      "radius": 29.31
+    },
+    {
+      "domain": "larimer",
+      "horizon": 8,
+      "method": "PID as tested (ahead=1)",
+      "coverage": 0.8991,
+      "roll13_min": 0.8963,
+      "miss_run": 11,
+      "radius": null,
+      "unstable": false
+    },
+    {
+      "domain": "larimer",
+      "horizon": 8,
+      "method": "PID in real time (lagged)",
+      "coverage": 0.9314,
+      "roll13_min": 0.3115,
+      "miss_run": 4249,
+      "radius": null,
+      "radius_min": -1487.5,
+      "radius_max": 32446.7,
+      "unstable": true
+    },
+    {
+      "domain": "larimer",
+      "horizon": 8,
+      "method": "split conformal",
+      "coverage": 0.8274,
+      "roll13_min": 0.5362,
+      "miss_run": 607,
+      "radius": 41.84
+    },
+    {
+      "domain": "larimer",
+      "horizon": 8,
+      "method": "radius the app showed",
+      "coverage": 0.5814,
+      "roll13_min": 0.2463,
+      "miss_run": 1132,
+      "radius": 31.04
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 2,
+      "method": "PID as tested (ahead=1)",
+      "coverage": 0.8982,
+      "roll13_min": 0.8944,
+      "miss_run": 14,
+      "radius": null,
+      "unstable": false
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 2,
+      "method": "PID in real time (lagged)",
+      "coverage": 0.9123,
+      "roll13_min": 0.8189,
+      "miss_run": 1002,
+      "radius": null,
+      "radius_min": -247.9,
+      "radius_max": 3115.9,
+      "unstable": true
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 2,
+      "method": "split conformal",
+      "coverage": 0.8687,
+      "roll13_min": 0.7495,
+      "miss_run": 433,
+      "radius": 38.24
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 2,
+      "method": "radius the app showed",
+      "coverage": 0.4341,
+      "roll13_min": 0.3123,
+      "miss_run": 1317,
+      "radius": 16.12
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 4,
+      "method": "PID as tested (ahead=1)",
+      "coverage": 0.8978,
+      "roll13_min": 0.891,
+      "miss_run": 12,
+      "radius": null,
+      "unstable": false
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 4,
+      "method": "PID in real time (lagged)",
+      "coverage": 0.9113,
+      "roll13_min": 0.646,
+      "miss_run": 1951,
+      "radius": null,
+      "radius_min": -547.2,
+      "radius_max": 6044.2,
+      "unstable": true
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 4,
+      "method": "split conformal",
+      "coverage": 0.9221,
+      "roll13_min": 0.7894,
+      "miss_run": 436,
+      "radius": 42.62
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 4,
+      "method": "radius the app showed",
+      "coverage": 0.6015,
+      "roll13_min": 0.4163,
+      "miss_run": 871,
+      "radius": 23.75
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 8,
+      "method": "PID as tested (ahead=1)",
+      "coverage": 0.898,
+      "roll13_min": 0.8917,
+      "miss_run": 12,
+      "radius": null,
+      "unstable": false
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 8,
+      "method": "PID in real time (lagged)",
+      "coverage": 0.9063,
+      "roll13_min": 0.2735,
+      "miss_run": 4040,
+      "radius": null,
+      "radius_min": -699.0,
+      "radius_max": 24615.6,
+      "unstable": true
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 8,
+      "method": "split conformal",
+      "coverage": 0.9271,
+      "roll13_min": 0.8114,
+      "miss_run": 432,
+      "radius": 45.25
+    },
+    {
+      "domain": "pueblo",
+      "horizon": 8,
+      "method": "radius the app showed",
+      "coverage": 0.4565,
+      "roll13_min": 0.2691,
+      "miss_run": 987,
+      "radius": 17.93
+    }
+  ]
+}

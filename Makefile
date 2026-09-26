@@ -31,12 +31,13 @@ export:
 # The shipped path: frozen configuration -> export -> rendering -> index.
 # cofire/model/ is frozen at FREEZE_COMMIT; everything here reads it.
 ship:
+	$(PY) -m cofire.ship.pid_audit
 	$(PY) -m cofire.ship.rendering
 	$(PY) -m cofire.ship.export
 	$(PY) -m cofire.ship.index_build
 	$(PY) -m cofire.ship.facts
-	$(PY) -m cofire.ship.story
 	$(PY) -m cofire.ship.demo
+	$(PY) -m cofire.ship.story
 
 pipeline:
 	$(PY) -m cofire.model.pipeline
