@@ -24,9 +24,7 @@ Then open http://127.0.0.1:3000 (API on :8000).
 
 `make demo` serves the committed fixture set in `demo/`: two issues of forecasts for all five
 areas as per-domain bundles, and the look-3 and survivor tables the Hindcast and Method screens
-read. **Measured clone-to-running:
-about 15 seconds** (npm install 4 s, API ready 2 s, web ready 5 s), verified from a directory
-containing no `artifacts/` and no `data/`.
+read. **Measured clone-to-running: 26 seconds** on 2026-09-27 with warm uv and npm caches (`make setup` 4 s, both servers answering 22 s later), from a fresh clone with no `data/`; every route then passed for every area (Playwright, 54 tests).
 
 Regenerate the fixture after a pipeline run with `make demo-data`.
 
