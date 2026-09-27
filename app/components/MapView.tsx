@@ -57,6 +57,34 @@ export function MapView({
   const clickRef = useRef(onClick);
   clickRef.current = onClick;
   const pending = useRef<() => void>(() => undefined);
+  const bboxRef = useRef(bbox);
+  bboxRef.current = bbox;
+
+  // Fit the area into whatever size the map actually has. Called again on
+  // load and on resize: on a phone the map's row gets its height after the
+  // first fit, which left the area cut off in a corner.
+  const fit = useRef((animate: boolean) => {
+    const map = mapRef.current;
+    const b = bboxRef.current;
+    if (!map || !b) return;
+    // On a phone the Place Card is a sheet fixed over the bottom of the map;
+    // keep the area in the part of the map the sheet leaves visible.
+    const rect = map.getContainer().getBoundingClientRect();
+    let bottom = 24;
+    const sheet = document.querySelector<HTMLElement>('[data-testid="place-card"]');
+    if (sheet && getComputedStyle(sheet).position === "fixed") {
+      const overlap = rect.bottom - sheet.getBoundingClientRect().top;
+      bottom = Math.min(Math.max(24, overlap + 24), Math.max(24, rect.height - 120));
+    }
+    map.fitBounds(
+      [
+        [b[0], b[1]],
+        [b[2], b[3]],
+      ],
+      { padding: { top: 24, left: 24, right: 24, bottom }, duration: animate ? 600 : 0 },
+    );
+  });
+  const fittedFor = useRef("");
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
@@ -69,14 +97,23 @@ export function MapView({
       zoom: 9,
     });
     map.on("click", (e) => clickRef.current(e.lngLat.lat, e.lngLat.lng));
-    map.on("load", () => pending.current());
+    map.on("load", () => {
+      fit.current(false);
+      pending.current();
+    });
     mapRef.current = map;
     // Exposed for automated screenshot capture: synthetic DOM events cannot
     // carry maplibre's lngLat, so the harness needs a handle on the map.
     (window as unknown as { __cofireMap?: maplibregl.Map }).__cofireMap = map;
-    const ro = new ResizeObserver(() => map.resize());
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const ro = new ResizeObserver(() => {
+      map.resize();
+      clearTimeout(t);
+      t = setTimeout(() => fit.current(false), 150);
+    });
     ro.observe(ref.current);
     return () => {
+      clearTimeout(t);
       ro.disconnect();
       map.remove();
       mapRef.current = null;
@@ -85,15 +122,7 @@ export function MapView({
 
   // Fly to the area when it changes.
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !bbox) return;
-    map.fitBounds(
-      [
-        [bbox[0], bbox[1]],
-        [bbox[2], bbox[3]],
-      ],
-      { padding: 40, duration: 600 },
-    );
+    fit.current(true);
   }, [bbox]);
 
   useEffect(() => {
@@ -126,6 +155,13 @@ export function MapView({
     };
     if (map.isStyleLoaded()) draw();
     else pending.current = draw;
+    // A new area's cells (and its card) have just arrived: fit once more, now
+    // that the sheet's size is known. Horizon and layer changes keep the view.
+    const key = cells.length ? `${cells[0].id}:${cells.length}` : "";
+    if (key && key !== fittedFor.current) {
+      fittedFor.current = key;
+      setTimeout(() => fit.current(true), 50);
+    }
   }, [cells, layer, selectedId]);
 
   return <div ref={ref} data-testid="map" className="absolute inset-0 h-full w-full" />;
