@@ -1496,3 +1496,65 @@ is what a real result looks like.
 `pueblo` at h2, h4 and h8 render as forecast intervals; `larimer` at h4 and h8
 render as the historical week-of-year range of raw ERC. The MAE gain interval is
 above zero on all six, so the point forecast is shown in every case.
+
+## v1.1 Stage 1: the Denver domains
+
+CO-01 is the City and County of Denver. Neither Larimer nor Pueblo is in it, so
+v1.1 adds Denver and the two watersheds Denver Water collects from. Boundaries
+are resolved by name and recorded in `artifacts/domains/footprints.json` by
+`cofire/ship/domains.py`; every fetch went through `cofire/ship/safe_fetch.py`
+(132,695 bytes, all JSON from hydro.nationalmap.gov).
+
+| Domain | Matched boundary | Area | Footprint cells | Rectangle | bbox (W, S, E, N) |
+|---|---|---|---|---|---|
+| Denver | Census cb_2023 county GEOID 08031, "Denver County" (on disk) | 400.7 km² | 52 | 8 x 13 = 104 | -105.1104, 39.5979, -104.5896, 39.9104 |
+| Upper South Platte | WBD HUC8 10190002 "Upper South Platte", 23 of its 50 HUC12s | 2,629.3 km² | 202 | 18 x 21 = 378 | -105.8604, 38.8896, -105.0063, 39.6188 |
+| Dillon | WBD HUC8 14010002 "Blue", 12 of its 19 HUC12s | 864.6 km² | 79 | 9 x 13 = 117 | -106.2771, 39.3479, -105.7563, 39.7021 |
+
+For comparison, Larimer is 16 x 30 = 480 cells and Pueblo 18 x 24 = 432.
+
+**Name resolution.** The HUC8 query for names containing "South Platte" in
+Colorado returned five candidates (10190001 South Platte Headwaters, 10190002
+Upper South Platte, 10190003 Middle South Platte-Cherry Creek, 10190012 Middle
+South Platte-Sterling, 10190018 Lower South Platte); exactly one is named
+"Upper South Platte". The query for "Blue" returned one, 14010002 "Blue".
+
+**Cut at the reservoir.** Both HUC8s run past their reservoirs, so each domain
+is the HUC12 holding the reservoir plus every HUC12 whose WBD `tohuc` chain
+drains into it. Strontia Springs Reservoir was located by GNIS name in USGS NHD
+(GNIS 00197627, 0.328 km²); it lies in HUC12 101900020701 "Platte Canyon-South
+Platte River". Plum Creek, Bear Creek, Chatfield and Sloan Lake, which join
+below the dam, are dropped. The NHD lookup for Dillon Reservoir timed out twice,
+and was not needed: WBD names HUC12 140100020401 "Dillon Reservoir-Blue River",
+which is the outlet. Green Mountain Reservoir and the lower Blue are dropped.
+
+**What the Upper South Platte domain leaves out.** HUC8 10190001 "South Platte
+Headwaters" (South Park, 4,154.9 km², including Antero and Elevenmile) also
+drains to Strontia Springs. It is outside the domain because the brief names a
+single HUC8. It can be added later as its own domain.
+
+**No clip.** Neither watershed is larger than the existing domains (202 and 79
+cells against 480 and 432), so none was clipped by distance from its reservoir.
+Denver has fewer cells because the county is small; growing it would add cells
+outside the district.
+
+**Footprint within rectangle.** The frozen pipeline selects cells by bbox, so
+each new domain is fetched and processed as the rectangle enclosing its
+footprint. The bbox is padded by a quarter cell around the footprint's
+outermost centres, so the frozen clip selects exactly that rectangle
+(`tests/test_domains.py`). The footprint mask marks which rectangle cells
+belong to the domain; half of Denver's rectangle is Aurora, Lakewood and
+Arapahoe County.
+
+**Enclaves.** Glendale and Holly Hills are Arapahoe County enclaves surrounded
+by Denver. They appear as holes in the Denver polygon (1.52 km² centred at
+39.704 N, 104.935 W and 1.31 km² at 39.667 N, 104.920 W; identified by
+location, since Census place boundaries are not on disk). At 4 km both fall
+inside Denver footprint cells: a hole's cell always touches the surrounding
+ring. So the Denver domain covers all of CO-01.
+
+**Runtime registration.** `domains.register()` adds the three domains to
+`config.SUBSETS` at runtime, so the frozen code runs on them unchanged with
+`COFIRE_SUBSET_NAME=<domain>`. The watersheds carry a nominal FIPS (08093 Park,
+08117 Summit) that only the frozen USDM county-statistics fallback would read;
+the v1.1 build requires rasterized shapefiles and fails rather than fall back.
