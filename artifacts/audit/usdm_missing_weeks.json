@@ -1,0 +1,87 @@
+{
+ "n_weeks": 992,
+ "status_counts": {
+  "ok": 991,
+  "missing_week": 1
+ },
+ "problem_weeks": [
+  {
+   "week": "2022-12-27",
+   "split": "validation",
+   "status": "missing_week",
+   "error": ""
+  }
+ ],
+ "per_domain": {
+  "denver": {
+   "train": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 383
+   },
+   "validation": {
+    "missing_or_unreadable": 1,
+    "readable_but_no_polygon_in_domain": 33
+   },
+   "calibration": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 33
+   }
+  },
+  "upper_south_platte": {
+   "train": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 277
+   },
+   "validation": {
+    "missing_or_unreadable": 1,
+    "readable_but_no_polygon_in_domain": 32
+   },
+   "calibration": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 23
+   }
+  },
+  "dillon": {
+   "train": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 315
+   },
+   "validation": {
+    "missing_or_unreadable": 1,
+    "readable_but_no_polygon_in_domain": 31
+   },
+   "calibration": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 31
+   }
+  },
+  "larimer": {
+   "train": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 319
+   },
+   "validation": {
+    "missing_or_unreadable": 1,
+    "readable_but_no_polygon_in_domain": 19
+   },
+   "calibration": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 6
+   }
+  },
+  "pueblo": {
+   "train": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 203
+   },
+   "validation": {
+    "missing_or_unreadable": 1,
+    "readable_but_no_polygon_in_domain": 17
+   },
+   "calibration": {
+    "missing_or_unreadable": 0,
+    "readable_but_no_polygon_in_domain": 42
+   }
+  }
+ }
+}

@@ -78,3 +78,28 @@ def test_export_comparison_ignores_platform_noise_only(tmp_path: Path) -> None:
     assert not same_export(prev.read_bytes(), cur)
     base.assign(domain=["denver", "pueblo"]).to_parquet(cur)
     assert not same_export(prev.read_bytes(), cur)
+
+
+def test_export_refuses_a_missing_map_inside_the_history() -> None:
+    from cofire.ship.export import MissingInputError, publishable_weeks
+
+    weeks = list(pd.date_range("2026-01-06", "2026-09-15", freq="W-TUE"))
+    mid = pd.Timestamp("2026-05-05")
+    with pytest.raises(MissingInputError, match="2026-05-05"):
+        publishable_weeks("denver", weeks, set(weeks) - {mid})
+
+
+def test_export_holds_back_only_the_trailing_edge() -> None:
+    from cofire.ship.export import publishable_weeks
+
+    weeks = list(pd.date_range("2026-01-06", "2026-09-22", freq="W-TUE"))
+    have = set(weeks) - {pd.Timestamp("2026-09-22")}
+    assert publishable_weeks("denver", weeks, have) == sorted(have)
+
+
+def test_the_export_guard_is_the_one_build_export_calls() -> None:
+    import inspect
+
+    from cofire.ship import export
+
+    assert "publishable_weeks(" in inspect.getsource(export.build_export)

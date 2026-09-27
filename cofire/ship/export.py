@@ -224,6 +224,34 @@ def usdm_weeks_available(raw: Path, years: range) -> set[pd.Timestamp]:
     return out
 
 
+class MissingInputError(RuntimeError):
+    """A week inside the published history has no USDM map."""
+
+
+def publishable_weeks(domain: str, weeks: list[pd.Timestamp], usdm_ok: set[pd.Timestamp]) -> list[pd.Timestamp]:
+    """Every published week must have its map; only the trailing edge may wait.
+
+    A missing map at the end means it has not been fetched yet, and those weeks
+    are held back. A missing map inside the history is a hole the frozen
+    rasterizer would fill with "none", so the export refuses rather than
+    publish around it.
+    """
+    weeks = sorted(pd.Timestamp(w) for w in weeks)
+    have = [w for w in weeks if w in usdm_ok]
+    if not have:
+        return []
+    interior = [w for w in weeks if w not in usdm_ok and w < have[-1]]
+    if interior:
+        raise MissingInputError(
+            f"{domain}: USDM map missing for published week(s) {[str(w.date()) for w in interior]}"
+        )
+    held = [w for w in weeks if w > have[-1]]
+    if held:
+        LOGGER.warning("%s: holding back %d trailing issue(s) until their maps arrive: %s",
+                       domain, len(held), [str(w.date()) for w in held])
+    return have
+
+
 def available_at(issue: pd.Timestamp) -> pd.Timestamp:
     """When every input of an issue had been published (the USDM map is last), UTC."""
     return pd.Timestamp(issue) + USDM_RELEASE_LAG
@@ -369,11 +397,8 @@ def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | Non
         t = frame["time"]
         train = frame[t <= pd.Timestamp(st.train_end)]
         issues = frame[(t > pd.Timestamp(st.calibrate_end)) & (t <= pd.Timestamp(last_issue))].copy()
-        missing = sorted(set(issues["time"]) - usdm_ok)
-        if missing:
-            LOGGER.warning("%s: dropping %d issue(s) whose USDM map is not in the archive: %s",
-                           dom, len(missing), [str(m.date()) for m in missing])
-            issues = issues[issues["time"].isin(usdm_ok)]
+        keep = publishable_weeks(dom, list(issues["time"].unique()), usdm_ok)
+        issues = issues[issues["time"].isin(keep)]
         if issues.empty:
             raise SystemExit(f"{dom}: no complete issues after {st.calibrate_end}")
 

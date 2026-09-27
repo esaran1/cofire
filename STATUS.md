@@ -27,6 +27,20 @@ and interval results cannot be measured without scoring 2026 again, which the
 seal forbids, so they are not recomputed. The interval results are already
 void; the probability results carry this caveat. The look count stays 3.
 
+**Open, 2026-09-27: one USDM week missing from the 2007 to 2025 record.** An
+audit of all 992 weeks (`artifacts/audit/usdm_missing_weeks.json`) found one
+map missing and none unreadable: 2022-12-27, in validation. The server has it
+(HTTP 200, 1,800,699 bytes); the local 2022 archive holds 51 weeks without it,
+so the frozen rasterizer coded that week "none" in every domain's store. It is
+false for Pueblo (mean category 1.23 before, 1.19 after) and cannot be ruled
+out for Larimer (0.59 before, 0 after) or Denver (0.23 before, 0 after); the
+Upper South Platte and Dillon read 0 on both sides. Training, calibration, the
+fold choices and look 3 do not touch it. The validation survivor tests and the
+new domains' validation reliability do: drought targets only, at most one
+issue week and one label week per horizon out of 104. Nothing is refit until
+that is decided. The export now refuses any published week without its map,
+not only the newest.
+
 **gridMET revised its 2026 file after the stores were built.** Re-reading
 Larimer and Pueblo's 2026 ERC through the reconciled path disagrees with the
 stored copy on 203 and 184 of 261 days since late February, by up to 20 ERC
