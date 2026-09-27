@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { API, Checklist, EmberItem, getParsed, postParsed } from "@/lib/api";
 import { ChecklistSchema } from "@/lib/schemas";
-import { getDomains } from "@/lib/data";
+import { IS_STATIC, getDomains, localScore, staticChecklist } from "@/lib/data";
 import { deviceId } from "@/lib/device";
 import { useDomain } from "@/lib/domain";
 import { Action, ErrorNote, Numeral, OfflineNote, Panel, Segmented, Skeleton } from "@/components/ui/Controls";
@@ -80,9 +80,24 @@ export default function EmberPage() {
 
   const load = useCallback((z: string) => {
     setData(null);
-    getParsed(`/ember/checklist?zone=${z}`, ChecklistSchema)
+    const get = IS_STATIC
+      ? staticChecklist<Checklist>(z).then((d) => ChecklistSchema.parse(d))
+      : getParsed(`/ember/checklist?zone=${z}`, ChecklistSchema);
+    get
       .then((d) => {
-        setData(d);
+        if (IS_STATIC) {
+          // The static site has no service to store ticks; keep them here.
+          let saved: Record<string, boolean> = {};
+          try {
+            saved = JSON.parse(window.localStorage.getItem(`ember_${z}`) ?? "{}") as Record<string, boolean>;
+          } catch {
+            saved = {};
+          }
+          setState(saved);
+          setData(localScore(d, saved));
+        } else {
+          setData(d);
+        }
         setOffline(false);
       })
       .catch(() => setOffline(true));
@@ -104,6 +119,15 @@ export default function EmberPage() {
   const copy = COPY[zone] ?? COPY.wui;
 
   async function save(next: Record<string, boolean>) {
+    if (IS_STATIC) {
+      try {
+        window.localStorage.setItem(`ember_${zone}`, JSON.stringify(next));
+      } catch {
+        /* storage blocked: the score still updates for this visit */
+      }
+      if (data) setData(localScore(data, next));
+      return;
+    }
     setBusy(true);
     setErr(null);
     try {

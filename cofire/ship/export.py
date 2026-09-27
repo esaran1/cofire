@@ -34,6 +34,8 @@ OUT = Path("artifacts/ship")
 # Denver first: it is the district being judged. The three v1.1 domains are
 # registered into the frozen config at runtime and served from v1.1 choices.
 DOMAINS = ("denver", "upper_south_platte", "dillon", "larimer", "pueblo")
+# The last issue before the refresh existed; the export now runs to the latest
+# issue whose inputs are published (`latest_published`).
 LAST_ISSUE = pd.Timestamp("2026-09-22")
 HORIZONS = (2, 4, 8)
 
@@ -190,8 +192,148 @@ def historical_erc_range(
     return out_lo, out_hi
 
 
-def build_export() -> pd.DataFrame:
-    """Every issue through 2026-09-22, every domain, from the frozen model."""
+# ------------------------------------------------ inputs complete at issue time
+#
+# The export used to emit the issue of 2026-09-22 with USDM coded 0 in every
+# cell: that week's map was not in the archive, and the frozen rasterizer fills
+# a missing week with "none" without a word. Larimer and Pueblo's ERC for the
+# same week was a three-day mean, because their daily record ended on the 18th
+# and the frozen weekly builder lets the store's partial week win. An issue is
+# now emitted only when its inputs were complete and published: the USDM map
+# for that Tuesday is in the archive, and all seven ERC days of the week ending
+# that Tuesday are in the daily record.
+
+USDM_RELEASE_LAG = pd.Timedelta(days=2, hours=13, minutes=30)  # Thursday 08:30 ET, as UTC
+
+
+def usdm_weeks_available(raw: Path, years: range) -> set[pd.Timestamp]:
+    """Tuesdays whose USDM map is in the yearly archives."""
+    import re
+    import zipfile
+
+    out: set[pd.Timestamp] = set()
+    for y in years:
+        z = raw / "usdm" / f"{y}_USDM_M.zip"
+        if not z.exists():
+            continue
+        with zipfile.ZipFile(z) as zf:
+            for n in zf.namelist():
+                m = re.search(r"(\d{8})", n)
+                if m and n.lower().endswith((".zip", ".shp")):
+                    out.add(pd.Timestamp(m.group(1)))
+    return out
+
+
+def available_at(issue: pd.Timestamp) -> pd.Timestamp:
+    """When every input of an issue had been published (the USDM map is last), UTC."""
+    return pd.Timestamp(issue) + USDM_RELEASE_LAG
+
+
+def utc_now() -> pd.Timestamp:
+    return pd.Timestamp.now(tz="UTC").tz_localize(None)
+
+
+def latest_published(now: pd.Timestamp | None = None) -> pd.Timestamp:
+    """The latest Tuesday whose USDM map had been released by `now` (UTC)."""
+    now = utc_now() if now is None else now
+    t = now.normalize() - pd.Timedelta(days=(now.weekday() - 1) % 7)
+    while available_at(t) > now:
+        t -= pd.Timedelta(weeks=1)
+    return t
+
+
+def gated(domain: str, year: int) -> bool:
+    """Whether a store domain's daily record for `year` passed the refresh gate."""
+    from cofire.model.data import erc_extension as ext
+
+    return ext.cache_path(domain, year).with_suffix(".gated.json").exists()
+
+
+def erc_complete_issue(domain: str, year: int = 2026) -> pd.Timestamp:
+    """The last Tuesday whose seven ERC days are all in the record this export uses.
+
+    New domains and gated store domains use the daily extension record; an
+    ungated store domain uses its processed cube, which was built from the raw
+    daily file, so that file's last day bounds it.
+    """
+    import xarray as xr
+
+    from cofire.model.data import erc_extension as ext
+    from cofire.ship import build_v11, domains
+
+    if domain in domains.NEW or gated(domain, year):
+        with xr.open_dataset(ext.cache_path(domain, year)) as ds:
+            last = pd.Timestamp(ds["day"].values[-1])
+    else:
+        raw = ext.reference_daily(year, build_v11.settings(domain))
+        if raw is None:
+            raise SystemExit(f"{domain}: no daily ERC for {year}")
+        last = pd.Timestamp(raw[[d for d in raw.dims if d in ("day", "time")][0]].values[-1])
+    return last.normalize() - pd.Timedelta(days=(last.weekday() - 1) % 7)
+
+
+class _complete_weeks_view:
+    """Run the frozen issue-frame builder on complete weeks only, through `last`.
+
+    The frozen `look3.build_holdout` stops at its own LAST_ISSUE and takes
+    Larimer and Pueblo's 2026 weeks from the processed cube, whose final week
+    was averaged over whatever days existed when it was built. This points it
+    at a view of the data directory without the 2026 cubes, so 2026 weeks come
+    from the reconciled daily record, where a week missing any day is dropped
+    (`n_per_week >= 7` in `features_a.weekly_erc`). `cofire.ship.refresh`
+    gates that record against the cube on every complete week before use.
+    Nothing under cofire/model is edited; the module constant is set for the
+    call and restored.
+    """
+
+    def __init__(self, last: pd.Timestamp, year: int = 2026) -> None:
+        self.last, self.year = last, year
+
+    def __enter__(self) -> _complete_weeks_view:
+        import tempfile
+
+        from cofire.model import look3
+        from cofire.model.config import get_settings
+
+        self._look3, self._prev = look3, look3.LAST_ISSUE
+        look3.LAST_ISSUE = self.last.date()
+        self._env = os.environ.get("COFIRE_DATA_DIR")
+        self._tmp = tempfile.TemporaryDirectory(prefix="cofire_view_")
+        root, data = Path(self._tmp.name), Path("data").resolve()
+        (root / "raw").symlink_to(data / "raw")
+        for proc in data.glob("processed*"):
+            gd = root / proc.name / "gridmet"
+            gd.mkdir(parents=True)
+            dom = "larimer" if proc.name == "processed" else proc.name.removeprefix("processed_")
+            for cube in (proc / "gridmet").glob("weekly_*.nc"):
+                # Hide the year's cube only where a gated daily record replaces it.
+                if cube.name == f"weekly_{self.year}.nc" and gated(dom, self.year):
+                    continue
+                (gd / cube.name).symlink_to(cube)
+        os.environ["COFIRE_DATA_DIR"] = str(root)
+        get_settings.cache_clear()
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        from cofire.model.config import get_settings
+
+        self._look3.LAST_ISSUE = self._prev
+        if self._env is None:
+            os.environ.pop("COFIRE_DATA_DIR", None)
+        else:
+            os.environ["COFIRE_DATA_DIR"] = self._env
+        get_settings.cache_clear()
+        self._tmp.cleanup()
+
+
+def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | None = None) -> pd.DataFrame:
+    """Every complete issue through `last_issue`, every domain, from the frozen model."""
+    from cofire.ship import domains as _d
+
+    now = utc_now() if now is None else now
+    last_issue = latest_published(now) if last_issue is None else last_issue
+    # Stop at the last issue whose ERC week is complete in every domain.
+    last_issue = min([pd.Timestamp(last_issue), *[erc_complete_issue(d) for d in _d.ORDER]])
     from cofire.model.calibration_stages import arms
     from cofire.model.look3 import build_holdout
     from cofire.model.shipping import (
@@ -216,7 +358,9 @@ def build_export() -> pd.DataFrame:
         arm_by_h = (
             {str(h): a for h, a in fit_v11.continuous_arms(dom).items()} if new else frozen_arms
         )
-        frame, st = build_holdout(dom)
+        with _complete_weeks_view(pd.Timestamp(last_issue)):
+            frame, st = build_holdout(dom)
+            usdm_ok = usdm_weeks_available(st.raw_dir, range(2026, pd.Timestamp(last_issue).year + 1))
         frame["time"] = pd.to_datetime(frame["time"])
         if new:
             cells = {f"{la:.4f}_{lo:.4f}" for la, lo in domains.load()[dom]["cells"]}
@@ -224,12 +368,20 @@ def build_export() -> pd.DataFrame:
             assert frame["cell_id"].nunique() == len(cells), f"{dom}: footprint cells missing"
         t = frame["time"]
         train = frame[t <= pd.Timestamp(st.train_end)]
-        issues = frame[(t > pd.Timestamp(st.calibrate_end)) & (t <= LAST_ISSUE)].copy()
+        issues = frame[(t > pd.Timestamp(st.calibrate_end)) & (t <= pd.Timestamp(last_issue))].copy()
+        missing = sorted(set(issues["time"]) - usdm_ok)
+        if missing:
+            LOGGER.warning("%s: dropping %d issue(s) whose USDM map is not in the archive: %s",
+                           dom, len(missing), [str(m.date()) for m in missing])
+            issues = issues[issues["time"].isin(usdm_ok)]
         if issues.empty:
-            raise SystemExit(f"{dom}: no issues after {st.calibrate_end}")
+            raise SystemExit(f"{dom}: no complete issues after {st.calibrate_end}")
 
         base = issues[["time", "cell_id", "lat", "lon", "erc", "erc_pct", "usdm", "woy"]].copy()
         base["domain"] = dom
+        base["available_at"] = base["time"].map(available_at)
+        late = base.loc[base["available_at"] > now, "time"].unique()
+        assert len(late) == 0, f"{dom}: issue(s) {late} not yet published at {now}"
         per_issue: dict[str, np.ndarray] = {}
 
         # Continuous ERC percentile, one column set per horizon.
@@ -307,9 +459,9 @@ def attach_rendering(frame: pd.DataFrame, decisions: pd.DataFrame) -> pd.DataFra
     return out
 
 
-def write(out_dir: Path = OUT) -> Path:
+def write(out_dir: Path = OUT, last_issue: pd.Timestamp | None = None, now: pd.Timestamp | None = None) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
-    frame = build_export()
+    frame = build_export(last_issue, now)
     path = out_dir / "forecast_issues.parquet"
     frame.to_parquet(path, index=False)
     states = {

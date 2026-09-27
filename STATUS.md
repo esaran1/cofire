@@ -1,4 +1,40 @@
-# STATUS: merged to main, v1 complete
+# STATUS: merged to main, v1.1 adds Denver (CO-01) and its source watersheds
+
+## Correction, 2026-09-27: a missing drought map read as "no drought"
+
+**The app's latest issue, 2026-09-22, showed no drought anywhere.** That
+week's USDM map was not in the archive, and the frozen rasterizer fills a
+missing week with category 0 without an error. The export therefore issued
+22 September forecasts from USDM 0 in every cell of every domain (Larimer and
+Pueblo since the export was built, Denver and its watersheds from v1.1 Stage
+6), where the 15 September map had Larimer at a mean category of 2.4, Pueblo
+2.0, Denver 2.6 and Dillon 3.7. The drought odds shown for that issue started
+from a false "none". Larimer and
+Pueblo's ERC for the same week was also a three-day mean, because their daily
+record ended on the 18th. The export now emits an issue only when its USDM
+map is in the archive and all seven ERC days are present, stamps every issue
+with the time its inputs were published, and tests for the fault
+(`tests/test_rendering.py`). The latest issue is 2026-09-15 until Larimer and
+Pueblo's 2026 ERC is resolved (below).
+
+**The same fault reached look 3.** Look 3 ran on 21 September, before the 22
+September map existed (released 24 September). Its frame ran through
+2026-09-22, so the drought labels for target week 2026-09-22 were coded "no
+drought", and the ERC labels for that week were three-day means. That is one
+target week per horizon: issues of 8 September at 2 weeks, 25 August at 4 and
+28 July at 8. The size and direction of the effect on the look-3 reliability
+and interval results cannot be measured without scoring 2026 again, which the
+seal forbids, so they are not recomputed. The interval results are already
+void; the probability results carry this caveat. The look count stays 3.
+
+**gridMET revised its 2026 file after the stores were built.** Re-reading
+Larimer and Pueblo's 2026 ERC through the reconciled path disagrees with the
+stored copy on 203 and 184 of 261 days since late February, by up to 20 ERC
+units. The same path reproduces June 2025 exactly (14,880 cell-days,
+max|diff| 0), so the difference is the server's revision, not the fetch. The
+refresh gate refused the revised record, and both counties stay on their
+stored, reconciled 2026 data until adopting the revision is decided
+(`COFIRE_REGATE=1`). Record in `docs/DECISIONS.md`, v1.1 Stage 7.
 
 ## Correction, 2026-09-26: interval results void, no forecast band shown
 

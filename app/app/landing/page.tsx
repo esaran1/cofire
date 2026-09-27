@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { asset } from "@/lib/asset";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowRight } from "@phosphor-icons/react";
@@ -61,7 +62,7 @@ export default function LandingPage() {
 
       {/* 2. The premise, carried by the one real photograph. */}
       <PhotoChapter
-        src="/img/hero-highpark.jpg"
+        src={asset("/img/hero-highpark.jpg")}
         alt="The sun seen through heavy smoke from the High Park Fire above Poudre Canyon, Colorado"
         credit="High Park Fire above Poudre Canyon. Photo CC BY 2.0 via Wikimedia Commons."
       >

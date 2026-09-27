@@ -111,3 +111,26 @@ export async function resolvePlace(domain: string, lat?: number, lon?: number): 
   if (!cell) throw new Error(`no forecast cells for ${domain}`);
   return placeFromCell(b, cell, idx.history_years);
 }
+
+/** Whether this build is the static site, with no API behind it. */
+export const IS_STATIC = !!STATIC_BASE;
+
+type ChecklistItem = { id: string; item_weight: number; cost: string };
+
+/**
+ * The Ember checklist for a zone, and its score for a set of ticked items, in
+ * the static site. Same rule as the API: completed weight over total weight.
+ * Ticks are kept in this browser only.
+ */
+export async function staticChecklist<T extends { items: ChecklistItem[] }>(zone: string): Promise<T> {
+  return fetchStatic(`/ember/${zone}.json`, (r) => r as T);
+}
+
+export function localScore<T extends { items: ChecklistItem[]; score: number }>(
+  data: T,
+  state: Record<string, boolean>,
+): T {
+  const total = data.items.reduce((a, i) => a + i.item_weight, 0) || 1;
+  const done = data.items.filter((i) => state[i.id]).reduce((a, i) => a + i.item_weight, 0);
+  return { ...data, score: done / total };
+}

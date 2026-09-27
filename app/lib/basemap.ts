@@ -13,6 +13,7 @@
  * osm in dev, selfhost in a production build).
  */
 
+import { asset } from "./asset";
 import type maplibregl from "maplibre-gl";
 
 export type BasemapMode = "osm" | "selfhost";
@@ -22,7 +23,7 @@ export const TILE_UA = "COFIRE/0.7 (Congressional App Challenge 2026; contact: t
 
 /** Where self-hosted tiles live. A PMTiles extract of Colorado, served static. */
 export const SELFHOST_PMTILES =
-  process.env.NEXT_PUBLIC_PMTILES_URL ?? "/tiles/colorado.pmtiles";
+  process.env.NEXT_PUBLIC_PMTILES_URL ?? asset("/tiles/colorado.pmtiles");
 
 export function resolveMode(): BasemapMode {
   const explicit = process.env.NEXT_PUBLIC_BASEMAP;

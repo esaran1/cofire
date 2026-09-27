@@ -1,4 +1,4 @@
-.PHONY: setup data sanity train calibrate hindcast export pipeline serve web demo test lint score lodo statewide statewide-run multiregime subsets demo-data facts tiles
+.PHONY: refresh static setup data sanity train calibrate hindcast export pipeline serve web demo test lint score lodo statewide statewide-run multiregime subsets demo-data facts tiles
 
 export COFIRE_DEV_SUBSET ?= 1
 UV ?= uv
@@ -38,6 +38,14 @@ ship:
 	$(PY) -m cofire.ship.facts
 	$(PY) -m cofire.ship.demo
 	$(PY) -m cofire.ship.story
+
+# Weekly refresh: newest USDM map and ERC days, frozen path, scoring nothing.
+refresh:
+	$(PY) -m cofire.ship.runner refresh -- $(PY) -m cofire.ship.refresh
+
+# Static site for GitHub Pages, into app/out.
+static:
+	./scripts/build_static.sh
 
 pipeline:
 	$(PY) -m cofire.model.pipeline

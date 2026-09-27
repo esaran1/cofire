@@ -1911,3 +1911,81 @@ target cell (Dillon, drought reaching D2, base rate with the "did not happen in
 2022 or 2023" reason); and the switcher moving map and card. Copy lint,
 em-dash ban, hardcoded-statistics lint, ruff, mypy strict (97 files), tsc and
 `next build` are green. The Python suite passes.
+
+## v1.1 Stage 7: the weekly refresh, and what it found
+
+**`make refresh` (`cofire/ship/refresh.py`).** It asserts the look counter
+reads 3 before and after. The target issue is the latest Tuesday whose USDM
+map has been released (Thursday 08:30 ET, 13:30 UTC) and whose seven ERC days
+are on the server. Missing weekly maps are fetched through `safe_fetch`, their
+zip entries are checked, and they are added to the yearly archive, which is
+what that archive is made of (the server's 15 September weekly zip is
+byte-for-byte the size of the archive's member). ERC is extended by new days
+only, over the reconciled OPeNDAP path: the frozen `.sel` with the day axis
+sliced first, re-reading the last cached week for revisions and comparing one
+day 60 days back exactly. The export, bundles, demo fixture and story are then
+rebuilt. The run is idempotent: a second run fetched 1,155 bytes of DDS
+metadata and left the export unchanged. It is resumable, since each step skips
+what is on disk. Each run appends to `artifacts/ship/refresh_log.json`.
+
+**Found: the latest issue had no drought map.** See the STATUS correction
+dated 2026-09-27. The export emitted 2026-09-22 with USDM coded 0 everywhere,
+because that week's map was missing and the frozen rasterizer fills a gap with
+"none". Larimer and Pueblo's ERC that week was a three-day mean. Look 3's
+labels for target week 2026-09-22 carry the same fault (one week per
+horizon); they are not recomputed, because the seal forbids another look. The
+export now emits an issue only if its USDM map is in the archive and every ERC
+day of its week is present, stamps `available_at` (the USDM release, the last
+input published), and asserts it is not in the future. Tests guard each rule.
+
+**Gate failed: gridMET revised 2026.** The refresh gate compares a store
+domain's daily record, rebuilt into weeks, with its processed 2026 cube on
+every complete week. Larimer: first mismatch at the week ending 2026-06-30,
+cell (40.6917, -105.6000), fetched 64.1429 against store 71.1429; 17,280
+cell-weeks compared, max|diff| 7.0. Pueblo: first mismatch at 2026-08-25, cell
+(38.1500, -104.3917), fetched 40.7143 against store 48.0000; max|diff| 7.29.
+Day by day the two records differ on 203 (Larimer) and 184 (Pueblo) of 261
+days from late February on, up to 20 ERC units. The same path reproduces June
+2025 exactly (14,880 cell-days, max|diff| 0), so the server revised its
+provisional 2026 file after the stores were built. Following the failure rule,
+the revised record is not used: it is set aside as `*.nc.ungated`, both
+counties stay on their stored 2026 data cut to complete weeks, and the export
+stops at the last issue complete in every domain, 2026-09-15. Adopting the
+revision is a decision for the owner (`COFIRE_REGATE=1` re-runs the gate
+after one is made). The three new domains' 2026 data is the server's current
+version, the only one they have ever had.
+
+**Cost.** The first refresh fetched the 22 September map (3,000,870 bytes)
+and Larimer and Pueblo's 2026 daily ERC (about 1 MB). A steady-state week costs
+about 3.0 MB for the map plus tens of kilobytes of ERC, roughly 160 MB a year.
+The ledger's global ceiling has 59.6 MB left, which carries the refresh for
+about 19 weeks unless the ceiling is raised.
+
+**Running without data/ (the cron).** A GitHub runner starts from a clean
+clone, and the frozen builder re-rasterizes USDM from 1.2 GB of national
+archives each run. `cofire/ship/datapack.py` builds a 13.9 MB pack instead,
+stored as a release asset:
+
+- USDM clipped to the frozen config's buffered Colorado box, same zip layout.
+  Gate: the frozen rasterizer gives identical cubes from clipped and national
+  archives for every domain, 2007 to 2026-09-22, with 0 differing out of
+  1,556,330 cell-weeks (`artifacts/domains/usdm_clip_gate.json`).
+- The daily ERC caches with their gate markers.
+- The store cubes, cut to the ERC variable.
+- Colorado's counties for the story map.
+
+Restoring refuses absolute paths, `..` and any entry outside `data/`.
+`.github/workflows/refresh.yml` runs Fridays at 18:30 UTC. Each run is its own
+ledger session (`refresh-<run id>`, capped at 50 MB) and commits the export,
+the ledger and the demo.
+
+**Deployment: blocked by the plan.** `scripts/build_static.sh` builds the whole
+app as a static site (26 MB, the bundles served as files) that passes every
+route for every domain under `/cofire/` with no HTTP errors (35 of 35 checks).
+`.github/workflows/site.yml` builds it on every push and after every refresh.
+Enabling GitHub Pages returned HTTP 422, "Your current plan does not support
+GitHub Pages for this repository": the repository is private on a plan
+without private Pages. The deploy job runs once the repository variable
+PAGES_ENABLED is true. Any of these fixes it, and each is the owner's call:
+make the repository public, move to a plan with private Pages, or publish the
+built site from a separate public repository.

@@ -1,0 +1,229 @@
+"""Weekly refresh: the newest USDM map and ERC days, through the frozen path.
+
+    python -m cofire.ship.refresh
+
+1. The look counter must read 3, before and after.
+2. The target issue is the latest Tuesday whose USDM map has been released
+   (Thursday 08:30 ET) and whose seven ERC days are all on the server.
+3. Missing USDM weekly maps are fetched through `safe_fetch` and added to the
+   yearly archive as members, which is what the archive is made of.
+4. Every domain's daily ERC is extended by the new days only, over the
+   reconciled OPeNDAP path, with an overlap week and an older gate day.
+5. Larimer and Pueblo's daily record is gated against their processed 2026
+   cube on every complete week, cell for cell, before the export uses it.
+6. The export is rebuilt through the target issue, scoring nothing and
+   emitting only issues whose inputs were complete and published, then the
+   bundles, the demo fixture and the story.
+
+Idempotent: with nothing new on the servers it fetches nothing and leaves the
+export unchanged. Resumable: every step skips what is already on disk. Each
+run appends to `artifacts/ship/refresh_log.json`.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import logging
+import os
+import shutil
+import tempfile
+import zipfile
+from pathlib import Path
+from typing import Any
+
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+
+import pandas as pd  # noqa: E402
+import xarray as xr  # noqa: E402
+
+from cofire.ship import domains, erc_fetch  # noqa: E402
+from cofire.ship.export import (  # noqa: E402
+    latest_published,
+    usdm_weeks_available,
+    utc_now,
+)
+from cofire.ship.safe_fetch import (  # noqa: E402
+    SESSION,
+    FetchRefused,
+    safe_extract,
+    safe_fetch,
+    session_bytes,
+)
+
+LOGGER = logging.getLogger("cofire.ship.refresh")
+
+RAW = Path("data/raw")
+USDM_URL = "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_{d:%Y%m%d}_M.zip"
+LOG = Path("artifacts/ship/refresh_log.json")
+EXPORT = Path("artifacts/ship/forecast_issues.parquet")
+STORE_DOMAINS = ("larimer", "pueblo")
+
+
+def _ledger() -> Any:
+    from cofire.model.data.ledger import DownloadLedger
+
+    return DownloadLedger(Path("data/ledger.json"))
+
+
+def usdm_week(week: pd.Timestamp, ledger: Any) -> dict[str, Any]:
+    """Fetch one weekly USDM map and add it to its year's archive."""
+    archive = RAW / "usdm" / f"{week.year}_USDM_M.zip"
+    name = f"USDM_{week:%Y%m%d}_M.zip"
+    peers: list[int] = []
+    if archive.exists():
+        with zipfile.ZipFile(archive) as zf:
+            if name in zf.namelist():
+                return {"week": str(week.date()), "fetched": False}
+            peers = [i.file_size for i in zf.infolist()][-8:]
+    incoming = RAW / "usdm" / "incoming" / name
+    res = safe_fetch(USDM_URL.format(d=week), incoming, "zip", "USDM-weekly", peers=peers, ledger=ledger)
+    with tempfile.TemporaryDirectory() as d:
+        files = safe_extract(incoming, Path(d))
+        if not any(f.suffix.lower() == ".shp" for f in files):
+            incoming.unlink()
+            raise FetchRefused(f"{name} holds no shapefile")
+    from cofire.ship import datapack
+
+    # Locally the national archive gets the map as published. The data pack's
+    # Colorado archive gets the clipped map; in CI, where data/raw/usdm is the
+    # pack's archive, that is the only copy.
+    if not (RAW / "usdm").is_symlink():
+        part = archive.with_name(archive.name + ".part")
+        if archive.exists():
+            shutil.copy2(archive, part)
+        with zipfile.ZipFile(part, "a") as zf:
+            zf.write(incoming, arcname=name)
+        part.replace(archive)
+    if datapack.CLIPPED.exists():
+        datapack.append_clipped(incoming, week.year)
+    incoming.unlink()
+    return {"week": str(week.date()), "fetched": True, "bytes": res.n_bytes, "sha256": res.sha256}
+
+
+def store_gate(domain: str, year: int) -> dict[str, Any]:
+    """Daily record against the processed cube, every complete week, cell for cell."""
+    from cofire.model.data import erc_extension as ext
+    from cofire.ship.build_v11 import settings
+
+    st = settings(domain)
+    cube = st.processed_dir / "gridmet" / f"weekly_{year}.nc"
+    raw = ext.reference_daily(year, st)
+    if not cube.exists() or raw is None:
+        return {"domain": domain, "ok": True, "note": "no processed cube for this year"}
+    daily = xr.open_dataset(ext.cache_path(domain, year))[ext.VAR].load().rename({"day": "time"})
+    grouped = daily.resample(time="W-TUE")
+    weekly = grouped.mean()
+    full = (grouped.count(dim="time").max(dim=["lat", "lon"]) >= 7).values
+    # Weeks the cube could fill completely: those ending on or before the last
+    # day of the daily file it was built from.
+    last_raw = pd.Timestamp(raw[[d for d in raw.dims if d in ("day", "time")][0]].values[-1])
+    with xr.open_dataset(cube) as ds:
+        store = ds["erc"].load()
+    in_store = set(pd.DatetimeIndex(store["time"].values))
+    ok_weeks = [t for t, f in zip(pd.DatetimeIndex(weekly["time"].values), full, strict=True)
+                if f and t <= last_raw and t in in_store]
+    r = ext.reconcile(weekly.sel(time=ok_weeks), store.sel(time=ok_weeks))
+    return {"domain": domain, "ok": r.ok, "n_compared": r.n_compared, "max_abs_diff": r.max_abs_diff,
+            "first_mismatch": r.first_mismatch, "weeks": len(ok_weeks)}
+
+
+def ext_cache(domain: str, year: int) -> Path:
+    from cofire.model.data import erc_extension as ext
+
+    return ext.cache_path(domain, year)
+
+
+def _hash(path: Path) -> str:
+    if not path.exists():
+        return ""
+    f = pd.read_parquet(path)
+    return hashlib.sha256(pd.util.hash_pandas_object(f, index=False).values.tobytes()).hexdigest()
+
+
+def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
+    from cofire.model.freeze import look_count
+    from cofire.ship import bundles, demo, export, story
+
+    assert look_count() == 3, "look counter must read 3 before a refresh"
+    now = utc_now() if now is None else now
+    ledger = _ledger()
+    bytes_before = session_bytes(ledger)
+    target = latest_published(now)
+    log: dict[str, Any] = {"run_at": str(now), "session": SESSION, "target_published": str(target.date())}
+
+    have = usdm_weeks_available(RAW, range(target.year, target.year + 1))
+    tuesdays = pd.date_range(f"{target.year}-01-01", target, freq="W-TUE")
+    log["usdm"] = [usdm_week(w, ledger) for w in tuesdays if w not in have]
+
+    # A store domain held after a failed gate stays held, without re-fetching
+    # its year every week, until someone asks for a re-gate (COFIRE_REGATE=1).
+    held = {
+        d for d in STORE_DOMAINS
+        if ext_cache(d, target.year).with_name(f"{d}_{target.year}.nc.ungated").exists()
+        and os.environ.get("COFIRE_REGATE") != "1"
+    }
+    log["held"] = sorted(held)
+    log["erc"] = [erc_fetch.extend(d, target.year, ledger) for d in domains.ORDER if d not in held]
+    # The issue needs all seven ERC days of its week in every domain.
+    last_erc = min(pd.Timestamp(e["last_day"]) for e in log["erc"])
+    while target > last_erc:
+        target -= pd.Timedelta(weeks=1)
+    log["target"] = str(target.date())
+
+    # A domain whose daily record fails the gate is not used: its file is set
+    # aside and the domain stays on its processed cube, cut to complete weeks.
+    # The export then stops at the last issue complete in every domain.
+    log["gates"] = [store_gate(d, target.year) for d in STORE_DOMAINS if d not in held]
+    for g in log["gates"]:
+        src = ext_cache(g["domain"], target.year)
+        marker = src.with_suffix(".gated.json")
+        if g["ok"]:
+            marker.write_text(json.dumps(g, default=str))
+        else:
+            marker.unlink(missing_ok=True)
+            if src.exists():
+                src.replace(src.with_name(src.name + ".ungated"))
+            LOGGER.error("gate failed for %s: %s", g["domain"], g["first_mismatch"])
+    failed = sorted({g["domain"] for g in log["gates"] if not g["ok"]} | held)
+
+    target = min([target, *[export.erc_complete_issue(d, target.year) for d in domains.ORDER]])
+    log["target"] = str(target.date())
+    before = _hash(EXPORT)
+    export.write(last_issue=target, now=now)
+    after = _hash(EXPORT)
+    log["export_changed"] = before != after
+    f = pd.read_parquet(EXPORT)
+    log["issues"] = [str(pd.Timestamp(f["time"].min()).date()), str(pd.Timestamp(f["time"].max()).date())]
+    assert (pd.to_datetime(f["available_at"]) <= now).all(), "an issue was emitted before its inputs were published"
+    assert pd.Timestamp(f["time"].max()) == target, f"last issue {f['time'].max()} is not the target {target}"
+    usdm_now = f[f["time"] == target].groupby("domain")["usdm"].mean()
+    log["usdm_mean_at_target"] = {k: round(float(v), 3) for k, v in usdm_now.items()}
+
+    bundles.build()
+    demo.build()
+    story.write()
+    log["bytes"] = session_bytes(ledger) - bytes_before
+    assert look_count() == 3, "look counter moved during a refresh"
+    log["looks"] = 3
+    log["outcome"] = (
+        f"gate failed for {', '.join(failed)}; held on reconciled data" if failed
+        else ("updated" if log["export_changed"] else "no change")
+    )
+    log_append(log)
+    return log
+
+
+def log_append(entry: dict[str, Any]) -> None:
+    runs = json.loads(LOG.read_text()) if LOG.exists() else []
+    runs.append(entry)
+    LOG.parent.mkdir(parents=True, exist_ok=True)
+    LOG.write_text(json.dumps(runs, indent=1, default=str) + "\n")
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    out = run()
+    print(json.dumps({k: v for k, v in out.items() if k not in ("erc", "usdm")}, indent=1, default=str))
+    print("erc", [(e["domain"], e.get("new_days"), e.get("last_day")) for e in out["erc"]])
+    print("usdm", out["usdm"])

@@ -1,0 +1,190 @@
+[
+ {
+  "run_at": "2026-09-27 20:37:35.495178",
+  "session": "v1.1",
+  "target_published": "2026-09-22",
+  "usdm": [
+   {
+    "week": "2026-09-22",
+    "fetched": true,
+    "bytes": 3000870,
+    "sha256": "1067984cfc900ce3cd63c87f53da3b944ade12d920d9ced4d7795d8c3ea540ed"
+   }
+  ],
+  "erc": [
+   {
+    "domain": "denver",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "upper_south_platte",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "dillon",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "larimer",
+    "year": 2026,
+    "new_days": 268,
+    "last_day": "2026-09-25",
+    "overlap_max_revision": 0.0,
+    "bytes": 521372
+   },
+   {
+    "domain": "pueblo",
+    "year": 2026,
+    "new_days": 268,
+    "last_day": "2026-09-25",
+    "overlap_max_revision": 0.0,
+    "bytes": 469884
+   }
+  ],
+  "target": "2026-09-22",
+  "gates": [
+   {
+    "domain": "larimer",
+    "ok": false,
+    "n_compared": 17280,
+    "max_abs_diff": 7.0,
+    "first_mismatch": "first mismatch at time=2026-06-30T00:00:00.000000000, lat=40.69166666666667, lon=-105.59999996666667: fetched 64.1429, store 71.1429",
+    "weeks": 36
+   },
+   {
+    "domain": "pueblo",
+    "ok": false,
+    "n_compared": 15552,
+    "max_abs_diff": 7.285714285714285,
+    "first_mismatch": "first mismatch at time=2026-08-25T00:00:00.000000000, lat=38.150000000000006, lon=-104.39166663333334: fetched 40.7143, store 48",
+    "weeks": 36
+   }
+  ],
+  "outcome": "gate failed"
+ },
+ {
+  "run_at": "2026-09-27 20:39:23.435694",
+  "session": "v1.1",
+  "target_published": "2026-09-22",
+  "usdm": [],
+  "erc": [
+   {
+    "domain": "denver",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "upper_south_platte",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "dillon",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "larimer",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "pueblo",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   }
+  ],
+  "target": "2026-09-15",
+  "gates": [
+   {
+    "domain": "larimer",
+    "ok": false,
+    "n_compared": 17280,
+    "max_abs_diff": 7.0,
+    "first_mismatch": "first mismatch at time=2026-06-30T00:00:00.000000000, lat=40.69166666666667, lon=-105.59999996666667: fetched 64.1429, store 71.1429",
+    "weeks": 36
+   },
+   {
+    "domain": "pueblo",
+    "ok": false,
+    "n_compared": 15552,
+    "max_abs_diff": 7.285714285714285,
+    "first_mismatch": "first mismatch at time=2026-08-25T00:00:00.000000000, lat=38.150000000000006, lon=-104.39166663333334: fetched 40.7143, store 48",
+    "weeks": 36
+   }
+  ],
+  "export_changed": true,
+  "issues": [
+   "2026-01-06",
+   "2026-09-15"
+  ],
+  "usdm_mean_at_target": {
+   "denver": 2.596,
+   "dillon": 3.734,
+   "larimer": 2.4,
+   "pueblo": 1.963,
+   "upper_south_platte": 2.713
+  },
+  "bytes": 1925,
+  "looks": 3,
+  "outcome": "gate failed for larimer, pueblo; held on reconciled data"
+ },
+ {
+  "run_at": "2026-09-27 20:42:37.142084",
+  "session": "v1.1",
+  "target_published": "2026-09-22",
+  "usdm": [],
+  "held": [
+   "larimer",
+   "pueblo"
+  ],
+  "erc": [
+   {
+    "domain": "denver",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "upper_south_platte",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "dillon",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   }
+  ],
+  "target": "2026-09-15",
+  "gates": [],
+  "export_changed": false,
+  "issues": [
+   "2026-01-06",
+   "2026-09-15"
+  ],
+  "usdm_mean_at_target": {
+   "denver": 2.596,
+   "dillon": 3.734,
+   "larimer": 2.4,
+   "pueblo": 1.963,
+   "upper_south_platte": 2.713
+  },
+  "bytes": 1155,
+  "looks": 3,
+  "outcome": "gate failed for larimer, pueblo; held on reconciled data"
+ }
+]

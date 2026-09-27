@@ -25,6 +25,8 @@ LOGGER = logging.getLogger("cofire.ship.story")
 EXPORT = Path("artifacts/ship/forecast_issues.parquet")
 BUNDLES = Path("demo/artifacts/ship/domains")
 COUNTIES = Path("data/raw/boundaries/cb_2023_us_county_500k.zip")
+# The data pack carries only Colorado's counties (cofire/ship/datapack.py).
+CO_COUNTIES = Path("data/raw/boundaries/co_counties.geojson")
 OUT = Path("app/lib/story.json")
 
 COLORADO_FIPS = "08"
@@ -92,7 +94,7 @@ def build() -> dict[str, Any]:
     issue = frame["time"].max()
     latest = frame[frame["time"] == issue]
 
-    counties = gpd.read_file(f"zip://{COUNTIES}")
+    counties = gpd.read_file(f"zip://{COUNTIES}") if COUNTIES.exists() else gpd.read_file(CO_COUNTIES)
     co = counties[counties["STATEFP"] == COLORADO_FIPS].copy()
     co["geometry"] = co.geometry.simplify(0.012, preserve_topology=True)
     minx, miny, maxx, maxy = co.total_bounds

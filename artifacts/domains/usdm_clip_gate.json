@@ -1,0 +1,32 @@
+{
+ "denver": {
+  "ok": true,
+  "cells_weeks": 107120,
+  "n_different": 0,
+  "weeks_with_drought": 372
+ },
+ "upper_south_platte": {
+  "ok": true,
+  "cells_weeks": 389340,
+  "n_different": 0,
+  "weeks_with_drought": 461
+ },
+ "dillon": {
+  "ok": true,
+  "cells_weeks": 120510,
+  "n_different": 0,
+  "weeks_with_drought": 359
+ },
+ "larimer": {
+  "ok": true,
+  "cells_weeks": 494400,
+  "n_different": 0,
+  "weeks_with_drought": 481
+ },
+ "pueblo": {
+  "ok": true,
+  "cells_weeks": 444960,
+  "n_different": 0,
+  "weeks_with_drought": 586
+ }
+}

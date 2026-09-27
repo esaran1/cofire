@@ -249,3 +249,96 @@ def verify_against_source(
                 first = f"{y} ({la},{lo}) day {d0 + k}: source {src[k]}, cache {got[k]}"
     return {"ok": worst == 0.0, "n_compared": n_cmp, "max_abs_diff": worst, "years": years,
             "cells": cells, "first_mismatch": first}
+
+
+# ------------------------------------------------------------ weekly refresh
+
+OVERLAP_DAYS = 7  # re-read the most recent cached week, which gridMET may revise
+GATE_LAG_DAYS = 60  # one older day that must match the cache exactly
+
+
+def rect(domain: str) -> tuple[int, int]:
+    """Rows and columns the frozen bbox selection gives for a domain."""
+    from cofire.model import config
+
+    domains.register()
+    w, s, e, n = config.SUBSETS[domain][0]
+    lats = domains.GRID_LAT0 - np.arange(585) / 24.0
+    lons = domains.GRID_LON0 + np.arange(1386) / 24.0
+    return int(((lats >= s) & (lats <= n)).sum()), int(((lons >= w) & (lons <= e)).sum())
+
+
+def _read_days(domain: str, year: int, start: int, stop: int) -> xr.DataArray:
+    """Days [start, stop) of one year over the domain's bbox, the reconciled way.
+
+    The same `open_dataset` and `.sel` as the frozen `fetch_year`, with the
+    day axis sliced first so only the new days cross the wire.
+    """
+    w, s, e, n = settings_for(domain).bbox
+    da = ext._open(year)[ext.VAR].isel(day=slice(start, stop))
+    lat_desc = bool(da.lat.values[0] > da.lat.values[-1])
+    out = da.sel(lat=slice(n, s) if lat_desc else slice(s, n), lon=slice(w, e)).load()
+    if out.sizes.get("lat", 0) == 0 or out.sizes.get("lon", 0) == 0:
+        raise FetchRefused(f"ERC {year}: empty selection for {domain}")
+    return out
+
+
+def extend(domain: str, year: int, ledger: DownloadLedger) -> dict[str, object]:
+    """Bring one domain-year of daily ERC up to the server's latest day."""
+    n_lat, n_lon = rect(domain)
+    dest = ext.cache_path(domain, year)
+    url = ext.OPENDAP.format(year=year)
+    _check_redirect(url)
+    # The current year's DDS grows daily, so it is always re-read.
+    (DDS_DIR / f"erc_{year}.dds").unlink(missing_ok=True)
+    n_server = _dims(_dds(year, ledger))["day"]
+    if not dest.exists():
+        start, cached = 0, None
+    else:
+        cached = xr.open_dataset(dest)[ext.VAR].load()
+        n_have = int(cached.sizes["day"])
+        if n_have >= n_server:
+            return {"domain": domain, "year": year, "new_days": 0, "last_day": str(cached.day.values[-1])[:10]}
+        start = max(0, n_have - OVERLAP_DAYS)
+
+    n_days = n_server - start
+    cost = n_days * n_lat * n_lon * 4 + (n_days + n_lat + n_lon) * 8 + _OPEN_OVERHEAD
+    gate_day = None if cached is None else int(cached.sizes["day"]) - GATE_LAG_DAYS
+    if gate_day is not None and gate_day >= 0:
+        cost += n_lat * n_lon * 4 + _OPEN_OVERHEAD
+    if session_bytes(ledger) + cost > SESSION_CAP_BYTES or not ledger.can_afford(cost):
+        raise FetchRefused(f"{domain} {year}: {cost} B would exceed the session cap or the ledger")
+    constraint = f"{url}?energy_release_component-g day[{start}:{n_server}] bbox={settings_for(domain).bbox}"
+    try:
+        new = _read_days(domain, year, start, n_server)
+        validate(new, n_lat, n_lon, n_days)
+        revised = 0.0
+        if cached is not None:
+            if gate_day is not None and gate_day >= 0:
+                g = _read_days(domain, year, gate_day, gate_day + 1)
+                r = ext.reconcile(g, cached.isel(day=slice(gate_day, gate_day + 1)))
+                if not r.ok:
+                    raise FetchRefused(f"{domain} {year} gate day {gate_day}: {r.first_mismatch}")
+            a, b = xr.align(new, cached, join="inner")
+            revised = float(np.nanmax(np.abs(a.values - b.values))) if a.size else 0.0
+            merged = xr.concat([cached.isel(day=slice(0, start)), new], dim="day")
+        else:
+            merged = new
+    except FetchRefused:
+        ledger.record("gridMET-OPeNDAP", constraint, cost, note=f"session={SESSION}; REJECTED")
+        raise
+    except Exception as exc:  # noqa: BLE001
+        ledger.record("gridMET-OPeNDAP", constraint, cost, note=f"session={SESSION}; REJECTED")
+        raise FetchRefused(f"OPeNDAP read failed for {domain} {year}: {exc}") from exc
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(dest.name + ".part")
+    merged.to_dataset(name=ext.VAR).to_netcdf(tmp)
+    with open(tmp, "rb") as fh:
+        check_magic(fh.read(64), "netcdf")
+    tmp.replace(dest)
+    sha = hashlib.sha256(dest.read_bytes()).hexdigest()
+    ledger.record("gridMET-OPeNDAP", constraint, cost,
+                  note=f"session={SESSION}; sha256={sha}; bytes computed from the DAP2 wire format")
+    return {"domain": domain, "year": year, "new_days": int(n_server - (start if cached is None else cached.sizes["day"])),
+            "last_day": str(merged.day.values[-1])[:10], "overlap_max_revision": revised, "bytes": cost}

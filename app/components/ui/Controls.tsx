@@ -161,10 +161,15 @@ export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () 
 }
 
 export function OfflineNote() {
+  // The static site has no service at all; saying "no connection" there would
+  // suggest retrying something that will never answer.
+  const isStatic = !!process.env.NEXT_PUBLIC_DATA_BASE;
   return (
-    <div className="rounded border border-ochre/40 bg-ochre-soft p-4">
+    <div className="rounded border border-ochre/40 bg-ochre-soft p-4" data-testid="offline-note">
       <p className="text-sm text-ochre">
-        No connection to the forecast service. Showing what is cached on this device.
+        {isStatic
+          ? "This is the static preview. Picks and reports need the live service, so they are not stored here; the forecast itself is complete."
+          : "No connection to the forecast service. Showing what is cached on this device."}
       </p>
     </div>
   );

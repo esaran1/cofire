@@ -134,12 +134,12 @@ def test_base_rate_is_the_training_record_rate_for_the_season() -> None:
         pytest.skip("training feature store not built in this checkout")
     frame = all_event_targets(frame, HORIZONS)
     train = frame[frame["time"] <= pd.Timestamp(st.train_end)]
-    issue = pd.Timestamp("2026-09-22")
+    exp = pd.read_parquet(EXPORT)
+    issue = pd.Timestamp(exp["time"].max())
     woy = train["time"].dt.isocalendar().week.astype(int).clip(1, 52)
     y = pd.to_numeric(train.loc[woy.isin(window_weeks(issue.isocalendar().week)), "d_ge2_h4"], errors="coerce")
     expected = float(y.dropna().mean())
 
-    exp = pd.read_parquet(EXPORT)
     row = exp[(exp["domain"] == "larimer") & (exp["time"] == issue)].iloc[0]
     assert row["d_ge2_h4_state"] == BASE_RATE
     # float32 storage in the export; a probability needs no more than 1e-6.
@@ -167,8 +167,36 @@ def test_the_export_reads_no_realized_outcome() -> None:
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
 def test_the_export_covers_every_issue_to_the_last(  ) -> None:
     frame = pd.read_parquet(EXPORT)
-    assert pd.Timestamp(frame["time"].max()) == pd.Timestamp("2026-09-22")
+    times = sorted(pd.to_datetime(frame["time"]).unique())
+    # Weekly and unbroken from the first 2026 issue to the last complete one.
+    assert pd.Timestamp(times[0]) == pd.Timestamp("2026-01-06")
+    assert all((b - a) == pd.Timedelta(weeks=1) for a, b in zip(times, times[1:], strict=False))
     assert set(frame["domain"].unique()) == {"denver", "upper_south_platte", "dillon", "larimer", "pueblo"}
+    # Every domain carries every issue, so the app's issue list holds everywhere.
+    assert frame.groupby("domain")["time"].nunique().nunique() == 1
+
+
+@pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
+def test_no_issue_is_emitted_before_its_inputs_were_published() -> None:
+    frame = pd.read_parquet(EXPORT)
+    lag = pd.to_datetime(frame["available_at"]) - pd.to_datetime(frame["time"])
+    assert (lag == pd.Timedelta(days=2, hours=13, minutes=30)).all()
+
+
+@pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
+def test_no_issue_has_a_missing_drought_map_coded_as_none() -> None:
+    """The 2026-09-22 fault: a week without its USDM map read as "none" everywhere.
+
+    A domain's mean category collapsing to zero for one week while the weeks
+    around it are in drought is that fault, not weather: USDM moves one
+    category at a time.
+    """
+    frame = pd.read_parquet(EXPORT)
+    m = frame.groupby(["domain", "time"])["usdm"].mean().unstack(0).sort_index()
+    for dom in m.columns:
+        s = m[dom].to_numpy()
+        for i in range(1, len(s)):
+            assert not (s[i] == 0 and s[i - 1] >= 1), f"{dom}: USDM drops to 0 at {m.index[i]}"
 
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")

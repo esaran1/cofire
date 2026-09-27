@@ -1,9 +1,9 @@
 {
   "budget_bytes": 3000000000,
-  "recorded_bytes": 4414087706,
+  "recorded_bytes": 4418149273,
   "correction_bytes": -1477699344,
-  "total_bytes": 2936388362,
-  "remaining_bytes": 63611638,
+  "total_bytes": 2940449929,
+  "remaining_bytes": 59550071,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
@@ -29265,6 +29265,125 @@
       "bytes": 149956,
       "timestamp": "2026-09-27T20:02:53+00:00",
       "note": "session=v1.1; sha256=5688a8dfa8bbd35479f8b5e4211458fccab83aadf6bbfc1f0868da6515caa334; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "USDM-weekly",
+      "url": "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20260922_M.zip",
+      "bytes": 3000870,
+      "timestamp": "2026-09-27T20:37:36+00:00",
+      "note": "session=v1.1; sha256=1067984cfc900ce3cd63c87f53da3b944ade12d920d9ced4d7795d8c3ea540ed"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:37:37+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:37:38+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:37:39+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:37:40+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[0:268] bbox=(-106.192, 40.324, -104.943, 40.998)",
+      "bytes": 521372,
+      "timestamp": "2026-09-27T20:37:42+00:00",
+      "note": "session=v1.1; sha256=136cc30671c59e6a218c871e01d1d9930ffdfc345aca386f3bbce89111bcab8e; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:37:42+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[0:268] bbox=(-105.051, 37.735, -104.054, 38.522)",
+      "bytes": 469884,
+      "timestamp": "2026-09-27T20:37:43+00:00",
+      "note": "session=v1.1; sha256=874b87eef72123ad5162aa5ec3d097d9b246a42998a1775a7292315ce83e0990; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2025.nc?day[150:181] larimer diagnosis",
+      "bytes": 64436,
+      "timestamp": "2026-09-27T20:38:47+00:00",
+      "note": "session=v1.1; diagnosis; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:39:24+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:39:25+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:39:26+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:39:26+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:39:27+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:42:37+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:42:39+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T20:42:39+00:00",
+      "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
     }
   ]
 }

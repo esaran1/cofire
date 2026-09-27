@@ -1,0 +1,63 @@
+name: weekly refresh
+
+# Fridays, a day after the Thursday 08:30 ET USDM release. Fetches the new
+# drought map and ERC days through the ledger and safe_fetch, runs the frozen
+# path, and commits the export. Scores nothing; the look counter must read 3
+# before and after (asserted inside the refresh).
+on:
+  schedule:
+    - cron: "30 18 * * 5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OMP_NUM_THREADS: "2"
+      COFIRE_DEV_SUBSET: "1"
+      # Each run is its own budget line in data/ledger.json.
+      COFIRE_FETCH_SESSION: refresh-${{ github.run_id }}
+      COFIRE_FETCH_SESSION_CAP: "50000000"
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --extra dev
+      - name: Restore the data pack
+        # 14 MB: USDM clipped to Colorado (gated identical to the national
+        # archives), daily ERC caches, and the store cubes the builder reads.
+        run: |
+          gh release download data-pack --pattern cofire-datapack.tar.gz --dir "$RUNNER_TEMP"
+          uv run python -m cofire.ship.datapack restore "$RUNNER_TEMP/cofire-datapack.tar.gz"
+      - name: Refresh
+        run: uv run python -m cofire.ship.runner refresh -- uv run python -m cofire.ship.refresh
+      - name: Checks
+        run: uv run pytest -q tests/test_frozen_model.py tests/test_delayed_feedback_gate.py tests/test_historical_range.py tests/test_rendering.py tests/test_refresh.py tests/test_bundles.py
+      - name: Save the data pack
+        run: |
+          uv run python -m cofire.ship.datapack pack "$RUNNER_TEMP/cofire-datapack.tar.gz"
+          gh release upload data-pack "$RUNNER_TEMP/cofire-datapack.tar.gz" --clobber
+      - name: Commit the refreshed export
+        run: |
+          git config user.name "cofire-refresh"
+          git config user.email "cofire-refresh@users.noreply.github.com"
+          git add artifacts/ship/forecast_issues.parquet artifacts/ship/refresh_log.json data/ledger.json demo app/lib/story.json
+          if git diff --cached --quiet; then
+            echo "nothing new this week"
+          else
+            git commit -m "Weekly refresh $(date -u +%F)"
+            git push
+          fi

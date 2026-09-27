@@ -95,7 +95,7 @@ def main() -> int:
         elif root.is_dir():
             files.extend(p for p in root.rglob("*") if p.suffix in {".md", ".tsx", ".ts", ".jsx", ".js", ".html"})
     for path in files:
-        if "node_modules" in path.parts or ".next" in path.parts:
+        if "node_modules" in path.parts or ".next" in path.parts or path.parts[:2] == ("app", "out"):
             continue
         text = path.read_text(errors="replace").lower()
         for phrase in FORBIDDEN:

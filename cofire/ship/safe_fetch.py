@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import os
 import statistics
 import zipfile
 from dataclasses import dataclass
@@ -37,8 +38,11 @@ from urllib.parse import urljoin, urlparse
 
 LOGGER = logging.getLogger("cofire.ship.safe_fetch")
 
-SESSION = "v1.1"
-SESSION_CAP_BYTES = 2_000_000_000
+# The session a transfer is counted against. v1.1 is the Denver session, capped
+# at 2.0 GB; a scheduled refresh sets its own tag and cap through the
+# environment, so each run is budgeted and logged on its own.
+SESSION = os.environ.get("COFIRE_FETCH_SESSION", "v1.1")
+SESSION_CAP_BYTES = int(os.environ.get("COFIRE_FETCH_SESSION_CAP", "2000000000"))
 
 ALLOWED_HOSTS = frozenset({
     # Climatology Lab / Northwest Knowledge Network (gridMET)
