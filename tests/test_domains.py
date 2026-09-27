@@ -54,3 +54,21 @@ def test_upstream_trace_stops_at_the_outlet() -> None:
                          geometry=gpd.points_from_xy([0] * 4, [0] * 4))
     assert set(domains.upstream(h, "b")["huc12"]) == {"a", "b"}
     assert set(domains.upstream(h, "c")["huc12"]) == {"a", "b", "c", "d"}
+
+
+@pytest.mark.parametrize("name", domains.NEW)
+def test_each_new_domain_reads_and_writes_only_its_own_paths(
+    name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from cofire.model.config import get_settings
+    from cofire.ship import build_v11
+
+    # Recorded so teardown restores them after `settings` overwrites them.
+    monkeypatch.setenv("COFIRE_SUBSET_NAME", "pueblo")
+    monkeypatch.setenv("COFIRE_DEV_SUBSET", "1")
+    try:
+        st = build_v11.settings(name)
+        assert st.processed_dir.name == f"processed_{name}"
+        assert st.bbox == tuple(domains.load()[name]["bbox"])
+    finally:
+        get_settings.cache_clear()

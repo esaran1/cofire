@@ -1606,3 +1606,61 @@ fetched.
 refused read, DAP metadata 13,028, DAP ASCII gate samples 24,133, WBD 119,315,
 NHD 13,380, NCSS probe 23). Session cap 2.0 GB; ledger global remaining
 64,327,490 bytes.
+
+## v1.1 Stage 3: configuration A stores for Denver, Upper South Platte, Dillon
+
+Built by the frozen `features_a.build`, unchanged, through
+`cofire/ship/build_v11.py`, 2007 to 2025 (992 weeks). The frozen builder needs
+a processed cube for coordinates; each new domain gets a coordinates-only
+`weekly_template.nc` taken from its own ERC cache (same grid by construction)
+and carrying no `erc` variable, so `weekly_erc` ignores it for data. Stores
+hold the full rectangle; the loader keeps footprint cells only and asserts none
+is missing. Each build took 30 s under the watchdog.
+
+**Reconciliation gate.** No new-domain cell coincides with a Larimer or Pueblo
+cell (0 shared), so the cell-for-cell store comparison cannot apply. The
+applicable gate is against the source: for each domain, 3 random years x 4
+random footprint cells x 7 days were requested again as raw DAP ASCII (a
+different wire format parsed by different code) through `safe_fetch` and
+compared with the cache. Result: 84 cell-days per domain, max|diff| 0 on all
+three, and every sampled index returned the coordinates the cache assigns it
+(`artifacts/domains/erc_gate.json`). The fetch path itself is the one that
+reconciled with max|diff| 0 on Larimer (175,200 cell-days) and Pueblo
+(157,680).
+
+**erc_pct** comes from the single reference implementation with pools from
+2007 to 2021 only. Uniformity check, per-cell 5th to 95th percentile width over
+the training years (asserted median 85 to 95, minimum 80):
+
+| Domain | median | min | max |
+|---|---|---|---|
+| Denver | 89.51 | 88.20 | 89.95 |
+| Upper South Platte | 88.57 | 86.84 | 90.35 |
+| Dillon | 88.05 | 86.67 | 89.40 |
+| Larimer | 88.57 | 86.59 | 90.48 |
+| Pueblo | 88.57 | 87.62 | 89.52 |
+
+Integer ERC ties keep the width a little under 90 in every domain.
+
+**Scoping.** Every path is derived from the active domain: `processed_<domain>`
+stores, `erc_ext/<domain>_*.nc` caches (22 files asserted, each name carrying
+the domain), and `processed_<domain>/usdm/weekly.nc`. The loader asserts its
+root carries the domain name; Larimer's legacy unscoped `data/processed` is
+the one documented exception.
+
+**Not estimable in validation (fewer than 12 positive weeks, 2022 to 2023):**
+Denver 10 of 27 (d_ge3 x3, d_intensify1_h2, d_intensify2 x3, f_gt97 x3);
+Upper South Platte 11 (d_ge2 x3, d_ge3 x3, d_intensify2 x3, f_gt97_h4,
+f_gt97_h8); Dillon 15 (d_ge2 x3, d_ge3 x3, d_intensify1 x3, d_intensify2 x3,
+f_gt97 x3). Larimer 7 and Pueblo 8 on the same count. Full per-target counts
+and the USDM category distribution by year are in
+`artifacts/domains/stage3.json`.
+
+**Denver's fire targets are estimable, contrary to the expectation.** The fire
+targets are ERC above the cell's own training percentile (80, 90, 97), so f_gt80
+and f_gt90 occur at similar rates in any domain by construction: Denver has 38
+to 39 validation positive weeks at 80 and 16 to 17 at 90. They measure how dry
+Denver is relative to its own record, not wildland fire danger in a city.
+Only f_gt97 falls short (6 weeks). The Denver Place Card therefore shows fire
+danger from the source watersheds, as planned, and Denver's own ERC targets
+are labeled as relative dryness wherever they appear.

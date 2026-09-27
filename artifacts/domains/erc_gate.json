@@ -1,0 +1,92 @@
+{
+ "denver": {
+  "ok": true,
+  "n_compared": 84,
+  "max_abs_diff": 0.0,
+  "years": [
+   2004,
+   2007,
+   2021
+  ],
+  "cells": [
+   [
+    39.775,
+    -104.933333
+   ],
+   [
+    39.733333,
+    -104.85
+   ],
+   [
+    39.816667,
+    -104.6
+   ],
+   [
+    39.9,
+    -104.6
+   ]
+  ],
+  "first_mismatch": "",
+  "cells_shared_with_existing_stores": 0
+ },
+ "upper_south_platte": {
+  "ok": true,
+  "n_compared": 84,
+  "max_abs_diff": 0.0,
+  "years": [
+   2004,
+   2007,
+   2021
+  ],
+  "cells": [
+   [
+    39.358333,
+    -105.433333
+   ],
+   [
+    39.233333,
+    -105.516667
+   ],
+   [
+    39.4,
+    -105.6
+   ],
+   [
+    39.566667,
+    -105.433333
+   ]
+  ],
+  "first_mismatch": "",
+  "cells_shared_with_existing_stores": 0
+ },
+ "dillon": {
+  "ok": true,
+  "n_compared": 84,
+  "max_abs_diff": 0.0,
+  "years": [
+   2004,
+   2007,
+   2021
+  ],
+  "cells": [
+   [
+    39.525,
+    -106.141667
+   ],
+   [
+    39.483333,
+    -106.016667
+   ],
+   [
+    39.566667,
+    -105.933333
+   ],
+   [
+    39.65,
+    -105.85
+   ]
+  ],
+  "first_mismatch": "",
+  "cells_shared_with_existing_stores": 0
+ }
+}
