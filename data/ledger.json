@@ -1,9 +1,9 @@
 {
   "budget_bytes": 3000000000,
-  "recorded_bytes": 4418149273,
+  "recorded_bytes": 4418150428,
   "correction_bytes": -1477699344,
-  "total_bytes": 2940449929,
-  "remaining_bytes": 59550071,
+  "total_bytes": 2940451084,
+  "remaining_bytes": 59548916,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
@@ -29384,6 +29384,27 @@
       "bytes": 385,
       "timestamp": "2026-09-27T20:42:39+00:00",
       "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:10:04+00:00",
+      "note": "session=refresh-36350647529; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:10:06+00:00",
+      "note": "session=refresh-36350647529; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:10:07+00:00",
+      "note": "session=refresh-36350647529; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
     }
   ]
 }
