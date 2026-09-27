@@ -1,10 +1,10 @@
 {
  "n_pairs": 115,
  "n_estimable": 83,
- "n_survivors": 21,
+ "n_survivors": 22,
  "current_survivors_hold": 11,
  "current_survivors_total": 11,
- "strongest_current_bss": 0.6352173407222945,
+ "strongest_current_bss": 0.6789004029231407,
  "agreeing_targets": [],
  "fire_survivors": 4
 }

@@ -1,7 +1,7 @@
 {
   "generated_from": "artifacts/",
   "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
-  "git_sha": "8f97573dad22757e7267518bd809bc19ea060477",
+  "git_sha": "64c628e95be3ca4ba894bc47d8d3f37b77447fe8",
   "resolution_m": 4000,
   "domains": [
     "denver",
@@ -30,16 +30,14 @@
   "multiplicity": {
     "n_comparisons": 115,
     "n_estimable": 83,
-    "n_survivors": 21,
+    "n_survivors": 22,
     "n_survivors_original": 12,
-    "withdrawn_by_leak_free_refit": [
-      "pueblo d_ge2_h4"
-    ],
+    "withdrawn_by_leak_free_refit": [],
     "q": 0.1,
     "min_positive_weeks": 12,
     "rule": "paired difference between the statistic on real targets and on targets shuffled within the same circular blocks, CI above zero",
     "n_domains": 5,
-    "n_survivors_larimer_pueblo": 11,
+    "n_survivors_larimer_pueblo": 12,
     "n_survivors_new_domains": 10,
     "n_comparisons_larimer_pueblo": 51,
     "agreement_rule": "passes in every domain where the target is estimable, and in at least two domains",
@@ -51,9 +49,9 @@
       "target": "d_improve1_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.2256600457806194,
-      "paired_lo": 0.1009079861704847,
-      "paired_hi": 0.3526982485588618,
+      "paired_diff": 0.2271377358305163,
+      "paired_lo": 0.102653104377298,
+      "paired_hi": 0.3533425120279504,
       "n_positive_weeks": 24
     },
     {
@@ -61,9 +59,9 @@
       "target": "d_improve1_h4",
       "horizon": 4,
       "arm": "markov",
-      "paired_diff": 0.2431098759595668,
-      "paired_lo": 0.0949867671248786,
-      "paired_hi": 0.4533934636771793,
+      "paired_diff": 0.2438027898397168,
+      "paired_lo": 0.0979499383074095,
+      "paired_hi": 0.4543917350003845,
       "n_positive_weeks": 35
     },
     {
@@ -71,9 +69,9 @@
       "target": "d_nochange_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.0797209490535326,
-      "paired_lo": 0.0198322051718859,
-      "paired_hi": 0.1533380043870074,
+      "paired_diff": 0.0809988517778014,
+      "paired_lo": 0.020546471586584,
+      "paired_hi": 0.1548913109324279,
       "n_positive_weeks": 90
     },
     {
@@ -151,9 +149,9 @@
       "target": "d_ge2_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.8330849647363536,
-      "paired_lo": 0.1667820481580218,
-      "paired_hi": 1.195929544331739,
+      "paired_diff": 0.8330844900858181,
+      "paired_lo": 0.1668581506080352,
+      "paired_hi": 1.1959255087503111,
       "n_positive_weeks": 21
     },
     {
@@ -161,9 +159,9 @@
       "target": "d_ge2_h4",
       "horizon": 4,
       "arm": "markov",
-      "paired_diff": 0.4860935219634647,
-      "paired_lo": 0.0173902397303135,
-      "paired_hi": 0.8697255141956929,
+      "paired_diff": 0.486092863248074,
+      "paired_lo": 0.0174310568897093,
+      "paired_hi": 0.8697622051686739,
       "n_positive_weeks": 19
     },
     {
@@ -171,39 +169,39 @@
       "target": "d_improve1_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.205007123343725,
-      "paired_lo": 0.0996339873484016,
-      "paired_hi": 0.3261843262223467,
-      "n_positive_weeks": 32
+      "paired_diff": 0.2078433051869373,
+      "paired_lo": 0.1031220638555176,
+      "paired_hi": 0.3244298276573056,
+      "n_positive_weeks": 33
     },
     {
       "domain": "larimer",
       "target": "d_improve1_h4",
       "horizon": 4,
       "arm": "markov",
-      "paired_diff": 0.3265846926139537,
-      "paired_lo": 0.1821754273738761,
-      "paired_hi": 0.5114748115792779,
-      "n_positive_weeks": 36
+      "paired_diff": 0.3326756371437825,
+      "paired_lo": 0.1887186575994465,
+      "paired_hi": 0.5114399428792507,
+      "n_positive_weeks": 37
     },
     {
       "domain": "larimer",
       "target": "d_improve1_h8",
       "horizon": 8,
       "arm": "markov",
-      "paired_diff": 0.3712671423579232,
-      "paired_lo": 0.2401466718430714,
-      "paired_hi": 0.5623577343044323,
-      "n_positive_weeks": 40
+      "paired_diff": 0.3731099216249321,
+      "paired_lo": 0.2418081941370615,
+      "paired_hi": 0.5647517785873732,
+      "n_positive_weeks": 41
     },
     {
       "domain": "larimer",
       "target": "d_nochange_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.1654221902897368,
-      "paired_lo": 0.0641576406059173,
-      "paired_hi": 0.2783720805187624,
+      "paired_diff": 0.1703432314537299,
+      "paired_lo": 0.0715020302510447,
+      "paired_hi": 0.2825335168896373,
       "n_positive_weeks": 102
     },
     {
@@ -211,9 +209,9 @@
       "target": "d_nochange_h4",
       "horizon": 4,
       "arm": "markov",
-      "paired_diff": 0.255376171134009,
-      "paired_lo": 0.094603923791998,
-      "paired_hi": 0.4240137181318725,
+      "paired_diff": 0.2580716412085057,
+      "paired_lo": 0.0921699584772841,
+      "paired_hi": 0.4266781363563653,
       "n_positive_weeks": 100
     },
     {
@@ -221,9 +219,9 @@
       "target": "d_nochange_h8",
       "horizon": 8,
       "arm": "markov",
-      "paired_diff": 0.3478297924360328,
-      "paired_lo": 0.1738485273176199,
-      "paired_hi": 0.5006696632465352,
+      "paired_diff": 0.3448217672233381,
+      "paired_lo": 0.1724425448411903,
+      "paired_hi": 0.499371931661661,
       "n_positive_weeks": 96
     },
     {
@@ -231,10 +229,20 @@
       "target": "d_ge2_h2",
       "horizon": 2,
       "arm": "markov",
-      "paired_diff": 0.3047553823535788,
-      "paired_lo": 0.0913215838089347,
-      "paired_hi": 0.513395368575741,
-      "n_positive_weeks": 39
+      "paired_diff": 0.3417800071193267,
+      "paired_lo": 0.1054836898244725,
+      "paired_hi": 0.5889508330506955,
+      "n_positive_weeks": 40
+    },
+    {
+      "domain": "pueblo",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.2426661496252081,
+      "paired_lo": 0.006720312283107,
+      "paired_hi": 0.4226829293953725,
+      "n_positive_weeks": 38
     },
     {
       "domain": "pueblo",
@@ -1742,14 +1750,14 @@
       "target": "d_ge2_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0220); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0222); it does not beat its baseline, so it is shown as a probability with no claim of skill"
     },
     {
       "domain": "denver",
       "target": "d_ge2_h8",
       "horizon": 8,
       "state": "probability",
-      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0360); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0364); it does not beat its baseline, so it is shown as a probability with no claim of skill"
     },
     {
       "domain": "denver",
@@ -1784,14 +1792,14 @@
       "target": "d_improve1_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0272) and beats its baseline there"
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0269) and beats its baseline there"
     },
     {
       "domain": "denver",
       "target": "d_improve1_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0851, needed 0.05 or less, so the regional base rate is shown instead"
+      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0839, needed 0.05 or less, so the regional base rate is shown instead"
     },
     {
       "domain": "denver",
@@ -1805,14 +1813,14 @@
       "target": "d_intensify1_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0053); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0054); it does not beat its baseline, so it is shown as a probability with no claim of skill"
     },
     {
       "domain": "denver",
       "target": "d_intensify1_h8",
       "horizon": 8,
       "state": "probability",
-      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0226); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0231); it does not beat its baseline, so it is shown as a probability with no claim of skill"
     },
     {
       "domain": "denver",
@@ -1847,14 +1855,14 @@
       "target": "d_nochange_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0203); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0196); it does not beat its baseline, so it is shown as a probability with no claim of skill"
     },
     {
       "domain": "denver",
       "target": "d_nochange_h8",
       "horizon": 8,
       "state": "probability",
-      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0330); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0320); it does not beat its baseline, so it is shown as a probability with no claim of skill"
     },
     {
       "domain": "denver",
@@ -2372,7 +2380,7 @@
       "target": "d_ge2_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "pueblo",
@@ -2782,11 +2790,11 @@
     }
   ],
   "ledger": {
-    "total_bytes": 2936388362,
+    "total_bytes": 2942252938,
     "budget_bytes": 3000000000,
-    "remaining_bytes": 63611638,
-    "total_gb": 2.936,
-    "n_transfers": 4179,
+    "remaining_bytes": 57747062,
+    "total_gb": 2.942,
+    "n_transfers": 4203,
     "n_corrections": 1
   },
   "sources": [

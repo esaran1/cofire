@@ -37,5 +37,5 @@ def test_new_domain_rendering_follows_estimability_and_reliability() -> None:
 
 def test_summary_is_consistent_with_the_table() -> None:
     s = json.loads((survivors_v11.OUT / "survivors_v11_summary.json").read_text())
-    assert s["n_survivors"] == int(T["survivor"].sum()) == 21
+    assert s["n_survivors"] == int(T["survivor"].sum()) == 22
     assert s["current_survivors_hold"] == 11

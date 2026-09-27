@@ -27,19 +27,23 @@ and interval results cannot be measured without scoring 2026 again, which the
 seal forbids, so they are not recomputed. The interval results are already
 void; the probability results carry this caveat. The look count stays 3.
 
-**Open, 2026-09-27: one USDM week missing from the 2007 to 2025 record.** An
-audit of all 992 weeks (`artifacts/audit/usdm_missing_weeks.json`) found one
-map missing and none unreadable: 2022-12-27, in validation. The server has it
-(HTTP 200, 1,800,699 bytes); the local 2022 archive holds 51 weeks without it,
-so the frozen rasterizer coded that week "none" in every domain's store. It is
-false for Pueblo (mean category 1.23 before, 1.19 after) and cannot be ruled
-out for Larimer (0.59 before, 0 after) or Denver (0.23 before, 0 after); the
-Upper South Platte and Dillon read 0 on both sides. Training, calibration, the
-fold choices and look 3 do not touch it. The validation survivor tests and the
-new domains' validation reliability do: drought targets only, at most one
-issue week and one label week per horizon out of 104. Nothing is refit until
-that is decided. The export now refuses any published week without its map,
-not only the newest.
+**Found and fixed, 2026-09-27: one USDM week was missing from 2007 to 2025.**
+An audit of all 992 weeks (`artifacts/audit/usdm_missing_weeks.json`) found
+one map missing and none unreadable: 2022-12-27, in validation. The cause was
+the server's archive, not our ingest: USDM's 2022 yearly zip was last rebuilt
+on 22 December 2022, before that map was released, and ours is byte-for-byte
+the same file. The frozen rasterizer coded the week "none" in every store.
+The map was fetched on its own through `safe_fetch` (1,800,699 bytes) and the
+stores rebuilt. Only each store's 2022 file changed; training, 2023 and
+calibration files are byte-identical. Changed cell-weeks, all in the week of
+2022-12-27: Denver 12, Larimer 122, Pueblo 295, Upper South Platte 0, Dillon 0.
+The validation survivor test and reliability were rerun on the drought targets,
+protocol unchanged, with fire results left as they were. One result changed:
+Pueblo `d_ge2_h4` now survives (lower bound -0.0018 to +0.0067), bringing the
+claimed pairs to 22 of 115. No display decision changed. A calendar check now
+refuses any store, export or refresh built on a year that lacks one of its
+Tuesdays (`cofire/ship/usdm_calendar.py`), and the export refuses any
+published week without its map.
 
 **gridMET revised its 2026 file after the stores were built.** Re-reading
 Larimer and Pueblo's 2026 ERC through the reconciled path disagrees with the
@@ -82,10 +86,12 @@ historical record in `artifacts/audit/shown_radius.json`. The look count is
 unchanged at 3: displaying a radius is not a look, because no one read 2026
 outcomes to learn anything from it. Details: [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md).
 
-**Survivors after a leak-free refit: 11, not 12.** Refit outside the frozen
-path with an h-week label embargo and per-fold `erc_pct`, the stage 1 test
-keeps 11 of the 12 survivors. Pueblo `d_ge2_h4` falls (lower bound +0.011 to
--0.002) and is no longer claimed. The fire conclusion is unchanged, and the
+**Survivors after a leak-free refit: 11, then 12 again once the missing map
+was fixed.** Refit outside the frozen path with an h-week label embargo and
+per-fold `erc_pct`, the stage 1 test kept 11 of the 12 survivors: Pueblo
+`d_ge2_h4` fell (lower bound +0.011 to -0.002) and was withdrawn. With the
+missing 2022-12-27 drought map restored (below), the same leak-free test puts
+its lower bound at +0.0067 and it is claimed again. The fire conclusion is unchanged, and the
 fire family choice is unchanged in all 9 targets. Record in
 `docs/LEAK_SWEEP.md`; diagnostic in `cofire/ship/sensitivity.py`.
 

@@ -1989,3 +1989,69 @@ without private Pages. The deploy job runs once the repository variable
 PAGES_ENABLED is true. Any of these fixes it, and each is the owner's call:
 make the repository public, move to a plan with private Pages, or publish the
 built site from a separate public repository.
+
+## v1.1: the missing 2022-12-27 map, fixed and rerun on validation
+
+**Root cause: the server's archive.** USDM's 2022 yearly zip on the server is
+98,909,841 bytes, last modified 22 December 2022 10:53 GMT, before the 27
+December map was released on 29 December. Ours is the same size: the frozen
+fetch saved it as served and nothing in our ingest renames, extracts or drops
+members. The week was never in the file. (A 2020 member named in lowercase,
+`usdm_20200623_M.zip`, is read correctly by the frozen matcher, which
+lower-cases names; the new calendar check does the same.)
+
+**Guard.** `cofire/ship/usdm_calendar.py` asserts that each year's archive
+holds exactly its Tuesdays, through the latest issue for the current year.
+The store builder, the export and the refresh all call it, and the test
+deletes a week and asserts failure. 2007 to 2025 now pass.
+
+**Fetch and rebuild.** The map came through `safe_fetch` (1,800,699 bytes,
+sha256 8a1a9ab3...) into the national archive and the pack's Colorado archive.
+All five stores were rebuilt by the frozen builder. Only each store's
+`year=2022.parquet` changed; every 2007 to 2021, 2023, 2024 and 2025 file is
+byte-identical. The only changed column is `usdm`, only in the week of
+2022-12-27 (outcome weeks are derived from it at load time).
+
+| Area | Changed cell-weeks | Mean category that week, old / new |
+|---|---|---|
+| Denver | 12 (footprint; 39 in the rectangle) | 0 / 0.375 |
+| Upper South Platte | 0 | 0 / 0 |
+| Dillon | 0 | 0 / 0 |
+| Larimer | 122 | 0 / 0.254 |
+| Pueblo | 295 | 0 / 1.227 |
+
+**Rerun, drought targets only, protocol unchanged** (leak-free, paired
+shuffled control, circular block bootstrap, BH across all 83 estimable pairs
+with the fire rows carried over unchanged, Holm within domain and family, at
+least 12 positive weeks). Fire statistics are identical to before.
+
+Drought survivors, paired difference [95% CI], before / after:
+
+| Pair | Before | After |
+|---|---|---|
+| Denver d_improve1_h2 | +0.2257 [+0.1009, +0.3527] S | +0.2271 [+0.1027, +0.3533] S |
+| Denver d_improve1_h4 | +0.2431 [+0.0950, +0.4534] S | +0.2438 [+0.0979, +0.4544] S |
+| Denver d_nochange_h2 | +0.0797 [+0.0198, +0.1533] S | +0.0810 [+0.0205, +0.1549] S |
+| Larimer d_ge2_h2 | +0.8331 [+0.1668, +1.1959] S | +0.8331 [+0.1669, +1.1959] S |
+| Larimer d_ge2_h4 | +0.4861 [+0.0174, +0.8697] S | +0.4861 [+0.0174, +0.8698] S |
+| Larimer d_improve1_h2 | +0.2050 [+0.0996, +0.3262] S | +0.2078 [+0.1031, +0.3244] S |
+| Larimer d_improve1_h4 | +0.3266 [+0.1822, +0.5115] S | +0.3327 [+0.1887, +0.5114] S |
+| Larimer d_improve1_h8 | +0.3713 [+0.2401, +0.5624] S | +0.3731 [+0.2418, +0.5648] S |
+| Larimer d_nochange_h2 | +0.1654 [+0.0642, +0.2784] S | +0.1703 [+0.0715, +0.2825] S |
+| Larimer d_nochange_h4 | +0.2554 [+0.0946, +0.4240] S | +0.2581 [+0.0922, +0.4267] S |
+| Larimer d_nochange_h8 | +0.3478 [+0.1738, +0.5007] S | +0.3448 [+0.1724, +0.4994] S |
+| Pueblo d_ge2_h2 | +0.3048 [+0.0913, +0.5134] S | +0.3418 [+0.1055, +0.5890] S |
+| **Pueblo d_ge2_h4** | +0.2158 [-0.0018, +0.3728] no | **+0.2427 [+0.0067, +0.4227] S** |
+| Upper South Platte d_improve1_h2, h4; d_nochange_h2, h4, h8 | unchanged, S | unchanged, S |
+
+Survivors: 21 to 22. Pueblo d_ge2_h4 passed the original stage 1 test, so
+under the claim rule it is claimed again (`withdrawn_by_leak_free_refit` is
+now empty). No target meets the agreement rule, before or after.
+
+**Display decisions for the new domains:** none changed. The two near the
+threshold: Denver d_improve1_h8, reliability 0.0851 to 0.0839, base rate
+before and after; Dillon d_nochange_h8, 0.0667 to 0.0667 (Dillon's store did
+not change), base rate before and after. Every other drought reliability moved
+by at most 0.0010 and stayed on its side of 0.05. Estimability changed for no
+pair. The export's forecast numbers are unchanged; only the reason strings
+that quote validation reliability, and Pueblo d_ge2_h4's claim, changed.

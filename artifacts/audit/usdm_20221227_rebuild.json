@@ -1,0 +1,70 @@
+{
+ "denver": {
+  "files_changed": [
+   "year=2022.parquet"
+  ],
+  "changed_cols": {
+   "usdm": 39
+  },
+  "changed_weeks": [
+   "2022-12-27"
+  ],
+  "changed_cell_weeks_footprint": 12,
+  "usdm_old_new_mean_at_20221227": [
+   0.0,
+   0.375
+  ]
+ },
+ "upper_south_platte": {
+  "files_changed": [],
+  "changed_cols": {},
+  "changed_weeks": [],
+  "changed_cell_weeks_footprint": 0,
+  "usdm_old_new_mean_at_20221227": [
+   0.0,
+   0.0
+  ]
+ },
+ "dillon": {
+  "files_changed": [],
+  "changed_cols": {},
+  "changed_weeks": [],
+  "changed_cell_weeks_footprint": 0,
+  "usdm_old_new_mean_at_20221227": [
+   0.0,
+   0.0
+  ]
+ },
+ "larimer": {
+  "files_changed": [
+   "year=2022.parquet"
+  ],
+  "changed_cols": {
+   "usdm": 122
+  },
+  "changed_weeks": [
+   "2022-12-27"
+  ],
+  "changed_cell_weeks_footprint": 122,
+  "usdm_old_new_mean_at_20221227": [
+   0.0,
+   0.254
+  ]
+ },
+ "pueblo": {
+  "files_changed": [
+   "year=2022.parquet"
+  ],
+  "changed_cols": {
+   "usdm": 295
+  },
+  "changed_weeks": [
+   "2022-12-27"
+  ],
+  "changed_cell_weeks_footprint": 295,
+  "usdm_old_new_mean_at_20221227": [
+   0.0,
+   1.227
+  ]
+ }
+}

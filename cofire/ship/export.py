@@ -360,6 +360,9 @@ def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | Non
 
     now = utc_now() if now is None else now
     last_issue = latest_published(now) if last_issue is None else last_issue
+    from cofire.ship.usdm_calendar import assert_complete
+
+    assert_complete(range(2007, pd.Timestamp(last_issue).year), Path("data/raw"))
     # Stop at the last issue whose ERC week is complete in every domain.
     last_issue = min([pd.Timestamp(last_issue), *[erc_complete_issue(d) for d in _d.ORDER]])
     from cofire.model.calibration_stages import arms

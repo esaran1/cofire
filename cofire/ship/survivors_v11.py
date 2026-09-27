@@ -35,7 +35,9 @@ VALID_START, VALID_END = pd.Timestamp("2022-01-01"), pd.Timestamp("2023-12-31")
 RELIABILITY_MAX = 0.05  # the preregistered look-3 threshold
 
 
-def run_domain(domain: str, n_boot: int = 400, n_shuffles: int = 20) -> Path:
+def run_domain(domain: str, n_boot: int = 400, n_shuffles: int = 20, only: str | None = None) -> Path:
+    """One domain's rows. With `only`, recompute just the targets with that
+    prefix and keep every other row of the existing checkpoint as it is."""
     from cofire.model.erc_pct import erc_percentile_reference
     from cofire.model.multiplicity import family_of
     from cofire.model.prob_metrics import brier, brier_decomposition
@@ -60,7 +62,7 @@ def run_domain(domain: str, n_boot: int = 400, n_shuffles: int = 20) -> Path:
 
     rows: list[dict[str, Any]] = []
     for (target, h), c in sorted(choices.items()):
-        if target not in valid.columns:
+        if target not in valid.columns or (only is not None and not target.startswith(only)):
             continue
         y = pd.to_numeric(valid[target], errors="coerce").to_numpy(dtype=float)
         if not np.isfinite(y).any() or len(np.unique(y[np.isfinite(y)])) < 2:
@@ -96,7 +98,12 @@ def run_domain(domain: str, n_boot: int = 400, n_shuffles: int = 20) -> Path:
         })
         LOGGER.info("%s %-16s paired=%+.4f [%+.4f, %+.4f] rel=%.4f", domain, target,
                     res.point, res.lo, res.hi, rel_cell)
-    pd.DataFrame(rows).to_csv(out, index=False)
+    new = pd.DataFrame(rows)
+    if only is not None and out.exists():
+        kept = pd.read_csv(out)
+        kept = kept[~kept["target"].str.startswith(only)]
+        new = pd.concat([kept, new], ignore_index=True).sort_values(["target"]).reset_index(drop=True)
+    new.to_csv(out, index=False)
     return out
 
 
@@ -155,7 +162,7 @@ def combine() -> pd.DataFrame:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     if sys.argv[1] == "domain":
-        print(run_domain(sys.argv[2]))
+        print(run_domain(sys.argv[2], only=sys.argv[3] if len(sys.argv) > 3 else None))
     elif sys.argv[1] == "combine":
         combine()
         print((OUT / "survivors_v11_summary.json").read_text())

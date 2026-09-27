@@ -166,3 +166,15 @@ an h-week embargo before each held-out year. The damped logistic beats the
 transition table in all 9 fire targets, matching the shipped choice.
 
 The app now claims only the 11 that survive both tests.
+
+## Addendum, 2026-09-27: Pueblo d_ge2_h4 restored
+
+The validation record used above was missing the USDM map for 2022-12-27; the
+server's 2022 yearly archive predates that map, and the frozen rasterizer
+coded the week "none" (Pueblo's mean category was 1.23 the week before and
+1.19 the week after). With the map fetched and the stores rebuilt, the
+five-domain leak-free test (`cofire/ship/survivors_v11.py`, same protocol)
+gives Pueblo `d_ge2_h4` a paired difference of +0.2427 [+0.0067, +0.4227],
+against +0.2158 [-0.0018, +0.3728] before the fix. It passed the original
+stage 1 test, so under the claim rule it is claimed again. Record in
+`docs/DECISIONS.md`.

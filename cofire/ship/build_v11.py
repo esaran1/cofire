@@ -6,7 +6,7 @@ coordinates-only template is written from the domain's own ERC cache, which is
 on the same grid by construction. The template carries no `erc` variable, so
 `weekly_erc` ignores it for data.
 
-    python -m cofire.ship.build_v11 build <domain>
+    python -m cofire.ship.build_v11 build <domain>   # any of the five
     python -m cofire.ship.build_v11 check
 """
 
@@ -61,13 +61,23 @@ def write_template(domain: str) -> Path:
 
 def build(domain: str) -> Path:
     from cofire.model.features_a import build as build_a
+    from cofire.ship.usdm_calendar import assert_complete
 
     st = settings(domain)
+    # Every week 2007 to 2025 must have its map, or the rasterizer writes "none".
+    assert_complete(range(2007, 2026), st.raw_dir)
+    if domain not in domains.NEW:
+        # Larimer and Pueblo have their own processed cubes; no template.
+        out_existing: Path = build_a(st)
+        return out_existing
     write_template(domain)
     erc_files = sorted(ext.cache_path(domain, 0).parent.glob(f"{domain}_*.nc"))
-    assert len(erc_files) == 22 and all(domain in p.name for p in erc_files), erc_files
+    years = {int(p.stem.rsplit("_", 1)[1]) for p in erc_files}
+    assert set(range(2004, 2026)) <= years and all(domain in p.name for p in erc_files), erc_files
     out = build_a(st)
     assert domain in str(out), out
+    # The 2026 cache feeds forecasts only; the store must stop at 2025.
+    assert load(domain)["time"].max() < pd.Timestamp("2026-01-01")
     return out
 
 

@@ -167,6 +167,10 @@ def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
     have = usdm_weeks_available(RAW, range(target.year, target.year + 1))
     tuesdays = pd.date_range(f"{target.year}-01-01", target, freq="W-TUE")
     log["usdm"] = [usdm_week(w, ledger) for w in tuesdays if w not in have]
+    from cofire.ship.usdm_calendar import assert_complete
+
+    assert_complete(range(2007, target.year), RAW)
+    assert_complete(range(target.year, target.year + 1), RAW, through=target)
 
     # A store domain held after a failed gate stays held, without re-fetching
     # its year every week, until someone asks for a re-gate (COFIRE_REGATE=1).

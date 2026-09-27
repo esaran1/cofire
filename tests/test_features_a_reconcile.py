@@ -52,6 +52,9 @@ def _load_pair(domain: str) -> tuple[pd.DataFrame, pd.DataFrame] | None:
     return old, new
 
 
+FIXED_USDM_WEEK = "2022-12-27"  # docs/DECISIONS.md, the missing 2022-12-27 map
+
+
 @pytest.mark.parametrize("domain", DOMAINS)
 def test_erc_pct_equals_the_reference(domain: str) -> None:
     """erc_pct is gated against the reference, not against the store.
@@ -103,6 +106,14 @@ def test_decoupled_builder_matches_the_store(domain: str, column: str) -> None:
     m = old.merge(new, on=["cell_id", "time"], suffixes=("_old", "_new"), how="inner")
     m = m[(m["time"].dt.year >= OVERLAP[0]) & (m["time"].dt.year <= OVERLAP[1])]
     assert len(m) > 10_000, f"{domain}: only {len(m)} overlapping cell-weeks"
+    if column == "usdm":
+        # The legacy store predates the 2022-12-27 fix: that week's map was
+        # missing from the server's 2022 archive and was coded "none". The
+        # rebuilt store carries the real map, so this one week is expected to
+        # differ, and only because the legacy store reads 0 there.
+        fixed = m["time"] == pd.Timestamp(FIXED_USDM_WEEK)
+        assert (pd.to_numeric(m.loc[fixed, "usdm_old"]) == 0).all()
+        m = m[~fixed]
 
     a = pd.to_numeric(m[f"{column}_old"], errors="coerce").to_numpy(dtype=float)
     b = pd.to_numeric(m[f"{column}_new"], errors="coerce").to_numpy(dtype=float)
