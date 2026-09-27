@@ -1723,3 +1723,42 @@ with a fit window 2007-01-01 to 2021-12-31, scope train, loaded through the
 frozen strict `checked_load` (tested to raise on a window past 2021).
 Larimer and Pueblo keep `artifacts/rerun_a`, so the frozen config hash is
 unchanged.
+
+## v1.1 Stage 5, stated before running: survivor test and agreement rule
+
+Written and committed before the Stage 5 test is run.
+
+**Pair-level survivor** (unchanged definition, now over five domains): a
+target and domain pair survives when it is estimable (at least 12 positive
+validation weeks), the paired real-minus-shuffled BSS interval from the
+circular block bootstrap lies above zero, BH at q = 0.10 rejects across every
+estimable pair in all five domains together, and Holm rejects within its
+domain and event family. Fits are embargoed at the 2021/2022 boundary, and
+`erc_pct` pools come from 2007 to 2021 only. Larimer and Pueblo are scored with
+their frozen families, the new domains with the v1.1 families. Validation is
+2022 to 2023. Nothing is computed on 2026.
+
+**Agreement rule, for a target-level claim across domains:** a target counts
+as skillful across domains only if it passes in every domain where it is
+estimable, and passes in at least two domains. A target that survives in one
+domain and fails in another where it is estimable does not agree, and is
+reported as a single-domain result.
+
+**What the app claims.** Skill claims in the app stay pair-level (a target in a
+domain), read from `facts.survivors`. If one of the 11 current survivors fails
+under the five-domain test (for example because the larger BH family moves its
+threshold), `facts.json` and the pages are updated to drop it.
+
+**Surprisingly strong results.** Every pair's real and shuffled BSS are both
+reported. Any new-domain pair whose real BSS exceeds the largest real BSS
+among the current 11 survivors is flagged and shown beside its shuffled
+control before it is used anywhere.
+
+**Reliability and rendering for the new domains.** No 2026 evaluation exists
+for them, so rendering is decided on validation 2022 to 2023 with the
+preregistered look-3 threshold: Murphy reliability term at most 0.05. A target
+renders as a per-cell probability when it is estimable and its per-cell
+reliability passes; otherwise it renders the regional base rate with the
+reason (not estimable, or reliability failed). The regional base rate's own
+reliability is reported beside it. Larimer and Pueblo keep their look-3
+rendering.
