@@ -23,7 +23,7 @@ import pandas as pd
 LOGGER = logging.getLogger("cofire.ship.story")
 
 EXPORT = Path("artifacts/ship/forecast_issues.parquet")
-INDEX = Path("demo/artifacts/forecast_index.json")
+BUNDLES = Path("demo/artifacts/ship/domains")
 COUNTIES = Path("data/raw/boundaries/cb_2023_us_county_500k.zip")
 OUT = Path("app/lib/story.json")
 
@@ -141,35 +141,42 @@ def build() -> dict[str, Any]:
         round(max(ys) + ch - min(ys) + 2 * margin, 1),
     ]
 
-    # Each forecast area is outlined as what it is, the rectangle of cells.
-    # Outlining the county instead would claim coverage the grid does not
-    # have: the Larimer grid misses the county's southern strip and runs past
-    # its eastern line.
+    # Each forecast area is outlined as what it is. Larimer and Pueblo are
+    # rectangles of cells, so the rectangle is drawn; outlining the county
+    # instead would claim coverage the grid does not have. The v1.1 domains are
+    # footprints (Denver, and two watersheds cut at their reservoirs), where a
+    # rectangle would claim cells outside the area, so only their label is
+    # drawn and the coloured cells show the shape.
+    from cofire.ship import domains
+
     areas = []
-    for dom in sorted({c["d"] for c in cells}):
+    for dom in [d for d in domains.ORDER if d in {c["d"] for c in cells}]:
         dx = [c["x"] for c in cells if c["d"] == dom]
         dy = [c["y"] for c in cells if c["d"] == dom]
         areas.append(
             {
-                "name": dom.capitalize(),
+                "name": domains.LABELS[dom],
                 "x": round(min(dx), 1),
                 "y": round(min(dy), 1),
                 "w": round(max(dx) + cw - min(dx), 1),
                 "h": round(max(dy) + ch - min(dy), 1),
+                "outline": dom not in domains.NEW,
             }
         )
 
     # A small locator: the state outline and where the crop sits in it.
     state_geom = co.union_all().simplify(0.03, preserve_topology=True)
 
-    index = json.loads(INDEX.read_text())
+    from cofire.ship.bundles import legacy_cells
+
+    index = legacy_cells(BUNDLES)
     dom, lat, lon, horizon = CARD_CELL
     pool = [
         c for c in index["cells"]
         if c.get("domain") == dom and c.get("issue") == issue.strftime("%Y-%m-%d")
     ]
     if not pool:
-        raise SystemExit(f"no {dom} cells for {issue.date()} in {INDEX}")
+        raise SystemExit(f"no {dom} cells for {issue.date()} in {BUNDLES}")
     cell = min(pool, key=lambda c: (c["lat"] - lat) ** 2 + (c["lon"] - lon) ** 2)
     states = [
         t["state"] for name, t in cell["targets"].items() if name.endswith(f"_h{horizon}")

@@ -44,16 +44,30 @@ def _sha256(path: Path) -> str:
 EMBARGOED = ART / "audit" / "survivors_embargoed.csv"
 
 
-def _survivor_frame() -> pd.DataFrame:
-    """Survivors of the original test and, when it exists, the leak-free refit.
+V11 = ART / "v11" / "survivors_v11.csv"
+NEW_DOMAINS = ("denver", "upper_south_platte", "dillon")
 
-    The leak sweep found training labels carrying outcomes from the evaluation
-    period (no embargo). `cofire.ship.sensitivity` refits without that leak and
-    reruns the same test. A pair is claimed only if it survives both, and the
-    numbers shown are the leak-free ones.
+
+def _survivor_frame() -> pd.DataFrame:
+    """The pairs the app may claim, with their leak-free numbers.
+
+    Larimer and Pueblo pairs must survive both the original stage 1 test and
+    the leak-free refit (the sweep found unembargoed training labels). The v1.1
+    domains were tested leak-free from the start, so the five-domain leak-free
+    test is their only test. The numbers shown are always the leak-free ones,
+    from the five-domain run (BH across all five domains).
     """
     orig = pd.read_csv(RERUN / "multiplicity.csv")
     keys = ["domain", "target", "horizon"]
+    if V11.exists():
+        v = pd.read_csv(V11)
+        passed_orig = {(str(r["domain"]), str(r["target"])) for _, r in orig[orig["survivor"].astype(bool)].iterrows()}
+        eligible = pd.Series(
+            [d in NEW_DOMAINS or (d, t) in passed_orig for d, t in zip(v["domain"], v["target"], strict=True)],
+            index=v.index,
+        )
+        ok = v["survivor"].astype(bool) & eligible
+        return v[ok]
     if not EMBARGOED.exists():
         return orig[orig["survivor"].astype(bool)]
     clean = pd.read_csv(EMBARGOED)
@@ -86,20 +100,18 @@ def _multiplicity_summary() -> dict[str, Any]:
     if not path.exists():
         return {}
     m = pd.read_csv(path)
-    return {
+    surv = _survivor_frame()
+    claimed = {(str(x["domain"]), str(x["target"])) for _, x in surv.iterrows()}
+    out: dict[str, Any] = {
         "n_comparisons": int(len(m)),
         "n_estimable": int(m["estimable"].sum()),
-        "n_survivors": len(_survivor_frame()),
+        "n_survivors": len(surv),
         "n_survivors_original": int(m["survivor"].sum()),
-        "withdrawn_by_leak_free_refit": (
-            [
-                f"{r['domain']} {r['target']}"
-                for _, r in m[m["survivor"].astype(bool)].iterrows()
-                if (r["domain"], r["target"]) not in {
-                    (x["domain"], x["target"]) for _, x in _survivor_frame().iterrows()
-                }
-            ]
-        ),
+        "withdrawn_by_leak_free_refit": [
+            f"{r['domain']} {r['target']}"
+            for _, r in m[m["survivor"].astype(bool)].iterrows()
+            if (r["domain"], r["target"]) not in claimed
+        ],
         "q": 0.10,
         "min_positive_weeks": 12,
         "rule": (
@@ -107,6 +119,21 @@ def _multiplicity_summary() -> dict[str, Any]:
             "targets shuffled within the same circular blocks, CI above zero"
         ),
     }
+    if V11.exists():
+        v = pd.read_csv(V11)
+        old = v["domain"].isin(["larimer", "pueblo"])
+        out |= {
+            # The five-domain run replaces the two-domain counts above.
+            "n_comparisons": int(len(v)),
+            "n_estimable": int(v["estimable"].astype(bool).sum()),
+            "n_domains": int(v["domain"].nunique()),
+            "n_survivors_larimer_pueblo": int(surv["domain"].isin(["larimer", "pueblo"]).sum()),
+            "n_survivors_new_domains": int(surv["domain"].isin(NEW_DOMAINS).sum()),
+            "n_comparisons_larimer_pueblo": int(old.sum()),
+            "agreement_rule": "passes in every domain where the target is estimable, and in at least two domains",
+            "agreeing_targets": sorted(v.loc[v["target_agrees_across_domains"].astype(bool), "target"].unique().tolist()),
+        }
+    return out
 
 
 def _subx() -> dict[str, Any]:
@@ -292,7 +319,7 @@ def build() -> dict[str, Any]:
         ),
         "git_sha": _git_sha(),
         "resolution_m": 4000,
-        "domains": ["larimer", "pueblo"],
+        "domains": ["denver", "upper_south_platte", "dillon", "larimer", "pueblo"],
         "split": {
             "train": "2007-01-01 to 2021-12-31",
             "validate": "2022 to 2023",

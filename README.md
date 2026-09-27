@@ -2,14 +2,14 @@
 
 Colorado Fire Intelligence and Risk Engine. 2026 Congressional App Challenge.
 
-COFIRE forecasts **drought** and **conditions that allow fires to spread** in Larimer and Pueblo counties, Colorado, 2 to 8 weeks ahead at gridMET 4 km cells, says which numbers it can stand behind, and turns the result into a decision: predict (Beat the Model), observe (Observer Streaks), and harden (Ember Score).
+COFIRE forecasts **drought** and **conditions that allow fires to spread** 2 to 8 weeks ahead at gridMET 4 km cells, for five areas: the **City and County of Denver** (all of CO-01, Glendale and Holly Hills enclaves included), the two watersheds Denver Water collects from (the **Upper South Platte above Strontia Springs** and the **Blue River above Dillon**), and **Larimer** and **Pueblo** counties. It says which numbers it can stand behind, and turns the result into a decision: predict (Beat the Model), observe (Observer Streaks), and prepare (the Urban Ember Score for Denver, the wildland-edge Ember Score elsewhere).
 
 It does **not** predict ignitions or where a fire will occur.
 
 ### What COFIRE claims, and what it does not
 
-- **Skill** is claimed for 11 of 51 target and county pairs, the ones that beat their baseline after multiplicity control and a shuffled-target check, and still do when refit with training labels kept out of the evaluation period. Nowhere else. A twelfth passed the original test and was withdrawn by the refit; see [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md).
-- **Probabilities** were tested once on the sealed 2026 year against pre-registered criteria: 39 of 54 passed reliability. Where a target failed, the app shows the county's historical rate for that time of year instead of a per-cell number.
+- **Skill** is claimed for 21 of 115 target and area pairs, the ones that beat their baseline after multiplicity control across all five areas and a shuffled-target check, with training labels kept out of the evaluation period. Nowhere else. 11 are in Larimer and Pueblo (a twelfth passed the original test and was withdrawn by the leak-free refit; see [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md)) and 10 in Denver and its watersheds. No target holds in every area where it can be tested, so every claim is for its own area only.
+- **Probabilities** for Larimer and Pueblo were tested once on the sealed 2026 year against pre-registered criteria: 39 of 54 passed reliability. Denver and its watersheds were added after the seal and are never scored on 2026; their probabilities were checked on 2022 to 2023 with the same threshold. Where a target failed or could not be checked, the app shows the area's historical rate for that time of year instead of a per-cell number, and says why.
 - **Forecast ranges are not shown.** The pre-registered interval tests passed, but the test was flawed: it updated each forecast with outcomes from the same week, which a real forecast would not know for 2 to 8 weeks. Run with the real delay, the method is unstable. The results are void and the app draws no band. See [`docs/CORRECTION_LOOK3.md`](docs/CORRECTION_LOOK3.md), beside the unedited [`docs/PREREGISTRATION_LOOK3.md`](docs/PREREGISTRATION_LOOK3.md), and the follow-up sweep for the same class of fault in [`docs/LEAK_SWEEP.md`](docs/LEAK_SWEEP.md).
 
 ## Run
@@ -22,9 +22,9 @@ make demo    # offline: no API keys, no network, no pipeline run
 
 Then open http://127.0.0.1:3000 (API on :8000).
 
-`make demo` serves the committed fixture set in `demo/` (6.7 MB): one issue of Pueblo County
-forecasts, the 2026 coverage series, the fires table with its matched non-fire control, the
-multiregime and LODO results, and a feature slice for Place Cards. **Measured clone-to-running:
+`make demo` serves the committed fixture set in `demo/`: two issues of forecasts for all five
+areas as per-domain bundles, and the look-3 and survivor tables the Hindcast and Method screens
+read. **Measured clone-to-running:
 about 15 seconds** (npm install 4 s, API ready 2 s, web ready 5 s), verified from a directory
 containing no `artifacts/` and no `data/`.
 

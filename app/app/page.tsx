@@ -1,149 +1,129 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { MapView } from "@/components/MapView";
+import { set } from "idb-keyval";
+import { MapCell, MapView } from "@/components/MapView";
 import { PlaceCard } from "@/components/PlaceCard";
 import { TimeScrubber } from "@/components/TimeScrubber";
-import { UncertaintyChip } from "@/components/UncertaintyBadge";
 import { ErrorNote } from "@/components/ui/Controls";
-import { API, Place, UncertaintyStatus, getParsed } from "@/lib/api";
-import { IssuesSchema, MetaSchema, PlaceSchema, UncertaintySchema } from "@/lib/schemas";
-import { set } from "idb-keyval";
+import type { Place } from "@/lib/api";
+import { getBundle, getDomains, nearestCell, placeFromCell } from "@/lib/data";
+import { useDomain } from "@/lib/domain";
+import type { Bundle, DomainsIndex } from "@/lib/schemas";
 
 export default function HomePage() {
   const router = useRouter();
-  const [issues, setIssues] = useState<string[]>([]);
+  const [domain, , ready] = useDomain();
+  const [index, setIndex] = useState<DomainsIndex | null>(null);
   const [issue, setIssue] = useState("");
   const [horizon, setHorizon] = useState("4");
   const [layer, setLayer] = useState<"drought" | "fire">("fire");
+  const [bundle, setBundle] = useState<Bundle | null>(null);
   const [place, setPlace] = useState<Place | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [resolutionM, setResolutionM] = useState(4000);
-  const [resolutionNote, setResolutionNote] = useState("");
-  const [shippingArm, setShippingArm] = useState("");
-  const [unc, setUnc] = useState<UncertaintyStatus | null>(null);
 
   useEffect(() => {
-    getParsed("/forecast/issues", IssuesSchema)
+    getDomains()
       .then((d) => {
-        setIssues(d.issues);
-        setIssue(d.issues[d.issues.length - 1] ?? "");
+        setIndex(d);
+        setIssue((cur) => cur || d.issues[d.issues.length - 1] || "");
       })
       .catch((e: Error) => setErr(e.message));
-    getParsed("/meta", MetaSchema)
-      .then((d) => {
-        setResolutionM(d.resolution_m || 4000);
-        setResolutionNote(d.resolution_note ?? "");
-        setShippingArm(d.shipping_arm ?? "");
-      })
-      .catch(() => undefined);
   }, []);
 
+  const meta = index?.domains[domain] ?? null;
+
+  // Load the area's forecast, and open the card on the cell nearest its centre
+  // so the page never lands on an empty map.
   useEffect(() => {
-    getParsed(`/uncertainty/status${issue ? `?issue=${issue}` : ""}`, UncertaintySchema)
-      .then(setUnc)
-      .catch(() => setUnc(null));
-  }, [issue]);
+    if (!ready || !index || !issue) return;
+    let live = true;
+    getBundle(domain, issue)
+      .then((b) => {
+        if (!live) return;
+        setBundle(b);
+        setPlace((prev) => {
+          const m = index.domains[domain];
+          const anchor = prev && prev.domain === domain ? [prev.lat, prev.lon] : [m.center[1], m.center[0]];
+          const c = nearestCell(b, anchor[0], anchor[1]);
+          return c ? placeFromCell(b, c, index.history_years) : null;
+        });
+      })
+      .catch((e: Error) => live && setErr(e.message));
+    return () => {
+      live = false;
+    };
+  }, [ready, index, domain, issue]);
 
   const onClick = useCallback(
-    async (lat: number, lon: number) => {
-      try {
-        const q = `/forecast?lat=${lat}&lon=${lon}${issue ? `&issue=${issue}` : ""}`;
-        const p = await getParsed(q, PlaceSchema);
-        setPlace(p);
-        await set("last_place", p);
-      } catch (e) {
-        setErr(e instanceof Error ? e.message : "forecast failed");
-      }
+    (lat: number, lon: number) => {
+      if (!bundle || !index) return;
+      const c = nearestCell(bundle, lat, lon);
+      // A click well outside the area's cells selects nothing.
+      if (!c || Math.abs(c.lat - lat) > 0.05 || Math.abs(c.lon - lon) > 0.05) return;
+      const p = placeFromCell(bundle, c, index.history_years);
+      setPlace(p);
+      void set("last_place", p).catch(() => undefined);
     },
-    [issue],
+    [bundle, index],
   );
 
-  // Explicit grid tracks per breakpoint. `order` does not move an item between
-  // grid rows, so relying on it collapsed the map pane to zero height. Mobile:
-  // map on top in a fixed-height row, panel below. Desktop: two columns.
+  const cells: MapCell[] = useMemo(() => {
+    if (!bundle) return [];
+    const ti = bundle.targets.indexOf(`d_ge2_h${horizon}`);
+    return bundle.cells.map((c) => ({
+      id: c.id,
+      lat: c.lat,
+      lon: c.lon,
+      value: layer === "fire" ? (c.h[horizon]?.[0] ?? null) : ti >= 0 && c.p[ti] !== null ? (c.p[ti] as number) * 100 : null,
+    }));
+  }, [bundle, horizon, layer]);
+
   return (
-    <div className="grid h-[calc(100dvh-4.0625rem)] grid-rows-[55dvh_1fr] overflow-hidden lg:grid-cols-[22rem_1fr] lg:grid-rows-1">
-      {/* Reading panel. The map alone does not explain itself, so the state of
-          the forecast lives beside it rather than in a box floating over it. */}
+    <div className="grid h-[calc(100dvh-4.0625rem)] grid-rows-[55dvh_1fr] overflow-hidden lg:grid-cols-[24rem_1fr] lg:grid-rows-1">
       <aside className="row-start-2 overflow-y-auto border-t border-rule bg-paper-raised lg:col-start-1 lg:row-start-1 lg:border-r lg:border-t-0">
-        <div className="p-6">
-          <h1 className="display text-2xl">Fire-spread conditions</h1>
-          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-            Forecast of the conditions that let fire spread. Not a forecast of ignitions.
+        <div className="p-6 pb-0">
+          <h1 className="display text-2xl" data-testid="map-title">
+            {meta?.label ?? "Loading"}
+          </h1>
+          {meta ? <p className="mt-1 text-sm leading-relaxed text-ink-soft">{meta.note}</p> : null}
+          <p className="mt-2 text-xs leading-relaxed text-mute">
+            Drought and the conditions that let fire spread, 2 to 8 weeks ahead. Not a forecast of ignitions.
           </p>
-
-          <dl className="mt-6 space-y-3 border-t border-rule pt-5 text-sm">
-            <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-mute">Issued</dt>
-              <dd className="num text-ink">{issue || "n/a"}</dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-mute">Cell size</dt>
-              <dd className="num text-ink">{place?.resolution_m ?? resolutionM} m</dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-mute">Model</dt>
-              <dd className="text-ink">{shippingArm || "n/a"}</dd>
-            </div>
-          </dl>
-
-          {unc?.available && (
-            <div className="mt-6 border-t border-rule pt-5">
-              <UncertaintyChip status={unc.status} />
-              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                {unc.status === "uncalibrated"
-                  ? "Intervals are hidden on this view. The calibration record does not support one for these conditions."
-                  : unc.status === "extrapolating"
-                    ? `Conditions run past the calibrated range, so intervals are widened ${unc.widen_factor.toFixed(2)}x and should be read as a floor.`
-                    : "Conditions sit inside the range the intervals were checked against."}
-              </p>
-              <Link href="/about" className="mt-2 inline-block text-sm text-ember underline underline-offset-4">
-                Why
-              </Link>
-            </div>
-          )}
-
           {err && (
-            <div className="mt-6">
+            <div className="mt-4">
               <ErrorNote message={err} onRetry={() => setErr(null)} />
             </div>
           )}
-
-          {!place && (
-            <p className="mt-6 border-t border-rule pt-5 text-sm text-mute">
-              Select a cell on the map to see its forecast and the drivers behind it.
-            </p>
-          )}
-          {!place && resolutionNote && <p className="mt-2 text-xs leading-relaxed text-mute">{resolutionNote}</p>}
         </div>
 
-        {/* Selected cell. Inside the panel on desktop, a bottom sheet on mobile. */}
-      {place && (
-        <PlaceCard
-          place={place}
-          horizon={horizon}
-          onHorizon={setHorizon}
-          onClose={() => setPlace(null)}
-          onAdopt={() => {
-            const raw = window.localStorage.getItem("adopted") ?? "[]";
-            const list = JSON.parse(raw) as string[];
-            if (!list.includes(place.cell_id)) list.push(place.cell_id);
-            window.localStorage.setItem("adopted", JSON.stringify(list));
-          }}
-          onPredict={() => router.push(`/beat?cell=${place.cell_id}`)}
-          onReport={() => router.push(`/observe?lat=${place.lat}&lon=${place.lon}`)}
-        />
-      )}
-      <span className="hidden">{API}</span>
+        {place ? (
+          <PlaceCard
+            place={place}
+            meta={meta}
+            sources={bundle?.sources ?? {}}
+            horizon={horizon}
+            onHorizon={setHorizon}
+            onClose={() => setPlace(null)}
+            onAdopt={() => {
+              const raw = window.localStorage.getItem("adopted") ?? "[]";
+              const list = JSON.parse(raw) as string[];
+              if (!list.includes(place.cell_id)) list.push(place.cell_id);
+              window.localStorage.setItem("adopted", JSON.stringify(list));
+            }}
+            onPredict={() => router.push(`/beat?cell=${place.cell_id}&domain=${domain}`)}
+            onReport={() => router.push(`/observe?lat=${place.lat}&lon=${place.lon}&domain=${domain}`)}
+          />
+        ) : (
+          <p className="px-6 pt-5 text-sm text-mute">Select a cell on the map to see its forecast.</p>
+        )}
       </aside>
 
       <div className="relative row-start-1 min-h-0 lg:col-start-2 lg:row-start-1">
-        <MapView issue={issue} horizon={horizon} layer={layer} onClick={onClick} />
+        <MapView cells={cells} bbox={meta?.bbox ?? null} layer={layer} selectedId={place?.cell_id} onClick={onClick} />
         <TimeScrubber
-          issues={issues}
+          issues={index?.issues ?? []}
           issue={issue}
           horizon={horizon}
           layer={layer}
@@ -152,7 +132,6 @@ export default function HomePage() {
           onLayer={setLayer}
         />
       </div>
-
     </div>
   );
 }

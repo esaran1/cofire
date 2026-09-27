@@ -5,7 +5,9 @@ import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { API, LeaderRow, getParsed, postParsed } from "@/lib/api";
-import { LeaderRowSchema, MetaSchema, PlaceSchema, PredictionSchema } from "@/lib/schemas";
+import { LeaderRowSchema, PredictionSchema } from "@/lib/schemas";
+import { resolvePlace } from "@/lib/data";
+import { domainLabel, useDomain } from "@/lib/domain";
 import { z } from "zod";
 import { deviceId } from "@/lib/device";
 import {
@@ -59,24 +61,20 @@ function BeatInner() {
   // be scored. Asking the API for the nearest cell snaps to one that exists,
   // and gives a name to show instead of the raw ID.
   const [where, setWhere] = useState<{ domain: string; lat: number; lon: number } | null>(null);
+  const [domain, , ready] = useDomain();
   useEffect(() => {
+    if (!ready) return;
     const fromCell = cell.match(/^(-?[\d.]+)_(-?[\d.]+)$/);
-    const resolve = (lat: number, lon: number) =>
-      getParsed(`/forecast?lat=${lat}&lon=${lon}`, PlaceSchema)
-        .then((p) => {
-          setWhere({ domain: p.domain ?? "", lat: p.lat, lon: p.lon });
-          if (p.cell_id !== cell) setCell(p.cell_id);
-        })
-        .catch(() => undefined);
-    if (fromCell) {
-      void resolve(Number(fromCell[1]), Number(fromCell[2]));
-    } else {
-      getParsed("/meta", MetaSchema)
-        .then((m) => (m.center ? resolve(m.center[1], m.center[0]) : undefined))
-        .catch(() => undefined);
-    }
+    // Snap to a real cell in the chosen area: the one named in the link, or the
+    // one nearest the area's centre.
+    resolvePlace(domain, fromCell ? Number(fromCell[1]) : undefined, fromCell ? Number(fromCell[2]) : undefined)
+      .then((p) => {
+        setWhere({ domain: p.domain ?? domain, lat: p.lat, lon: p.lon });
+        if (p.cell_id !== cell) setCell(p.cell_id);
+      })
+      .catch(() => undefined);
     refresh();
-  }, [cell, refresh]);
+  }, [cell, refresh, domain, ready]);
 
   const me = deviceId();
 
@@ -130,7 +128,7 @@ function BeatInner() {
           <span className="text-sm text-ink-soft">
             {where ? (
               <>
-                for the {where.domain.charAt(0).toUpperCase() + where.domain.slice(1)} cell at{" "}
+                for the {domainLabel(where.domain)} cell at{" "}
                 <span className="num text-ink">
                   {where.lat.toFixed(2)}, {where.lon.toFixed(2)}
                 </span>
@@ -210,7 +208,7 @@ function BeatInner() {
         {board === null ? (
           <Skeleton rows={3} />
         ) : board.length === 0 ? (
-          <EmptyState title="Nobody has played yet" body="The first locked pick in this county starts the board." />
+          <EmptyState title="Nobody has played yet" body="The first locked pick in this area starts the board." />
         ) : (
           <ul className="divide-y divide-rule rounded-lg border border-rule">
             {board.slice(0, 8).map((r, i) => (

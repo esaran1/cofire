@@ -1,9 +1,12 @@
 "use client";
 
 import { Horizon, Place, Target } from "@/lib/api";
+import { domainLabel } from "@/lib/domainNames";
+import type { Bundle, DomainMeta } from "@/lib/schemas";
 import { targetHorizon, targetLabel } from "@/lib/targets";
 import { Disclosure } from "./ui/Controls";
 import { UncertaintyBadge } from "./UncertaintyBadge";
+import { WatershedPanel } from "./WatershedPanel";
 import { WhyBars } from "./WhyBars";
 
 const HCHIPS = ["2", "4", "8"] as const;
@@ -151,9 +154,12 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
  * a county-wide number" changes how the value should be read and cannot wait
  * for a click.
  */
-function TargetRow({ name, t }: { name: string; t: Target }) {
+const AREA: Record<string, string> = { county: "county", urban: "city", watershed: "watershed" };
+
+function TargetRow({ name, t, kind }: { name: string; t: Target; kind?: string | null }) {
   if (t.p === null || t.p === undefined) return null;
   const isBase = t.state === "base_rate";
+  const area = AREA[kind ?? "county"] ?? "area";
   return (
     <li
       className="border-rule border-b py-2.5 last:border-b-0"
@@ -163,9 +169,9 @@ function TargetRow({ name, t }: { name: string; t: Target }) {
         summary={
           <div className="flex items-baseline justify-between gap-3">
             <span className="min-w-0">
-              <span className="block text-sm">{targetLabel(name)}</span>
+              <span className="block text-sm">{targetLabel(name, kind)}</span>
               {isBase ? (
-                <span className="text-mute block text-[11px]">same for the whole county</span>
+                <span className="text-mute block text-[11px]">same for the whole {area}</span>
               ) : null}
             </span>
             <span className="num text-ink text-sm">{formatProbability(t.p)}</span>
@@ -173,7 +179,7 @@ function TargetRow({ name, t }: { name: string; t: Target }) {
         }
       >
         {isBase
-          ? `The same number for every cell in this county. ${sentence(t.reason ?? "")}`
+          ? `The same number for every cell in this ${area}. ${sentence(t.reason ?? "")}`
           : sentence(t.reason ?? "")}
       </Disclosure>
     </li>
@@ -189,8 +195,14 @@ export function PlaceCard({
   onPredict,
   onReport,
   embedded = false,
+  meta = null,
+  sources = {},
 }: {
   place: Place;
+  /** The area this cell belongs to: its name, kind and how it was evaluated. */
+  meta?: DomainMeta | null;
+  /** For Denver: the watersheds its water comes from. */
+  sources?: Bundle["sources"];
   horizon: string;
   onHorizon: (h: string) => void;
   onClose?: () => void;
@@ -226,10 +238,15 @@ export function PlaceCard({
           Close
         </button>
       ) : null}
-      <p className="text-ink-soft mt-1 text-xs">
-        {place.domain ? `${place.domain.charAt(0).toUpperCase()}${place.domain.slice(1)} · ` : ""}
-        {place.issue}
+      <p className="text-ink-soft mt-1 text-xs" data-testid="place-domain">
+        {meta?.label ?? domainLabel(place.domain)}
+        {place.issue ? ` · ${place.issue}` : ""}
       </p>
+      {meta?.evaluation === "validation" ? (
+        <p className="text-mute mt-1 text-[11px] leading-relaxed" data-testid="validation-note">
+          Added after the sealed 2026 test, so these numbers were checked on 2022 and 2023 only.
+        </p>
+      ) : null}
       <div className="mt-3 flex gap-2">
         {HCHIPS.map((h) => (
           <button
@@ -247,7 +264,7 @@ export function PlaceCard({
 
       {place.usdm !== null && place.usdm !== undefined ? (
         <p className="text-ink-soft mt-3 text-xs">
-          Drought now: D{Math.round(place.usdm)}.
+          Drought now: {Math.round(place.usdm) === 0 ? "none or D0" : `D${Math.round(place.usdm)}`}.
         </p>
       ) : null}
 
@@ -256,11 +273,13 @@ export function PlaceCard({
           <h3 className="mt-5 text-lg">What could happen in {horizon} weeks</h3>
           <ul className="mt-1">
             {targets.map(([name, t]) => (
-              <TargetRow key={name} name={name} t={t} />
+              <TargetRow key={name} name={name} t={t} kind={meta?.kind} />
             ))}
           </ul>
         </>
       ) : null}
+
+      <WatershedPanel sources={sources} horizon={horizon} />
 
       {u && <UncertaintyBadge u={u} />}
       {(place.why ?? []).length > 0 ? (

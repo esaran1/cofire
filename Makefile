@@ -28,13 +28,13 @@ hindcast:
 export:
 	$(PY) -m cofire.model.export
 
-# The shipped path: frozen configuration -> export -> rendering -> index.
+# The shipped path: frozen configuration -> export -> rendering -> bundles.
 # cofire/model/ is frozen at FREEZE_COMMIT; everything here reads it.
 ship:
 	$(PY) -m cofire.ship.pid_audit
 	$(PY) -m cofire.ship.rendering
 	$(PY) -m cofire.ship.export
-	$(PY) -m cofire.ship.index_build
+	$(PY) -m cofire.ship.bundles
 	$(PY) -m cofire.ship.facts
 	$(PY) -m cofire.ship.demo
 	$(PY) -m cofire.ship.story
@@ -119,3 +119,4 @@ lint:
 	$(UV) run ruff check cofire tests scripts
 	$(UV) run mypy --strict cofire/model cofire/ship
 	$(PY) scripts/check_copy.py
+	$(PY) scripts/check_stats.py

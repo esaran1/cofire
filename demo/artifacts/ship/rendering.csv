@@ -1,12 +1,72 @@
 domain,target,horizon,state,reason
-larimer,d_ge2_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on the training record
+denver,d_ge2_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0072); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,d_ge2_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0220); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,d_ge2_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0360); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,d_ge3_h2,2,base_rate,"only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,d_ge3_h4,4,base_rate,"only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,d_ge3_h8,8,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+denver,d_improve1_h2,2,probability,calibrated on 2022 to 2023 validation (reliability 0.0116) and beats its baseline there
+denver,d_improve1_h4,4,probability,calibrated on 2022 to 2023 validation (reliability 0.0272) and beats its baseline there
+denver,d_improve1_h8,8,base_rate,"stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0851, needed 0.05 or less, so the regional base rate is shown instead"
+denver,d_intensify1_h2,2,base_rate,"only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,d_intensify1_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0053); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,d_intensify1_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0226); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,d_intensify2_h2,2,base_rate,"only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,d_intensify2_h4,4,base_rate,"only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,d_intensify2_h8,8,base_rate,"only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,d_nochange_h2,2,probability,calibrated on 2022 to 2023 validation (reliability 0.0110) and beats its baseline there
+denver,d_nochange_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0203); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,d_nochange_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0330); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,erc_pct,2,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+denver,erc_pct,4,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+denver,erc_pct,8,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+denver,f_gt80_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0033); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,f_gt80_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0036); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,f_gt80_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0022); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,f_gt90_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0053); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,f_gt90_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0014); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,f_gt90_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0013); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+denver,f_gt97_h2,2,base_rate,"only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,f_gt97_h4,4,base_rate,"only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+denver,f_gt97_h8,8,base_rate,"only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+dillon,d_ge2_h2,2,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_ge2_h4,4,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_ge2_h8,8,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_ge3_h2,2,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_ge3_h4,4,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_ge3_h8,8,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_improve1_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0022); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,d_improve1_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0063); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,d_improve1_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0225); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,d_intensify1_h2,2,base_rate,"only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+dillon,d_intensify1_h4,4,base_rate,"only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+dillon,d_intensify1_h8,8,base_rate,"only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+dillon,d_intensify2_h2,2,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_intensify2_h4,4,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_intensify2_h8,8,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+dillon,d_nochange_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0138); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,d_nochange_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0413); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,d_nochange_h8,8,base_rate,"stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0667, needed 0.05 or less, so the regional base rate is shown instead"
+dillon,erc_pct,2,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+dillon,erc_pct,4,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+dillon,erc_pct,8,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+dillon,f_gt80_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0041); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,f_gt80_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0035); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,f_gt80_h8,8,probability,calibrated on 2022 to 2023 validation (reliability 0.0043) and beats its baseline there
+dillon,f_gt90_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0021); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,f_gt90_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0024); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,f_gt90_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0027); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+dillon,f_gt97_h2,2,base_rate,"only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+dillon,f_gt97_h4,4,base_rate,"only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+dillon,f_gt97_h8,8,base_rate,"only 2 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+larimer,d_ge2_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
 larimer,d_ge2_h4,4,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1127, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
 larimer,d_ge2_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.2407, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
 larimer,d_ge3_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 larimer,d_ge3_h4,4,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 larimer,d_ge3_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1520, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
-larimer,d_improve1_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on the training record
-larimer,d_improve1_h4,4,probability,calibrated on the 2026 holdout and beats its baseline on the training record
+larimer,d_improve1_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
+larimer,d_improve1_h4,4,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
 larimer,d_improve1_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1132, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
 larimer,d_intensify1_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 larimer,d_intensify1_h4,4,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1230, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
@@ -14,8 +74,8 @@ larimer,d_intensify1_h8,8,base_rate,"stated probabilities did not match observed
 larimer,d_intensify2_h2,2,base_rate,"the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
 larimer,d_intensify2_h4,4,base_rate,"the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
 larimer,d_intensify2_h8,8,base_rate,"the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
-larimer,d_nochange_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on the training record
-larimer,d_nochange_h4,4,probability,calibrated on the 2026 holdout and beats its baseline on the training record
+larimer,d_nochange_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
+larimer,d_nochange_h4,4,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
 larimer,d_nochange_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1301, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
 larimer,erc_pct,2,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
 larimer,erc_pct,4,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
@@ -29,8 +89,8 @@ larimer,f_gt90_h8,8,probability,"calibrated on the 2026 holdout; it does not bea
 larimer,f_gt97_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 larimer,f_gt97_h4,4,base_rate,"the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
 larimer,f_gt97_h8,8,base_rate,"the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
-pueblo,d_ge2_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on the training record
-pueblo,d_ge2_h4,4,probability,calibrated on the 2026 holdout and beats its baseline on the training record
+pueblo,d_ge2_h2,2,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
+pueblo,d_ge2_h4,4,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,d_ge2_h8,8,base_rate,"stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0698, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
 pueblo,d_ge3_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,d_ge3_h4,4,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
@@ -52,10 +112,40 @@ pueblo,erc_pct,4,uncalibrated,"The interval tests were run with same-week update
 pueblo,erc_pct,8,uncalibrated,"The interval tests were run with same-week updates a real-time forecaster cannot make. With the honest lag the controller is unstable, so no calibrated interval can be shown."
 pueblo,f_gt80_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,f_gt80_h4,4,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
-pueblo,f_gt80_h8,8,probability,calibrated on the 2026 holdout and beats its baseline on the training record
+pueblo,f_gt80_h8,8,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
 pueblo,f_gt90_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,f_gt90_h4,4,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
-pueblo,f_gt90_h8,8,probability,calibrated on the 2026 holdout and beats its baseline on the training record
+pueblo,f_gt90_h8,8,probability,calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation
 pueblo,f_gt97_h2,2,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,f_gt97_h4,4,probability,"calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
 pueblo,f_gt97_h8,8,base_rate,"the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+upper_south_platte,d_ge2_h2,2,base_rate,"only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+upper_south_platte,d_ge2_h4,4,base_rate,"only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+upper_south_platte,d_ge2_h8,8,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+upper_south_platte,d_ge3_h2,2,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+upper_south_platte,d_ge3_h4,4,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+upper_south_platte,d_ge3_h8,8,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+upper_south_platte,d_improve1_h2,2,probability,calibrated on 2022 to 2023 validation (reliability 0.0110) and beats its baseline there
+upper_south_platte,d_improve1_h4,4,probability,calibrated on 2022 to 2023 validation (reliability 0.0293) and beats its baseline there
+upper_south_platte,d_improve1_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0370); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,d_intensify1_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0004); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,d_intensify1_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0032); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,d_intensify1_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0115); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,d_intensify2_h2,2,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+upper_south_platte,d_intensify2_h4,4,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+upper_south_platte,d_intensify2_h8,8,base_rate,"the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+upper_south_platte,d_nochange_h2,2,probability,calibrated on 2022 to 2023 validation (reliability 0.0128) and beats its baseline there
+upper_south_platte,d_nochange_h4,4,probability,calibrated on 2022 to 2023 validation (reliability 0.0250) and beats its baseline there
+upper_south_platte,d_nochange_h8,8,probability,calibrated on 2022 to 2023 validation (reliability 0.0333) and beats its baseline there
+upper_south_platte,erc_pct,2,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+upper_south_platte,erc_pct,4,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+upper_south_platte,erc_pct,8,uncalibrated,"No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+upper_south_platte,f_gt80_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0037); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,f_gt80_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0025); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,f_gt80_h8,8,probability,calibrated on 2022 to 2023 validation (reliability 0.0022) and beats its baseline there
+upper_south_platte,f_gt90_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0017); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,f_gt90_h4,4,probability,"calibrated on 2022 to 2023 validation (reliability 0.0014); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,f_gt90_h8,8,probability,"calibrated on 2022 to 2023 validation (reliability 0.0010); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,f_gt97_h2,2,probability,"calibrated on 2022 to 2023 validation (reliability 0.0001); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+upper_south_platte,f_gt97_h4,4,base_rate,"only 11 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+upper_south_platte,f_gt97_h8,8,base_rate,"only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"

@@ -4,13 +4,31 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { API, Checklist, EmberItem, getParsed, postParsed } from "@/lib/api";
 import { ChecklistSchema } from "@/lib/schemas";
+import { getDomains } from "@/lib/data";
 import { deviceId } from "@/lib/device";
+import { useDomain } from "@/lib/domain";
 import { Action, ErrorNote, Numeral, OfflineNote, Panel, Segmented, Skeleton } from "@/components/ui/Controls";
 
+// "city" is the Urban Ember Score, written for Denver (cofire/ship/ember_city.yaml):
+// water before restrictions, smoke readiness, not starting a fire. "wui" is the
+// wildland-edge hardening checklist for the foothills and mountain watersheds.
 const ZONES = [
+  { value: "city", label: "In the city" },
   { value: "wui", label: "Wildland edge" },
-  { value: "urban", label: "In town" },
 ];
+
+const COPY: Record<string, { title: string; lede: string; ring: string }> = {
+  city: {
+    title: "Urban Ember Score",
+    lede: "For Denver: save water before restrictions, get ready for smoke days, and do not start a fire.",
+    ring: "ready",
+  },
+  wui: {
+    title: "Ember Score",
+    lede: "For homes at the wildland edge, weighted by how much each action cuts ember ignition risk.",
+    ring: "hardened",
+  },
+};
 
 const COST_LABEL: Record<string, string> = {
   free: "Free",
@@ -19,7 +37,7 @@ const COST_LABEL: Record<string, string> = {
   contractor: "Contractor",
 };
 
-function Ring({ score }: { score: number }) {
+function Ring({ score, label }: { score: number; label: string }) {
   const reduce = useReducedMotion();
   const r = 52;
   const c = 2 * Math.PI * r;
@@ -45,14 +63,15 @@ function Ring({ score }: { score: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <Numeral value={Math.round(pct * 100)} suffix="%" size="xl" />
-        <span className="text-[10px] uppercase tracking-wide text-ink-soft">hardened</span>
+        <span className="text-[10px] uppercase tracking-wide text-ink-soft">{label}</span>
       </div>
     </div>
   );
 }
 
 export default function EmberPage() {
-  const [zone, setZone] = useState("wui");
+  const [domain, , ready] = useDomain();
+  const [zone, setZone] = useState("");
   const [data, setData] = useState<Checklist | null>(null);
   const [state, setState] = useState<Record<string, boolean>>({});
   const [err, setErr] = useState<string | null>(null);
@@ -69,9 +88,20 @@ export default function EmberPage() {
       .catch(() => setOffline(true));
   }, []);
 
+  // Open on the checklist that fits the area: the city list for Denver, the
+  // wildland-edge list for the watersheds and counties.
   useEffect(() => {
-    load(zone);
+    if (!ready) return;
+    getDomains()
+      .then((d) => setZone(d.domains[domain]?.ember_zone ?? "wui"))
+      .catch(() => setZone(domain === "denver" ? "city" : "wui"));
+  }, [domain, ready]);
+
+  useEffect(() => {
+    if (zone) load(zone);
   }, [zone, load]);
+
+  const copy = COPY[zone] ?? COPY.wui;
 
   async function save(next: Record<string, boolean>) {
     setBusy(true);
@@ -118,10 +148,10 @@ export default function EmberPage() {
 
   return (
     <div className="reading px-6 pb-24 pt-12">
-      <h1 className="display text-4xl">Ember Score</h1>
-      <p className="mt-2 leading-relaxed text-ink-soft">
-        A bad outlook you can act on, weighted by how much each action cuts ember ignition risk.
-      </p>
+      <h1 className="display text-4xl" data-testid="ember-title">
+        {copy.title}
+      </h1>
+      <p className="mt-2 leading-relaxed text-ink-soft">{copy.lede}</p>
 
       {offline && (
         <div className="mt-4">
@@ -135,11 +165,11 @@ export default function EmberPage() {
       )}
 
       <div className="mt-8">
-        <Segmented label="Where is your property" options={ZONES} value={zone} onChange={setZone} />
+        <Segmented label="Where do you live" options={ZONES} value={zone} onChange={setZone} />
       </div>
 
       <div className="mt-8 flex items-center gap-6">
-        <Ring score={data?.score ?? 0} />
+        <Ring score={data?.score ?? 0} label={copy.ring} />
         <div className="flex-1">
           <p className="text-sm leading-relaxed text-ink-soft">
             {data

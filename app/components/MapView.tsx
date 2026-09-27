@@ -3,24 +3,60 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { API } from "@/lib/api";
 import { basemapStyle, registerPmtiles, resolveMode } from "@/lib/basemap";
 
+export type MapCell = { id: string; lat: number; lon: number; value: number | null };
+
+const HALF = 1 / 48; // half a gridMET cell, in degrees
+
+/** A cell as the 4 km square it is, not a dot at its centre. */
+function toGeoJSON(cells: MapCell[]): GeoJSON.FeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: cells.map((c) => ({
+      type: "Feature",
+      id: c.id,
+      properties: { id: c.id, value: c.value },
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [c.lon - HALF, c.lat - HALF],
+            [c.lon + HALF, c.lat - HALF],
+            [c.lon + HALF, c.lat + HALF],
+            [c.lon - HALF, c.lat + HALF],
+            [c.lon - HALF, c.lat - HALF],
+          ],
+        ],
+      },
+    })),
+  };
+}
+
+// 0 to 100 on both layers: the forecast ERC percentile, or the chance in percent.
+const RAMP: Record<"fire" | "drought", maplibregl.ExpressionSpecification> = {
+  fire: ["interpolate", ["linear"], ["coalesce", ["get", "value"], 0], 0, "#efe9da", 50, "#e6a24a", 80, "#c8541f", 100, "#7d1d0c"],
+  drought: ["interpolate", ["linear"], ["coalesce", ["get", "value"], 0], 0, "#efe9da", 25, "#e6c15c", 60, "#b8862b", 100, "#6b4a12"],
+};
+
 export function MapView({
-  issue,
-  horizon,
+  cells,
+  bbox,
   layer,
+  selectedId,
   onClick,
 }: {
-  issue: string;
-  horizon: string;
+  cells: MapCell[];
+  bbox: [number, number, number, number] | null;
   layer: "drought" | "fire";
+  selectedId?: string | null;
   onClick: (lat: number, lon: number) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const clickRef = useRef(onClick);
   clickRef.current = onClick;
+  const pending = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
@@ -29,26 +65,15 @@ export function MapView({
     const map = new maplibregl.Map({
       container: ref.current,
       style: basemapStyle(mode),
-      // Center is derived from the exported grid, not hardcoded, so moving the
-      // dev subset does not leave the camera pointed at the previous domain.
-      center: [-105.1, 40.58],
-      zoom: 8,
+      center: [-104.99, 39.74],
+      zoom: 9,
     });
-    fetch(`${API}/meta`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((m) => {
-        const c = m?.center as [number, number] | undefined;
-        if (c && map.getStyle()) map.jumpTo({ center: c, zoom: m?.zoom ?? 8 });
-      })
-      .catch(() => undefined);
     map.on("click", (e) => clickRef.current(e.lngLat.lat, e.lngLat.lng));
+    map.on("load", () => pending.current());
     mapRef.current = map;
     // Exposed for automated screenshot capture: synthetic DOM events cannot
     // carry maplibre's lngLat, so the harness needs a handle on the map.
     (window as unknown as { __cofireMap?: maplibregl.Map }).__cofireMap = map;
-    // The container can still be zero-height on first paint (dvh + absolute
-    // positioning), which leaves maplibre sized to a stale 0/300px canvas and
-    // renders nothing. Observe the element and resize when it gets real bounds.
     const ro = new ResizeObserver(() => map.resize());
     ro.observe(ref.current);
     return () => {
@@ -58,53 +83,50 @@ export function MapView({
     };
   }, []);
 
+  // Fly to the area when it changes.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !issue) return;
-    const srcId = "forecast";
-    const url = `${API}/overlay/${issue}/${horizon}/${layer}.png`;
-    const boundsUrl = `${API}/overlay/${issue}/${horizon}/${layer}.json`;
-    fetch(boundsUrl)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((b) => {
-        if (!map.getStyle() || !b) return;
-        if (map.getLayer("forecast-img")) map.removeLayer("forecast-img");
-        if (map.getSource(srcId)) map.removeSource(srcId);
-        map.addSource(srcId, {
-          type: "image",
-          url,
-          coordinates: [
-            [b.west, b.north],
-            [b.east, b.north],
-            [b.east, b.south],
-            [b.west, b.south],
-          ],
-        });
-        map.addLayer({ id: "forecast-img", type: "raster", source: srcId, paint: { "raster-opacity": 0.65 } });
-      })
-      .catch(() => {
-        /* overlay optional in fixture mode */
-      });
-    fetch(`${API}/forecast/grid?issue=${issue}&horizon=${horizon}&variable=${layer}`)
-      .then((r) => r.json())
-      .then((gj) => {
-        if (!map.getStyle()) return;
-        if (map.getLayer("cells")) map.removeLayer("cells");
-        if (map.getSource("cells")) map.removeSource("cells");
-        map.addSource("cells", { type: "geojson", data: gj });
+    if (!map || !bbox) return;
+    map.fitBounds(
+      [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]],
+      ],
+      { padding: 40, duration: 600 },
+    );
+  }, [bbox]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const draw = () => {
+      const data = toGeoJSON(cells);
+      const src = map.getSource("cells") as maplibregl.GeoJSONSource | undefined;
+      if (src) {
+        src.setData(data);
+      } else {
+        map.addSource("cells", { type: "geojson", data });
+        map.addLayer({ id: "cells-fill", type: "fill", source: "cells", paint: { "fill-opacity": 0.72 } });
         map.addLayer({
-          id: "cells",
-          type: "circle",
+          id: "cells-line",
+          type: "line",
           source: "cells",
-          paint: {
-            "circle-radius": 6,
-            "circle-color": layer === "fire" ? "#ff5a2a" : "#e6c15c",
-            "circle-opacity": ["coalesce", ["get", "confidence"], 0.6],
-          },
+          paint: { "line-color": "#17181b", "line-opacity": 0.12, "line-width": 0.5 },
         });
-      })
-      .catch(() => undefined);
-  }, [issue, horizon, layer]);
+        map.addLayer({
+          id: "cells-selected",
+          type: "line",
+          source: "cells",
+          paint: { "line-color": "#17181b", "line-width": 2.5 },
+          filter: ["==", ["get", "id"], ""],
+        });
+      }
+      map.setPaintProperty("cells-fill", "fill-color", RAMP[layer]);
+      map.setFilter("cells-selected", ["==", ["get", "id"], selectedId ?? ""]);
+    };
+    if (map.isStyleLoaded()) draw();
+    else pending.current = draw;
+  }, [cells, layer, selectedId]);
 
   return <div ref={ref} data-testid="map" className="absolute inset-0 h-full w-full" />;
 }

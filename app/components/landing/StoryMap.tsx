@@ -1,5 +1,6 @@
 "use client";
 
+import { domainLabel } from "@/lib/domainNames";
 import { ReactNode, useState } from "react";
 import story from "@/lib/story.json";
 
@@ -95,7 +96,7 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
           viewBox={`${vx} ${vy} ${vw} ${vh}`}
           className="h-auto max-h-[82dvh] w-full"
           role="img"
-          aria-label={`Larimer and Pueblo forecast areas coloured by expected dryness ${h} weeks out`}
+          aria-label={`Forecast areas from Larimer to Pueblo, including Denver and its watersheds, coloured by expected dryness ${h} weeks out`}
         >
           {m.outlines.map((o) => (
             <path
@@ -117,21 +118,23 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
               fill={colour(c.v[hi])}
               style={{ transition: "fill 700ms cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
-              <title>{`${c.d}: ${c.v[hi].toFixed(0)}, where 50 is typical`}</title>
+              <title>{`${domainLabel(c.d)}: ${c.v[hi].toFixed(0)}, where 50 is typical`}</title>
             </rect>
           ))}
           {m.areas.map((a) => (
             <g key={a.name}>
-              <rect
-                x={a.x}
-                y={a.y}
-                width={a.w}
-                height={a.h}
-                fill="none"
-                stroke="#17181b"
-                strokeWidth={1.4}
-                vectorEffect="non-scaling-stroke"
-              />
+              {a.outline ? (
+                <rect
+                  x={a.x}
+                  y={a.y}
+                  width={a.w}
+                  height={a.h}
+                  fill="none"
+                  stroke="#17181b"
+                  strokeWidth={1.4}
+                  vectorEffect="non-scaling-stroke"
+                />
+              ) : null}
               <text
                 x={a.x}
                 y={a.y - label * 0.45}

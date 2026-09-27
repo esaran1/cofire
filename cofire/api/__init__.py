@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,8 +19,9 @@ from sqlmodel import Field as SQLField
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from cofire.model.config import get_settings
-from cofire.model.ember import score as ember_score
 from cofire.model.uncertainty.status import classify, pool_from_artifacts
+from cofire.ship.ember_zones import ZONES as EMBER_ZONES
+from cofire.ship.ember_zones import score as ember_score
 
 settings = get_settings()
 DB_URL = os.environ.get("DATABASE_URL") or os.environ.get("COFIRE_DATABASE_URL") or str(settings.database_url)
@@ -125,7 +127,25 @@ def art_path(rel: str) -> Path:
     return settings.artifacts_dir / rel
 
 
+_INDEX_CACHE: dict[str, Any] = {}
+
+
 def load_index() -> dict[str, Any]:
+    """Every cell and issue, rebuilt from the per-domain bundles when present.
+
+    Cached on the bundle index's modification time, so a refresh is picked up
+    without a restart and a request never re-reads every bundle.
+    """
+    bundles = art_path("ship/domains/index.json")
+    if bundles.exists():
+        key = f"{bundles}:{bundles.stat().st_mtime_ns}"
+        if key not in _INDEX_CACHE:
+            from cofire.ship.bundles import legacy_cells
+
+            _INDEX_CACHE.clear()
+            _INDEX_CACHE[key] = legacy_cells(bundles.parent)
+        cached: dict[str, Any] = _INDEX_CACHE[key]
+        return cached
     path = art_path("forecast_index.json")
     fixture = Path("tests/fixtures/forecast_index.json")
     if path.exists():
@@ -249,6 +269,30 @@ def uncertainty_status(issue: str | None = None) -> dict[str, Any]:
     return _regime_status(issue)
 
 
+_DOMAIN_RE = re.compile(r"^[a-z_]{1,40}$")
+_ISSUE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+@app.get("/domains")
+def domains_index() -> Any:
+    """The forecast domains, Denver first, with the issues each bundle covers."""
+    path = art_path("ship/domains/index.json")
+    if not path.exists():
+        raise HTTPException(404, "no domain bundles exported")
+    return json.loads(path.read_text())
+
+
+@app.get("/domains/{domain}/{issue}")
+def domain_bundle(domain: str, issue: str) -> Any:
+    """One domain's forecast for one issue: cells, decisions, and source watersheds."""
+    if not _DOMAIN_RE.match(domain) or not _ISSUE_RE.match(issue):
+        raise HTTPException(400, "bad domain or issue")
+    path = art_path(f"ship/domains/{domain}/{issue}.json")
+    if not path.exists():
+        raise HTTPException(404, f"no forecast for {domain} on {issue}")
+    return json.loads(path.read_text())
+
+
 @app.get("/forecast/issues")
 def issues() -> dict[str, Any]:
     index = load_index()
@@ -256,8 +300,12 @@ def issues() -> dict[str, Any]:
 
 
 @app.get("/forecast")
-def forecast(lat: float = Query(...), lon: float = Query(...), issue: str | None = None) -> dict[str, Any]:
+def forecast(
+    lat: float = Query(...), lon: float = Query(...), issue: str | None = None, domain: str | None = None
+) -> dict[str, Any]:
     index = load_index()
+    if domain:
+        index = {**index, "cells": [c for c in index.get("cells", []) if c.get("domain") == domain]}
     cell = nearest_cell(lat, lon, index, issue)
     if cell is None:
         raise HTTPException(404, "no forecast for this location")
@@ -402,7 +450,9 @@ def post_prediction(body: PredictionIn) -> dict[str, Any]:
     with Session(engine) as session:
         session.add(row)
         session.commit()
-    locked = nearest_cell(0, 0, index, issue)
+    # No match locks nothing. This used to fall back to the cell nearest (0, 0),
+    # which locked an arbitrary forecast against the pick.
+    locked = None
     for c in index.get("cells", []):
         if c["cell_id"] == body.cell_id and c["issue"] == issue:
             locked = c
@@ -485,13 +535,15 @@ def get_observations(bbox: str | None = None) -> list[dict[str, Any]]:
 
 @app.get("/ember/checklist")
 def ember_checklist(zone: str = "wui") -> dict[str, Any]:
-    if zone not in {"urban", "wui"}:
-        raise HTTPException(400, "zone must be urban|wui")
+    if zone not in EMBER_ZONES:
+        raise HTTPException(400, f"zone must be one of {'|'.join(EMBER_ZONES)}")
     return ember_score({}, zone)
 
 
 @app.post("/ember/state")
 def ember_state(body: EmberIn) -> dict[str, Any]:
+    if body.zone not in EMBER_ZONES:
+        raise HTTPException(400, f"zone must be one of {'|'.join(EMBER_ZONES)}")
     _rate_limit(body.device_id)
     with Session(engine) as session:
         row = session.get(EmberRow, body.device_id) or EmberRow(device_id=body.device_id)

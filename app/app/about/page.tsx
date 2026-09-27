@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
 import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
+import { domainLabel } from "@/lib/domainNames";
 import { targetLabel } from "@/lib/targets";
 
 /**
@@ -43,8 +44,9 @@ export default function AboutPage() {
       >
         <h1 className="display text-4xl font-normal md:text-5xl">How it works</h1>
         <p className="text-ink-soft mt-3 max-w-[58ch] leading-relaxed">
-          Drought and fire-spread conditions for two Colorado counties, 2 to 8 weeks out, with an
-          honest account of how far to trust each number. Not a forecast of ignitions.
+          Drought and fire-spread conditions for Denver, the two watersheds its water comes from, and
+          Larimer and Pueblo counties, 2 to 8 weeks out, with an honest account of how far to trust
+          each number. Not a forecast of ignitions.
         </p>
       </motion.header>
 
@@ -71,9 +73,14 @@ export default function AboutPage() {
             {facts.multiplicity.withdrawn_by_leak_free_refit.join(", ")}.
           </p>
         ) : null}
+        <p className="text-mute mt-2 max-w-[58ch] text-xs leading-relaxed" data-testid="agreement-note">
+          {facts.multiplicity.agreeing_targets.length === 0
+            ? "None of these holds in every area where it can be tested, so each is claimed for its own area only."
+            : `Holding in every area where it can be tested: ${facts.multiplicity.agreeing_targets.map((t) => targetLabel(t)).join(", ")}.`}
+        </p>
         {Object.entries(byDomain).map(([dom, rows]) => (
           <div key={dom} className="mt-6">
-            <h3 className="text-mute text-xs capitalize">{dom}</h3>
+            <h3 className="text-mute text-xs">{domainLabel(dom)}</h3>
             <div className="mt-1">
               {rows.map((s) => (
                 <StatRow

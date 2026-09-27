@@ -46,31 +46,29 @@ def pick_issues(index: dict[str, Any]) -> list[str]:
     return sorted({latest, mid})
 
 
-def subset_index(index: dict[str, Any], issues: list[str]) -> dict[str, Any]:
-    keep = set(issues)
-    out = dict(index)
-    out["cells"] = [c for c in index.get("cells", []) if c.get("issue") in keep]
-    out["issues"] = issues
-    out["demo_fixture"] = True
-    out["demo_note"] = (
-        f"Committed fixture: {len(issues)} of {len(index.get('issues', []))} "
-        "issues, every cell of each. Numbers are the real ones."
-    )
-    return out
-
-
 def build() -> Path:
     DEMO.mkdir(parents=True, exist_ok=True)
-    index_path = ART / "forecast_index.json"
-    if not index_path.exists():
-        raise SystemExit("run `python -m cofire.ship.index_build` first")
-    index = json.loads(index_path.read_text())
-    issues = pick_issues(index)
-    subset = subset_index(index, issues)
+    src = ART / "ship" / "domains"
+    if not (src / "index.json").exists():
+        raise SystemExit("run `python -m cofire.ship.bundles` first")
+    full = json.loads((src / "index.json").read_text())
+    issues = pick_issues(full)
 
     dst = DEMO / "artifacts"
     dst.mkdir(parents=True, exist_ok=True)
-    (dst / "forecast_index.json").write_text(json.dumps(subset))
+    # The monolithic index is gone; the API rebuilds its view from bundles.
+    (dst / "forecast_index.json").unlink(missing_ok=True)
+    out = dst / "ship" / "domains"
+    if out.exists():
+        shutil.rmtree(out)
+    n_cells = 0
+    for dom in full["order"]:
+        (out / dom).mkdir(parents=True, exist_ok=True)
+        for issue in issues:
+            _copy(src / dom / f"{issue}.json", out / dom / f"{issue}.json")
+            n_cells += len(json.loads((src / dom / f"{issue}.json").read_text())["cells"])
+    trimmed = {**full, "issues": issues, "demo_fixture": True}
+    (out / "index.json").write_text(json.dumps(trimmed, indent=1))
 
     # The look-3 results, whole: they are small and the hindcast screen shows
     # every one of them.
@@ -90,9 +88,9 @@ def build() -> Path:
 
     manifest = {
         "issues": issues,
-        "n_cells": len(subset["cells"]),
-        "domains": subset.get("domains", []),
-        "targets": subset.get("targets", []),
+        "n_cells": n_cells,
+        "domains": full["order"],
+        "targets": full["targets"],
         "look_index": 3,
         "freeze_commit": (ART / "FREEZE_COMMIT").read_text().strip()
         if (ART / "FREEZE_COMMIT").exists() else "",
@@ -103,7 +101,7 @@ def build() -> Path:
     size_mb = sum(f.stat().st_size for f in DEMO.rglob("*") if f.is_file()) / 1e6
     LOGGER.info(
         "demo fixture: %d issues %s, %d cells, %.1f MB of %d MB cap",
-        len(issues), issues, len(subset["cells"]), size_mb, SIZE_CAP_MB,
+        len(issues), issues, n_cells, size_mb, SIZE_CAP_MB,
     )
     if size_mb > SIZE_CAP_MB:
         raise SystemExit(f"demo fixture is {size_mb:.1f} MB, over the {SIZE_CAP_MB} MB cap")

@@ -5,7 +5,9 @@ import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { API, Observation, getParsed, postParsed } from "@/lib/api";
-import { MetaSchema, ObservationAckSchema, ObservationSchema, PlaceSchema } from "@/lib/schemas";
+import { ObservationAckSchema, ObservationSchema } from "@/lib/schemas";
+import { resolvePlace } from "@/lib/data";
+import { useDomain } from "@/lib/domain";
 import type { ObservationCell } from "@/lib/schemas";
 import { z } from "zod";
 import { deviceId } from "@/lib/device";
@@ -56,20 +58,23 @@ function ObserveInner() {
   // counties, where there is no forecast, so it used to be the default point
   // and every report filed without editing it landed outside both areas.
   // Asking the API for the nearest cell to the centre snaps to one that exists.
+  const [domain, , ready] = useDomain();
+  const [explicit] = useState(() => !!(params.get("lat") && params.get("lon")));
   useEffect(() => {
-    if (!lat || !lon) {
-      getParsed("/meta", MetaSchema)
-        .then((m) => {
-          if (!m.center) return;
-          return getParsed(`/forecast?lat=${m.center[1]}&lon=${m.center[0]}`, PlaceSchema).then((p) => {
-            setLat(p.lat.toFixed(3));
-            setLon(p.lon.toFixed(3));
-          });
-        })
-        .catch(() => undefined);
-    }
+    // Default to the cell nearest the chosen area's centre, and follow the area
+    // when it changes, unless the link named a point.
+    if (!ready || explicit) return;
+    resolvePlace(domain)
+      .then((p) => {
+        setLat(p.lat.toFixed(3));
+        setLon(p.lon.toFixed(3));
+      })
+      .catch(() => undefined);
+  }, [domain, ready, explicit]);
+
+  useEffect(() => {
     load();
-  }, [lat, lon, load]);
+  }, [load]);
 
   function useMyLocation() {
     if (!("geolocation" in navigator)) {
@@ -255,7 +260,7 @@ function ObserveInner() {
         ) : rows.length === 0 ? (
           <EmptyState
             title="No reports yet"
-            body="File the first one above. Reports from this county show here with their location and type."
+            body="File the first one above. Reports from this area show here with their location and type."
           />
         ) : (
           <ul className="divide-y divide-rule rounded-lg border border-rule">

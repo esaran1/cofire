@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { List, X } from "@phosphor-icons/react";
+import { DomainSwitcher } from "./DomainSwitcher";
 
 /**
  * One nav, one line at desktop, drawer below md.
@@ -76,6 +77,7 @@ export function SiteNav() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <DomainSwitcher />
           {/* One label per intent, and never pointed at the page you are on. */}
           {path !== "/" && (
             <Link

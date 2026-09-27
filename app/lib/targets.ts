@@ -19,9 +19,20 @@ const LABELS: Record<string, string> = {
   f_gt97: "Fire-spread conditions above the 97th percentile",
 };
 
+// In a city the ERC percentile says how dry it is against the city's own
+// record, not how readily a wildfire would run. Denver's fire targets pass
+// their checks, but naming them "fire-spread conditions" would imply a
+// wildland fire danger the city does not have.
+const URBAN_LABELS: Record<string, string> = {
+  f_gt80: "Drier than 80% of past weeks here",
+  f_gt90: "Drier than 90% of past weeks here",
+  f_gt97: "Drier than 97% of past weeks here",
+};
+
 /** The event a target id describes, without its horizon. */
-export function targetLabel(id: string): string {
+export function targetLabel(id: string, kind?: string | null): string {
   const base = id.replace(/_h\d+$/, "");
+  if (kind === "urban" && URBAN_LABELS[base]) return URBAN_LABELS[base];
   return LABELS[base] ?? base.replace(/_/g, " ");
 }
 
@@ -30,8 +41,5 @@ export function targetHorizon(id: string): string {
   return id.match(/_h(\d+)$/)?.[1] ?? "";
 }
 
-/** County id to display name. */
-export function countyName(domain: string | null | undefined): string {
-  if (!domain) return "";
-  return domain.charAt(0).toUpperCase() + domain.slice(1);
-}
+/** Domain id to display name. */
+export { domainLabel as countyName } from "./domainNames";

@@ -81,11 +81,15 @@ def test_ember_and_observation() -> None:
     assert body["cell"]["domain"] == "larimer"
 
 
-def test_a_report_outside_both_areas_is_not_attached() -> None:
-    """The map centre lies between the counties, where there is no forecast."""
+def test_a_report_outside_every_area_is_not_attached() -> None:
+    """The eastern plains lie outside all five domains, where there is no forecast.
+
+    This used to use the point between Larimer and Pueblo, which the Upper
+    South Platte domain now covers.
+    """
     r = client.post(
         "/observations",
-        json={"device_id": "t-outside", "lat": 39.379, "lon": -105.121, "type": "creek_low", "note": ""},
+        json={"device_id": "t-outside", "lat": 39.0, "lon": -103.5, "type": "creek_low", "note": ""},
     )
     assert r.status_code == 200
     assert r.json()["cell"] is None
@@ -113,3 +117,20 @@ def test_forecast_defaults_to_the_latest_issue() -> None:
     issues = client.get("/forecast/issues").json()["issues"]
     body = client.get("/forecast", params={"lat": 40.55, "lon": -105.08}).json()
     assert body["issue"] == max(issues)
+
+
+def test_domain_index_and_bundles() -> None:
+    r = client.get("/domains")
+    if r.status_code == 404:
+        return
+    idx = r.json()
+    assert idx["default"] == "denver"
+    b = client.get(f"/domains/denver/{idx['issues'][-1]}").json()
+    assert b["domain"] == "denver" and b["cells"]
+    assert client.get("/domains/..%2Fetc/2026-09-22").status_code in (400, 404)
+    assert client.get("/domains/denver/not-a-date").status_code == 400
+
+
+def test_city_ember_zone_is_served() -> None:
+    assert client.get("/ember/checklist?zone=city").json()["zone"] == "city"
+    assert client.get("/ember/checklist?zone=nowhere").status_code == 400

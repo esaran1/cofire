@@ -1848,3 +1848,66 @@ ERC relative to Denver's own record and are labeled so.
 
 **facts.json.** No current survivor failed, so nothing is withdrawn. The new
 domains' pairs enter the app in Stage 6, read from this table.
+
+## v1.1 Stage 6: the app covers Denver, and Denver's card carries its water
+
+**Domain switcher.** Denver, Upper South Platte, Dillon, Larimer, Pueblo, with
+Denver the default. The choice lives in `?domain=` and local storage
+(`app/lib/domain.ts`), and a switcher in the site nav drives every route.
+
+**Data path.** 2026 forecasts for the new domains come through the
+scoring-free export (`cofire/ship/export.py`, which asserts that no realized
+outcome column survives), built by the frozen `look3.build_holdout` on the
+registered domain and cut to the footprint. That needed each new domain's 2026
+ERC: 715,852 bytes over the same OPeNDAP wrapper, used for forecasts only. The
+look counter read 3 before and after. The monolithic 240 MB forecast index is
+replaced by per-domain, per-issue bundles (`cofire/ship/bundles.py`, 20 MB for
+all 38 issues). The API rebuilds its old cell view from them, and a static
+build can serve them unchanged. The demo fixture fell from 12.8 MB to 1.2 MB.
+
+**Denver Place Card.** Denver's drought odds per cell, a note that Denver was
+added after the seal and checked on 2022 and 2023 only, and a watershed panel:
+the chance of fire-spread conditions above the 80th, 90th and 97th
+percentiles in the Upper South Platte above Strontia Springs and the Blue River
+above Dillon, averaged over each watershed and labelled as where Denver's
+water comes from. One line on post-fire sediment: after the 1996 Buffalo Creek
+and 2002 Hayman fires, sediment washed into Strontia Springs Reservoir for
+years. Denver's own ERC targets are labelled "Drier than N% of past weeks
+here", because in a city they measure dryness against the city's own record,
+not wildland fire danger.
+
+**Rendering.** New domains render per the validation rule recorded before
+Stage 5 (Denver 16 probability and 11 base rate, Upper South Platte 16 and 11,
+Dillon 11 and 16, plus 3 continuous horizons each with no band). Every
+base-rate row says "same for the whole city / watershed / county" and gives
+its reason one click away.
+
+**A stale claim fixed.** The rendering reasons read survivors from the
+original stage 1 table, so the app told users Pueblo d_ge2_h4 "beats its
+baseline", a pair the leak-free refit withdrew. Rendering now reads the
+five-domain leak-free table. The reason wording also now says validation,
+not "the training record".
+
+**Urban Ember Score.** `cofire/ship/ember_city.yaml`, scored by
+`cofire/ship/ember_zones.py` with the frozen rule (group weight split evenly
+across items). Groups and weights: water before restrictions 0.40 (Denver
+Water summer watering rules, conservation guidance, Drought Response Plan;
+Denver Water and CSU Extension), ready for smoke days 0.30 (AirNow and CDPHE,
+US EPA, CDC), not starting a fire 0.30 (Denver Fire Department, NFPA, National
+Weather Service). Denver opens on it. The other four domains open on the
+frozen wildland-edge checklist, which is unchanged.
+
+**Hardcoded-statistics lint.** New, `scripts/check_stats.py`, in `make lint`.
+It flags fractions, "N of M" counts, worded percentages, and decimals with two
+or more places in app JSX text and strings, and allows only the preregistered
+criteria phrases. It caught one: the Hindcast page's "30/30 interval tests
+passed", in a branch that could only render if the retraction disappeared.
+That branch is removed.
+
+**Verification.** Playwright, 54 tests passing, 45 of them new: every route
+(map, Predict, Observe, Harden, Hindcast, Method, landing) for every domain;
+the Denver cell with its watershed panel; a watershed cell; a non-estimable
+target cell (Dillon, drought reaching D2, base rate with the "did not happen in
+2022 or 2023" reason); and the switcher moving map and card. Copy lint,
+em-dash ban, hardcoded-statistics lint, ruff, mypy strict (97 files), tsc and
+`next build` are green. The Python suite passes.

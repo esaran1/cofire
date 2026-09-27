@@ -168,7 +168,7 @@ def test_the_export_reads_no_realized_outcome() -> None:
 def test_the_export_covers_every_issue_to_the_last(  ) -> None:
     frame = pd.read_parquet(EXPORT)
     assert pd.Timestamp(frame["time"].max()) == pd.Timestamp("2026-09-22")
-    assert set(frame["domain"].unique()) == {"larimer", "pueblo"}
+    assert set(frame["domain"].unique()) == {"denver", "upper_south_platte", "dillon", "larimer", "pueblo"}
 
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")

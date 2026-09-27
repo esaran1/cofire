@@ -17,8 +17,8 @@ import { expect, test } from "@playwright/test";
  */
 
 /** Click the centre of the map and wait for the Place Card. */
-async function openPlaceCard(page: import("@playwright/test").Page) {
-  await page.goto("/");
+async function openPlaceCard(page: import("@playwright/test").Page, domain = "denver") {
+  await page.goto(`/?domain=${domain}`);
   await page.waitForLoadState("networkidle");
   // The map needs a frame to size itself before the click lands on a cell.
   await page.waitForTimeout(4000);
@@ -44,7 +44,7 @@ test("the continuous forecast renders in the state the payload declares", async 
   await expect(card).toBeVisible({ timeout: 15_000 });
 
   const hz = await page.evaluate(async (base: string) => {
-    const r = await fetch(`${base}/forecast?lat=40.55&lon=-105.08`);
+    const r = await fetch(`${base}/forecast?lat=40.55&lon=-105.08&domain=larimer`);
     const d = (await r.json()) as {
       horizons: Record<string, { state?: string | null }>;
     };
@@ -74,11 +74,13 @@ test("every rendering state carries its reason", async ({ page }) => {
 });
 
 test("a base-rate target says it is the same for every cell", async ({ page }) => {
-  const card = await openPlaceCard(page);
+  // Larimer, so the marker names a county; the city and watershed wording is
+  // covered in domains.spec.ts.
+  const card = await openPlaceCard(page, "larimer");
   await expect(card).toBeVisible({ timeout: 15_000 });
 
   const nBase = await page.evaluate(async (base: string) => {
-    const r = await fetch(`${base}/forecast?lat=40.55&lon=-105.08`);
+    const r = await fetch(`${base}/forecast?lat=40.55&lon=-105.08&domain=larimer`);
     const d = (await r.json()) as { targets: Record<string, { state?: string | null }> };
     return Object.values(d.targets ?? {}).filter((t) => t.state === "base_rate").length;
   }, apiBase());

@@ -319,3 +319,88 @@ export type ObservationCell = NonNullable<ObservationAck["cell"]>;
 export type Observation = z.infer<typeof ObservationSchema>;
 export type LeaderRow = z.infer<typeof LeaderRowSchema>;
 export type Grid = z.infer<typeof GridSchema>;
+
+/**
+ * Forecast domains and their per-issue bundles (cofire/ship/bundles.py).
+ *
+ * A bundle stores each rendering decision once per domain and each cell's
+ * probabilities as an array aligned to `targets`, so the client rebuilds a
+ * Place from one cell rather than downloading a state and reason per cell.
+ */
+export const DomainMetaSchema = z.object({
+  domain: z.string(),
+  label: z.string(),
+  kind: z.enum(["urban", "watershed", "county"]),
+  note: z.string().default(""),
+  bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+  center: z.tuple([z.number(), z.number()]),
+  n_cells: z.number(),
+  sources: z.array(z.string()).default([]),
+  ember_zone: z.string().default("wui"),
+  // "look3": checked on the sealed 2026 year. "validation": added after the
+  // seal, checked on 2022 to 2023 only.
+  evaluation: z.enum(["look3", "validation"]),
+});
+
+export const DomainsIndexSchema = z.object({
+  default: z.string(),
+  order: z.array(z.string()),
+  issues: z.array(z.string()),
+  targets: z.array(z.string()),
+  resolution_m: z.number().default(4000),
+  history_years: z.string().default(""),
+  domains: z.record(z.string(), DomainMetaSchema),
+});
+
+const decision = z.tuple([RenderStateSchema.nullable(), z.string().nullable()]);
+
+export const BundleCellSchema = z.object({
+  id: z.string(),
+  lat: z.number(),
+  lon: z.number(),
+  erc: maybeNumber,
+  erc_pct: maybeNumber,
+  usdm: maybeNumber,
+  p: z.array(maybeNumber),
+  // Per horizon: [point, history low, history high, target week].
+  h: z.record(z.string(), z.tuple([maybeNumber, maybeNumber, maybeNumber, z.string()])),
+});
+
+const FireOddsSchema = z.object({
+  mean: maybeNumber,
+  min: maybeNumber,
+  max: maybeNumber,
+  state: RenderStateSchema.nullable(),
+});
+
+export const DomainSummarySchema = z
+  .object({ erc_pct_now_median: maybeNumber })
+  .catchall(z.union([z.record(z.string(), z.union([FireOddsSchema, maybeNumber])), maybeNumber]));
+
+export const BundleSchema = z.object({
+  domain: z.string(),
+  issue: z.string(),
+  targets: z.array(z.string()),
+  decisions: z.object({
+    targets: z.record(z.string(), decision),
+    horizons: z.record(z.string(), decision),
+  }),
+  cells: z.array(BundleCellSchema),
+  summary: DomainSummarySchema,
+  sources: z
+    .record(
+      z.string(),
+      z.object({
+        label: z.string(),
+        summary: DomainSummarySchema,
+        decisions: z.record(z.string(), decision),
+      }),
+    )
+    .default({}),
+});
+
+export type DomainMeta = z.infer<typeof DomainMetaSchema>;
+export type DomainsIndex = z.infer<typeof DomainsIndexSchema>;
+export type Bundle = z.infer<typeof BundleSchema>;
+export type BundleCell = z.infer<typeof BundleCellSchema>;
+export type DomainSummary = z.infer<typeof DomainSummarySchema>;

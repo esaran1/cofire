@@ -5,6 +5,7 @@ import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigur
 import { CountUp, Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
 import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
+import { domainLabel, useDomain } from "@/lib/domain";
 import { countyName, targetHorizon, targetLabel } from "@/lib/targets";
 
 /**
@@ -53,6 +54,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function HindcastPage() {
   const reduce = useReducedMotion();
+  const [domain] = useDomain();
+  const sealedHere = domain === "larimer" || domain === "pueblo";
   return (
     <div className="reading px-6 pb-20 pt-10">
       <motion.header
@@ -67,6 +70,12 @@ export default function HindcastPage() {
           2026 was held back from every fitting decision, then tested once against criteria
           written down in advance.
         </p>
+        {!sealedHere ? (
+          <p className="text-mute mt-3 max-w-[58ch] text-sm leading-relaxed" data-testid="hindcast-domain-note">
+            This test covered Larimer and Pueblo. {domainLabel(domain)} was added after the seal, so its
+            numbers were checked on 2022 and 2023 only, and nothing about it is scored on 2026.
+          </p>
+        ) : null}
       </motion.header>
 
       {/* The correction comes first. The look-3 interval results passed, but the
@@ -90,11 +99,7 @@ export default function HindcastPage() {
           label="probability tests passed"
           sub="written down before the look"
         />
-        {audit.retraction ? (
-          <Verdict value="void" label="interval tests" sub="the test itself was flawed" tone="fail" />
-        ) : (
-          <Verdict value="30/30" label="interval tests passed" sub="both counties, all ranges" />
-        )}
+        <Verdict value="void" label="interval tests" sub="the test itself was flawed" tone="fail" />
         <Verdict
           value={`${failures.length}`}
           label="reliability failures"

@@ -1,0 +1,185 @@
+{
+ "default": "denver",
+ "order": [
+  "denver",
+  "upper_south_platte",
+  "dillon",
+  "larimer",
+  "pueblo"
+ ],
+ "issues": [
+  "2026-05-05",
+  "2026-09-22"
+ ],
+ "targets": [
+  "d_ge2_h2",
+  "d_ge2_h4",
+  "d_ge2_h8",
+  "d_ge3_h2",
+  "d_ge3_h4",
+  "d_ge3_h8",
+  "d_improve1_h2",
+  "d_improve1_h4",
+  "d_improve1_h8",
+  "d_intensify1_h2",
+  "d_intensify1_h4",
+  "d_intensify1_h8",
+  "d_intensify2_h2",
+  "d_intensify2_h4",
+  "d_intensify2_h8",
+  "d_nochange_h2",
+  "d_nochange_h4",
+  "d_nochange_h8",
+  "f_gt80_h2",
+  "f_gt80_h4",
+  "f_gt80_h8",
+  "f_gt90_h2",
+  "f_gt90_h4",
+  "f_gt90_h8",
+  "f_gt97_h2",
+  "f_gt97_h4",
+  "f_gt97_h8"
+ ],
+ "resolution_m": 4000,
+ "history_years": "2007 to 2021",
+ "domains": {
+  "denver": {
+   "domain": "denver",
+   "label": "Denver",
+   "kind": "urban",
+   "note": "City and County of Denver, including the Glendale and Holly Hills enclaves.",
+   "bbox": [
+    -105.110417,
+    39.597916,
+    -104.589583,
+    39.910417
+   ],
+   "center": [
+    -104.85,
+    39.7541665
+   ],
+   "n_cells": 52,
+   "matched": {
+    "GEOID": "08031",
+    "NAME": "Denver",
+    "NAMELSAD": "Denver County"
+   },
+   "sources": [
+    "upper_south_platte",
+    "dillon"
+   ],
+   "ember_zone": "city",
+   "evaluation": "validation"
+  },
+  "upper_south_platte": {
+   "domain": "upper_south_platte",
+   "label": "Upper South Platte",
+   "kind": "watershed",
+   "note": "A collection area Denver Water draws from.",
+   "bbox": [
+    -105.860417,
+    38.889583,
+    -105.00625,
+    39.61875
+   ],
+   "center": [
+    -105.4333335,
+    39.2541665
+   ],
+   "n_cells": 202,
+   "matched": {
+    "huc8": "10190002",
+    "huc8_name": "Upper South Platte",
+    "huc8_area_km2": "4790.8",
+    "reservoir": "Strontia Springs Reservoir",
+    "reservoir_gnis_id": "00197627",
+    "reservoir_source": "USGS NHD waterbody, matched by GNIS name",
+    "outlet_huc12": "101900020701",
+    "outlet_huc12_name": "Platte Canyon-South Platte River",
+    "n_huc12_upstream": "23",
+    "n_huc12_in_huc8": "50"
+   },
+   "sources": [],
+   "ember_zone": "wui",
+   "evaluation": "validation"
+  },
+  "dillon": {
+   "domain": "dillon",
+   "label": "Dillon",
+   "kind": "watershed",
+   "note": "A collection area Denver Water draws from.",
+   "bbox": [
+    -106.277084,
+    39.347916,
+    -105.75625,
+    39.702084
+   ],
+   "center": [
+    -106.016667,
+    39.525
+   ],
+   "n_cells": 79,
+   "matched": {
+    "huc8": "14010002",
+    "huc8_name": "Blue",
+    "huc8_area_km2": "1769.36",
+    "reservoir": "Dillon Reservoir",
+    "reservoir_source": "WBD HUC12 named for the reservoir",
+    "outlet_huc12": "140100020401",
+    "outlet_huc12_name": "Dillon Reservoir-Blue River",
+    "n_huc12_upstream": "12",
+    "n_huc12_in_huc8": "19"
+   },
+   "sources": [],
+   "ember_zone": "wui",
+   "evaluation": "validation"
+  },
+  "larimer": {
+   "domain": "larimer",
+   "label": "Larimer",
+   "kind": "county",
+   "note": "County-wide forecast domain.",
+   "bbox": [
+    -106.192,
+    40.324,
+    -104.943,
+    40.998
+   ],
+   "center": [
+    -105.5675,
+    40.661
+   ],
+   "n_cells": 480,
+   "matched": {
+    "FIPS": "08069"
+   },
+   "sources": [],
+   "ember_zone": "wui",
+   "evaluation": "look3"
+  },
+  "pueblo": {
+   "domain": "pueblo",
+   "label": "Pueblo",
+   "kind": "county",
+   "note": "County-wide forecast domain.",
+   "bbox": [
+    -105.051,
+    37.735,
+    -104.054,
+    38.522
+   ],
+   "center": [
+    -104.55250000000001,
+    38.1285
+   ],
+   "n_cells": 432,
+   "matched": {
+    "FIPS": "08101"
+   },
+   "sources": [],
+   "ember_zone": "wui",
+   "evaluation": "look3"
+  }
+ },
+ "demo_fixture": true
+}

@@ -3,8 +3,11 @@
     "2026-05-05",
     "2026-09-22"
   ],
-  "n_cells": 1824,
+  "n_cells": 2490,
   "domains": [
+    "denver",
+    "upper_south_platte",
+    "dillon",
     "larimer",
     "pueblo"
   ],

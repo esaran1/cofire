@@ -1,9 +1,12 @@
 {
   "generated_from": "artifacts/",
   "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
-  "git_sha": "fc50d5d051240ced1e2fdd0e4c4ed00c4dc7fd88",
+  "git_sha": "8f97573dad22757e7267518bd809bc19ea060477",
   "resolution_m": 4000,
   "domains": [
+    "denver",
+    "upper_south_platte",
+    "dillon",
     "larimer",
     "pueblo"
   ],
@@ -25,18 +28,124 @@
   "freeze_commit": "46c17ae4aac2bef2d1397e422755104284f71667",
   "config_hash": "ed0c2079a5bc0eee1d0aa11869d3bc5eb0af671b9f30ee0c5114c3b9ca7be157",
   "multiplicity": {
-    "n_comparisons": 51,
-    "n_estimable": 39,
-    "n_survivors": 11,
+    "n_comparisons": 115,
+    "n_estimable": 83,
+    "n_survivors": 21,
     "n_survivors_original": 12,
     "withdrawn_by_leak_free_refit": [
       "pueblo d_ge2_h4"
     ],
     "q": 0.1,
     "min_positive_weeks": 12,
-    "rule": "paired difference between the statistic on real targets and on targets shuffled within the same circular blocks, CI above zero"
+    "rule": "paired difference between the statistic on real targets and on targets shuffled within the same circular blocks, CI above zero",
+    "n_domains": 5,
+    "n_survivors_larimer_pueblo": 11,
+    "n_survivors_new_domains": 10,
+    "n_comparisons_larimer_pueblo": 51,
+    "agreement_rule": "passes in every domain where the target is estimable, and in at least two domains",
+    "agreeing_targets": []
   },
   "survivors": [
+    {
+      "domain": "denver",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.2256600457806194,
+      "paired_lo": 0.1009079861704847,
+      "paired_hi": 0.3526982485588618,
+      "n_positive_weeks": 24
+    },
+    {
+      "domain": "denver",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.2431098759595668,
+      "paired_lo": 0.0949867671248786,
+      "paired_hi": 0.4533934636771793,
+      "n_positive_weeks": 35
+    },
+    {
+      "domain": "denver",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.0797209490535326,
+      "paired_lo": 0.0198322051718859,
+      "paired_hi": 0.1533380043870074,
+      "n_positive_weeks": 90
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.2703017146895997,
+      "paired_lo": 0.1347116786917241,
+      "paired_hi": 0.4371231085943176,
+      "n_positive_weeks": 22
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.3484588514377199,
+      "paired_lo": 0.1732967945898066,
+      "paired_hi": 0.6767487528044642,
+      "n_positive_weeks": 31
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "arm": "markov",
+      "paired_diff": 0.1770449266199477,
+      "paired_lo": 0.0533699091132401,
+      "paired_hi": 0.3281889157863683,
+      "n_positive_weeks": 102
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_nochange_h4",
+      "horizon": 4,
+      "arm": "markov",
+      "paired_diff": 0.2603558664904963,
+      "paired_lo": 0.1111224249301,
+      "paired_hi": 0.4216783391568238,
+      "n_positive_weeks": 100
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_nochange_h8",
+      "horizon": 8,
+      "arm": "markov",
+      "paired_diff": 0.2801524647051409,
+      "paired_lo": 0.057090457351474,
+      "paired_hi": 0.5445742960769223,
+      "n_positive_weeks": 96
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "arm": "damped",
+      "paired_diff": 0.0451677755673418,
+      "paired_lo": 0.0100424881417348,
+      "paired_hi": 0.0777767827503676,
+      "n_positive_weeks": 37
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "arm": "damped",
+      "paired_diff": 0.031659131403392,
+      "paired_lo": 0.0100436819029018,
+      "paired_hi": 0.0501680677853749,
+      "n_positive_weeks": 34
+    },
     {
       "domain": "larimer",
       "target": "d_ge2_h2",
@@ -1622,11 +1731,431 @@
   },
   "rendering": [
     {
+      "domain": "denver",
+      "target": "d_ge2_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0072); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0220); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "d_ge2_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0360); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "d_ge3_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_ge3_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_ge3_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0116) and beats its baseline there"
+    },
+    {
+      "domain": "denver",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0272) and beats its baseline there"
+    },
+    {
+      "domain": "denver",
+      "target": "d_improve1_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0851, needed 0.05 or less, so the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_intensify1_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_intensify1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0053); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "d_intensify1_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0226); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "d_intensify2_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_intensify2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_intensify2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0110) and beats its baseline there"
+    },
+    {
+      "domain": "denver",
+      "target": "d_nochange_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0203); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "d_nochange_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0330); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "erc_pct",
+      "horizon": 2,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "denver",
+      "target": "erc_pct",
+      "horizon": 4,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "denver",
+      "target": "erc_pct",
+      "horizon": 8,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt80_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0033); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt80_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0036); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0022); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt90_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0053); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt90_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0014); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt90_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0013); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt97_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt97_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "denver",
+      "target": "f_gt97_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_ge2_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_ge2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_ge3_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_ge3_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_ge3_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0022); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0063); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_improve1_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0225); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_intensify1_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_intensify1_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_intensify1_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_intensify2_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_intensify2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_intensify2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0138); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_nochange_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0413); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "d_nochange_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0667, needed 0.05 or less, so the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "erc_pct",
+      "horizon": 2,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "dillon",
+      "target": "erc_pct",
+      "horizon": 4,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "dillon",
+      "target": "erc_pct",
+      "horizon": 8,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt80_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0041); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt80_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0035); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0043) and beats its baseline there"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt90_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0021); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt90_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0024); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt90_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0027); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt97_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt97_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "dillon",
+      "target": "f_gt97_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "only 2 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
       "domain": "larimer",
       "target": "d_ge2_h2",
       "horizon": 2,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "larimer",
@@ -1668,14 +2197,14 @@
       "target": "d_improve1_h2",
       "horizon": 2,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "larimer",
       "target": "d_improve1_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "larimer",
@@ -1731,14 +2260,14 @@
       "target": "d_nochange_h2",
       "horizon": 2,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "larimer",
       "target": "d_nochange_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "larimer",
@@ -1836,14 +2365,14 @@
       "target": "d_ge2_h2",
       "horizon": 2,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "pueblo",
       "target": "d_ge2_h4",
       "horizon": 4,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout; it does not beat its baseline, so it is shown as a probability with its historical basis and no claim of skill"
     },
     {
       "domain": "pueblo",
@@ -1997,7 +2526,7 @@
       "target": "f_gt80_h8",
       "horizon": 8,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "pueblo",
@@ -2018,7 +2547,7 @@
       "target": "f_gt90_h8",
       "horizon": 8,
       "state": "probability",
-      "reason": "calibrated on the 2026 holdout and beats its baseline on the training record"
+      "reason": "calibrated on the 2026 holdout and beats its baseline on 2022 to 2023 validation"
     },
     {
       "domain": "pueblo",
@@ -2040,14 +2569,224 @@
       "horizon": 8,
       "state": "base_rate",
       "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_ge2_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_ge2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_ge2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_ge3_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_ge3_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_ge3_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_improve1_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0110) and beats its baseline there"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_improve1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0293) and beats its baseline there"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_improve1_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0370); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_intensify1_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0004); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_intensify1_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0032); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_intensify1_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0115); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_intensify2_h2",
+      "horizon": 2,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_intensify2_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_intensify2_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_nochange_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0128) and beats its baseline there"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_nochange_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0250) and beats its baseline there"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "d_nochange_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0333) and beats its baseline there"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "erc_pct",
+      "horizon": 2,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "erc_pct",
+      "horizon": 4,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "erc_pct",
+      "horizon": 8,
+      "state": "uncalibrated",
+      "reason": "No interval method passes the delayed-feedback check, so no band is drawn. The point forecast is shown with the historical range for the week."
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt80_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0037); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt80_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0025); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt80_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0022) and beats its baseline there"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt90_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0017); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt90_h4",
+      "horizon": 4,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0014); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt90_h8",
+      "horizon": 8,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0010); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt97_h2",
+      "horizon": 2,
+      "state": "probability",
+      "reason": "calibrated on 2022 to 2023 validation (reliability 0.0001); it does not beat its baseline, so it is shown as a probability with no claim of skill"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt97_h4",
+      "horizon": 4,
+      "state": "base_rate",
+      "reason": "only 11 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+    },
+    {
+      "domain": "upper_south_platte",
+      "target": "f_gt97_h8",
+      "horizon": 8,
+      "state": "base_rate",
+      "reason": "only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
     }
   ],
   "ledger": {
-    "total_bytes": 2914326823,
+    "total_bytes": 2936388362,
     "budget_bytes": 3000000000,
-    "remaining_bytes": 85673177,
-    "total_gb": 2.914,
-    "n_transfers": 4040,
+    "remaining_bytes": 63611638,
+    "total_gb": 2.936,
+    "n_transfers": 4179,
     "n_corrections": 1
   },
   "sources": [

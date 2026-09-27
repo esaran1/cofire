@@ -1,0 +1,98 @@
+# Urban Ember Score: a preparedness checklist for Denver residents.
+#
+# Denver is almost entirely urban, so the wildland-edge checklist (defensible
+# space, ember-resistant vents) is the wrong list for most of the district. What
+# a Denver household controls during drought and fire season is its water use
+# before restrictions arrive, its readiness for smoke from fires elsewhere, and
+# whether it starts a fire itself. The score is completion of this list, not a
+# forecast of anything.
+#
+# Group weights sum to 1 and are split evenly across a group's items, exactly as
+# the frozen wildland-edge checklist is scored (cofire/model/ember.py).
+# Weights: water 0.40 because Denver's drought exposure is its water supply;
+# smoke 0.30 because smoke days are the fire effect most Denver residents meet;
+# ignition 0.30 because human ignitions are the fire risk a resident controls.
+water:
+  label: Water before restrictions
+  weight: 0.40
+  items:
+    - id: water_schedule
+      label: Water the lawn only on a set schedule, early or late in the day
+      cost: free
+      zone_applicability: [city]
+      rationale: Denver Water's summer watering rules limit daytime watering, and cutting use before a drought stage is declared stretches reservoir storage.
+      source: Denver Water summer watering rules
+    - id: water_leaks
+      label: Fix running toilets, dripping taps and sprinkler leaks
+      cost: under_100
+      zone_applicability: [city]
+      rationale: Leaks waste water every hour of every day, drought or not.
+      source: Denver Water conservation guidance
+    - id: water_stage
+      label: Know which Denver Water drought stage is in effect
+      cost: free
+      zone_applicability: [city]
+      rationale: Restriction stages change what is allowed; knowing the stage before it tightens avoids scrambling.
+      source: Denver Water Drought Response Plan
+    - id: water_turf
+      label: Replace part of the lawn with low-water plants
+      cost: contractor
+      zone_applicability: [city]
+      rationale: Turf is the largest outdoor water use; low-water landscaping keeps the yard alive under restrictions.
+      source: Denver Water and Colorado State University Extension
+smoke:
+  label: Ready for smoke days
+  weight: 0.30
+  items:
+    - id: smoke_alerts
+      label: Sign up for air-quality alerts
+      cost: free
+      zone_applicability: [city]
+      rationale: Smoke from fires far outside Denver reaches the city; an alert is the cue to close up and filter.
+      source: AirNow and the Colorado Department of Public Health and Environment
+    - id: smoke_filter
+      label: A HEPA air cleaner or MERV 13 filter for one room
+      cost: under_100
+      zone_applicability: [city]
+      rationale: A filtered clean room cuts indoor smoke exposure when outdoor air is poor.
+      source: US EPA wildfire smoke guidance
+    - id: smoke_masks
+      label: N95 respirators at home for everyone who needs to go out
+      cost: under_100
+      zone_applicability: [city]
+      rationale: Cloth masks do not stop smoke particles; a well-fitted N95 does.
+      source: US EPA and CDC wildfire smoke guidance
+    - id: smoke_plan
+      label: A plan for children, older adults and anyone with asthma or heart disease
+      cost: free
+      zone_applicability: [city]
+      rationale: These groups are hurt first and most by smoke, so their plan should be settled before a smoke day.
+      source: US EPA wildfire smoke guidance
+ignition:
+  label: Not starting a fire
+  weight: 0.30
+  items:
+    - id: ign_fireworks
+      label: No fireworks
+      cost: free
+      zone_applicability: [city]
+      rationale: Fireworks are illegal in Denver and start grass and structure fires every summer.
+      source: Denver Fire Department
+    - id: ign_smoking
+      label: Put cigarettes out in water or sand, never in mulch, grass or planters
+      cost: free
+      zone_applicability: [city]
+      rationale: Discarded smoking materials are a leading cause of outdoor fires that spread to homes.
+      source: National Fire Protection Association
+    - id: ign_grill
+      label: Grills and fire pits well away from the house, deck and fences, never left burning
+      cost: free
+      zone_applicability: [city]
+      rationale: Unattended and too-close grills ignite decks, siding and dry vegetation.
+      source: National Fire Protection Association
+    - id: ign_redflag
+      label: Skip spark-making work outdoors on Red Flag days
+      cost: free
+      zone_applicability: [city]
+      rationale: Mowing dry grass, grinding and welding throw sparks; on Red Flag days a spark can outrun you.
+      source: National Weather Service and Denver Fire Department

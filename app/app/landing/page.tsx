@@ -80,8 +80,8 @@ export default function LandingPage() {
             title={<>COFIRE forecasts that window.</>}
             line={
               <>
-                Every <span className="num">{facts.resolution_m / 1000}</span> km of two Colorado
-                counties, 2 to 8 weeks ahead.
+                Every <span className="num">{facts.resolution_m / 1000}</span> km of Denver, the
+                watersheds its water comes from, and two more Colorado counties, 2 to 8 weeks ahead.
               </>
             }
           />
@@ -160,7 +160,7 @@ export default function LandingPage() {
         <div className="measure">
           <LineReveal
             className="display max-w-[20ch] text-4xl text-paper md:text-6xl"
-            lines={[<>See your county.</>]}
+            lines={[<>See your area.</>]}
           />
           <Link
             href="/"

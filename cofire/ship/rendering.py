@@ -202,8 +202,8 @@ def probabilistic_decisions() -> list[Decision]:
             continue
         beats = key in survivors or (dom, target) in survivors
         reason = (
-            "calibrated on the 2026 holdout and beats its baseline on the "
-            "training record"
+            "calibrated on the 2026 holdout and beats its baseline on 2022 to "
+            "2023 validation"
             if beats
             else "calibrated on the 2026 holdout; it does not beat its baseline, "
             "so it is shown as a probability with its historical basis and no "
@@ -213,14 +213,81 @@ def probabilistic_decisions() -> list[Decision]:
     return out
 
 
+V11 = ART / "v11" / "survivors_v11.csv"
+
+
 def _survivor_set() -> set[tuple[str, str]]:
-    """Stage 1 survivors, as (domain, target) pairs."""
-    path = RERUN / "multiplicity.csv"
-    if not path.exists():
+    """Current survivors, as (domain, target) pairs.
+
+    Read from the leak-free five-domain test. This previously read the
+    original stage 1 table, which still lists Pueblo d_ge2_h4, withdrawn by
+    the leak-free refit, so the app told users that pair beat its baseline.
+    """
+    if not V11.exists():
         return set()
-    m = pd.read_csv(path)
+    m = pd.read_csv(V11)
     s = m[m["survivor"].astype(bool)]
     return {(str(r["domain"]), str(r["target"])) for _, r in s.iterrows()}
+
+
+def new_domain_decisions() -> list[Decision]:
+    """Rendering for the v1.1 domains, decided on 2022 to 2023 validation.
+
+    These domains have no 2026 evaluation and never will under the seal, so
+    the look-3 reliability threshold is applied to validation instead
+    (docs/DECISIONS.md, v1.1 Stage 5). The continuous forecast draws no band,
+    as everywhere.
+    """
+    from cofire.model.targets import HORIZONS, target_names
+    from cofire.ship import domains
+
+    if not V11.exists():
+        return []
+    tab = pd.read_csv(V11)
+    out: list[Decision] = []
+    for dom in domains.NEW:
+        for h in HORIZONS:
+            out.append(Decision(
+                dom, "erc_pct", h, UNCALIBRATED,
+                "No interval method passes the delayed-feedback check, so no band is drawn. "
+                "The point forecast is shown with the historical range for the week.",
+            ))
+        t = tab[tab["domain"] == dom].set_index("target")
+        for target in target_names(HORIZONS):
+            h = int(target.rsplit("_h", 1)[1])
+            if target not in t.index:
+                out.append(Decision(
+                    dom, target, h, BASE_RATE,
+                    "the event did not happen in this area in 2022 or 2023, so a per-cell "
+                    "probability cannot be checked; the regional base rate is shown instead",
+                ))
+                continue
+            r = t.loc[target]
+            if str(r["render"]) == "probability":
+                reason = (
+                    f"calibrated on 2022 to 2023 validation (reliability "
+                    f"{float(r['reliability_cell']):.4f}) and beats its baseline there"
+                    if bool(r["survivor"])
+                    else f"calibrated on 2022 to 2023 validation (reliability "
+                    f"{float(r['reliability_cell']):.4f}); it does not beat its baseline, so it "
+                    f"is shown as a probability with no claim of skill"
+                )
+                out.append(Decision(dom, target, h, "probability", reason))
+            elif not bool(r["estimable"]):
+                out.append(Decision(
+                    dom, target, h, BASE_RATE,
+                    f"only {int(r['n_positive_weeks'])} weeks with the event in 2022 to 2023 "
+                    f"validation, fewer than the 12 needed to check a per-cell probability; "
+                    f"the regional base rate is shown instead",
+                ))
+            else:
+                out.append(Decision(
+                    dom, target, h, BASE_RATE,
+                    f"stated probabilities did not match observed frequencies in 2022 to 2023 "
+                    f"validation: reliability {float(r['reliability_cell']):.4f}, needed "
+                    f"{RELIABILITY_MAX} or less, so the regional base rate is shown instead",
+                ))
+    return out
 
 
 def all_decisions() -> pd.DataFrame:
@@ -229,7 +296,7 @@ def all_decisions() -> pd.DataFrame:
             "domain": d.domain, "target": d.target, "horizon": d.horizon,
             "state": d.state, "reason": d.reason,
         }
-        for d in continuous_decisions() + probabilistic_decisions()
+        for d in continuous_decisions() + probabilistic_decisions() + new_domain_decisions()
     ]
     return pd.DataFrame(rows).sort_values(["domain", "target", "horizon"])
 

@@ -50,3 +50,7 @@ artifacts/calibration/
 artifacts/training_stats.pkl
 artifacts/frontend/screens/*.png
 !artifacts/frontend/screens/.gitkeep
+
+# Per-domain bundles are rebuilt from artifacts/ship/forecast_issues.parquet by
+# `python -m cofire.ship.bundles`; demo/ keeps the committed copy make demo serves.
+artifacts/ship/domains/

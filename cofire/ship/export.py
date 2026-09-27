@@ -31,7 +31,9 @@ from cofire.ship.rendering import (  # noqa: E402
 LOGGER = logging.getLogger("cofire.ship.export")
 
 OUT = Path("artifacts/ship")
-DOMAINS = ("larimer", "pueblo")
+# Denver first: it is the district being judged. The three v1.1 domains are
+# registered into the frozen config at runtime and served from v1.1 choices.
+DOMAINS = ("denver", "upper_south_platte", "dillon", "larimer", "pueblo")
 LAST_ISSUE = pd.Timestamp("2026-09-22")
 HORIZONS = (2, 4, 8)
 
@@ -189,7 +191,7 @@ def historical_erc_range(
 
 
 def build_export() -> pd.DataFrame:
-    """Every issue through 2026-09-22, both domains, from the frozen model."""
+    """Every issue through 2026-09-22, every domain, from the frozen model."""
     from cofire.model.calibration_stages import arms
     from cofire.model.look3 import build_holdout
     from cofire.model.shipping import (
@@ -200,15 +202,26 @@ def build_export() -> pd.DataFrame:
         continuous_predict,
     )
     from cofire.model.shipping import load as load_choices
+    from cofire.ship import domains, fit_v11
 
-    choices = load_choices(out_dir=Path("artifacts/rerun_a"))
-    arm_by_h = arms()
+    domains.register()
+    frozen_choices = load_choices(out_dir=Path("artifacts/rerun_a"))
+    frozen_arms = arms()
     decisions = all_decisions()
     out_frames: list[pd.DataFrame] = []
 
     for dom in DOMAINS:
+        new = dom in domains.NEW
+        choices = fit_v11.load_choices(dom) if new else frozen_choices
+        arm_by_h = (
+            {str(h): a for h, a in fit_v11.continuous_arms(dom).items()} if new else frozen_arms
+        )
         frame, st = build_holdout(dom)
         frame["time"] = pd.to_datetime(frame["time"])
+        if new:
+            cells = {f"{la:.4f}_{lo:.4f}" for la, lo in domains.load()[dom]["cells"]}
+            frame = frame[frame["cell_id"].astype(str).isin(cells)].reset_index(drop=True)
+            assert frame["cell_id"].nunique() == len(cells), f"{dom}: footprint cells missing"
         t = frame["time"]
         train = frame[t <= pd.Timestamp(st.train_end)]
         issues = frame[(t > pd.Timestamp(st.calibrate_end)) & (t <= LAST_ISSUE)].copy()
