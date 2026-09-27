@@ -1664,3 +1664,62 @@ Denver is relative to its own record, not wildland fire danger in a city.
 Only f_gt97 falls short (6 weeks). The Denver Place Card therefore shows fire
 danger from the source watersheds, as planned, and Denver's own ERC targets
 are labeled as relative dryness wherever they appear.
+
+## v1.1 Stage 4: configuration A fitted per domain, selection leak-free
+
+`cofire/ship/fit_v11.py`. The frozen predictors are called unchanged: Markov
+for drought, damped logistic and ERC-decile transition for fire, damped
+regression and decile mean for the continuous percentile. The frozen
+`shipping.choose` is not used, because it runs folds without an embargo and
+with `erc_pct` pools that include the held-out year. Here every fold recomputes
+`erc_pct` from its own training years and drops training rows whose h-week
+label lands in the held-out year (asserted per fold).
+
+Split: train 2007 to 2021, validate 2022 to 2023, calibrate 2024 to 2025.
+Configuration A ships no calibrator, so 2024 to 2025 fit nothing and are not
+used for selection. Nothing touches 2026.
+
+**LODO folds** (training years whose footprint-mean USDM category exceeds that
+domain's 2007 to 2021 median):
+
+| Domain | median | folds |
+|---|---|---|
+| Denver | 0.2448 | 2010, 2011, 2012, 2013, 2017, 2020, 2021 |
+| Upper South Platte | 0.2509 | 2011, 2012, 2013, 2017, 2018, 2020, 2021 |
+| Dillon | 0.0114 | 2012, 2013, 2016, 2018, 2019, 2020, 2021 |
+| Larimer | 0.1609 | 2011, 2012, 2013, 2016, 2017, 2020, 2021 |
+| Pueblo | 0.4596 | 2011, 2012, 2013, 2014, 2018, 2020, 2021 |
+
+**Shared years, used for pooled selection: 2012, 2013, 2020, 2021.** Pueblo's
+list equals its frozen `DOMAIN_FOLDS`; Larimer's lacks 2018, which the frozen
+list carried only as a shared year.
+
+**Pooled selection.** Each domain is fitted on its own rows and scored on its
+own held-out rows in the shared years; arms are compared on the mean of the
+five per-domain scores, so Larimer's 480 cells do not outvote Denver's 52.
+
+| target | damped | transition | choice | frozen |
+|---|---|---|---|---|
+| f_gt80_h2 | 0.174596 | 0.177365 | damped | damped |
+| f_gt80_h4 | 0.201666 | 0.209206 | damped | damped |
+| f_gt80_h8 | 0.219477 | 0.226171 | damped | damped |
+| f_gt90_h2 | 0.129711 | 0.131327 | damped | damped |
+| f_gt90_h4 | 0.147308 | 0.151422 | damped | damped |
+| f_gt90_h8 | 0.156306 | 0.160380 | damped | damped |
+| f_gt97_h2 | 0.062546 | 0.063116 | damped | damped |
+| f_gt97_h4 | 0.067233 | 0.068372 | damped | damped |
+| f_gt97_h8 | 0.068140 | 0.069726 | damped | damped |
+
+Continuous arm: damped regression at h2, h4 and h8 (all 15 domain-horizon
+comparisons), matching the frozen choice. Drought: Markov, the only candidate.
+
+On each domain's own folds damped wins 40 of 45 fire targets. The five
+exceptions are all h2 in the watersheds (Dillon f_gt90, f_gt97; Upper South
+Platte f_gt80, f_gt90, f_gt97), by at most 0.00043 Brier. Selection is pooled
+by design, so damped ships in all five domains.
+
+**Artifacts.** `artifacts/v11/choices.json` and `continuous_arms.json`, each
+with a fit window 2007-01-01 to 2021-12-31, scope train, loaded through the
+frozen strict `checked_load` (tested to raise on a window past 2021).
+Larimer and Pueblo keep `artifacts/rerun_a`, so the frozen config hash is
+unchanged.

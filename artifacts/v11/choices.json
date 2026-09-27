@@ -1,0 +1,245 @@
+[
+  {
+    "target": "d_ge2_h2",
+    "horizon": 2,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.058658,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_ge2_h4",
+    "horizon": 4,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.106514,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_ge2_h8",
+    "horizon": 8,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.191536,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_ge3_h2",
+    "horizon": 2,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.044344,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_ge3_h4",
+    "horizon": 4,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.082318,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_ge3_h8",
+    "horizon": 8,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.142807,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_improve1_h2",
+    "horizon": 2,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.066051,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_improve1_h4",
+    "horizon": 4,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.113233,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_improve1_h8",
+    "horizon": 8,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.174165,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_intensify1_h2",
+    "horizon": 2,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.080569,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_intensify1_h4",
+    "horizon": 4,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.13831,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_intensify1_h8",
+    "horizon": 8,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.20354,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_intensify2_h2",
+    "horizon": 2,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.006811,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_intensify2_h4",
+    "horizon": 4,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.026579,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_intensify2_h8",
+    "horizon": 8,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.0776,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_nochange_h2",
+    "horizon": 2,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.132571,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_nochange_h4",
+    "horizon": 4,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.205485,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "d_nochange_h8",
+    "horizon": 8,
+    "family": "markov",
+    "pooled": false,
+    "lodo_brier": 0.263986,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt80_h2",
+    "horizon": 2,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.174596,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt80_h4",
+    "horizon": 4,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.201666,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt80_h8",
+    "horizon": 8,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.219477,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt90_h2",
+    "horizon": 2,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.129711,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt90_h4",
+    "horizon": 4,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.147308,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt90_h8",
+    "horizon": 8,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.156306,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt97_h2",
+    "horizon": 2,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.062546,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt97_h4",
+    "horizon": 4,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.067233,
+    "reliability": NaN,
+    "resolution": NaN
+  },
+  {
+    "target": "f_gt97_h8",
+    "horizon": 8,
+    "family": "damped",
+    "pooled": false,
+    "lodo_brier": 0.06814,
+    "reliability": NaN,
+    "resolution": NaN
+  }
+]
