@@ -103,3 +103,33 @@ def test_the_export_guard_is_the_one_build_export_calls() -> None:
     from cofire.ship import export
 
     assert "publishable_weeks(" in inspect.getsource(export.build_export)
+
+
+def test_the_ci_ceiling_is_three_times_the_measured_run() -> None:
+    from cofire.ship import ci_budget
+
+    assert ci_budget.CEILING_BYTES == 3 * ci_budget.PER_RUN_BYTES == 10_778_277
+
+
+def test_the_ci_check_fails_a_run_over_its_ceiling(tmp_path: Path) -> None:
+    import json
+
+    from cofire.ship import ci_budget
+
+    led = tmp_path / "ci.json"
+    rows = [{"source": "USDM-weekly", "url": "https://x", "bytes": b, "timestamp": "t",
+             "note": f"session={s}; sha256=0"} for s, b in (("refresh-1", 3_000_000), ("refresh-2", 12_000_000))]
+    led.write_text(json.dumps({"transfers": rows}))
+    assert ci_budget.check("refresh-1", led)["ok"]
+    over = ci_budget.check("refresh-2", led)
+    assert not over["ok"] and over["bytes"] == 12_000_000
+
+
+def test_ci_transfers_go_to_their_own_ledger(monkeypatch: pytest.MonkeyPatch) -> None:
+    from cofire.ship import ci_budget, refresh
+
+    monkeypatch.setenv("COFIRE_LEDGER_PATH", str(ci_budget.CI_LEDGER))
+    led = refresh._ledger()
+    assert led.path == ci_budget.CI_LEDGER and led.budget_bytes == ci_budget.CI_BUDGET_BYTES
+    monkeypatch.delenv("COFIRE_LEDGER_PATH")
+    assert refresh._ledger().path == Path("data/ledger.json")

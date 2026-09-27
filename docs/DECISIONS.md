@@ -2116,3 +2116,24 @@ export now runs to 2026-09-22 with real USDM at that week.
 accepted, logged and versioned; a revision outside it fails the gate and
 leaves no vintage; an old issue's series is identical after a new vintage
 lands, and its pin cannot move; a vintage cannot be overwritten.
+
+## v1.1: the weekly refresh has its own ledger and a per-run ceiling
+
+CI transfers go to `artifacts/ci/ledger.json` (`COFIRE_LEDGER_PATH`), no longer
+to the local project ledger. The six transfers the first two CI runs recorded
+locally (2,310 bytes) were copied there, and a correction was appended to the
+local ledger taking them out of its total, with the entries left as written.
+
+**Measured per-run size: 3,592,759 bytes.** Largest 2026 weekly USDM map,
+3,412,666 B (38 maps; median 2,355,010). Plus ERC for five domains, 180,093 B
+(7 new days and the 14-day re-read, one gate day, the DDS, all DAP2 wire bytes
+by the refresh's own formula). The data pack restored from the release asset
+is GitHub-internal and not a source transfer.
+
+**Ceiling: 3 x 3,592,759 = 10,778,277 bytes per run.** It is the run's session
+cap, so `safe_fetch` and the ERC reader refuse any transfer that would cross
+it. A check step (`python -m cofire.ship.ci_budget check`) then fails the job
+with an error annotation if the run's total exceeds it, and writes the total
+to the job summary. The allowlist, redirect check, magic-byte check and
+error-page rejection run in CI through the same code as locally. The CI
+ledger's own budget is a 1.0 GB backstop.

@@ -1,0 +1,52 @@
+{
+  "budget_bytes": 1000000000,
+  "recorded_bytes": 2310,
+  "correction_bytes": 0,
+  "total_bytes": 2310,
+  "remaining_bytes": 999997690,
+  "corrections": [],
+  "transfers": [
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:10:04+00:00",
+      "note": "session=refresh-36350647529; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:10:06+00:00",
+      "note": "session=refresh-36350647529; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:10:07+00:00",
+      "note": "session=refresh-36350647529; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:20:00+00:00",
+      "note": "session=refresh-36351274426; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:20:02+00:00",
+      "note": "session=refresh-36351274426; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-09-27T21:20:02+00:00",
+      "note": "session=refresh-36351274426; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    }
+  ]
+}

@@ -61,8 +61,12 @@ EXPORT = Path("artifacts/ship/forecast_issues.parquet")
 
 def _ledger() -> Any:
     from cofire.model.data.ledger import DownloadLedger
+    from cofire.ship.ci_budget import CI_BUDGET_BYTES, CI_LEDGER, ledger_path
 
-    return DownloadLedger(Path("data/ledger.json"))
+    path = ledger_path()
+    if path == CI_LEDGER:
+        return DownloadLedger(path, budget_bytes=CI_BUDGET_BYTES)
+    return DownloadLedger(path)
 
 
 def usdm_week(week: pd.Timestamp, ledger: Any) -> dict[str, Any]:

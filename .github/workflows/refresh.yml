@@ -23,9 +23,13 @@ jobs:
     env:
       OMP_NUM_THREADS: "2"
       COFIRE_DEV_SUBSET: "1"
-      # Each run is its own budget line in data/ledger.json.
+      # CI transfers go to their own ledger, not the local project ledger.
+      # Each run is one session, capped at 3x the measured steady-state run
+      # (cofire/ship/ci_budget.py): safe_fetch refuses a transfer that would
+      # cross it, and the check step fails the job if the total does.
+      COFIRE_LEDGER_PATH: artifacts/ci/ledger.json
       COFIRE_FETCH_SESSION: refresh-${{ github.run_id }}
-      COFIRE_FETCH_SESSION_CAP: "50000000"
+      COFIRE_FETCH_SESSION_CAP: "10778277"
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +48,9 @@ jobs:
           uv run python -m cofire.ship.datapack restore "$RUNNER_TEMP/cofire-datapack.tar.gz"
       - name: Refresh
         run: uv run python -m cofire.ship.runner refresh -- uv run python -m cofire.ship.refresh
+      - name: Per-run download ceiling
+        if: always()
+        run: uv run python -m cofire.ship.ci_budget check
       - name: Checks
         run: uv run pytest -q tests/test_frozen_model.py tests/test_delayed_feedback_gate.py tests/test_historical_range.py tests/test_rendering.py tests/test_refresh.py tests/test_bundles.py tests/test_vintages.py tests/test_usdm_calendar.py
       - name: Save the data pack
@@ -54,7 +61,7 @@ jobs:
         run: |
           git config user.name "cofire-refresh"
           git config user.email "cofire-refresh@users.noreply.github.com"
-          git add artifacts/ship/forecast_issues.parquet artifacts/ship/refresh_log.json artifacts/ship/issue_vintages.json artifacts/vintages data/ledger.json demo app/lib/story.json
+          git add artifacts/ship/forecast_issues.parquet artifacts/ship/refresh_log.json artifacts/ship/issue_vintages.json artifacts/vintages artifacts/ci/ledger.json demo app/lib/story.json
           if git diff --cached --quiet; then
             echo "nothing new this week"
           else

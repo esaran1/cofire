@@ -1,15 +1,21 @@
 {
   "budget_bytes": 3000000000,
   "recorded_bytes": 4420300599,
-  "correction_bytes": -1477699344,
-  "total_bytes": 2942601255,
-  "remaining_bytes": 57398745,
+  "correction_bytes": -1477701654,
+  "total_bytes": 2942598945,
+  "remaining_bytes": 57401055,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
       "reason": "ESI windowed reads were charged a flat per-file estimate. Measured over the wire by issuing the exact byte ranges a windowed read needs: 16-17 strips of 28800 B plus a 65536 B header = 555136 B. The original entries are left exactly as recorded.",
       "delta_bytes": -1477699344,
       "evidence": "larimer rows 980..995 -> 460800 + 65536 = 526336 B; pueblo rows 1029..1045 -> 489600 + 65536 = 555136 B; full file Content-Length 86424366 B"
+    },
+    {
+      "at": "2026-09-27T22:22:16.232705+00:00",
+      "reason": "The weekly refresh on GitHub now records to its own ledger (artifacts/ci/ledger.json). Its first transfers, recorded here before the split, are copied there and taken out of this total; the entries themselves are left as written.",
+      "delta_bytes": -2310,
+      "evidence": "2026-09-27T21:10:04+00:00 385 B session=refresh-36350647529; 2026-09-27T21:10:06+00:00 385 B session=refresh-36350647529; 2026-09-27T21:10:07+00:00 385 B session=refresh-36350647529; 2026-09-27T21:20:00+00:00 385 B session=refresh-36351274426; 2026-09-27T21:20:02+00:00 385 B session=refresh-36351274426; 2026-09-27T21:20:02+00:00 385 B session=refresh-36351274426"
     }
   ],
   "transfers": [
