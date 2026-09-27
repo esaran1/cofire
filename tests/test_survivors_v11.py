@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 
 import pandas as pd
-
 from cofire.ship import survivors_v11
 
 T = pd.read_csv(survivors_v11.OUT / "survivors_v11.csv")
