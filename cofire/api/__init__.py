@@ -457,8 +457,36 @@ def post_prediction(body: PredictionIn) -> dict[str, Any]:
         if c["cell_id"] == body.cell_id and c["issue"] == issue:
             locked = c
             break
-    hz = (locked or {}).get("horizons", {}).get(str(body.horizon), {})
+    hz = dict((locked or {}).get("horizons", {}).get(str(body.horizon), {}))
+    hz.update(_likely_category(locked, body.horizon))
     return {"id": pid, "locked_model": hz, "issue": issue}
+
+
+def _likely_category(cell: dict[str, Any] | None, horizon: int) -> dict[str, Any]:
+    """The drought category the model makes most likely at the horizon, and its chance.
+
+    The shipped drought model gives event probabilities, not a category: easing
+    by one, staying, worsening by one, worsening by two or more, all from the
+    current category. Their largest is the model's pick to set beside the
+    player's. Categories run 0 (none or D0) to 4.
+    """
+    if not cell or cell.get("usdm") is None:
+        return {"drought_likely": None, "drought_likely_p": None}
+    t = cell.get("targets", {})
+
+    def p(name: str) -> float:
+        v = (t.get(f"{name}_h{horizon}") or {}).get("p")
+        return float(v) if v is not None else 0.0
+
+    now = int(round(float(cell["usdm"])))
+    options = {
+        max(now - 1, 0): p("d_improve1") if now > 0 else 0.0,
+        now: p("d_nochange"),
+        min(now + 1, 4): max(p("d_intensify1") - p("d_intensify2"), 0.0),
+        min(now + 2, 4): p("d_intensify2"),
+    }
+    cat, chance = max(options.items(), key=lambda kv: kv[1])
+    return {"drought_now": now, "drought_likely": cat, "drought_likely_p": round(chance, 4)}
 
 
 @app.get("/predictions/me")

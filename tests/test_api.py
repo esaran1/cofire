@@ -145,3 +145,22 @@ def test_every_credit_is_complete() -> None:
     assert {"OpenStreetMap", "U.S. Drought Monitor", "gridMET", "High Park fire photo"} <= names
     for c in credits:
         assert c["license"] and c["credit"] and c["url"].startswith("https://")
+
+
+def test_the_model_pick_is_the_most_likely_drought_category() -> None:
+    from cofire.api import _likely_category
+
+    cell = {"usdm": 2.0, "targets": {
+        "d_improve1_h4": {"p": 0.10}, "d_nochange_h4": {"p": 0.48},
+        "d_intensify1_h4": {"p": 0.42}, "d_intensify2_h4": {"p": 0.05}}}
+    assert _likely_category(cell, 4) == {"drought_now": 2, "drought_likely": 2, "drought_likely_p": 0.48}
+    cell["targets"]["d_nochange_h4"]["p"] = 0.20
+    assert _likely_category(cell, 4)["drought_likely"] == 3  # 0.42 - 0.05 = 0.37 to D3
+    assert _likely_category(None, 4)["drought_likely"] is None
+
+
+def test_a_locked_pick_returns_the_model_numbers_the_page_shows() -> None:
+    r = client.post("/predictions", json={"device_id": "t-lock", "cell_id": "39.7750_-104.8500",
+                                          "horizon": 4, "drought_category": 2, "fire_band": "high"})
+    m = r.json()["locked_model"]
+    assert {"point", "drought_likely", "drought_likely_p"} <= set(m)

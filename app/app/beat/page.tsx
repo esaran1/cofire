@@ -25,7 +25,14 @@ const CATEGORIES = DROUGHT_CATEGORIES;
 const BANDS = FIRE_BANDS;
 
 type Pick = { cell_id: string; horizon: number; drought_category: number; fire_band: string; issue: string };
-type Locked = { drought_point?: number | null; fire_index?: number | null };
+// What the model said for the same cell and horizon: the dryness percentile
+// (0 to 100) and the drought category it makes most likely, with its chance.
+type Locked = {
+  point?: number | null;
+  drought_now?: number | null;
+  drought_likely?: number | null;
+  drought_likely_p?: number | null;
+};
 
 function BeatInner() {
   const params = useSearchParams();
@@ -159,19 +166,28 @@ function BeatInner() {
               <div className="mt-3 grid grid-cols-2 gap-4">
                 <div>
                   <Numeral
-                    value={locked.drought_point !== null && locked.drought_point !== undefined ? locked.drought_point.toFixed(1) : "n/a"}
+                    value={
+                      locked.drought_likely !== null && locked.drought_likely !== undefined
+                        ? (CATEGORIES.find((c) => c.value === locked.drought_likely)?.label ?? "n/a")
+                        : "n/a"
+                    }
                     tone="ochre"
                     size="xl"
                   />
-                  <p className="mt-1 text-xs text-ink-soft">drought category</p>
+                  <p className="mt-1 text-xs text-ink-soft">
+                    most likely drought category in 4 weeks
+                    {locked.drought_likely_p !== null && locked.drought_likely_p !== undefined
+                      ? `, ${Math.round(locked.drought_likely_p * 100)}% chance`
+                      : ""}
+                  </p>
                 </div>
                 <div>
                   <Numeral
-                    value={locked.fire_index !== null && locked.fire_index !== undefined ? locked.fire_index.toFixed(0) : "n/a"}
+                    value={locked.point !== null && locked.point !== undefined ? locked.point.toFixed(0) : "n/a"}
                     tone="ember"
                     size="xl"
                   />
-                  <p className="mt-1 text-xs text-ink-soft">fire-spread index</p>
+                  <p className="mt-1 text-xs text-ink-soft">dryness in 4 weeks, out of 100 (50 is typical)</p>
                 </div>
               </div>
               <p className="mt-4 text-xs leading-relaxed text-ink-soft">
