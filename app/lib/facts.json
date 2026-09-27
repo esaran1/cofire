@@ -1,7 +1,7 @@
 {
   "generated_from": "artifacts/",
   "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
-  "git_sha": "64c628e95be3ca4ba894bc47d8d3f37b77447fe8",
+  "git_sha": "a22fcc7fa4580ad3a834dbb74a349ca8c8404068",
   "resolution_m": 4000,
   "domains": [
     "denver",
@@ -43,6 +43,50 @@
     "agreement_rule": "passes in every domain where the target is estimable, and in at least two domains",
     "agreeing_targets": []
   },
+  "credits": [
+    {
+      "name": "gridMET",
+      "use": "fuel dryness (ERC)",
+      "license": "freely available; citation requested",
+      "credit": "Abatzoglou, J. T. (2013), International Journal of Climatology 33: 121-131.",
+      "url": "https://www.climatologylab.org/gridmet.html"
+    },
+    {
+      "name": "U.S. Drought Monitor",
+      "use": "drought categories",
+      "license": "free to use with credit",
+      "credit": "The U.S. Drought Monitor is jointly produced by the National Drought Mitigation Center at the University of Nebraska-Lincoln, the United States Department of Agriculture, and the National Oceanic and Atmospheric Administration. Map courtesy of NDMC.",
+      "url": "https://droughtmonitor.unl.edu"
+    },
+    {
+      "name": "USGS Watershed Boundary Dataset and NHD",
+      "use": "watershed and reservoir boundaries",
+      "license": "U.S. public domain",
+      "credit": "U.S. Geological Survey.",
+      "url": "https://www.usgs.gov/national-hydrography"
+    },
+    {
+      "name": "U.S. Census Bureau cartographic boundaries",
+      "use": "county boundaries",
+      "license": "U.S. public domain",
+      "credit": "U.S. Census Bureau, 2023 cartographic boundary files.",
+      "url": "https://www.census.gov/geographies/mapping-files.html"
+    },
+    {
+      "name": "OpenStreetMap",
+      "use": "map tiles",
+      "license": "ODbL; tiles CC BY-SA",
+      "credit": "\u00a9 OpenStreetMap contributors.",
+      "url": "https://www.openstreetmap.org/copyright"
+    },
+    {
+      "name": "High Park fire photo",
+      "use": "landing page",
+      "license": "CC BY 2.0",
+      "credit": "High Park fire near Poudre Canyon, Colorado, 2012. Photo by DVIDSHUB, via Wikimedia Commons.",
+      "url": "https://commons.wikimedia.org/wiki/File:High_Park_fire_near_Poudre_Canyon,_Colorado.jpg"
+    }
+  ],
   "survivors": [
     {
       "domain": "denver",
@@ -2790,12 +2834,12 @@
     }
   ],
   "ledger": {
-    "total_bytes": 2942252938,
+    "total_bytes": 2942598945,
     "budget_bytes": 3000000000,
-    "remaining_bytes": 57747062,
-    "total_gb": 2.942,
-    "n_transfers": 4203,
-    "n_corrections": 1
+    "remaining_bytes": 57401055,
+    "total_gb": 2.943,
+    "n_transfers": 4210,
+    "n_corrections": 2
   },
   "sources": [
     {

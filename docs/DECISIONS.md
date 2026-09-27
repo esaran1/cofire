@@ -2137,3 +2137,45 @@ with an error annotation if the run's total exceeds it, and writes the total
 to the job summary. The allowlist, redirect check, magic-byte check and
 error-page rejection run in CI through the same code as locally. The CI
 ledger's own budget is a 1.0 GB backstop.
+
+## v1.1: preparing for a public repository
+
+Visibility and ownership are unchanged; making the repository public is a
+manual step for the owner.
+
+**Secrets.** All 100 commits were scanned: common key and token formats
+(AWS, GitHub, OpenAI-style, Slack, Google API), private-key blocks,
+credential assignments with values, tracked `.env` files, databases and logs,
+home-directory and scratch paths. None found. The only env file ever tracked
+is `.env.example`, whose credentials are blank in every revision. Two personal
+identifiers would become public, and git history keeps them whatever the
+current tree says, so they are the owner's call:
+`tech.mahi@gmail.com` as the tile-policy contact in `app/lib/basemap.ts`, and
+the commit author address `evan.msaran@gmail.com` on 97 commits.
+
+**Licenses.** Inventory in `docs/THIRD_PARTY.md`. Changes:
+
+- The landing photo's credit lacked the author and license link that CC BY
+  2.0 requires. It now reads "Photo by DVIDSHUB, CC BY 2.0, via Wikimedia
+  Commons", with links, matching the Commons file metadata.
+- The OpenStreetMap attribution now links to openstreetmap.org/copyright.
+- The Method page gains a credits section from `facts.json`: gridMET citation,
+  the USDM credit line, USGS, Census, OpenStreetMap, the photo.
+- An unused, uncredited CC BY image (`westfork.jpg`) was removed.
+- Fonts (SIL OFL) and code libraries (MIT, BSD, Apache-2.0, NCSA) need no
+  on-screen credit.
+- The repository has no LICENSE; choosing one is the owner's decision.
+
+**Size.** Largest tracked file 2,194,539 bytes
+(`artifacts/ship/forecast_issues.parquet`); nothing near 50 MB. Largest blob
+ever in history: 12,826,197 bytes (a demo index since removed).
+
+**`AI_USAGE.md`** rewritten from what the repository records:
+
+- The owner directed the research through written instructions.
+- The agent generated effectively every file: 96 of 100 commits carry its
+  co-author trailer, 3 are the automated refresh, and the untrailed initial
+  scaffold's own `AI_USAGE.md` lists its files as agent-generated.
+- The four files once marked "intended for hand-rewrite" show no hand rewrite
+  in history.
+- A section for the student's own contributions is left blank for the student.

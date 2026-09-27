@@ -48,6 +48,6 @@ What ships: a Markov transition model for drought targets, a damped-persistence 
 
 Uncertainty: no forecast band is drawn; see the correction above. Any method that updates as outcomes arrive must pass the delayed-feedback gate in `tests/test_delayed_feedback_gate.py`, which checks that no update uses an observation unavailable at issue time.
 
-A 2020–2025 science-fair project (*Beyond the Forecast*) is **prior art by a different author**. It is cited in `docs/PRIOR_ART.md`. Nothing from it is copied. What is new here is the Colorado domain, fire-condition targets, a fuel-moisture constraint, conformal calibration, and this app.
+A 2020–2025 science-fair project (*Beyond the Forecast*) is **prior art by a different author**. It is cited in `docs/PRIOR_ART.md`. Nothing from it is copied. What is new here is the Colorado domains, fire-condition targets, the leak-free evaluation, and this app.
 
-Student-owned modules (rewrite these): `features.py`, `train.py`, `conformal.py`, `models/pi_convlstm.py`. Table: `AI_USAGE.md`.
+Who wrote what, and who directed the research: [`AI_USAGE.md`](AI_USAGE.md). Third-party data, map tiles, photo, fonts and libraries, with their terms: [`docs/THIRD_PARTY.md`](docs/THIRD_PARTY.md).

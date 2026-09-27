@@ -133,6 +133,22 @@ export default function AboutPage() {
         </p>
       </Section>
 
+      <Section title="Credits and licenses">
+        <ul className="border-rule mt-4 divide-y divide-rule border-y" data-testid="credits">
+          {facts.credits.map((c) => (
+            <li key={c.name} className="py-3">
+              <p className="text-sm">
+                <a href={c.url} className="underline underline-offset-2">
+                  {c.name}
+                </a>
+                <span className="text-mute">, {c.use}. {c.license}.</span>
+              </p>
+              <p className="text-ink-soft mt-1 text-xs leading-relaxed">{c.credit}</p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
       <Section title="Provenance">
         <div className="mt-4">
           <StatRow label="Training" value={facts.split.train} />

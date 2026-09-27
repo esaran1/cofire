@@ -310,6 +310,35 @@ def _sources() -> list[dict[str, Any]]:
     ]
 
 
+def _credits() -> list[dict[str, str]]:
+    """Every third-party asset the app shows or is built from, with its terms.
+
+    Rendered on the Method page. docs/THIRD_PARTY.md holds the same list with
+    the fonts and code libraries, whose licenses need no on-screen credit.
+    """
+    return [
+        {"name": "gridMET", "use": "fuel dryness (ERC)", "license": "freely available; citation requested",
+         "credit": "Abatzoglou, J. T. (2013), International Journal of Climatology 33: 121-131.",
+         "url": "https://www.climatologylab.org/gridmet.html"},
+        {"name": "U.S. Drought Monitor", "use": "drought categories", "license": "free to use with credit",
+         "credit": "The U.S. Drought Monitor is jointly produced by the National Drought Mitigation Center at "
+                   "the University of Nebraska-Lincoln, the United States Department of Agriculture, and the "
+                   "National Oceanic and Atmospheric Administration. Map courtesy of NDMC.",
+         "url": "https://droughtmonitor.unl.edu"},
+        {"name": "USGS Watershed Boundary Dataset and NHD", "use": "watershed and reservoir boundaries",
+         "license": "U.S. public domain", "credit": "U.S. Geological Survey.",
+         "url": "https://www.usgs.gov/national-hydrography"},
+        {"name": "U.S. Census Bureau cartographic boundaries", "use": "county boundaries",
+         "license": "U.S. public domain", "credit": "U.S. Census Bureau, 2023 cartographic boundary files.",
+         "url": "https://www.census.gov/geographies/mapping-files.html"},
+        {"name": "OpenStreetMap", "use": "map tiles", "license": "ODbL; tiles CC BY-SA",
+         "credit": "© OpenStreetMap contributors.", "url": "https://www.openstreetmap.org/copyright"},
+        {"name": "High Park fire photo", "use": "landing page", "license": "CC BY 2.0",
+         "credit": "High Park fire near Poudre Canyon, Colorado, 2012. Photo by DVIDSHUB, via Wikimedia Commons.",
+         "url": "https://commons.wikimedia.org/wiki/File:High_Park_fire_near_Poudre_Canyon,_Colorado.jpg"},
+    ]
+
+
 def build() -> dict[str, Any]:
     return {
         "generated_from": "artifacts/",
@@ -345,6 +374,7 @@ def build() -> dict[str, Any]:
         "config_hash": json.loads((LOOK3 / "provenance.json").read_text())["config_hash"]
         if (LOOK3 / "provenance.json").exists() else "",
         "multiplicity": _multiplicity_summary(),
+        "credits": _credits(),
         "survivors": _survivors(),
         "subx": _subx(),
         "look3": _look3(),

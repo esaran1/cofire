@@ -42,7 +42,7 @@ function osmStyle(): maplibregl.StyleSpecification {
         tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
         tileSize: 256,
         maxzoom: 19,
-        attribution: "© OpenStreetMap contributors",
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       },
     },
     layers: [{ id: "basemap", type: "raster", source: "basemap" }],
@@ -61,7 +61,8 @@ function selfhostStyle(): maplibregl.StyleSpecification {
       basemap: {
         type: "vector",
         url: `pmtiles://${SELFHOST_PMTILES}`,
-        attribution: "© OpenStreetMap contributors, © Protomaps",
+        attribution:
+          '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://protomaps.com">Protomaps</a>',
       },
     },
     layers: [

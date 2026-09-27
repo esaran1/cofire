@@ -134,3 +134,14 @@ def test_domain_index_and_bundles() -> None:
 def test_city_ember_zone_is_served() -> None:
     assert client.get("/ember/checklist?zone=city").json()["zone"] == "city"
     assert client.get("/ember/checklist?zone=nowhere").status_code == 400
+
+
+def test_every_credit_is_complete() -> None:
+    import json
+    from pathlib import Path
+
+    credits = json.loads(Path("app/lib/facts.json").read_text())["credits"]
+    names = {c["name"] for c in credits}
+    assert {"OpenStreetMap", "U.S. Drought Monitor", "gridMET", "High Park fire photo"} <= names
+    for c in credits:
+        assert c["license"] and c["credit"] and c["url"].startswith("https://")

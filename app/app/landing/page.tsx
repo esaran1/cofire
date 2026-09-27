@@ -64,7 +64,22 @@ export default function LandingPage() {
       <PhotoChapter
         src={asset("/img/hero-highpark.jpg")}
         alt="The sun seen through heavy smoke from the High Park Fire above Poudre Canyon, Colorado"
-        credit="High Park Fire above Poudre Canyon. Photo CC BY 2.0 via Wikimedia Commons."
+        credit={
+          <>
+            High Park fire near Poudre Canyon, Colorado, 2012. Photo by DVIDSHUB,{" "}
+            <a className="underline" href="https://creativecommons.org/licenses/by/2.0/">
+              CC BY 2.0
+            </a>
+            , via{" "}
+            <a
+              className="underline"
+              href="https://commons.wikimedia.org/wiki/File:High_Park_fire_near_Poudre_Canyon,_Colorado.jpg"
+            >
+              Wikimedia Commons
+            </a>
+            .
+          </>
+        }
       >
         <h2 className="display text-paper max-w-[16ch] text-5xl md:text-7xl">
           Colorado dries out weeks <em className="text-paper">before</em> it burns.
@@ -230,7 +245,7 @@ function PhotoChapter({
 }: {
   src: string;
   alt: string;
-  credit: string;
+  credit: React.ReactNode;
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
