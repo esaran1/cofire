@@ -45,7 +45,7 @@ jobs:
       - name: Refresh
         run: uv run python -m cofire.ship.runner refresh -- uv run python -m cofire.ship.refresh
       - name: Checks
-        run: uv run pytest -q tests/test_frozen_model.py tests/test_delayed_feedback_gate.py tests/test_historical_range.py tests/test_rendering.py tests/test_refresh.py tests/test_bundles.py
+        run: uv run pytest -q tests/test_frozen_model.py tests/test_delayed_feedback_gate.py tests/test_historical_range.py tests/test_rendering.py tests/test_refresh.py tests/test_bundles.py tests/test_vintages.py tests/test_usdm_calendar.py
       - name: Save the data pack
         run: |
           uv run python -m cofire.ship.datapack pack "$RUNNER_TEMP/cofire-datapack.tar.gz"
@@ -54,7 +54,7 @@ jobs:
         run: |
           git config user.name "cofire-refresh"
           git config user.email "cofire-refresh@users.noreply.github.com"
-          git add artifacts/ship/forecast_issues.parquet artifacts/ship/refresh_log.json data/ledger.json demo app/lib/story.json
+          git add artifacts/ship/forecast_issues.parquet artifacts/ship/refresh_log.json artifacts/ship/issue_vintages.json artifacts/vintages data/ledger.json demo app/lib/story.json
           if git diff --cached --quiet; then
             echo "nothing new this week"
           else

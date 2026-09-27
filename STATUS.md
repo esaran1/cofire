@@ -45,14 +45,17 @@ refuses any store, export or refresh built on a year that lacks one of its
 Tuesdays (`cofire/ship/usdm_calendar.py`), and the export refuses any
 published week without its map.
 
-**gridMET revised its 2026 file after the stores were built.** Re-reading
-Larimer and Pueblo's 2026 ERC through the reconciled path disagrees with the
-stored copy on 203 and 184 of 261 days since late February, by up to 20 ERC
-units. The same path reproduces June 2025 exactly (14,880 cell-days,
-max|diff| 0), so the difference is the server's revision, not the fetch. The
-refresh gate refused the revised record, and both counties stay on their
-stored, reconciled 2026 data until adopting the revision is decided
-(`COFIRE_REGATE=1`). Record in `docs/DECISIONS.md`, v1.1 Stage 7.
+**gridMET revised its 2026 file after the stores were built; the revision is
+now a vintage.** A re-read on 27 September disagreed with the stores' copy of
+Larimer and Pueblo's 2026 ERC on 203 and 184 of 261 days, back to 28 February,
+by up to 20 ERC units, while the same path reproduces 2025 exactly. Data is now
+kept as vintages (`cofire/ship/vintages.py`): every fetch is stored and never
+overwritten, revisions inside a 240-day provisional window are accepted and
+logged with old and new values, anything older fails the gate, and each issue
+is pinned to the vintage it was built from. The revision was adopted as
+Larimer and Pueblo's second 2026 vintage (17,580 and 13,769 revised
+cell-days). The 37 issues already published keep the stores' vintage and
+reproduce exactly; 2026-09-22 onward uses the revision.
 
 ## Correction, 2026-09-26: interval results void, no forecast band shown
 

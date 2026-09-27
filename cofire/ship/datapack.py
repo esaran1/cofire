@@ -9,7 +9,7 @@ cut to what it needs:
   Same yearly and weekly zip layout, same DM column, so the frozen rasterizer
   reads them unchanged. `gate` proves the rasterized cubes are identical to the
   national archives' for every domain and week before a clipped archive is used.
-* The daily ERC extension caches, with their gate markers.
+* The daily ERC extension caches and every ERC vintage (cofire/ship/vintages.py).
 * Larimer and Pueblo's processed weekly cubes, ERC only (the builder reads
   `erc` and the grid), and their raw 2026 daily ERC (the gate's reference).
 
@@ -142,6 +142,7 @@ def gate(end: str = "2026-09-22") -> dict[str, Any]:
 def _members() -> list[Path]:
     keep: list[Path] = sorted(CLIPPED.glob("*_USDM_M.zip"))
     keep += sorted((DATA / "cache" / "erc_ext").glob("*"))
+    keep += sorted((DATA / "vintages").rglob("*.nc"))
     for proc in sorted(DATA.glob("processed*")):
         keep += sorted((proc / "gridmet").glob("weekly_*.nc"))
     keep += sorted((DATA / "raw").glob("gridmet*/erc_2026.nc"))

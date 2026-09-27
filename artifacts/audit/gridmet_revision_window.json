@@ -1,0 +1,46 @@
+{
+ "larimer": {
+  "v0_last_day": "2026-09-18",
+  "earliest_revised_day": "2026-02-28",
+  "reach_days": 202,
+  "share_of_cell_days_revised_by_month_2026": {
+   "1": 0.0,
+   "2": 0.0,
+   "3": 0.088,
+   "4": 0.147,
+   "5": 0.169,
+   "6": 0.12,
+   "7": 0.168,
+   "8": 0.285,
+   "9": 0.366
+  },
+  "q4_2025_vs_stored": {
+   "ok": true,
+   "n": 44160,
+   "max_abs": 0.0
+  },
+  "q4_bytes": 182044
+ },
+ "pueblo": {
+  "v0_last_day": "2026-09-18",
+  "earliest_revised_day": "2026-03-04",
+  "reach_days": 198,
+  "share_of_cell_days_revised_by_month_2026": {
+   "1": 0.0,
+   "2": 0.0,
+   "3": 0.002,
+   "4": 0.015,
+   "5": 0.075,
+   "6": 0.041,
+   "7": 0.123,
+   "8": 0.436,
+   "9": 0.582
+  },
+  "q4_2025_vs_stored": {
+   "ok": true,
+   "n": 39744,
+   "max_abs": 0.0
+  },
+  "q4_bytes": 164348
+ }
+}

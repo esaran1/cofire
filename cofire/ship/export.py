@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
@@ -270,81 +271,86 @@ def latest_published(now: pd.Timestamp | None = None) -> pd.Timestamp:
     return t
 
 
-def gated(domain: str, year: int) -> bool:
-    """Whether a store domain's daily record for `year` passed the refresh gate."""
-    from cofire.model.data import erc_extension as ext
-
-    return ext.cache_path(domain, year).with_suffix(".gated.json").exists()
+CURRENT_YEAR = 2026
+STORE_DOMAINS = ("larimer", "pueblo")
 
 
-def erc_complete_issue(domain: str, year: int = 2026) -> pd.Timestamp:
-    """The last Tuesday whose seven ERC days are all in the record this export uses.
+def erc_complete_issue(domain: str, year: int = CURRENT_YEAR) -> pd.Timestamp:
+    """The last Tuesday whose seven ERC days are all in the domain's latest vintage."""
+    from cofire.ship import vintages
 
-    New domains and gated store domains use the daily extension record; an
-    ungated store domain uses its processed cube, which was built from the raw
-    daily file, so that file's last day bounds it.
-    """
-    import xarray as xr
-
-    from cofire.model.data import erc_extension as ext
-    from cofire.ship import build_v11, domains
-
-    if domain in domains.NEW or gated(domain, year):
-        with xr.open_dataset(ext.cache_path(domain, year)) as ds:
-            last = pd.Timestamp(ds["day"].values[-1])
-    else:
-        raw = ext.reference_daily(year, build_v11.settings(domain))
-        if raw is None:
-            raise SystemExit(f"{domain}: no daily ERC for {year}")
-        last = pd.Timestamp(raw[[d for d in raw.dims if d in ("day", "time")][0]].values[-1])
+    last = pd.Timestamp(vintages.assemble(domain, year)["day"].values[-1])
     return last.normalize() - pd.Timedelta(days=(last.weekday() - 1) % 7)
 
 
-class _complete_weeks_view:
-    """Run the frozen issue-frame builder on complete weeks only, through `last`.
+class _vintage_view:
+    """Run the frozen issue-frame builder on one domain's ERC as of one vintage.
 
-    The frozen `look3.build_holdout` stops at its own LAST_ISSUE and takes
-    Larimer and Pueblo's 2026 weeks from the processed cube, whose final week
-    was averaged over whatever days existed when it was built. This points it
-    at a view of the data directory without the 2026 cubes, so 2026 weeks come
-    from the reconciled daily record, where a week missing any day is dropped
-    (`n_per_week >= 7` in `features_a.weekly_erc`). `cofire.ship.refresh`
-    gates that record against the cube on every complete week before use.
-    Nothing under cofire/model is edited; the module constant is set for the
-    call and restored.
+    The frozen `look3.build_holdout` stops at its own LAST_ISSUE, reads the
+    daily extension record from `data/cache/erc_ext` (relative to the working
+    directory) and takes Larimer and Pueblo's current-year weeks from the
+    processed cube. This builds a throwaway data directory whose current-year
+    daily file for `domain` is the series as of `as_of` and which holds no
+    current-year cube, so every current-year week comes from that vintage,
+    complete weeks only (`n_per_week >= 7` in `features_a.weekly_erc`). Nothing
+    under cofire/model is edited; the constant, the environment and the working
+    directory are set for the call and restored.
     """
 
-    def __init__(self, last: pd.Timestamp, year: int = 2026) -> None:
-        self.last, self.year = last, year
+    def __init__(self, last: pd.Timestamp, domain: str, as_of: pd.Timestamp, year: int = CURRENT_YEAR) -> None:
+        self.last, self.domain, self.as_of, self.year = last, domain, as_of, year
 
-    def __enter__(self) -> _complete_weeks_view:
+    def __enter__(self) -> _vintage_view:
         import tempfile
 
         from cofire.model import look3
         from cofire.model.config import get_settings
+        from cofire.ship import vintages
 
         self._look3, self._prev = look3, look3.LAST_ISSUE
         look3.LAST_ISSUE = self.last.date()
         self._env = os.environ.get("COFIRE_DATA_DIR")
+        self._cwd = Path.cwd()
         self._tmp = tempfile.TemporaryDirectory(prefix="cofire_view_")
-        root, data = Path(self._tmp.name), Path("data").resolve()
-        (root / "raw").symlink_to(data / "raw")
+        root = Path(self._tmp.name)
+        data = (self._cwd / "data").resolve()
+        (root / "data").mkdir()
+        (root / "data" / "raw").symlink_to(data / "raw")
         for proc in data.glob("processed*"):
-            gd = root / proc.name / "gridmet"
+            gd = root / "data" / proc.name / "gridmet"
             gd.mkdir(parents=True)
-            dom = "larimer" if proc.name == "processed" else proc.name.removeprefix("processed_")
             for cube in (proc / "gridmet").glob("weekly_*.nc"):
-                # Hide the year's cube only where a gated daily record replaces it.
-                if cube.name == f"weekly_{self.year}.nc" and gated(dom, self.year):
-                    continue
-                (gd / cube.name).symlink_to(cube)
-        os.environ["COFIRE_DATA_DIR"] = str(root)
+                if cube.name != f"weekly_{self.year}.nc":
+                    (gd / cube.name).symlink_to(cube)
+        cache = root / "data" / "cache" / "erc_ext"
+        cache.mkdir(parents=True)
+        mine = f"{self.domain}_{self.year}.nc"
+        for f in (data / "cache" / "erc_ext").glob("*.nc"):
+            if f.name != mine:
+                (cache / f.name).symlink_to(f)
+        if self.domain in STORE_DOMAINS:
+            # Larimer and Pueblo's stores hold one weekly cube per year,
+            # resampled from that year's days only, with the later year's cube
+            # winning the week that straddles New Year (frozen convention,
+            # `features_a.weekly_erc`). Their current-year cube is rebuilt from
+            # the vintage the same way, so a published issue reproduces exactly
+            # and a new one follows the convention its training data follows.
+            proc = root / "data" / ("processed" if self.domain == "larimer" else f"processed_{self.domain}")
+            daily = vintages.assemble(self.domain, self.year, self.as_of).rename({"day": "time"})
+            daily.resample(time="W-TUE").mean().to_dataset(name="erc").to_netcdf(
+                proc / "gridmet" / f"weekly_{self.year}.nc"
+            )
+        else:
+            vintages.materialize(self.domain, self.year, cache / mine, self.as_of)
+        os.chdir(root)
+        os.environ["COFIRE_DATA_DIR"] = str(root / "data")
         get_settings.cache_clear()
         return self
 
     def __exit__(self, *exc: object) -> None:
         from cofire.model.config import get_settings
 
+        os.chdir(self._cwd)
         self._look3.LAST_ISSUE = self._prev
         if self._env is None:
             os.environ.pop("COFIRE_DATA_DIR", None)
@@ -383,67 +389,100 @@ def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | Non
     decisions = all_decisions()
     out_frames: list[pd.DataFrame] = []
 
+    from cofire.ship import vintages
+
+    pins = vintages.issue_vintages()
     for dom in DOMAINS:
         new = dom in domains.NEW
         choices = fit_v11.load_choices(dom) if new else frozen_choices
         arm_by_h = (
             {str(h): a for h, a in fit_v11.continuous_arms(dom).items()} if new else frozen_arms
         )
-        with _complete_weeks_view(pd.Timestamp(last_issue)):
-            frame, st = build_holdout(dom)
-            usdm_ok = usdm_weeks_available(st.raw_dir, range(2026, pd.Timestamp(last_issue).year + 1))
-        frame["time"] = pd.to_datetime(frame["time"])
-        if new:
-            cells = {f"{la:.4f}_{lo:.4f}" for la, lo in domains.load()[dom]["cells"]}
-            frame = frame[frame["cell_id"].astype(str).isin(cells)].reset_index(drop=True)
-            assert frame["cell_id"].nunique() == len(cells), f"{dom}: footprint cells missing"
+        latest = vintages.latest(dom, CURRENT_YEAR)
+        frames: dict[pd.Timestamp, tuple[pd.DataFrame, Any]] = {}
+
+        def frame_as_of(
+            as_of: pd.Timestamp, dom: str = dom, new: bool = new,
+            frames: dict[pd.Timestamp, tuple[pd.DataFrame, Any]] = frames,
+        ) -> tuple[pd.DataFrame, Any]:
+            if as_of not in frames:
+                with _vintage_view(pd.Timestamp(last_issue), dom, as_of):
+                    f, st = build_holdout(dom)
+                f["time"] = pd.to_datetime(f["time"])
+                if new:
+                    cells = {f"{la:.4f}_{lo:.4f}" for la, lo in domains.load()[dom]["cells"]}
+                    f = f[f["cell_id"].astype(str).isin(cells)].reset_index(drop=True)
+                    assert f["cell_id"].nunique() == len(cells), f"{dom}: footprint cells missing"
+                frames[as_of] = (f, st)
+            return frames[as_of]
+
+        frame, st = frame_as_of(latest)
+        usdm_ok = usdm_weeks_available(Path("data/raw"), range(CURRENT_YEAR, pd.Timestamp(last_issue).year + 1))
         t = frame["time"]
-        train = frame[t <= pd.Timestamp(st.train_end)]
-        issues = frame[(t > pd.Timestamp(st.calibrate_end)) & (t <= pd.Timestamp(last_issue))].copy()
-        keep = publishable_weeks(dom, list(issues["time"].unique()), usdm_ok)
-        issues = issues[issues["time"].isin(keep)]
-        if issues.empty:
+        weeks = sorted(t[(t > pd.Timestamp(st.calibrate_end)) & (t <= pd.Timestamp(last_issue))].unique())
+        pinned = pins.get(dom, {})
+        for w in pinned:
+            if pd.Timestamp(w) <= pd.Timestamp(last_issue) and pd.Timestamp(w) not in set(weeks):
+                weeks.append(pd.Timestamp(w))
+        keep = publishable_weeks(dom, sorted(pd.Timestamp(w) for w in weeks), usdm_ok)
+        if not keep:
             raise SystemExit(f"{dom}: no complete issues after {st.calibrate_end}")
+        # An issue is built from the vintage it was first produced from; only
+        # issues never produced before use the latest.
+        groups: dict[pd.Timestamp, list[pd.Timestamp]] = {}
+        for w in keep:
+            as_of = pd.Timestamp(pinned.get(str(pd.Timestamp(w).date()), latest))
+            groups.setdefault(as_of, []).append(pd.Timestamp(w))
 
-        base = issues[["time", "cell_id", "lat", "lon", "erc", "erc_pct", "usdm", "woy"]].copy()
-        base["domain"] = dom
-        base["available_at"] = base["time"].map(available_at)
-        late = base.loc[base["available_at"] > now, "time"].unique()
-        assert len(late) == 0, f"{dom}: issue(s) {late} not yet published at {now}"
-        per_issue: dict[str, np.ndarray] = {}
+        for as_of, group in sorted(groups.items()):
+            frame, st = frame_as_of(as_of)
+            t = frame["time"]
+            train = frame[t <= pd.Timestamp(st.train_end)]
+            issues = frame[t.isin(group)].copy()
+            missing_here = sorted(set(group) - set(issues["time"].unique()))
+            assert not missing_here, f"{dom}: vintage {as_of} lacks pinned issue(s) {missing_here}"
 
-        # Continuous ERC percentile, one column set per horizon.
-        for h in HORIZONS:
-            arm = arm_by_h[str(h)]
-            pred = continuous_predict(arm, train, h, issues)
-            per_issue[f"erc_pct_h{h}_point"] = pred
-            # No interval radius is carried into the export. It used to be the
-            # last state of a PID controller run with same-week updates, which
-            # the delayed-feedback gate shows leaks, and nothing renders a band.
-            per_issue[f"erc_pct_h{h}_clim_median"] = climatological_median(train, h, issues)
-            per_issue[f"erc_pct_h{h}_clim_width"] = climatological_width(train, h, issues)
-            e_lo, e_hi = historical_erc_range(train, issues, h, pd.Timestamp(st.train_end))
-            per_issue[f"erc_h{h}_hist_lo"] = e_lo
-            per_issue[f"erc_h{h}_hist_hi"] = e_hi
-            b_lo, b_hi = climatological_bounds(train, h, issues)
-            per_issue[f"erc_pct_h{h}_clim_lo"] = b_lo
-            per_issue[f"erc_pct_h{h}_clim_hi"] = b_hi
+            base = issues[["time", "cell_id", "lat", "lon", "erc", "erc_pct", "usdm", "woy"]].copy()
+            base["domain"] = dom
+            base["erc_vintage"] = pd.Timestamp(as_of).isoformat()
+            base["available_at"] = base["time"].map(available_at)
+            late = base.loc[base["available_at"] > now, "time"].unique()
+            assert len(late) == 0, f"{dom}: issue(s) {late} not yet published at {now}"
+            per_issue: dict[str, np.ndarray] = {}
 
-        # Probabilistic targets.
-        for (target, h), c in sorted(choices.items()):
-            pred = (
-                _drought_prediction(h, train, target, issues)
-                if c.family == "markov"
-                else _fire_prediction(c.family, train, target, issues)
-            )
-            per_issue[f"{target}_p"] = pred
-            per_issue[f"{target}_base_rate"] = regional_base_rate(train, target, issues)
+            # Continuous ERC percentile, one column set per horizon.
+            for h in HORIZONS:
+                arm = arm_by_h[str(h)]
+                pred = continuous_predict(arm, train, h, issues)
+                per_issue[f"erc_pct_h{h}_point"] = pred
+                # No interval radius is carried into the export. It used to be the
+                # last state of a PID controller run with same-week updates, which
+                # the delayed-feedback gate shows leaks, and nothing renders a band.
+                per_issue[f"erc_pct_h{h}_clim_median"] = climatological_median(train, h, issues)
+                per_issue[f"erc_pct_h{h}_clim_width"] = climatological_width(train, h, issues)
+                e_lo, e_hi = historical_erc_range(train, issues, h, pd.Timestamp(st.train_end))
+                per_issue[f"erc_h{h}_hist_lo"] = e_lo
+                per_issue[f"erc_h{h}_hist_hi"] = e_hi
+                b_lo, b_hi = climatological_bounds(train, h, issues)
+                per_issue[f"erc_pct_h{h}_clim_lo"] = b_lo
+                per_issue[f"erc_pct_h{h}_clim_hi"] = b_hi
 
-        for col, vals in per_issue.items():
-            base[col] = vals
-        out_frames.append(base)
+            # Probabilistic targets.
+            for (target, h), c in sorted(choices.items()):
+                pred = (
+                    _drought_prediction(h, train, target, issues)
+                    if c.family == "markov"
+                    else _fire_prediction(c.family, train, target, issues)
+                )
+                per_issue[f"{target}_p"] = pred
+                per_issue[f"{target}_base_rate"] = regional_base_rate(train, target, issues)
 
-    export = pd.concat(out_frames, ignore_index=True)
+            for col, vals in per_issue.items():
+                base[col] = vals
+            out_frames.append(base)
+
+    export = pd.concat(out_frames, ignore_index=True).sort_values(["domain", "time", "cell_id"])
+    export = export.reset_index(drop=True)
     assert_no_scoring(export)
     export = attach_rendering(export, decisions)
     return export
@@ -489,9 +528,17 @@ def attach_rendering(frame: pd.DataFrame, decisions: pd.DataFrame) -> pd.DataFra
 
 def write(out_dir: Path = OUT, last_issue: pd.Timestamp | None = None, now: pd.Timestamp | None = None) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
+    from cofire.ship import vintages
+
     frame = build_export(last_issue, now)
     path = out_dir / "forecast_issues.parquet"
     frame.to_parquet(path, index=False)
+    # Pin every issue to the vintage it was produced from. Existing pins never move.
+    pins = frame.groupby(["domain", "time"])["erc_vintage"].first()
+    vintages.pin_issues({
+        d: {str(pd.Timestamp(t).date()): v for (dd, t), v in pins.items() if dd == d}
+        for d in frame["domain"].unique()
+    })
     states = {
         c[: -len("_state")]: frame[c].dropna().unique().tolist()
         for c in frame.columns if c.endswith("_state")

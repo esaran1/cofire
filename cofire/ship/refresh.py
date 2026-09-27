@@ -9,8 +9,10 @@
    yearly archive as members, which is what the archive is made of.
 4. Every domain's daily ERC is extended by the new days only, over the
    reconciled OPeNDAP path, with an overlap week and an older gate day.
-5. Larimer and Pueblo's daily record is gated against their processed 2026
-   cube on every complete week, cell for cell, before the export uses it.
+5. Each ERC fetch becomes a vintage (`cofire.ship.vintages`): revisions
+   inside the provisional window are accepted and logged, anything older
+   fails the gate. Issues already published keep the vintage they were built
+   from; only new issues use the latest.
 6. The export is rebuilt through the target issue, scoring nothing and
    emitting only issues whose inputs were complete and published, then the
    bundles, the demo fixture and the story.
@@ -34,7 +36,6 @@ from typing import Any
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import pandas as pd  # noqa: E402
-import xarray as xr  # noqa: E402
 
 from cofire.ship import domains, erc_fetch  # noqa: E402
 from cofire.ship.export import (  # noqa: E402
@@ -56,7 +57,6 @@ RAW = Path("data/raw")
 USDM_URL = "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_{d:%Y%m%d}_M.zip"
 LOG = Path("artifacts/ship/refresh_log.json")
 EXPORT = Path("artifacts/ship/forecast_issues.parquet")
-STORE_DOMAINS = ("larimer", "pueblo")
 
 
 def _ledger() -> Any:
@@ -100,39 +100,6 @@ def usdm_week(week: pd.Timestamp, ledger: Any) -> dict[str, Any]:
     return {"week": str(week.date()), "fetched": True, "bytes": res.n_bytes, "sha256": res.sha256}
 
 
-def store_gate(domain: str, year: int) -> dict[str, Any]:
-    """Daily record against the processed cube, every complete week, cell for cell."""
-    from cofire.model.data import erc_extension as ext
-    from cofire.ship.build_v11 import settings
-
-    st = settings(domain)
-    cube = st.processed_dir / "gridmet" / f"weekly_{year}.nc"
-    raw = ext.reference_daily(year, st)
-    if not cube.exists() or raw is None:
-        return {"domain": domain, "ok": True, "note": "no processed cube for this year"}
-    daily = xr.open_dataset(ext.cache_path(domain, year))[ext.VAR].load().rename({"day": "time"})
-    grouped = daily.resample(time="W-TUE")
-    weekly = grouped.mean()
-    full = (grouped.count(dim="time").max(dim=["lat", "lon"]) >= 7).values
-    # Weeks the cube could fill completely: those ending on or before the last
-    # day of the daily file it was built from.
-    last_raw = pd.Timestamp(raw[[d for d in raw.dims if d in ("day", "time")][0]].values[-1])
-    with xr.open_dataset(cube) as ds:
-        store = ds["erc"].load()
-    in_store = set(pd.DatetimeIndex(store["time"].values))
-    ok_weeks = [t for t, f in zip(pd.DatetimeIndex(weekly["time"].values), full, strict=True)
-                if f and t <= last_raw and t in in_store]
-    r = ext.reconcile(weekly.sel(time=ok_weeks), store.sel(time=ok_weeks))
-    return {"domain": domain, "ok": r.ok, "n_compared": r.n_compared, "max_abs_diff": r.max_abs_diff,
-            "first_mismatch": r.first_mismatch, "weeks": len(ok_weeks)}
-
-
-def ext_cache(domain: str, year: int) -> Path:
-    from cofire.model.data import erc_extension as ext
-
-    return ext.cache_path(domain, year)
-
-
 def same_export(previous: bytes, current: Path, atol: float = 1e-9) -> bool:
     """Same rows and columns, numbers equal within `atol`, everything else exact."""
     import io
@@ -172,36 +139,10 @@ def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
     assert_complete(range(2007, target.year), RAW)
     assert_complete(range(target.year, target.year + 1), RAW, through=target)
 
-    # A store domain held after a failed gate stays held, without re-fetching
-    # its year every week, until someone asks for a re-gate (COFIRE_REGATE=1).
-    held = {
-        d for d in STORE_DOMAINS
-        if ext_cache(d, target.year).with_name(f"{d}_{target.year}.nc.ungated").exists()
-        and os.environ.get("COFIRE_REGATE") != "1"
-    }
-    log["held"] = sorted(held)
-    log["erc"] = [erc_fetch.extend(d, target.year, ledger) for d in domains.ORDER if d not in held]
-    # The issue needs all seven ERC days of its week in every domain.
-    last_erc = min(pd.Timestamp(e["last_day"]) for e in log["erc"])
-    while target > last_erc:
-        target -= pd.Timedelta(weeks=1)
-    log["target"] = str(target.date())
-
-    # A domain whose daily record fails the gate is not used: its file is set
-    # aside and the domain stays on its processed cube, cut to complete weeks.
-    # The export then stops at the last issue complete in every domain.
-    log["gates"] = [store_gate(d, target.year) for d in STORE_DOMAINS if d not in held]
-    for g in log["gates"]:
-        src = ext_cache(g["domain"], target.year)
-        marker = src.with_suffix(".gated.json")
-        if g["ok"]:
-            marker.write_text(json.dumps(g, default=str))
-        else:
-            marker.unlink(missing_ok=True)
-            if src.exists():
-                src.replace(src.with_name(src.name + ".ungated"))
-            LOGGER.error("gate failed for %s: %s", g["domain"], g["first_mismatch"])
-    failed = sorted({g["domain"] for g in log["gates"] if not g["ok"]} | held)
+    # Each fetch becomes a vintage; the vintage gate accepts revisions inside
+    # the provisional window, logs them, and refuses anything older.
+    log["erc"] = [erc_fetch.extend(d, target.year, ledger, now=now) for d in domains.ORDER]
+    log["revised_cell_days"] = {e["domain"]: e.get("revised_cell_days", 0) for e in log["erc"]}
 
     target = min([target, *[export.erc_complete_issue(d, target.year) for d in domains.ORDER]])
     log["target"] = str(target.date())
@@ -226,10 +167,7 @@ def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
     log["bytes"] = session_bytes(ledger) - bytes_before
     assert look_count() == 3, "look counter moved during a refresh"
     log["looks"] = 3
-    log["outcome"] = (
-        f"gate failed for {', '.join(failed)}; held on reconciled data" if failed
-        else ("updated" if log["export_changed"] else "no change")
-    )
+    log["outcome"] = "updated" if log["export_changed"] else "no change"
     log_append(log)
     return log
 

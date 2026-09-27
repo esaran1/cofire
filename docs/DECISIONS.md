@@ -2055,3 +2055,64 @@ not change), base rate before and after. Every other drought reliability moved
 by at most 0.0010 and stayed on its side of 0.05. Estimability changed for no
 pair. The export's forecast numbers are unchanged; only the reason strings
 that quote validation reliability, and Pueblo d_ge2_h4's claim, changed.
+
+## v1.1: data vintages instead of overwrites
+
+**Why.** gridMET revises provisional data, and the refresh used to overwrite.
+A forecast issue could then be silently recomputed from numbers that did not
+exist when it was published.
+
+**Provisional window: 240 days, measured.** No provisional period was stated
+in the gridMET documentation available to this project, so it was measured.
+Two vintages of Larimer and Pueblo's 2026 record, fetched a week apart
+(2026-09-20 and 2026-09-27), differ from 2026-02-28 (Larimer) and 2026-03-04
+(Pueblo) onward. That is 202 and 198 days before the older copy's last day.
+Revisions are densest recently: 37% and 58% of September cell-days, and
+0% in January and February. A fresh read of October to December 2025 matches
+the stored copies exactly (83,904 cell-days). Window = the 202-day maximum
+plus a margin of about five weeks, since two vintages a week apart bound the
+reach only from below. Record: `artifacts/audit/gridmet_revision_window.json`.
+
+**Rules** (`cofire/ship/vintages.py`):
+
+- Every fetch is stored as its own file under `data/vintages/`, keyed by
+  source, domain, year, the days it covers and its UTC fetch time. A vintage
+  is never overwritten; the manifest is `artifacts/vintages/manifest.json`.
+- The series as of a time is every fetch up to that time, applied in order.
+- A fetch may revise days inside the window. Each revised cell-day is logged
+  with date, cell, old and new value (`artifacts/vintages/revisions/`). A
+  revision older than the window refuses the fetch.
+- The refresh re-reads the last 14 held days, plus one day 7 days beyond the
+  window that must match exactly.
+- Each issue is pinned to the vintage it was first produced from
+  (`artifacts/ship/issue_vintages.json`), and a pin never moves. The export
+  rebuilds each issue from its own vintage; only issues never produced before
+  use the latest. Every export row carries `erc_vintage`.
+
+**The frozen weekly convention is kept.** Larimer and Pueblo's stores hold
+one weekly cube per year, resampled from that year's days only, with the
+later year's cube winning the week that straddles New Year (so their boundary
+weeks are partial means, in training too). Their current-year cube is rebuilt
+from the vintage the same way. A first attempt that bypassed the cube changed
+the 2026-01-06 issue from the six-day mean it was published with (Larimer
+44.11) to a one-day mean (48.23); rebuilding the cube restores it exactly.
+
+**Migration** (`cofire/ship/vintage_migration.py`, run once): 97 ERC files
+seeded as vintages. Larimer and Pueblo's first 2026 vintage is the copy the
+stores were built from (fetched 2026-09-20 03:01 and 20:17 UTC). Their second
+is the 2026-09-27 re-read, adopted through the gate:
+
+| | revised cell-days | dates | largest change |
+|---|---|---|---|
+| Larimer | 17,580 | 2026-02-28 to 2026-09-18 | 20 ERC |
+| Pueblo | 13,769 | 2026-03-04 to 2026-09-18 | 20 ERC |
+
+All 37 published issues per domain were pinned to their original vintage and
+reproduce exactly (46,065 rows, no column changed). The 2026-09-22 issue is
+new for every domain, Larimer and Pueblo from the adopted vintage, so the
+export now runs to 2026-09-22 with real USDM at that week.
+
+**Tests** (`tests/test_vintages.py`): a revision inside the window is
+accepted, logged and versioned; a revision outside it fails the gate and
+leaves no vintage; an old issue's series is identical after a new vintage
+lands, and its pin cannot move; a vintage cannot be overwritten.

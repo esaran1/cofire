@@ -36,6 +36,7 @@ import urllib.parse
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import requests
 import xarray as xr
 
@@ -253,8 +254,8 @@ def verify_against_source(
 
 # ------------------------------------------------------------ weekly refresh
 
-OVERLAP_DAYS = 7  # re-read the most recent cached week, which gridMET may revise
-GATE_LAG_DAYS = 60  # one older day that must match the cache exactly
+OVERLAP_DAYS = 14  # re-read the last two cached weeks; revisions there become a new vintage
+GATE_MARGIN_DAYS = 7  # one day this far beyond the provisional window must re-read exactly
 
 
 def rect(domain: str) -> tuple[int, int]:
@@ -283,28 +284,32 @@ def _read_days(domain: str, year: int, start: int, stop: int) -> xr.DataArray:
     return out
 
 
-def extend(domain: str, year: int, ledger: DownloadLedger) -> dict[str, object]:
-    """Bring one domain-year of daily ERC up to the server's latest day."""
+def extend(domain: str, year: int, ledger: DownloadLedger, now: pd.Timestamp | None = None) -> dict[str, object]:
+    """Fetch the new days of one domain-year as a new vintage.
+
+    Re-reads the last OVERLAP_DAYS already held, plus one day just beyond the
+    provisional window. The vintage gate (`cofire.ship.vintages`) accepts and
+    logs revisions inside the window and refuses the fetch if the older day, or
+    anything else outside the window, changed.
+    """
+    from cofire.ship import vintages
+    from cofire.ship.export import utc_now
+
+    now = utc_now() if now is None else now
     n_lat, n_lon = rect(domain)
-    dest = ext.cache_path(domain, year)
     url = ext.OPENDAP.format(year=year)
     _check_redirect(url)
-    # The current year's DDS grows daily, so it is always re-read.
     (DDS_DIR / f"erc_{year}.dds").unlink(missing_ok=True)
     n_server = _dims(_dds(year, ledger))["day"]
-    if not dest.exists():
-        start, cached = 0, None
-    else:
-        cached = xr.open_dataset(dest)[ext.VAR].load()
-        n_have = int(cached.sizes["day"])
-        if n_have >= n_server:
-            return {"domain": domain, "year": year, "new_days": 0, "last_day": str(cached.day.values[-1])[:10]}
-        start = max(0, n_have - OVERLAP_DAYS)
-
+    have = vintages.assemble(domain, year) if vintages.records(domain, year) else None
+    n_have = 0 if have is None else int(have.sizes["day"])
+    if have is not None and n_have >= n_server:
+        return {"domain": domain, "year": year, "new_days": 0, "last_day": str(have.day.values[-1])[:10]}
+    start = max(0, n_have - OVERLAP_DAYS)
     n_days = n_server - start
+    gate_day = n_server - 1 - vintages.WINDOW_DAYS - GATE_MARGIN_DAYS
     cost = n_days * n_lat * n_lon * 4 + (n_days + n_lat + n_lon) * 8 + _OPEN_OVERHEAD
-    gate_day = None if cached is None else int(cached.sizes["day"]) - GATE_LAG_DAYS
-    if gate_day is not None and gate_day >= 0:
+    if have is not None and 0 <= gate_day < n_have:
         cost += n_lat * n_lon * 4 + _OPEN_OVERHEAD
     if session_bytes(ledger) + cost > SESSION_CAP_BYTES or not ledger.can_afford(cost):
         raise FetchRefused(f"{domain} {year}: {cost} B would exceed the session cap or the ledger")
@@ -312,33 +317,21 @@ def extend(domain: str, year: int, ledger: DownloadLedger) -> dict[str, object]:
     try:
         new = _read_days(domain, year, start, n_server)
         validate(new, n_lat, n_lon, n_days)
-        revised = 0.0
-        if cached is not None:
-            if gate_day is not None and gate_day >= 0:
-                g = _read_days(domain, year, gate_day, gate_day + 1)
-                r = ext.reconcile(g, cached.isel(day=slice(gate_day, gate_day + 1)))
-                if not r.ok:
-                    raise FetchRefused(f"{domain} {year} gate day {gate_day}: {r.first_mismatch}")
-            a, b = xr.align(new, cached, join="inner")
-            revised = float(np.nanmax(np.abs(a.values - b.values))) if a.size else 0.0
-            merged = xr.concat([cached.isel(day=slice(0, start)), new], dim="day")
-        else:
-            merged = new
+        if have is not None and 0 <= gate_day < n_have:
+            g = _read_days(domain, year, gate_day, gate_day + 1)
+            r = ext.reconcile(g, have.isel(day=slice(gate_day, gate_day + 1)))
+            if not r.ok:
+                raise FetchRefused(f"{domain} {year} day {gate_day}, beyond the provisional window: {r.first_mismatch}")
+        rec = vintages.record(domain, year, new, fetched_at=now)
     except FetchRefused:
         ledger.record("gridMET-OPeNDAP", constraint, cost, note=f"session={SESSION}; REJECTED")
         raise
     except Exception as exc:  # noqa: BLE001
         ledger.record("gridMET-OPeNDAP", constraint, cost, note=f"session={SESSION}; REJECTED")
         raise FetchRefused(f"OPeNDAP read failed for {domain} {year}: {exc}") from exc
-
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    tmp = dest.with_name(dest.name + ".part")
-    merged.to_dataset(name=ext.VAR).to_netcdf(tmp)
-    with open(tmp, "rb") as fh:
-        check_magic(fh.read(64), "netcdf")
-    tmp.replace(dest)
-    sha = hashlib.sha256(dest.read_bytes()).hexdigest()
     ledger.record("gridMET-OPeNDAP", constraint, cost,
-                  note=f"session={SESSION}; sha256={sha}; bytes computed from the DAP2 wire format")
-    return {"domain": domain, "year": year, "new_days": int(n_server - (start if cached is None else cached.sizes["day"])),
-            "last_day": str(merged.day.values[-1])[:10], "overlap_max_revision": revised, "bytes": cost}
+                  note=f"session={SESSION}; sha256={rec['sha256']}; vintage={rec['id']}; bytes computed from the DAP2 wire format")
+    dest = vintages.materialize(domain, year, ext.cache_path(domain, year))
+    return {"domain": domain, "year": year, "new_days": int(n_server - n_have), "last_day": rec["last_day"],
+            "vintage": rec["id"], "revised_cell_days": rec["revisions"]["n_cell_days"], "bytes": cost,
+            "materialized": str(dest)}

@@ -280,5 +280,66 @@
   "bytes": 1155,
   "looks": 3,
   "outcome": "gate failed for larimer, pueblo; held on reconciled data"
+ },
+ {
+  "run_at": "2026-09-27 22:12:44.228979",
+  "session": "v1.1",
+  "target_published": "2026-09-22",
+  "usdm": [],
+  "erc": [
+   {
+    "domain": "denver",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "upper_south_platte",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "dillon",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "larimer",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   },
+   {
+    "domain": "pueblo",
+    "year": 2026,
+    "new_days": 0,
+    "last_day": "2026-09-25"
+   }
+  ],
+  "revised_cell_days": {
+   "denver": 0,
+   "upper_south_platte": 0,
+   "dillon": 0,
+   "larimer": 0,
+   "pueblo": 0
+  },
+  "target": "2026-09-22",
+  "export_changed": false,
+  "issues": [
+   "2026-01-06",
+   "2026-09-22"
+  ],
+  "usdm_mean_at_target": {
+   "denver": 2.596,
+   "dillon": 3.734,
+   "larimer": 2.362,
+   "pueblo": 1.963,
+   "upper_south_platte": 2.713
+  },
+  "bytes": 1925,
+  "looks": 3,
+  "outcome": "no change"
  }
 ]
