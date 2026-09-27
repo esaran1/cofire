@@ -1762,3 +1762,89 @@ reliability passes; otherwise it renders the regional base rate with the
 reason (not estimable, or reliability failed). The regional base rate's own
 reliability is reported beside it. Larimer and Pueblo keep their look-3
 rendering.
+
+## v1.1 Stage 5 results: 21 survivors over five domains, no cross-domain agreement
+
+`cofire/ship/survivors_v11.py`, run after the rules above were committed
+(79f6989). Output `artifacts/v11/survivors_v11.csv` and
+`survivors_v11_summary.json`.
+
+**Reproduction check.** Larimer and Pueblo recomputed through the new runner
+match `artifacts/audit/survivors_embargoed.csv` on all 51 pairs with max|diff| 0
+for the paired difference, both CI ends, the p-value and positive weeks.
+
+**Counts.** 115 pairs with non-constant validation labels (Larimer 24, Pueblo
+27, Denver 26, Upper South Platte 20, Dillon 18); 83 estimable; 21 survive
+BH (q = 0.10, across all 83) and Holm (within domain and family). **All 11
+current survivors hold** with unchanged CIs. 10 new pairs survive, all in the
+new domains.
+
+| Domain | Target | Arm | Pos. weeks | Real BSS | Shuffled BSS | Paired diff [95% CI] | |
+|---|---|---|---|---|---|---|---|
+| Denver | d_improve1_h2 | markov | 24 | +0.2854 | +0.0597 | +0.2257 [+0.1009, +0.3527] | new |
+| Denver | d_improve1_h4 | markov | 35 | +0.4024 | +0.1593 | +0.2431 [+0.0950, +0.4534] | new |
+| Denver | d_nochange_h2 | markov | 90 | +0.1792 | +0.0995 | +0.0797 [+0.0198, +0.1533] | new |
+| Dillon | f_gt80_h8 | damped | 34 | +0.0656 | +0.0340 | +0.0317 [+0.0100, +0.0502] | new |
+| Larimer | d_ge2_h2 | markov | 21 | +0.5489 | -0.2841 | +0.8331 [+0.1668, +1.1959] | current |
+| Larimer | d_ge2_h4 | markov | 19 | +0.1241 | -0.3620 | +0.4861 [+0.0174, +0.8697] | current |
+| Larimer | d_improve1_h2 | markov | 32 | +0.2016 | -0.0034 | +0.2050 [+0.0996, +0.3262] | current |
+| Larimer | d_improve1_h4 | markov | 36 | +0.3342 | +0.0077 | +0.3266 [+0.1822, +0.5115] | current |
+| Larimer | d_improve1_h8 | markov | 40 | +0.3748 | +0.0036 | +0.3713 [+0.2401, +0.5624] | current |
+| Larimer | d_nochange_h2 | markov | 102 | +0.1526 | -0.0128 | +0.1654 [+0.0642, +0.2784] | current |
+| Larimer | d_nochange_h4 | markov | 100 | +0.2556 | +0.0003 | +0.2554 [+0.0946, +0.4240] | current |
+| Larimer | d_nochange_h8 | markov | 96 | +0.3442 | -0.0036 | +0.3478 [+0.1738, +0.5007] | current |
+| Pueblo | d_ge2_h2 | markov | 39 | +0.6352 | +0.3305 | +0.3048 [+0.0913, +0.5134] | current |
+| Pueblo | f_gt80_h8 | damped | 33 | +0.0722 | +0.0322 | +0.0400 [+0.0124, +0.0679] | current |
+| Pueblo | f_gt90_h8 | damped | 19 | +0.0437 | +0.0196 | +0.0242 [+0.0026, +0.0455] | current |
+| Upper South Platte | d_improve1_h2 | markov | 22 | +0.3087 | +0.0384 | +0.2703 [+0.1347, +0.4371] | new |
+| Upper South Platte | d_improve1_h4 | markov | 31 | +0.4663 | +0.1179 | +0.3485 [+0.1733, +0.6767] | new |
+| Upper South Platte | d_nochange_h2 | markov | 102 | +0.2477 | +0.0706 | +0.1770 [+0.0534, +0.3282] | new |
+| Upper South Platte | d_nochange_h4 | markov | 100 | +0.3788 | +0.1184 | +0.2604 [+0.1111, +0.4217] | new |
+| Upper South Platte | d_nochange_h8 | markov | 96 | +0.5074 | +0.2273 | +0.2802 [+0.0571, +0.5446] | new |
+| Upper South Platte | f_gt80_h8 | damped | 37 | +0.0753 | +0.0301 | +0.0452 [+0.0100, +0.0778] | new |
+
+**Surprisingly strong: none.** The largest real BSS among the new survivors is
++0.5074 (Upper South Platte d_nochange_h8), below the largest among the current
+11 (+0.6352, Pueblo d_ge2_h2). Every pair's shuffled control is reported.
+
+**Agreement rule: no target qualifies.** Every target that survives somewhere
+fails in at least one domain where it is estimable:
+
+| Target | Denver | Upper South Platte | Dillon | Larimer | Pueblo |
+|---|---|---|---|---|---|
+| d_improve1_h2 | pass | pass | fail | pass | fail |
+| d_improve1_h4 | pass | pass | fail | pass | fail |
+| d_nochange_h2 | pass | pass | fail | pass | fail |
+| d_nochange_h4 | fail | pass | fail | pass | fail |
+| d_nochange_h8 | fail | pass | fail | pass | fail |
+| f_gt80_h8 | fail | pass | pass | fail | pass |
+| d_ge2_h2 | fail | n.e. | n.e. | pass | pass |
+| d_ge2_h4 | fail | n.e. | n.e. | pass | fail |
+| d_improve1_h8 | fail | fail | fail | pass | fail |
+| f_gt90_h8 | fail | fail | fail | fail | pass |
+
+(n.e. = not estimable or no positive validation weeks.) So COFIRE makes no
+target-level claim across domains. Skill claims stay pair-level.
+
+**Fire conclusion, re-run.** 4 fire pairs survive: Pueblo f_gt80_h8 and
+f_gt90_h8 (both already among the 11), Dillon f_gt80_h8 and Upper South Platte
+f_gt80_h8. None at h2 or h4, none in Denver or Larimer. f_gt80_h8 passes in
+three domains and fails in two where it is estimable, so it does not meet the
+agreement rule. The family conclusion is unchanged: damped logistic in every
+domain (Stage 4).
+
+**Validation reliability and rendering for the new domains** (preregistered
+look-3 threshold, Murphy reliability at most 0.05):
+
+| Domain | probability | base rate: fewer than 12 weeks | base rate: reliability failed | no positive validation weeks |
+|---|---|---|---|---|
+| Denver | 16 | 8 | 1 (d_improve1_h8, 0.0851) | 1 (d_ge3_h8) |
+| Upper South Platte | 16 | 4 | 0 | 7 |
+| Dillon | 11 | 6 | 1 (d_nochange_h8, 0.0667) | 9 |
+
+Per-cell and regional-base-rate reliability for every pair are in the CSV.
+Denver's fire probabilities (f_gt80, f_gt90) pass reliability; they measure
+ERC relative to Denver's own record and are labeled so.
+
+**facts.json.** No current survivor failed, so nothing is withdrawn. The new
+domains' pairs enter the app in Stage 6, read from this table.
