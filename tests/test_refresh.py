@@ -63,3 +63,18 @@ def test_the_clip_gate_passed_for_every_domain() -> None:
     gate = json.loads(datapack.GATE.read_text())
     assert set(gate) == {"denver", "upper_south_platte", "dillon", "larimer", "pueblo"}
     assert all(v["ok"] and v["n_different"] == 0 for v in gate.values())
+
+
+def test_export_comparison_ignores_platform_noise_only(tmp_path: Path) -> None:
+    from cofire.ship.refresh import same_export
+
+    base = pd.DataFrame({"domain": ["denver", "dillon"], "p": [0.25, 0.5]})
+    prev = tmp_path / "prev.parquet"
+    base.to_parquet(prev)
+    cur = tmp_path / "cur.parquet"
+    base.assign(p=base["p"] + 1e-12).to_parquet(cur)
+    assert same_export(prev.read_bytes(), cur)
+    base.assign(p=base["p"] + 1e-6).to_parquet(cur)
+    assert not same_export(prev.read_bytes(), cur)
+    base.assign(domain=["denver", "pueblo"]).to_parquet(cur)
+    assert not same_export(prev.read_bytes(), cur)

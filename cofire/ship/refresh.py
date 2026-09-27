@@ -22,7 +22,6 @@ run appends to `artifacts/ship/refresh_log.json`.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 import os
@@ -134,11 +133,24 @@ def ext_cache(domain: str, year: int) -> Path:
     return ext.cache_path(domain, year)
 
 
-def _hash(path: Path) -> str:
-    if not path.exists():
-        return ""
-    f = pd.read_parquet(path)
-    return hashlib.sha256(pd.util.hash_pandas_object(f, index=False).values.tobytes()).hexdigest()
+def same_export(previous: bytes, current: Path, atol: float = 1e-9) -> bool:
+    """Same rows and columns, numbers equal within `atol`, everything else exact."""
+    import io
+
+    import numpy as np
+
+    a = pd.read_parquet(io.BytesIO(previous))
+    b = pd.read_parquet(current)
+    if list(a.columns) != list(b.columns) or len(a) != len(b):
+        return False
+    for c in a.columns:
+        x, y = a[c], b[c]
+        if pd.api.types.is_numeric_dtype(x) and pd.api.types.is_numeric_dtype(y):
+            if not np.allclose(x.to_numpy(float), y.to_numpy(float), atol=atol, rtol=0, equal_nan=True):
+                return False
+        elif not x.astype(str).equals(y.astype(str)):
+            return False
+    return True
 
 
 def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
@@ -189,10 +201,14 @@ def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
 
     target = min([target, *[export.erc_complete_issue(d, target.year) for d in domains.ORDER]])
     log["target"] = str(target.date())
-    before = _hash(EXPORT)
+    previous = EXPORT.read_bytes() if EXPORT.exists() else None
     export.write(last_issue=target, now=now)
-    after = _hash(EXPORT)
-    log["export_changed"] = before != after
+    log["export_changed"] = previous is None or not same_export(previous, EXPORT)
+    if previous is not None and not log["export_changed"]:
+        # Equal to the last export within floating-point noise (least-squares
+        # sums differ at 1e-12 between Linux and macOS): keep the old bytes, so
+        # a week with nothing new commits nothing.
+        EXPORT.write_bytes(previous)
     f = pd.read_parquet(EXPORT)
     log["issues"] = [str(pd.Timestamp(f["time"].min()).date()), str(pd.Timestamp(f["time"].max()).date())]
     assert (pd.to_datetime(f["available_at"]) <= now).all(), "an issue was emitted before its inputs were published"
