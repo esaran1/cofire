@@ -63,6 +63,8 @@ CONTENT_TYPES = {
     "geotiff": ("image/tiff", "application/octet-stream"),
     "zip": ("application/zip", "application/x-zip-compressed", "application/octet-stream"),
     "json": ("application/json", "application/geo+json", "text/plain"),
+    # OPeNDAP metadata responses (.dds, .das), which open with a fixed keyword.
+    "dap": ("text/plain",),
 }
 
 
@@ -96,6 +98,7 @@ def check_magic(head: bytes, fmt: str) -> None:
         "geotiff": head[:4] in (b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+"),
         "zip": head[:4] == b"PK\x03\x04",
         "json": head.lstrip()[:1] in (b"{", b"["),
+        "dap": head.lstrip().startswith((b"Dataset", b"Attributes")),
     }.get(fmt)
     if ok is None:
         raise FetchRefused(f"unknown expected format {fmt!r}")

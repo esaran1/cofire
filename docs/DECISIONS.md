@@ -1558,3 +1558,51 @@ ring. So the Denver domain covers all of CO-01.
 `COFIRE_SUBSET_NAME=<domain>`. The watersheds carry a nominal FIPS (08093 Park,
 08117 Summit) that only the frozen USDM county-statistics fallback would read;
 the v1.1 build requires rasterized shapefiles and fails rather than fall back.
+
+## v1.1 Stage 2: ERC for the new domains, and why it is not an NCSS download
+
+USDM needed no transfer: the 2007 to 2026 national yearly archives are on disk
+and rasterize onto any grid.
+
+ERC 2004 to 2025 came through the reconciled path, the frozen
+`erc_extension.fetch_year` (`xarray.open_dataset` on the OPeNDAP URL, `.sel`
+with the domain bbox), called unchanged for each registered domain by
+`cofire/ship/erc_fetch.py`.
+
+**NCSS, which would have produced a file for `safe_fetch`, is broken on the
+server.** Every subset request, down to one cell-day, returns HTTP 500 with the
+body "-101: NetCDF: HDF error" (probe logged, 23 bytes). The whole-file
+fileServer route costs tens of MB per variable-year, which the 85.7 MB left
+under the ledger's global ceiling cannot carry.
+
+**How the fetch rules apply to an OPeNDAP stream.** No file crosses the wire,
+so `safe_fetch` cannot wrap the read itself. `erc_fetch` applies each rule that
+has a meaning for a stream:
+
+1. HTTPS and the allowlist on the URL. A HEAD on the `.dds` endpoint must not
+   redirect, because the NetCDF library would follow a redirect unchecked.
+2. HEAD first, then the `.dds` through `safe_fetch`. The exact DAP2 wire size
+   comes from its shape (UInt16 sent as 4-byte XDR words, plus coordinate maps
+   and metadata) and is checked against the session cap and the ledger before
+   data moves.
+3. The library refuses an HTML error page, and the array must have the
+   domain's exact rectangle, at least 95% finite cell-days, values in 0 to 200,
+   and non-zero spread, or nothing is cached.
+4. Each cached year is checked against its peers' sizes.
+5. No archives are involved.
+6. No new packages. The frozen reader's pydap fallback is not installed and
+   was not added; one read failed on a transient error, was refused, logged,
+   and succeeded on resume.
+7. Each read is logged with URL, computed bytes, the cached file's sha256 and
+   a timestamp.
+
+**Priced before fetching.** One variable-year (Denver 2020): 178,348 bytes
+projected, 97,907 bytes cached, 1.7 s. Projected 2004 to 2025: Denver
+3,916,744, Upper South Platte 12,727,368, Dillon 4,334,792, total 20,978,904
+bytes. 2026, needed only for scoring-free forecasts: 715,852 bytes, not yet
+fetched.
+
+**Spent this session:** 21,345,687 bytes (OPeNDAP 21,175,808 including the
+refused read, DAP metadata 13,028, DAP ASCII gate samples 24,133, WBD 119,315,
+NHD 13,380, NCSS probe 23). Session cap 2.0 GB; ledger global remaining
+64,327,490 bytes.
