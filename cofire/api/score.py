@@ -1,19 +1,24 @@
-"""Score Beat-the-Model picks against realized values when they exist."""
+"""Summarise Beat-the-Model picks: how many are scored and how many points.
+
+Scoring happens on read (`cofire.api.score_pick`): a pick is scored once its
+target week is in the forecast record. Only players are scored; the model's
+call is never compared with 2026 outcomes, because 2026 is the sealed year.
+"""
 
 from __future__ import annotations
 
 from sqlmodel import Session, select
 
-from cofire.api import PredictionRow, engine, load_index
+from cofire.api import PredictionRow, _cells_by_key, engine, score_pick
 
 
 def run() -> None:
-    index = load_index()
+    cells = _cells_by_key()
     with Session(engine) as session:
-        rows = session.exec(select(PredictionRow)).all()
-        print(f"unscored picks={len(rows)} cells_in_index={len(index.get('cells', []))}")
-        # Realized scoring happens once USDM/ERC for the valid date are in the index.
-        # v0.2 reports counts only; exact-match and Brier attach when labels land.
+        picks = [r.model_dump() for r in session.exec(select(PredictionRow)).all()]
+    scored = [s for s in (score_pick(p, cells) for p in picks) if s["status"] == "scored"]
+    points = sum(int(s["points"]) for s in scored)
+    print(f"picks={len(picks)} scored={len(scored)} pending={len(picks) - len(scored)} points={points}")
 
 
 if __name__ == "__main__":

@@ -194,3 +194,44 @@ def test_saved_ember_ticks_come_back_for_the_zone_asked_for() -> None:
     assert city["zone"] == "city" and "water_leaks" in city["done"]
     assert client.get("/ember/score", params={"device_id": dev, "zone": "wui"}).json()["zone"] == "wui"
     assert client.get("/ember/score", params={"device_id": dev, "zone": "nowhere"}).status_code == 400
+
+
+def test_a_pick_is_scored_once_its_week_is_in() -> None:
+    from cofire.api import score_pick
+
+    cells = {("c1", "2026-06-02"): {"usdm": 2.0, "erc_pct": 83.0}}
+    base = {"cell_id": "c1", "issue": "2026-05-05", "horizon": 4}
+    right = score_pick(base | {"drought_category": 2, "fire_band": "high"}, cells)
+    assert right["status"] == "scored" and right["points"] == 2 and right["actual_band"] == "high"
+    wrong = score_pick(base | {"drought_category": 0, "fire_band": "low"}, cells)
+    assert wrong["points"] == 0 and wrong["drought_correct"] is False
+    later = score_pick(base | {"issue": "2026-09-22", "drought_category": 2, "fire_band": "high"}, cells)
+    assert later["status"] == "pending" and later["target_week"] == "2026-10-20"
+    assert "model" not in " ".join(k for k in right), "the model is never scored"
+
+
+def test_fire_band_edges_match_the_page() -> None:
+    import re
+    from pathlib import Path
+
+    from cofire.api import FIRE_BAND_EDGES
+
+    text = Path("app/lib/options.ts").read_text()
+    page = {m[0]: (float(m[1]), float(m[2])) for m in re.findall(r'value: "(\w+)",[^}]*min: (\d+), max: (\d+)', text)}
+    assert page == {name: (lo, hi) for name, lo, hi in FIRE_BAND_EDGES}
+
+
+def test_the_leaderboard_ranks_by_points() -> None:
+    r = client.post("/predictions", json={"device_id": "t-rank-a", "cell_id": "40.5250_-105.0583", "horizon": 4,
+                                          "drought_category": 2, "fire_band": "high", "issue": "2026-05-05"})
+    assert r.status_code == 200
+    board = client.get("/leaderboard").json()
+    assert all({"points", "scored", "picks"} <= set(row) for row in board)
+    pts = [row["points"] for row in board]
+    assert pts == sorted(pts, reverse=True)
+
+
+def test_a_horizon_that_is_not_forecast_is_refused() -> None:
+    r = client.post("/predictions", json={"device_id": "t-h", "cell_id": "40.5250_-105.0583", "horizon": 5,
+                                          "drought_category": 2, "fire_band": "high"})
+    assert r.status_code == 422

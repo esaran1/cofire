@@ -93,3 +93,23 @@ test("too many picks in a minute gets a plain message", async ({ page }) => {
   await lock.click();
   await expect(page.getByText("That is a lot in one minute")).toBeVisible();
 });
+
+test("your picks show as pending until their week, then scored", async ({ page }) => {
+  await page.route("**/predictions/me**", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify([
+        { id: "a", cell_id: "39.7333_-104.9750", horizon: 4, drought_category: 2, fire_band: "low", issue: "2026-09-22",
+          created_at: "2026-09-28", target_week: "2026-10-20", status: "pending" },
+        { id: "b", cell_id: "39.7333_-104.9750", horizon: 4, drought_category: 2, fire_band: "moderate", issue: "2026-05-05",
+          created_at: "2026-09-27", target_week: "2026-06-02", status: "scored", actual_category: 2, actual_band: "moderate",
+          actual_dryness: 53.8, drought_correct: true, fire_correct: true, points: 2 },
+      ]),
+    }),
+  );
+  await page.goto("/beat?domain=denver");
+  await expect(page.getByTestId("pick-pending")).toContainText("week of 2026-10-20", { timeout: 20_000 });
+  await expect(page.getByTestId("pick-pending")).toContainText("Scored once that week");
+  await expect(page.getByTestId("pick-scored")).toContainText("It was D2 (right) and moderate, dryness 54 (right): 2 points.");
+  await expect(page.getByTestId("pick-summary")).toContainText("2");
+});

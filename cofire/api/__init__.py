@@ -6,7 +6,7 @@ import json
 import os
 import re
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -14,7 +14,7 @@ from uuid import uuid4
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlmodel import Field as SQLField
 from sqlmodel import Session, SQLModel, create_engine, select
 
@@ -74,6 +74,13 @@ class PredictionIn(BaseModel):
     fire_band: str
     issue: str | None = None
 
+    @field_validator("horizon")
+    @classmethod
+    def _horizon(cls, v: int) -> int:
+        if v not in (2, 4, 8):
+            raise ValueError("horizon must be 2, 4 or 8")
+        return v
+
 
 class ObservationIn(BaseModel):
     device_id: str
@@ -92,6 +99,56 @@ class EmberIn(BaseModel):
 
 OBS_TYPES = {"stock_tank_dry", "lawn_crispy", "creek_low", "soil_cracked", "vegetation_green"}
 FIRE_BANDS = {"low", "moderate", "high", "very_high"}
+# Band edges on the dryness scale (the ERC percentile for the week, 50 typical).
+# The same edges as app/lib/options.ts; tests/test_api.py pins the two together.
+FIRE_BAND_EDGES = (("low", 0.0, 50.0), ("moderate", 50.0, 80.0), ("high", 80.0, 90.0), ("very_high", 90.0, 101.0))
+
+
+def fire_band_for(value: float) -> str:
+    for name, lo, hi in FIRE_BAND_EDGES:
+        if lo <= value < hi:
+            return name
+    return "very_high"
+
+
+def score_pick(pick: dict[str, Any], cells: dict[tuple[str, str], dict[str, Any]]) -> dict[str, Any]:
+    """A player's pick against what happened, once the target week is in.
+
+    The target week is the pick's issue plus its horizon. What happened is the
+    cell's own record for that week: its USDM category and its dryness
+    percentile, the two quantities the forecasts are about. Only the player is
+    scored. The model's call is never compared with 2026 outcomes: 2026 is the
+    sealed test year, and scoring the model against it would be another look.
+    """
+    target = (date.fromisoformat(str(pick["issue"])) + timedelta(weeks=int(pick["horizon"]))).isoformat()
+    out = {**pick, "target_week": target, "status": "pending"}
+    cell = cells.get((str(pick["cell_id"]), target))
+    if cell is None or cell.get("usdm") is None or cell.get("erc_pct") is None:
+        return out
+    actual_cat = int(round(float(cell["usdm"])))
+    actual_band = fire_band_for(float(cell["erc_pct"]))
+    drought_ok = actual_cat == int(pick["drought_category"])
+    fire_ok = actual_band == str(pick["fire_band"])
+    return out | {
+        "status": "scored", "actual_category": actual_cat, "actual_band": actual_band,
+        "actual_dryness": round(float(cell["erc_pct"]), 1),
+        "drought_correct": drought_ok, "fire_correct": fire_ok, "points": int(drought_ok) + int(fire_ok),
+    }
+
+
+def _cells_by_key() -> dict[tuple[str, str], dict[str, Any]]:
+    """Every cell record by (cell, issue week), for scoring."""
+    index = load_index()
+    key = f"{len(index.get('cells', []))}:{index.get('issues', [''])[-1] if index.get('issues') else ''}"
+    if _SCORE_CACHE.get("key") != key:
+        _SCORE_CACHE.clear()
+        _SCORE_CACHE["key"] = key
+        _SCORE_CACHE["cells"] = {(c["cell_id"], c["issue"]): c for c in index.get("cells", [])}
+    cells: dict[tuple[str, str], dict[str, Any]] = _SCORE_CACHE["cells"]
+    return cells
+
+
+_SCORE_CACHE: dict[str, Any] = {}
 
 SQLModel.metadata.create_all(engine)
 
@@ -527,20 +584,32 @@ def _likely_category(cell: dict[str, Any] | None, horizon: int) -> dict[str, Any
 
 @app.get("/predictions/me")
 def predictions_me(device_id: str) -> list[dict[str, Any]]:
+    """A device's picks, newest first, each scored once its target week is in."""
     with Session(engine) as session:
         rows = session.exec(select(PredictionRow).where(PredictionRow.device_id == device_id)).all()
-        return [r.model_dump() for r in rows]
+        picks = [r.model_dump() for r in rows]
+    cells = _cells_by_key()
+    return sorted((score_pick(p, cells) for p in picks), key=lambda p: str(p["created_at"]), reverse=True)
 
 
 @app.get("/leaderboard")
 def leaderboard(county: str | None = None) -> list[dict[str, Any]]:
+    """Players ranked by points from scored picks, then by picks scored and made."""
     del county
     with Session(engine) as session:
         rows = session.exec(select(PredictionRow)).all()
-    scores: dict[str, int] = defaultdict(int)
-    for r in rows:
-        scores[r.device_id] += 1
-    return [{"device_id": k[:8], "picks": v} for k, v in sorted(scores.items(), key=lambda kv: -kv[1])]
+        picks = [r.model_dump() for r in rows]
+    cells = _cells_by_key()
+    board: dict[str, dict[str, int]] = defaultdict(lambda: {"picks": 0, "scored": 0, "points": 0})
+    for p in picks:
+        s = score_pick(p, cells)
+        b = board[str(p["device_id"])]
+        b["picks"] += 1
+        if s["status"] == "scored":
+            b["scored"] += 1
+            b["points"] += int(s["points"])
+    ranked = sorted(board.items(), key=lambda kv: (-kv[1]["points"], -kv[1]["scored"], -kv[1]["picks"]))
+    return [{"device_id": k[:8], **v} for k, v in ranked]
 
 
 @app.post("/observations")

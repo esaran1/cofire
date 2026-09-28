@@ -295,7 +295,31 @@ export const ObservationSchema = z.object({
   created_at: z.string().nullish(),
 });
 
-export const LeaderRowSchema = z.object({ device_id: z.string(), picks: z.number().default(0) });
+export const LeaderRowSchema = z.object({
+  device_id: z.string(),
+  picks: z.number().default(0),
+  scored: z.number().default(0),
+  points: z.number().default(0),
+});
+
+/** One of the player's picks, scored once its target week is in the record. */
+export const PickSchema = z.object({
+  id: z.string(),
+  cell_id: z.string(),
+  horizon: z.number(),
+  drought_category: z.number(),
+  fire_band: z.string(),
+  issue: z.string(),
+  created_at: z.string().default(""),
+  target_week: z.string(),
+  status: z.enum(["pending", "scored"]),
+  actual_category: maybeNumber,
+  actual_band: z.string().nullish(),
+  actual_dryness: maybeNumber,
+  drought_correct: z.boolean().nullish(),
+  fire_correct: z.boolean().nullish(),
+  points: maybeNumber,
+});
 
 export const GridFeatureSchema = z.object({
   type: z.literal("Feature"),
@@ -334,6 +358,7 @@ export type ObservationAck = z.infer<typeof ObservationAckSchema>;
 export type ObservationCell = NonNullable<ObservationAck["cell"]>;
 export type Observation = z.infer<typeof ObservationSchema>;
 export type LeaderRow = z.infer<typeof LeaderRowSchema>;
+export type PickRow = z.infer<typeof PickSchema>;
 export type Grid = z.infer<typeof GridSchema>;
 
 /**

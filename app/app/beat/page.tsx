@@ -5,7 +5,8 @@ import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { API, LeaderRow, getParsed, postParsed } from "@/lib/api";
-import { LeaderRowSchema, PredictionSchema } from "@/lib/schemas";
+import { LeaderRowSchema, PickSchema, PredictionSchema } from "@/lib/schemas";
+import type { PickRow } from "@/lib/schemas";
 import type { LockedModel } from "@/lib/schemas";
 import { resolvePlace } from "@/lib/data";
 import { domainLabel, useDomain } from "@/lib/domain";
@@ -25,7 +26,6 @@ import {
 const CATEGORIES = DROUGHT_CATEGORIES;
 const BANDS = FIRE_BANDS;
 
-type Pick = { cell_id: string; horizon: number; drought_category: number; fire_band: string; issue: string };
 // What the model said for the same cell and horizon (LockedModelSchema): the
 // dryness percentile and the drought category it makes most likely.
 type Locked = LockedModel;
@@ -40,7 +40,7 @@ function BeatInner() {
   // What was locked, and for which cell: the reveal compares these, not the
   // selectors, which may have moved since.
   const [lockedPick, setLockedPick] = useState<{ cat: number; band: string; cell: string } | null>(null);
-  const [mine, setMine] = useState<Pick[] | null>(null);
+  const [mine, setMine] = useState<PickRow[] | null>(null);
   const [board, setBoard] = useState<LeaderRow[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
@@ -48,9 +48,9 @@ function BeatInner() {
 
   const refresh = useCallback(() => {
     const id = deviceId();
-    getParsed(`/predictions/me?device_id=${id}`, z.array(z.object({ id: z.string().nullish() }).passthrough()))
+    getParsed(`/predictions/me?device_id=${id}`, z.array(PickSchema))
       .then((d) => {
-        setMine(d as unknown as Pick[]);
+        setMine(d);
         setOffline(false);
       })
       .catch(() => setOffline(true));
@@ -112,8 +112,10 @@ function BeatInner() {
       <p className="mt-2 leading-relaxed text-ink-soft">
         Make your call for this cell 4 weeks out, lock it, then see the model&apos;s call for the same
         cell. The model&apos;s call comes from the forecast, so it does not change with your pick; pick
-        another cell on the map to see a different one. Picks are kept. Scoring them against what
-        happens is not built yet.
+        another cell on the map to see a different one. Your pick is scored once the week arrives: a
+        point if your drought category matches the drought map that week, and a point if your
+        fire-spread band matches that week&apos;s dryness. The model&apos;s call is not scored, because
+        2026 is the sealed test year and scoring the model against it would be another look.
       </p>
 
       {offline && (
@@ -231,26 +233,51 @@ function BeatInner() {
         {mine === null ? (
           <Skeleton rows={2} />
         ) : streak === 0 ? (
-          <EmptyState
-            title="No picks yet"
-            body="Lock a call above and it is counted here."
-          />
+          <EmptyState title="No picks yet" body="Lock a call above and it shows up here, then gets scored when its week arrives." />
         ) : (
           <Panel>
-            <div className="flex items-baseline gap-3">
-              <Numeral value={streak} size="xl" />
-              <span className="text-sm text-ink-soft">
-                {streak === 1 ? "pick locked" : "picks locked"}, across{" "}
-                {new Set((mine ?? []).map((m) => m.issue)).size} forecast{" "}
-                {new Set((mine ?? []).map((m) => m.issue)).size === 1 ? "week" : "weeks"}
+            <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2" data-testid="pick-summary">
+              <span className="flex items-baseline gap-2">
+                <Numeral value={streak} size="xl" />
+                <span className="text-sm text-ink-soft">{streak === 1 ? "pick" : "picks"}</span>
+              </span>
+              <span className="flex items-baseline gap-2">
+                <Numeral value={mine.filter((m) => m.status === "scored").length} size="xl" />
+                <span className="text-sm text-ink-soft">scored</span>
+              </span>
+              <span className="flex items-baseline gap-2">
+                <Numeral value={mine.reduce((a, m) => a + (m.points ?? 0), 0)} size="xl" tone="ember" />
+                <span className="text-sm text-ink-soft">points</span>
               </span>
             </div>
+            <ul className="mt-4 divide-y divide-rule text-sm" data-testid="pick-list">
+              {mine.slice(0, 10).map((m) => (
+                <li key={m.id} className="py-2" data-testid={`pick-${m.status}`}>
+                  <span className="text-ink">
+                    {CATEGORIES.find((c) => c.value === m.drought_category)?.label} and{" "}
+                    {BANDS.find((x) => x.value === m.fire_band)?.label.toLowerCase()}
+                  </span>
+                  <span className="text-mute"> for the week of {m.target_week}</span>
+                  {m.status === "pending" ? (
+                    <span className="block text-xs text-ink-soft">Scored once that week&apos;s data is in.</span>
+                  ) : (
+                    <span className="block text-xs text-ink-soft">
+                      It was {CATEGORIES.find((c) => c.value === m.actual_category)?.label} (
+                      {m.drought_correct ? "right" : "wrong"}) and{" "}
+                      {BANDS.find((x) => x.value === m.actual_band)?.label.toLowerCase()}, dryness{" "}
+                      {m.actual_dryness?.toFixed(0)} ({m.fire_correct ? "right" : "wrong"}): {m.points}{" "}
+                      {m.points === 1 ? "point" : "points"}.
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
           </Panel>
         )}
       </div>
 
-      <h2 className="mt-10 text-lg font-medium">Most picks locked</h2>
-      <p className="mt-1 text-xs text-ink-soft">All areas together. Ranked by picks locked, since scoring is not built yet.</p>
+      <h2 className="mt-10 text-lg font-medium">Leaderboard</h2>
+      <p className="mt-1 text-xs text-ink-soft">All areas together. Ranked by points from scored picks.</p>
       <div className="mt-3">
         {board === null ? (
           <Skeleton rows={3} />
@@ -266,7 +293,12 @@ function BeatInner() {
                     {r.device_id === me || me.startsWith(r.device_id) ? "You" : `Player ${r.device_id.slice(0, 4)}`}
                   </span>
                 </span>
-                <Numeral value={r.picks} size="sm" />
+                <span className="text-right text-xs text-ink-soft">
+                  <Numeral value={r.points} size="sm" /> points
+                  <span className="block">
+                    {r.scored} of {r.picks} scored
+                  </span>
+                </span>
               </li>
             ))}
           </ul>
