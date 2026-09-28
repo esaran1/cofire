@@ -14,12 +14,20 @@ export const DROUGHT_CATEGORIES = [
   { value: 4, label: "D4", hint: "exceptional" },
 ];
 
+// Fire-spread bands on the dryness scale the model forecasts (the ERC
+// percentile for the week, 50 is typical). 80 and 90 are the thresholds the
+// fire-spread targets use, so a band means the same thing everywhere.
 export const FIRE_BANDS = [
-  { value: "low", label: "Low" },
-  { value: "moderate", label: "Moderate" },
-  { value: "high", label: "High" },
-  { value: "very_high", label: "Very high" },
+  { value: "low", label: "Low", hint: "under 50", min: 0, max: 50 },
+  { value: "moderate", label: "Moderate", hint: "50 to 80", min: 50, max: 80 },
+  { value: "high", label: "High", hint: "80 to 90", min: 80, max: 90 },
+  { value: "very_high", label: "Very high", hint: "over 90", min: 90, max: 101 },
 ];
+
+/** The band a dryness value falls in. */
+export function fireBandFor(point: number): (typeof FIRE_BANDS)[number] {
+  return FIRE_BANDS.find((b) => point >= b.min && point < b.max) ?? FIRE_BANDS[FIRE_BANDS.length - 1];
+}
 
 export const OBSERVATION_TYPES = [
   { value: "stock_tank_dry", label: "Stock tank dry" },

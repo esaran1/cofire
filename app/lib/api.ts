@@ -9,6 +9,7 @@ export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
  */
 export async function getParsed<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, { cache: "no-store", ...init });
+  if (res.status === 429) throw new Error("That is a lot in one minute. Wait a moment, then try again.");
   if (!res.ok) throw new Error(`${path} returned ${res.status}`);
   const raw: unknown = await res.json();
   const parsed = schema.safeParse(raw);

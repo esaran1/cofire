@@ -106,7 +106,8 @@ def _rate_limit(device_id: str, limit: int = 30) -> None:
 
 
 # `make demo` runs from a committed fixture set with no pipeline run and no
-# network. When demo/ exists it wins, so a fresh clone serves real numbers.
+# network (COFIRE_DEMO=1). Otherwise the real artifacts are served when built,
+# and the fixture is the fallback, so a fresh clone still serves real numbers.
 # Anchored to the repo root (three levels up from this file), not the process
 # cwd: `make demo` and `uvicorn` are started from different directories, and a
 # relative path silently fell through to the test fixture instead.

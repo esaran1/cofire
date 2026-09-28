@@ -1,6 +1,6 @@
 "use client";
 
-import { DROUGHT_CATEGORIES, FIRE_BANDS } from "@/lib/options";
+import { DROUGHT_CATEGORIES, FIRE_BANDS, fireBandFor } from "@/lib/options";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -37,6 +37,9 @@ function BeatInner() {
   const [cat, setCat] = useState(2);
   const [band, setBand] = useState("high");
   const [locked, setLocked] = useState<Locked | null>(null);
+  // What was locked, and for which cell: the reveal compares these, not the
+  // selectors, which may have moved since.
+  const [lockedPick, setLockedPick] = useState<{ cat: number; band: string; cell: string } | null>(null);
   const [mine, setMine] = useState<Pick[] | null>(null);
   const [board, setBoard] = useState<LeaderRow[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -92,6 +95,7 @@ function BeatInner() {
         PredictionSchema,
       );
       setLocked(body.locked_model ?? null);
+      setLockedPick({ cat, band, cell });
       refresh();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Could not lock your pick.");
@@ -106,8 +110,10 @@ function BeatInner() {
     <div className="reading px-6 pb-24 pt-12">
       <h1 className="display text-4xl">Beat the Model</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
-        Lock your call for 4 weeks out before you see the model&apos;s. Both are scored against
-        what actually happens once those weeks arrive.
+        Make your call for this cell 4 weeks out, lock it, then see the model&apos;s call for the same
+        cell. The model&apos;s call comes from the forecast, so it does not change with your pick; pick
+        another cell on the map to see a different one. Picks are kept. Scoring them against what
+        happens is not built yet.
       </p>
 
       {offline && (
@@ -149,7 +155,7 @@ function BeatInner() {
 
       {/* One deliberate reveal: the model's number is hidden until the pick is locked. */}
       <AnimatePresence>
-        {locked && (
+        {locked && lockedPick && lockedPick.cell === cell && (
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -160,7 +166,7 @@ function BeatInner() {
             <Panel>
               <p className="text-sm font-medium text-ink">The model said</p>
               <div className="mt-3 grid grid-cols-2 gap-4">
-                <div>
+                <div data-testid="reveal-drought">
                   <Numeral
                     value={
                       locked.drought_likely !== null && locked.drought_likely !== undefined
@@ -181,46 +187,70 @@ function BeatInner() {
                       {locked.drought_note.charAt(0).toUpperCase() + locked.drought_note.slice(1)}.
                     </p>
                   ) : null}
+                  <p className="mt-2 text-xs text-ink" data-testid="compare-drought">
+                    You: {CATEGORIES.find((c) => c.value === lockedPick.cat)?.label}.{" "}
+                    {locked.drought_likely === lockedPick.cat ? "Same as the model." : "Different from the model."}
+                  </p>
                 </div>
-                <div>
+                <div data-testid="reveal-fire">
                   <Numeral
-                    value={locked.point !== null && locked.point !== undefined ? locked.point.toFixed(0) : "not shown"}
+                    value={
+                      locked.point !== null && locked.point !== undefined
+                        ? `${fireBandFor(locked.point).label}`
+                        : "not shown"
+                    }
                     tone="ember"
                     size="xl"
                   />
-                  <p className="mt-1 text-xs text-ink-soft">dryness in 4 weeks, out of 100 (50 is typical)</p>
+                  <p className="mt-1 text-xs text-ink-soft">
+                    the model&apos;s fire-spread band in 4 weeks
+                    {locked.point !== null && locked.point !== undefined
+                      ? `: dryness ${locked.point.toFixed(0)} out of 100, where 50 is typical`
+                      : ""}
+                  </p>
+                  <p className="mt-2 text-xs text-ink" data-testid="compare-fire">
+                    You: {BANDS.find((x) => x.value === lockedPick.band)?.label}.{" "}
+                    {locked.point !== null && locked.point !== undefined && fireBandFor(locked.point).value === lockedPick.band
+                      ? "Same as the model."
+                      : "Different from the model."}
+                  </p>
                 </div>
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-ink-soft">
-                You picked {CATEGORIES.find((c) => c.value === cat)?.label} and{" "}
-                {BANDS.find((b) => b.value === band)?.label.toLowerCase()}. Neither number is scored
-                yet.
-              </p>
+              {cat !== lockedPick.cat || band !== lockedPick.band ? (
+                <p className="mt-4 text-xs leading-relaxed text-ember" data-testid="pick-changed">
+                  You have changed your pick since you locked it. Press Lock another to lock the new one.
+                </p>
+              ) : null}
             </Panel>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <h2 className="mt-12 text-lg font-medium">Your streak</h2>
+      <h2 className="mt-12 text-lg font-medium">Your picks</h2>
       <div className="mt-3">
         {mine === null ? (
           <Skeleton rows={2} />
         ) : streak === 0 ? (
           <EmptyState
             title="No picks yet"
-            body="Lock a call above and it shows up here. Your streak counts consecutive weeks with a pick."
+            body="Lock a call above and it is counted here."
           />
         ) : (
           <Panel>
             <div className="flex items-baseline gap-3">
               <Numeral value={streak} size="xl" />
-              <span className="text-sm text-ink-soft">{streak === 1 ? "pick locked" : "picks locked"}</span>
+              <span className="text-sm text-ink-soft">
+                {streak === 1 ? "pick locked" : "picks locked"}, across{" "}
+                {new Set((mine ?? []).map((m) => m.issue)).size} forecast{" "}
+                {new Set((mine ?? []).map((m) => m.issue)).size === 1 ? "week" : "weeks"}
+              </span>
             </div>
           </Panel>
         )}
       </div>
 
-      <h2 className="mt-10 text-lg font-medium">County leaderboard</h2>
+      <h2 className="mt-10 text-lg font-medium">Most picks locked</h2>
+      <p className="mt-1 text-xs text-ink-soft">All areas together. Ranked by picks locked, since scoring is not built yet.</p>
       <div className="mt-3">
         {board === null ? (
           <Skeleton rows={3} />

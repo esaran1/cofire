@@ -58,3 +58,38 @@ test("when the model's drought odds were not all checked, the call shows without
   await expect(reveal).toContainText("47");
   await expect(reveal).not.toContainText("n/a");
 });
+
+test("the reveal compares the locked pick with the model, and flags an unlocked change", async ({ page }) => {
+  await page.route("**/predictions", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ id: "e2e", issue: "2026-09-22",
+        locked_model: { point: 84, state: "uncalibrated", drought_now: 3, drought_likely: 3, drought_likely_p: 0.7 } }),
+    });
+  });
+  await page.goto("/beat?domain=denver");
+  await page.getByRole("radio", { name: /^D3/ }).first().click();
+  await page.getByRole("radio", { name: /^Moderate/ }).first().click();
+  const lock = page.getByRole("button", { name: /Lock my pick|Lock another/ });
+  await expect(lock).toBeEnabled({ timeout: 20_000 });
+  await lock.click();
+  // Dryness 84 is in the High band (80 to 90).
+  await expect(page.getByTestId("reveal-fire")).toContainText("High");
+  await expect(page.getByTestId("compare-drought")).toHaveText("You: D3. Same as the model.");
+  await expect(page.getByTestId("compare-fire")).toHaveText("You: Moderate. Different from the model.");
+  await expect(page.getByTestId("pick-changed")).toHaveCount(0);
+  await page.getByRole("radio", { name: /^D1/ }).first().click();
+  await expect(page.getByTestId("pick-changed")).toBeVisible();
+  await expect(page.getByTestId("compare-drought")).toHaveText("You: D3. Same as the model.");
+});
+
+test("too many picks in a minute gets a plain message", async ({ page }) => {
+  await page.route("**/predictions", (route) =>
+    route.request().method() === "POST" ? route.fulfill({ status: 429, body: '{"detail":"rate limit"}' }) : route.fallback());
+  await page.goto("/beat?domain=denver");
+  const lock = page.getByRole("button", { name: /Lock my pick|Lock another/ });
+  await expect(lock).toBeEnabled({ timeout: 20_000 });
+  await lock.click();
+  await expect(page.getByText("That is a lot in one minute")).toBeVisible();
+});
