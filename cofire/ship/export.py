@@ -90,6 +90,56 @@ def regional_base_rate(train: pd.DataFrame, target: str, index: pd.DataFrame) ->
     return np.array([rate_by_woy[int(w)] for w in _woy(index["time"])])
 
 
+MIN_CONDITIONAL_WEEKS = 8
+
+
+def conditional_base_rate(train: pd.DataFrame, target: str, index: pd.DataFrame) -> np.ndarray:
+    """How often the event happened here, this time of year, from the same drought category.
+
+    The fallback shown for a drought target whose per-cell probability did not
+    pass its check. The unconditional seasonal rate (`regional_base_rate`)
+    ignores where a cell is now, so a card could show an 11% chance of D2 or
+    worse for a cell already in D3, or a 6% chance of worsening two categories
+    from D3, which is impossible. This pools the training record over the whole
+    domain, the +/- 3 week window of the issue, and the cell's current USDM
+    category. A category seen in fewer than MIN_CONDITIONAL_WEEKS distinct weeks
+    at that season pools the category over all seasons; only a category almost
+    never seen falls back to the unconditional seasonal rate. Fire targets
+    keep the seasonal rate, which respects every state by construction.
+    """
+    from cofire.model.erc_pct import window_weeks
+
+    if not target.startswith("d_"):
+        return regional_base_rate(train, target, index)
+    y = pd.to_numeric(train[target], errors="coerce").to_numpy(dtype=float)
+    cat = np.round(pd.to_numeric(train["usdm"], errors="coerce").to_numpy(dtype=float))
+    tw = _woy(train["time"])
+    weeks = pd.to_datetime(train["time"]).to_numpy()
+    ok = np.isfinite(y) & np.isfinite(cat)
+    fallback = regional_base_rate(train, target, index)
+    icat = np.round(pd.to_numeric(index["usdm"], errors="coerce").to_numpy(dtype=float))
+    iw = _woy(index["time"])
+    out = np.array(fallback, dtype=float)
+    cache: dict[tuple[int, int], float] = {}
+    for i, (c, w) in enumerate(zip(icat, iw, strict=True)):
+        if not np.isfinite(c):
+            continue
+        key = (int(w), int(c))
+        if key not in cache:
+            same = ok & (cat == c)
+            m = same & np.isin(tw, window_weeks(int(w)))
+            if np.unique(weeks[m]).size < MIN_CONDITIONAL_WEEKS:
+                # Too few weeks in this category at this season: keep the
+                # category and pool the seasons, because dropping the category
+                # is what brings back impossible numbers (worsening two
+                # categories from D3). A category never seen falls back further.
+                m = same
+            cache[key] = float(y[m].mean()) if np.unique(weeks[m]).size >= MIN_CONDITIONAL_WEEKS else float("nan")
+        if np.isfinite(cache[key]):
+            out[i] = cache[key]
+    return out
+
+
 def climatological_bounds(
     train: pd.DataFrame, horizon: int, index: pd.DataFrame, lo: float = 5.0, hi: float = 95.0
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -475,7 +525,7 @@ def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | Non
                     else _fire_prediction(c.family, train, target, issues)
                 )
                 per_issue[f"{target}_p"] = pred
-                per_issue[f"{target}_base_rate"] = regional_base_rate(train, target, issues)
+                per_issue[f"{target}_base_rate"] = conditional_base_rate(train, target, issues)
 
             for col, vals in per_issue.items():
                 base[col] = vals

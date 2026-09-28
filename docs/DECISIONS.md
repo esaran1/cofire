@@ -2179,3 +2179,35 @@ ever in history: 12,826,197 bytes (a demo index since removed).
 - The four files once marked "intended for hand-rewrite" show no hand rewrite
   in history.
 - A section for the student's own contributions is left blank for the student.
+
+## v1.1: drought fallback rates conditioned on the current category
+
+A wiring check of the map and Place Card (every control, every value against
+the bundle data) found the controls correct, but three things that made the
+output look stuck or wrong:
+
+- **Drought odds are the same for every cell in the same drought category.**
+  This is the frozen Markov model: it conditions on the current category and
+  the season only. Denver's 52 cells fall in two categories this week, so
+  clicking around Denver gives two sets of drought odds. The card now says so;
+  fire-spread odds vary per cell.
+- **The fallback rate for drought ignored the current category.** Where a
+  per-cell drought probability did not pass its check, the card showed the
+  area's unconditional seasonal rate. That produced "11% chance of D2 or worse
+  in 4 weeks" for Larimer, where most cells are already in D2 or D3. It also
+  produced impossible numbers: a 6% chance of worsening two categories from D3
+  (USDM stops at D4). The fallback is now the training-era rate among cells in
+  the same category, within +/- 3 weeks of the issue, pooled over all seasons
+  when that window has fewer than 8 weeks (`conditional_base_rate` in
+  `cofire/ship/export.py`). Which targets fall back is unchanged; only what the
+  fallback shows. Fire fallbacks keep the seasonal rate. A test asserts no
+  exported number describes an impossible move.
+- **The fire map looked flat.** Forecast dryness sits mostly between 35 and 65,
+  one colour on a 0 to 100 ramp. The ramp now diverges around 50 (typical), and
+  the map has a legend. The card's "Dryness for this week" heading showed the 2,
+  4 or 8 week forecast and now says so.
+
+**Still open, for the owner:** a card mixes model rows (targets that passed
+their check) with fallback rows (targets that did not). The two are different
+estimators, so a card can still contradict itself. A Denver D3 cell shows D3
+or worse 69% (history) against staying at D3 76% (model).

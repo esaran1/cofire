@@ -90,7 +90,10 @@ def test_reliability_failures_render_as_base_rate() -> None:
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
 def test_base_rate_targets_are_identical_across_cells_within_an_issue() -> None:
-    """One number per county and issue, and it moves with the season.
+    """One number per area and issue (and, for drought, per current category).
+
+    Drought fallbacks are conditioned on the cell's current category, so cells
+    in the same category share one number; fire fallbacks are one per area.
 
     The earlier version of this test checked identity across every issue at
     once, which a single year-round number passes. That is how a base rate
@@ -106,7 +109,8 @@ def test_base_rate_targets_are_identical_across_cells_within_an_issue() -> None:
         sel = frame[frame[col] == BASE_RATE]
         if sel.empty:
             continue
-        spread = sel.groupby(["domain", "time"])[pcol].agg(lambda v: float(np.nanstd(v)))
+        keys = ["domain", "time"] + (["usdm"] if key.startswith("d_") else [])
+        spread = sel.groupby(keys)[pcol].agg(lambda v: float(np.nanstd(v)))
         assert (spread < 1e-12).all(), f"{key} varies across cells within an issue"
         checked += 1
     assert checked > 0
@@ -114,11 +118,12 @@ def test_base_rate_targets_are_identical_across_cells_within_an_issue() -> None:
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
 def test_base_rate_is_the_training_record_rate_for_the_season() -> None:
-    """The shown base rate equals how often the event happened, not a model mean.
+    """The shown base rate is how often the event happened from the same category.
 
     Recomputed independently from the training split for one target and issue.
-    On 22 September the shown value for Larimer D2-or-worse in 4 weeks was 0.644
-    before this was fixed; the record for late September says about 0.11.
+    It was once the mean of the model's own predictions (0.644), then the
+    unconditional seasonal rate (0.11), which ignored that most of Larimer was
+    already in D2 or D3.
     """
     from cofire.model.calibration_stages import domain_frame
     from cofire.model.erc_pct import window_weeks
@@ -136,12 +141,16 @@ def test_base_rate_is_the_training_record_rate_for_the_season() -> None:
     train = frame[frame["time"] <= pd.Timestamp(st.train_end)]
     exp = pd.read_parquet(EXPORT)
     issue = pd.Timestamp(exp["time"].max())
-    woy = train["time"].dt.isocalendar().week.astype(int).clip(1, 52)
-    y = pd.to_numeric(train.loc[woy.isin(window_weeks(issue.isocalendar().week)), "d_ge2_h4"], errors="coerce")
-    expected = float(y.dropna().mean())
-
     row = exp[(exp["domain"] == "larimer") & (exp["time"] == issue)].iloc[0]
     assert row["d_ge2_h4_state"] == BASE_RATE
+    # The rate among training cell-weeks in the same drought category as this
+    # cell, within +/- 3 weeks of the issue (cofire.ship.export.conditional_base_rate).
+    woy = train["time"].dt.isocalendar().week.astype(int).clip(1, 52)
+    same = train["usdm"].round() == round(float(row["usdm"]))
+    m = same & woy.isin(window_weeks(issue.isocalendar().week))
+    if train.loc[m, "time"].nunique() < 8:
+        m = same
+    expected = float(pd.to_numeric(train.loc[m, "d_ge2_h4"], errors="coerce").dropna().mean())
     # float32 storage in the export; a probability needs no more than 1e-6.
     assert abs(float(row["d_ge2_h4_p"]) - expected) < 1e-6
 
@@ -231,3 +240,21 @@ def test_hindcast_criteria_labels_state_the_recorded_thresholds() -> None:
             assert want in labels[k] or n in labels[k] or f"{float(n):.2f}" in labels[k], (
                 f"test {k} threshold {t['threshold']!r} is not stated in {labels[k]!r}"
             )
+
+
+@pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
+def test_no_drought_number_describes_an_impossible_move() -> None:
+    """USDM runs 0 to 4, so some moves cannot happen from some categories.
+
+    A fallback rate that ignored the current category showed, for example, a 6%
+    chance of worsening two categories from D3.
+    """
+    import numpy as np
+
+    e = pd.read_parquet(EXPORT)
+    c = e["usdm"].round()
+    for h in (2, 4, 8):
+        assert (e.loc[c >= 3, f"d_intensify2_h{h}_p"] < 1e-9).all(), f"worsening two from D3+ at h{h}"
+        assert (e.loc[c >= 4, f"d_intensify1_h{h}_p"] < 1e-9).all(), f"worsening from D4 at h{h}"
+        assert (e.loc[c <= 0, f"d_improve1_h{h}_p"] < 1e-9).all(), f"easing from none at h{h}"
+        assert np.isfinite(e[f"d_ge2_h{h}_p"]).all()

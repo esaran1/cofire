@@ -12,7 +12,8 @@ The four states a target-horizon-domain can render in:
   change nothing.
 - `historical_range`: point forecast plus the labelled historical week-of-year
   range of raw ERC. Where Stage B classified the horizon climatological.
-- `base_rate`: the regional base rate, visibly identical across cells. For a
+- `base_rate`: a historical rate instead of a per-cell probability (for drought,
+  conditioned on the cell's current category; for fire, the seasonal rate). For a
   probabilistic target that failed the look-3 reliability criterion, or that has
   no resolution to offer.
 - `uncalibrated`: no interval at all, with the reason shown. For a horizon that
@@ -46,6 +47,14 @@ RELIABILITY_MAX = 0.05
 # A target whose forecasts barely separate events from non-events has nothing
 # to say per cell, whatever its Brier score.
 MIN_RESOLUTION = 1e-4
+
+
+def shown_instead(target: str) -> str:
+    """What a base-rate target shows in place of a per-cell probability."""
+    if target.startswith("d_"):
+        return ("the historical rate for cells in the same drought category at this time of "
+                "year is shown instead")
+    return "the historical rate for this area at this time of year is shown instead"
 
 
 @dataclass(frozen=True)
@@ -164,7 +173,7 @@ def probabilistic_decisions() -> list[Decision]:
     """One decision per domain and probabilistic target.
 
     A target renders per cell only if it passed the look-3 reliability
-    criterion and has resolution to offer. Otherwise the regional base rate,
+    criterion and has resolution to offer. Otherwise a historical rate,
     identical across cells, with the reason stated.
     """
     path = LOOK3 / "reliability.csv"
@@ -185,8 +194,7 @@ def probabilistic_decisions() -> list[Decision]:
                     dom, target, h, BASE_RATE,
                     f"stated probabilities did not match observed frequencies on "
                     f"the 2026 holdout: reliability {bad_rel[key]:.4f}, needed "
-                    f"{RELIABILITY_MAX} or less, so the regional base rate is "
-                    f"shown instead of a per-cell probability",
+                    f"{RELIABILITY_MAX} or less, so {shown_instead(target)}",
                 )
             )
             continue
@@ -196,7 +204,7 @@ def probabilistic_decisions() -> list[Decision]:
                     dom, target, h, BASE_RATE,
                     f"the forecast does not separate events from non-events: "
                     f"resolution {flat[key]:.6f}, so every cell would show the "
-                    f"same number and the regional base rate is shown instead",
+                    f"same number, so {shown_instead(target)}",
                 )
             )
             continue
@@ -259,7 +267,7 @@ def new_domain_decisions() -> list[Decision]:
                 out.append(Decision(
                     dom, target, h, BASE_RATE,
                     "the event did not happen in this area in 2022 or 2023, so a per-cell "
-                    "probability cannot be checked; the regional base rate is shown instead",
+                    f"probability cannot be checked; {shown_instead(target)}",
                 ))
                 continue
             r = t.loc[target]
@@ -278,14 +286,14 @@ def new_domain_decisions() -> list[Decision]:
                     dom, target, h, BASE_RATE,
                     f"only {int(r['n_positive_weeks'])} weeks with the event in 2022 to 2023 "
                     f"validation, fewer than the 12 needed to check a per-cell probability; "
-                    f"the regional base rate is shown instead",
+                    f"{shown_instead(target)}",
                 ))
             else:
                 out.append(Decision(
                     dom, target, h, BASE_RATE,
                     f"stated probabilities did not match observed frequencies in 2022 to 2023 "
                     f"validation: reliability {float(r['reliability_cell']):.4f}, needed "
-                    f"{RELIABILITY_MAX} or less, so the regional base rate is shown instead",
+                    f"{RELIABILITY_MAX} or less, so {shown_instead(target)}",
                 ))
     return out
 

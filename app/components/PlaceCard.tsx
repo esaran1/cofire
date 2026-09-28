@@ -154,10 +154,20 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
  */
 const AREA: Record<string, string> = { county: "county", urban: "city", watershed: "watershed" };
 
-function TargetRow({ name, t, kind }: { name: string; t: Target; kind?: string | null }) {
+function categoryName(c: number): string {
+  return c <= 0 ? "no drought or D0" : `D${c}`;
+}
+
+function TargetRow({ name, t, kind, now }: { name: string; t: Target; kind?: string | null; now?: number | null }) {
   if (t.p === null || t.p === undefined) return null;
   const isBase = t.state === "base_rate";
   const area = AREA[kind ?? "county"] ?? "area";
+  const drought = name.startsWith("d_");
+  // A base-rate row is the historical rate, not a forecast for this cell. For
+  // drought it is the rate among cells in the same category now, so say which.
+  const marker = drought && now !== null && now !== undefined
+    ? `usual rate for cells in ${categoryName(Math.round(now))} here`
+    : `usual rate for this ${area} this time of year`;
   return (
     <li
       className="border-rule border-b py-2.5 last:border-b-0"
@@ -168,17 +178,13 @@ function TargetRow({ name, t, kind }: { name: string; t: Target; kind?: string |
           <div className="flex items-baseline justify-between gap-3">
             <span className="min-w-0">
               <span className="block text-sm">{targetLabel(name, kind)}</span>
-              {isBase ? (
-                <span className="text-mute block text-[11px]">same for the whole {area}</span>
-              ) : null}
+              {isBase ? <span className="text-mute block text-[11px]">{marker}</span> : null}
             </span>
             <span className="num text-ink text-sm">{formatProbability(t.p)}</span>
           </div>
         }
       >
-        {isBase
-          ? `The same number for every cell in this ${area}. ${sentence(t.reason ?? "")}`
-          : sentence(t.reason ?? "")}
+        {sentence(t.reason ?? "")}
       </Disclosure>
     </li>
   );
@@ -257,7 +263,13 @@ export function PlaceCard({
         ))}
       </div>
 
-      <h2 className="mt-4 text-xl font-semibold">Dryness for this week</h2>
+      <h2 className="mt-4 text-xl font-semibold" data-testid="dryness-heading">
+        Dryness in {horizon} weeks
+      </h2>
+      <p className="text-mute mt-1 text-[11px] leading-relaxed">
+        Forecast fuel dryness (ERC) as a percentile of what is usual for that week here: 50 is typical,
+        90 is drier than nine in ten past weeks at that time of year.
+      </p>
       <ErcBlock hz={hz} erc={place.erc} />
 
       {place.usdm !== null && place.usdm !== undefined ? (
@@ -269,9 +281,13 @@ export function PlaceCard({
       {targets.length > 0 ? (
         <>
           <h3 className="mt-5 text-lg">What could happen in {horizon} weeks</h3>
+          <p className="text-mute mt-1 text-[11px] leading-relaxed" data-testid="drought-note">
+            Drought odds come from a cell&apos;s current drought category and the season, so nearby cells
+            in the same category show the same drought odds. Fire-spread odds are per cell.
+          </p>
           <ul className="mt-1">
             {targets.map(([name, t]) => (
-              <TargetRow key={name} name={name} t={t} kind={meta?.kind} />
+              <TargetRow key={name} name={name} t={t} kind={meta?.kind} now={place.usdm} />
             ))}
           </ul>
         </>

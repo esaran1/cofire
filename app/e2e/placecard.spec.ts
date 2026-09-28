@@ -73,7 +73,7 @@ test("every rendering state carries its reason", async ({ page }) => {
   await expect(card.locator('[data-testid="erc-reason"]')).toBeVisible();
 });
 
-test("a base-rate target says it is the same for every cell", async ({ page }) => {
+test("a base-rate target says it is a historical rate, not this cell's forecast", async ({ page }) => {
   // Larimer, so the marker names a county; the city and watershed wording is
   // covered in domains.spec.ts.
   const card = await openPlaceCard(page, "larimer");
@@ -88,11 +88,11 @@ test("a base-rate target says it is the same for every cell", async ({ page }) =
   if (nBase > 0) {
     const rows = card.locator('[data-testid="target-base-rate"]');
     await expect(rows.first()).toBeVisible();
-    // The statement is the point: a number identical across cells must say so,
-    // or the reader will read spatial detail into it that is not there. The
-    // marker is inline on the row, because it changes how the number should be
-    // read and so cannot sit behind the disclosure.
-    await expect(rows.first()).toContainText("same for the whole county");
+    // The statement is the point: a historical rate must say so, or the reader
+    // will take it for this cell's forecast. Drought rates name the category
+    // they are conditioned on; fire rates name the area and season. The marker
+    // is inline on the row, because it changes how the number should be read.
+    await expect(rows.first()).toContainText(/usual rate for (cells in (D\d|no drought or D0) here|this county this time of year)/);
   }
 });
 
@@ -100,7 +100,7 @@ test("the point forecast survives every state", async ({ page }) => {
   const card = await openPlaceCard(page);
   await expect(card).toBeVisible({ timeout: 15_000 });
   // Whatever happens to the band, the forecast itself is always shown.
-  await expect(card.getByText("Dryness for this week")).toBeVisible();
+  await expect(card.getByText("Dryness in")).toBeVisible();
 });
 
 test("the historical ERC range is shown, labelled as history", async ({ page }) => {

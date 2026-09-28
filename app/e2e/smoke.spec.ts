@@ -11,7 +11,7 @@ test("map loads and place card opens", async ({ page }) => {
   // rule, neither of which has a per-feature attribution, so the Why panel is
   // absent rather than filled with invented drivers. It reappears if a model
   // that can explain itself ever ships.
-  await expect(page.getByTestId("place-card")).toContainText("Dryness for this week");
+  await expect(page.getByTestId("place-card")).toContainText("Dryness in");
 });
 
 test("the hindcast screen reports the look against each criterion", async ({ page }) => {

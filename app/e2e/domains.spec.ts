@@ -33,7 +33,7 @@ for (const d of DOMAINS) {
     const card = page.getByTestId("place-card");
     await expect(card).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId("place-domain")).toContainText(d.label);
-    await expect(card).toContainText("Dryness for this week");
+    await expect(card).toContainText("Dryness in");
     await expect(page.getByTestId("erc-history")).toBeVisible();
     // No band anywhere: the point forecast and the labelled history only.
     await expect(page.getByTestId("erc-interval")).toHaveCount(0);
@@ -85,7 +85,7 @@ test("a target that cannot be checked shows the base rate and says why", async (
   await expect(card).toBeVisible({ timeout: 20_000 });
   const base = page.getByTestId("target-base-rate").filter({ hasText: "Drought reaching D2 or worse" });
   await expect(base).toHaveCount(1);
-  await expect(base).toContainText("same for the whole watershed");
+  await expect(base).toContainText(/usual rate for cells in (D\d|no drought or D0) here/);
   await base.getByRole("button").first().click();
   await expect(base).toContainText("did not happen in this area in 2022 or 2023");
 });

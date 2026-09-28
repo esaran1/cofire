@@ -1,7 +1,7 @@
 {
   "generated_from": "artifacts/",
   "note": "Every figure the site shows is written here from artifacts. Do not hard-code numbers in components.",
-  "git_sha": "a22fcc7fa4580ad3a834dbb74a349ca8c8404068",
+  "git_sha": "ae53a700243ac8ca56bbb10e352af6e2ae7e109e",
   "resolution_m": 4000,
   "domains": [
     "denver",
@@ -1808,21 +1808,21 @@
       "target": "d_ge3_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
       "target": "d_ge3_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
       "target": "d_ge3_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
@@ -1843,14 +1843,14 @@
       "target": "d_improve1_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0839, needed 0.05 or less, so the regional base rate is shown instead"
+      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0839, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
       "target": "d_intensify1_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
@@ -1871,21 +1871,21 @@
       "target": "d_intensify2_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 1 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
       "target": "d_intensify2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
       "target": "d_intensify2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "denver",
@@ -1976,63 +1976,63 @@
       "target": "f_gt97_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "denver",
       "target": "f_gt97_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "denver",
       "target": "f_gt97_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_ge2_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_ge2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_ge2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_ge3_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_ge3_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_ge3_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
@@ -2060,42 +2060,42 @@
       "target": "d_intensify1_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_intensify1_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 8 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_intensify1_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_intensify2_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_intensify2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "d_intensify2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
@@ -2116,7 +2116,7 @@
       "target": "d_nochange_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0667, needed 0.05 or less, so the regional base rate is shown instead"
+      "reason": "stated probabilities did not match observed frequencies in 2022 to 2023 validation: reliability 0.0667, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "dillon",
@@ -2186,21 +2186,21 @@
       "target": "f_gt97_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "f_gt97_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 3 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "dillon",
       "target": "f_gt97_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "only 2 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 2 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2214,14 +2214,14 @@
       "target": "d_ge2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1127, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1127, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
       "target": "d_ge2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.2407, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.2407, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2242,7 +2242,7 @@
       "target": "d_ge3_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1520, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1520, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2263,7 +2263,7 @@
       "target": "d_improve1_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1132, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1132, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2277,35 +2277,35 @@
       "target": "d_intensify1_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1230, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1230, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
       "target": "d_intensify1_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1492, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1492, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
       "target": "d_intensify2_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
       "target": "d_intensify2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
       "target": "d_intensify2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2326,7 +2326,7 @@
       "target": "d_nochange_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1301, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1301, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2361,14 +2361,14 @@
       "target": "f_gt80_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0539, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0539, needed 0.05 or less, so the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "larimer",
       "target": "f_gt80_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0535, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0535, needed 0.05 or less, so the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2382,7 +2382,7 @@
       "target": "f_gt90_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0502, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0502, needed 0.05 or less, so the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "larimer",
@@ -2403,14 +2403,14 @@
       "target": "f_gt97_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number, so the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "larimer",
       "target": "f_gt97_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number, so the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
@@ -2431,7 +2431,7 @@
       "target": "d_ge2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0698, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0698, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
@@ -2473,14 +2473,14 @@
       "target": "d_improve1_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0658, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0658, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
       "target": "d_intensify1_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000011, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000011, so every cell would show the same number, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
@@ -2494,21 +2494,21 @@
       "target": "d_intensify1_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1124, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1124, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
       "target": "d_intensify2_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
       "target": "d_intensify2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000092, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000092, so every cell would show the same number, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
@@ -2529,14 +2529,14 @@
       "target": "d_nochange_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0541, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.0541, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
       "target": "d_nochange_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1412, needed 0.05 or less, so the regional base rate is shown instead of a per-cell probability"
+      "reason": "stated probabilities did not match observed frequencies on the 2026 holdout: reliability 0.1412, needed 0.05 or less, so the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "pueblo",
@@ -2620,49 +2620,49 @@
       "target": "f_gt97_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number and the regional base rate is shown instead"
+      "reason": "the forecast does not separate events from non-events: resolution 0.000000, so every cell would show the same number, so the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_ge2_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 6 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_ge2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 4 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_ge2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_ge3_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_ge3_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_ge3_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
@@ -2711,21 +2711,21 @@
       "target": "d_intensify2_h2",
       "horizon": 2,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_intensify2_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "d_intensify2_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the regional base rate is shown instead"
+      "reason": "the event did not happen in this area in 2022 or 2023, so a per-cell probability cannot be checked; the historical rate for cells in the same drought category at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
@@ -2823,14 +2823,14 @@
       "target": "f_gt97_h4",
       "horizon": 4,
       "state": "base_rate",
-      "reason": "only 11 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 11 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     },
     {
       "domain": "upper_south_platte",
       "target": "f_gt97_h8",
       "horizon": 8,
       "state": "base_rate",
-      "reason": "only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the regional base rate is shown instead"
+      "reason": "only 10 weeks with the event in 2022 to 2023 validation, fewer than the 12 needed to check a per-cell probability; the historical rate for this area at this time of year is shown instead"
     }
   ],
   "ledger": {

@@ -33,11 +33,35 @@ function toGeoJSON(cells: MapCell[]): GeoJSON.FeatureCollection {
   };
 }
 
-// 0 to 100 on both layers: the forecast ERC percentile, or the chance in percent.
+// Fire: the forecast ERC percentile, where 50 is typical for the week. Most
+// forecasts sit between 35 and 65 (the model pulls longer ranges toward
+// typical), so the ramp diverges around 50: a 0-to-100 ramp drew every cell the
+// same colour. Drought: the chance, in percent, of D2 or worse.
 const RAMP: Record<"fire" | "drought", maplibregl.ExpressionSpecification> = {
-  fire: ["interpolate", ["linear"], ["coalesce", ["get", "value"], 0], 0, "#efe9da", 50, "#e6a24a", 80, "#c8541f", 100, "#7d1d0c"],
+  fire: ["interpolate", ["linear"], ["coalesce", ["get", "value"], 50], 20, "#8fb3c4", 40, "#d9e3e2", 50, "#efe9da", 60, "#eab26b", 75, "#cf6a2c", 90, "#8a2410"],
   drought: ["interpolate", ["linear"], ["coalesce", ["get", "value"], 0], 0, "#efe9da", 25, "#e6c15c", 60, "#b8862b", 100, "#6b4a12"],
 };
+
+export const LEGEND: Record<"fire" | "drought", { stops: string[]; labels: [string, string, string]; title: string }> = {
+  fire: { title: "Dryness vs usual for the week", stops: ["#8fb3c4", "#d9e3e2", "#efe9da", "#eab26b", "#cf6a2c", "#8a2410"], labels: ["wetter", "typical", "drier"] },
+  drought: { title: "Chance of D2 or worse", stops: ["#efe9da", "#e6c15c", "#b8862b", "#6b4a12"], labels: ["0%", "50%", "100%"] },
+};
+
+/** What the colours mean, in the map's corner. */
+export function MapLegend({ layer }: { layer: "drought" | "fire" }) {
+  const l = LEGEND[layer];
+  return (
+    <div data-testid="map-legend" className="pointer-events-none absolute left-3 top-3 z-10 rounded border border-rule bg-paper/95 px-3 py-2 text-[11px] text-ink-soft shadow-sm">
+      <p className="text-ink">{l.title}</p>
+      <div className="mt-1 h-2 w-40 rounded-sm" style={{ background: `linear-gradient(to right, ${l.stops.join(", ")})` }} />
+      <div className="mt-0.5 flex w-40 justify-between">
+        {l.labels.map((t) => (
+          <span key={t}>{t}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function MapView({
   cells,
@@ -164,5 +188,10 @@ export function MapView({
     }
   }, [cells, layer, selectedId]);
 
-  return <div ref={ref} data-testid="map" className="absolute inset-0 h-full w-full" />;
+  return (
+    <>
+      <div ref={ref} data-testid="map" className="absolute inset-0 h-full w-full" />
+      <MapLegend layer={layer} />
+    </>
+  );
 }
