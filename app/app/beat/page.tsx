@@ -171,13 +171,16 @@ function BeatInner() {
                     size="xl"
                   />
                   <p className="mt-1 text-xs text-ink-soft">
-                    most likely drought category in 4 weeks
+                    the model&apos;s most likely drought category in 4 weeks
                     {locked.drought_likely_p !== null && locked.drought_likely_p !== undefined
                       ? `, ${Math.round(locked.drought_likely_p * 100)}% chance`
-                      : locked.drought_note
-                        ? `: not shown, because ${locked.drought_note}`
-                        : ""}
+                      : ""}
                   </p>
+                  {locked.drought_note ? (
+                    <p className="mt-1 text-[11px] leading-relaxed text-mute" data-testid="drought-note">
+                      {locked.drought_note.charAt(0).toUpperCase() + locked.drought_note.slice(1)}.
+                    </p>
+                  ) : null}
                 </div>
                 <div>
                   <Numeral

@@ -475,29 +475,39 @@ def post_prediction(body: PredictionIn) -> dict[str, Any]:
 
 
 def _likely_category(cell: dict[str, Any] | None, horizon: int) -> dict[str, Any]:
-    """The drought category the model makes most likely at the horizon, and its chance.
+    """The drought category the model makes most likely at the horizon.
 
-    The shipped drought model gives event probabilities, not a category: easing
-    by one, staying, worsening by one, worsening by two or more, all from the
-    current category. Their largest is the model's pick to set beside the
-    player's. Categories run 0 (none or D0) to 4. If any of the four did not
-    pass its check it has no number, and no category is derived from the rest.
+    The shipped drought model gives a full forecast over the next category:
+    easing by one, staying, worsening by one, worsening by two or more, all
+    from the current category. Its most likely outcome is the model's call to
+    set beside the player's, and it always has one. The chance is reported only
+    when every probability behind it passed its check; otherwise the call is
+    shown without a number, as the Place Card does. Categories run 0 (none or
+    D0) to 4; moves that cannot happen from the current category are zero.
     """
     empty: dict[str, Any] = {"drought_now": None, "drought_likely": None, "drought_likely_p": None}
     if not cell or cell.get("usdm") is None:
         return empty
-    t = cell.get("targets", {})
+    shown = cell.get("targets", {})
+    model = cell.get("model") or {}
     names = ("d_improve1", "d_nochange", "d_intensify1", "d_intensify2")
-    vals = {n: (t.get(f"{n}_h{horizon}") or {}).get("p") for n in names}
     now = int(round(float(cell["usdm"])))
-    # Moves that cannot happen from this category are exactly zero whatever a
-    # check said: no easing from none, no worsening from D4, no worsening by
-    # two from D3 (USDM stops at D4).
     impossible = {"d_improve1": now <= 0, "d_intensify1": now >= 4, "d_intensify2": now >= 3}
-    vals = {n: (0.0 if impossible.get(n) else v) for n, v in vals.items()}
-    if any(v is None for v in vals.values()):
-        return empty | {"drought_now": now, "drought_note": "not every drought outcome could be checked here"}
-    p = {n: float(v) for n, v in vals.items() if v is not None}
+
+    def value(n: str, source: dict[str, Any]) -> float | None:
+        if impossible.get(n):
+            return 0.0
+        v = source.get(f"{n}_h{horizon}")
+        v = v.get("p") if isinstance(v, dict) else v
+        return None if v is None else float(v)
+
+    raw = {n: value(n, model) for n in names}
+    if any(v is None for v in raw.values()):
+        # No model numbers in this payload (an older bundle): use what is shown.
+        raw = {n: value(n, shown) for n in names}
+    if any(v is None for v in raw.values()):
+        return empty | {"drought_now": now}
+    p = {n: float(v) for n, v in raw.items() if v is not None}
     options = {
         max(now - 1, 0): p["d_improve1"] if now > 0 else 0.0,
         now: p["d_nochange"],
@@ -505,7 +515,13 @@ def _likely_category(cell: dict[str, Any] | None, horizon: int) -> dict[str, Any
         min(now + 2, 4): p["d_intensify2"],
     }
     cat, chance = max(options.items(), key=lambda kv: kv[1])
-    return {"drought_now": now, "drought_likely": cat, "drought_likely_p": round(chance, 4)}
+    checked = all(impossible.get(n) or (shown.get(f"{n}_h{horizon}") or {}).get("p") is not None for n in names)
+    out: dict[str, Any] = {"drought_now": now, "drought_likely": cat, "drought_likely_p": None}
+    if checked:
+        out["drought_likely_p"] = round(chance, 4)
+    else:
+        out["drought_note"] = "some of the model's drought odds here could not be checked, so its chance is not shown"
+    return out
 
 
 @app.get("/predictions/me")

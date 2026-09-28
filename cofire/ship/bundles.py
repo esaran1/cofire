@@ -83,6 +83,9 @@ def _cell(row: pd.Series, targets: list[str]) -> dict[str, Any]:
         "erc": _num(row.get("erc"), 1), "erc_pct": _num(row.get("erc_pct"), 1),
         "usdm": _num(row.get("usdm"), 0),
         "p": [_num(row.get(f"{t}_p")) for t in targets],
+        # The drought model's own numbers for every drought target, including
+        # ones not shown on the card (see export). Aligned to `model_targets`.
+        "m": [_num(row.get(f"{t}_model_p")) for t in targets if t.startswith("d_")],
         "h": {
             str(h): [
                 _num(row.get(f"erc_pct_h{h}_point"), 1),
@@ -131,6 +134,7 @@ def build(export: Path = EXPORT, out: Path = OUT) -> dict[str, Any]:
         for issue, fi in fd.groupby(fd["time"].dt.strftime("%Y-%m-%d")):
             bundle: dict[str, Any] = {
                 "domain": dom, "issue": issue, "targets": targets, "decisions": dec,
+                "model_targets": [t for t in targets if t.startswith("d_")],
                 "cells": [_cell(r, targets) for _, r in fi.iterrows()],
                 "summary": _summary(fi, targets),
                 "sources": {
@@ -184,6 +188,7 @@ def legacy_cells(root: Path = OUT) -> dict[str, Any]:
                     "usdm": c["usdm"], "horizons": horizons,
                     "targets": {t: {"p": c["p"][i], "state": dec_t[t][0], "reason": dec_t[t][1]}
                                 for i, t in enumerate(b["targets"])},
+                    "model": dict(zip(b.get("model_targets", []), c.get("m", []), strict=False)),
                 })
     return {
         "resolution_m": 4000,

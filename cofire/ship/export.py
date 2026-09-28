@@ -526,6 +526,12 @@ def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | Non
                 )
                 per_issue[f"{target}_p"] = pred
                 per_issue[f"{target}_base_rate"] = conditional_base_rate(train, target, issues)
+                if target.startswith("d_"):
+                    # The model's own number, kept whatever the rendering state.
+                    # The card never shows it for an unchecked target; Predict
+                    # uses the full set only to name the model's most likely
+                    # category, which it always has.
+                    per_issue[f"{target}_model_p"] = pred
 
             for col, vals in per_issue.items():
                 base[col] = vals
