@@ -80,11 +80,22 @@ export default function EmberPage() {
 
   const load = useCallback((z: string) => {
     setData(null);
+    // The saved ticks come back with the checklist: from the service, or from
+    // this browser in the static build. This used to fetch the bare checklist,
+    // so every reload started from nothing although the ticks were saved.
     const get = IS_STATIC
       ? staticChecklist<Checklist>(z).then((d) => ChecklistSchema.parse(d))
-      : getParsed(`/ember/checklist?zone=${z}`, ChecklistSchema);
+      : getParsed(`/ember/score?device_id=${deviceId()}&zone=${z}`, ChecklistSchema);
     get
       .then((d) => {
+        if (!IS_STATIC) {
+          const done = new Set(d.done);
+          setState((prev) => {
+            const next = { ...prev };
+            for (const it of d.items) next[it.id] = done.has(it.id);
+            return next;
+          });
+        }
         if (IS_STATIC) {
           // The static site has no service to store ticks; keep them here.
           let saved: Record<string, boolean> = {};

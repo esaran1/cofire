@@ -619,11 +619,18 @@ def ember_state(body: EmberIn) -> dict[str, Any]:
 
 @app.get("/ember/score")
 def get_ember_score(device_id: str, zone: str = "wui") -> dict[str, Any]:
+    """A device's saved ticks, scored for the zone asked for.
+
+    This used to answer with the zone the device saved last, whatever zone was
+    requested, so switching between the city and wildland-edge lists returned
+    the wrong list.
+    """
+    if zone not in EMBER_ZONES:
+        raise HTTPException(400, f"zone must be one of {'|'.join(EMBER_ZONES)}")
     with Session(engine) as session:
         row = session.get(EmberRow, device_id)
     state = json.loads(row.state_json) if row else {}
-    z = row.zone if row else zone
-    return ember_score(state, z)
+    return ember_score(state, zone)
 
 
 @app.get("/manifest")

@@ -66,7 +66,9 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
 
   return (
     <>
-      <p className="text-ember display text-5xl font-normal">{point.toFixed(0)}</p>
+      <p className="text-ember display text-5xl font-normal" data-testid="erc-point">
+        {point.toFixed(0)}
+      </p>
 
       {hasInterval ? (
         <div data-testid="erc-interval">
@@ -169,6 +171,7 @@ function TargetRow({ name, t, kind }: { name: string; t: Target; kind?: string |
     <li
       className="border-rule border-b py-2.5 last:border-b-0"
       data-testid={isBase ? "target-base-rate" : "target-probability"}
+      data-target={name}
     >
       <Disclosure
         summary={
@@ -195,6 +198,7 @@ export function PlaceCard({
   onHorizon,
   onClose,
   onAdopt,
+  adopted = false,
   onPredict,
   onReport,
   embedded = false,
@@ -210,6 +214,8 @@ export function PlaceCard({
   onHorizon: (h: string) => void;
   onClose?: () => void;
   onAdopt?: () => void;
+  /** Whether this cell is adopted in this browser. */
+  adopted?: boolean;
   onPredict?: () => void;
   onReport?: () => void;
   /**
@@ -296,8 +302,13 @@ export function PlaceCard({
 
       {!embedded ? (
         <div className="mt-5 grid grid-cols-3 gap-2">
-          <button onClick={onAdopt} className="bg-paper-sunk rounded-lg py-3 text-sm">
-            Adopt
+          <button
+            onClick={onAdopt}
+            aria-pressed={adopted}
+            data-testid="adopt"
+            className={`rounded-lg py-3 text-sm ${adopted ? "bg-ink text-paper" : "bg-paper-sunk"}`}
+          >
+            {adopted ? "Adopted" : "Adopt"}
           </button>
           <button onClick={onPredict} className="bg-paper-sunk rounded-lg py-3 text-sm">
             Predict here

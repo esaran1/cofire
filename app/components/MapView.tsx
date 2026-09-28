@@ -87,6 +87,10 @@ export function MapView({
   const clickRef = useRef(onClick);
   clickRef.current = onClick;
   const pending = useRef<() => void>(() => undefined);
+  // True once the style itself is parsed. The forecast cells need only that,
+  // not the basemap tiles: `isStyleLoaded()` also waits for every tile source,
+  // so with no network (make demo offline) the cells never drew.
+  const styleReady = useRef(false);
   const bboxRef = useRef(bbox);
   bboxRef.current = bbox;
 
@@ -127,10 +131,14 @@ export function MapView({
       zoom: 9,
     });
     map.on("click", (e) => clickRef.current(e.lngLat.lat, e.lngLat.lng));
-    map.on("load", () => {
+    const ready = () => {
+      if (styleReady.current) return;
+      styleReady.current = true;
       fit.current(false);
       pending.current();
-    });
+    };
+    map.on("style.load", ready);
+    map.on("load", ready);
     mapRef.current = map;
     // Exposed for automated screenshot capture: synthetic DOM events cannot
     // carry maplibre's lngLat, so the harness needs a handle on the map.
@@ -147,6 +155,7 @@ export function MapView({
       ro.disconnect();
       map.remove();
       mapRef.current = null;
+      styleReady.current = false;
     };
   }, []);
 
@@ -189,7 +198,8 @@ export function MapView({
       map.setPaintProperty("cells-fill", "fill-color", RAMP[layer]);
       map.setFilter("cells-selected", ["==", ["get", "id"], selectedId ?? ""]);
     };
-    if (map.isStyleLoaded()) draw();
+    // Draw now if the style is parsed; otherwise when it is.
+    if (styleReady.current) draw();
     else pending.current = draw;
     // A new area's cells (and its card) have just arrived: fit once more, now
     // that the sheet's size is known. Horizon and layer changes keep the view.

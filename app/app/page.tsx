@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { set } from "idb-keyval";
 import { MapCell, MapView } from "@/components/MapView";
@@ -10,6 +10,7 @@ import { ErrorNote } from "@/components/ui/Controls";
 import type { Place } from "@/lib/api";
 import { getBundle, getDomains, nearestCell, placeFromCell } from "@/lib/data";
 import { useDomain } from "@/lib/domain";
+import { Adopted, readAdopted, toggleAdopted } from "@/lib/adopted";
 import type { Bundle, DomainsIndex } from "@/lib/schemas";
 
 export default function HomePage() {
@@ -22,15 +23,48 @@ export default function HomePage() {
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [place, setPlace] = useState<Place | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [adopted, setAdopted] = useState<Adopted[]>([]);
+  // Settings named in the link (the Hindcast page's replay link, a shared URL):
+  // read once, after the page mounts, then kept in the URL as they change.
+  const [linked, setLinked] = useState<{ issue?: string; cell?: string } | null>(null);
+  // The linked cell applies to the first load only; after that the card follows
+  // the reader's clicks and area changes.
+  const linkedCell = useRef<string | undefined>(undefined);
 
   useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const h = q.get("horizon");
+    if (h === "2" || h === "4" || h === "8") setHorizon(h);
+    const l = q.get("layer");
+    if (l === "fire" || l === "drought") setLayer(l);
+    linkedCell.current = q.get("cell") ?? undefined;
+    setLinked({ issue: q.get("issue") ?? undefined, cell: linkedCell.current });
+    setAdopted(readAdopted());
+  }, []);
+
+  useEffect(() => {
+    if (!linked) return;
     getDomains()
       .then((d) => {
         setIndex(d);
-        setIssue((cur) => cur || d.issues[d.issues.length - 1] || "");
+        const wanted = linked.issue && d.issues.includes(linked.issue) ? linked.issue : "";
+        setIssue((cur) => cur || wanted || d.issues[d.issues.length - 1] || "");
       })
       .catch((e: Error) => setErr(e.message));
-  }, []);
+  }, [linked]);
+
+  // Keep the URL describing what is on screen, so a link or Back returns here.
+  useEffect(() => {
+    if (!ready || !issue) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("domain", domain);
+    url.searchParams.set("issue", issue);
+    url.searchParams.set("horizon", horizon);
+    url.searchParams.set("layer", layer);
+    if (place && place.domain === domain) url.searchParams.set("cell", place.cell_id);
+    else url.searchParams.delete("cell");
+    window.history.replaceState(window.history.state, "", url.toString());
+  }, [ready, domain, issue, horizon, layer, place]);
 
   const meta = index?.domains[domain] ?? null;
 
@@ -43,9 +77,17 @@ export default function HomePage() {
       .then((b) => {
         if (!live) return;
         setBundle(b);
+        // Read and clear outside the updater: React may run an updater twice.
+        const fromLink = linkedCell.current?.match(/^(-?[\d.]+)_(-?[\d.]+)$/);
+        linkedCell.current = undefined;
         setPlace((prev) => {
           const m = index.domains[domain];
-          const anchor = prev && prev.domain === domain ? [prev.lat, prev.lon] : [m.center[1], m.center[0]];
+          const anchor =
+            prev && prev.domain === domain
+              ? [prev.lat, prev.lon]
+              : fromLink
+                ? [Number(fromLink[1]), Number(fromLink[2])]
+                : [m.center[1], m.center[0]];
           const c = nearestCell(b, anchor[0], anchor[1]);
           return c ? placeFromCell(b, c, index.history_years) : null;
         });
@@ -106,12 +148,10 @@ export default function HomePage() {
             horizon={horizon}
             onHorizon={setHorizon}
             onClose={() => setPlace(null)}
-            onAdopt={() => {
-              const raw = window.localStorage.getItem("adopted") ?? "[]";
-              const list = JSON.parse(raw) as string[];
-              if (!list.includes(place.cell_id)) list.push(place.cell_id);
-              window.localStorage.setItem("adopted", JSON.stringify(list));
-            }}
+            adopted={adopted.some((a) => a.cell_id === place.cell_id && a.domain === domain)}
+            onAdopt={() =>
+              setAdopted(toggleAdopted({ cell_id: place.cell_id, domain, lat: place.lat, lon: place.lon }))
+            }
             onPredict={() => router.push(`/beat?cell=${place.cell_id}&domain=${domain}`)}
             onReport={() => router.push(`/observe?lat=${place.lat}&lon=${place.lon}&domain=${domain}`)}
           />

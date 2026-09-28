@@ -7,7 +7,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { API, Observation, getParsed, postParsed } from "@/lib/api";
 import { ObservationAckSchema, ObservationSchema } from "@/lib/schemas";
 import { resolvePlace } from "@/lib/data";
-import { useDomain } from "@/lib/domain";
+import { domainLabel, useDomain } from "@/lib/domain";
+import { Adopted, readAdopted } from "@/lib/adopted";
 import type { ObservationCell } from "@/lib/schemas";
 import { z } from "zod";
 import { deviceId } from "@/lib/device";
@@ -59,6 +60,8 @@ function ObserveInner() {
   // and every report filed without editing it landed outside both areas.
   // Asking the API for the nearest cell to the centre snaps to one that exists.
   const [domain, , ready] = useDomain();
+  const [adopted, setAdopted] = useState<Adopted[]>([]);
+  useEffect(() => setAdopted(readAdopted()), []);
   const [explicit] = useState(() => !!(params.get("lat") && params.get("lon")));
   useEffect(() => {
     // Default to the cell nearest the chosen area's centre, and follow the area
@@ -99,6 +102,13 @@ function ObserveInner() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setErr(null);
+    // Check the location here: the service rejects anything that is not a
+    // number, and its error is not written for a reader.
+    const la = Number(lat), lo = Number(lon);
+    if (!lat.trim() || !lon.trim() || !Number.isFinite(la) || !Number.isFinite(lo) || Math.abs(la) > 90 || Math.abs(lo) > 180) {
+      setErr("Enter the location as decimal degrees: latitude north and longitude west of Greenwich, which is negative in Colorado.");
+      return;
+    }
     setBusy(true);
     try {
       const body = await postParsed(
@@ -173,6 +183,27 @@ function ObserveInner() {
           />
           <p className="text-xs text-ink-soft">Optional. Stored on this device for the demo.</p>
         </div>
+
+        {adopted.length > 0 ? (
+          <div className="flex flex-col gap-2" data-testid="adopted-picks">
+            <p className="text-sm font-medium text-ink">Your adopted cells</p>
+            <div className="flex flex-wrap gap-2">
+              {adopted.map((a) => (
+                <button
+                  key={`${a.domain}-${a.cell_id}`}
+                  type="button"
+                  onClick={() => {
+                    setLat(a.lat.toFixed(3));
+                    setLon(a.lon.toFixed(3));
+                  }}
+                  className="rounded-full border border-rule bg-paper-raised px-3 py-1.5 text-xs text-ink hover:border-ember"
+                >
+                  {domainLabel(a.domain)} {a.lat.toFixed(2)}, {a.lon.toFixed(2)}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-2">

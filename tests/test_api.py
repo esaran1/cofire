@@ -185,3 +185,12 @@ def test_a_pick_for_a_cell_that_does_not_exist_is_refused() -> None:
                                           "horizon": 4, "drought_category": 2, "fire_band": "high"})
     assert r.status_code == 404
     assert client.get("/predictions/me", params={"device_id": "t-ghost"}).json() == []
+
+
+def test_saved_ember_ticks_come_back_for_the_zone_asked_for() -> None:
+    dev = "t-ember-zones"
+    client.post("/ember/state", json={"device_id": dev, "zone": "wui", "state": {"water_leaks": True}})
+    city = client.get("/ember/score", params={"device_id": dev, "zone": "city"}).json()
+    assert city["zone"] == "city" and "water_leaks" in city["done"]
+    assert client.get("/ember/score", params={"device_id": dev, "zone": "wui"}).json()["zone"] == "wui"
+    assert client.get("/ember/score", params={"device_id": dev, "zone": "nowhere"}).status_code == 400

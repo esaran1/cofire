@@ -238,6 +238,8 @@ export const ChecklistSchema = z.object({
   score: z.number().default(0),
   zone: z.string().default("wui"),
   items: z.array(EmberItemSchema).default([]),
+  // Ids of the items this device has ticked, so a reload restores them.
+  done: z.array(z.string()).default([]),
 });
 
 /**
