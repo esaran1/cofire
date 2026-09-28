@@ -66,3 +66,13 @@ def test_new_domain_bundles_hold_footprint_cells_only() -> None:
         b = _latest(dom)
         assert len(b["cells"]) == len(domains.load()[dom]["cells"])
         assert Path(ROOT / dom).is_dir()
+
+
+def test_the_bundle_lists_exactly_the_real_targets() -> None:
+    """Only real target names: a helper column once matched the `_p` pattern."""
+    from cofire.model.targets import target_names
+
+    b = _latest("denver")
+    assert b["targets"] == sorted(target_names())
+    assert b["model_targets"] == [t for t in b["targets"] if t.startswith("d_")]
+    assert all(len(c["m"]) == len(b["model_targets"]) for c in b["cells"])

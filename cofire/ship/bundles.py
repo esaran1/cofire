@@ -85,7 +85,7 @@ def _cell(row: pd.Series, targets: list[str]) -> dict[str, Any]:
         "p": [_num(row.get(f"{t}_p")) for t in targets],
         # The drought model's own numbers for every drought target, including
         # ones not shown on the card (see export). Aligned to `model_targets`.
-        "m": [_num(row.get(f"{t}_model_p")) for t in targets if t.startswith("d_")],
+        "m": [_num(row.get(f"{t}_model_prob")) for t in targets if t.startswith("d_")],
         "h": {
             str(h): [
                 _num(row.get(f"erc_pct_h{h}_point"), 1),
