@@ -120,11 +120,17 @@ OBS_ATTACH_DEG = 0.06
 
 
 def art_path(rel: str) -> Path:
-    """Artifact path, preferring the committed demo fixture when present."""
+    """Artifact path: the real artifacts when built, else the committed demo fixture.
+
+    `make demo` sets COFIRE_DEMO=1 to serve the fixture even where artifacts
+    exist. This used to prefer the fixture always, so a local run showed the
+    fixture's two issues instead of every issue the export holds.
+    """
     demo = DEMO_ROOT / "artifacts" / rel
-    if demo.exists():
+    real = settings.artifacts_dir / rel
+    if os.environ.get("COFIRE_DEMO") == "1" and demo.exists():
         return demo
-    return settings.artifacts_dir / rel
+    return real if real.exists() else demo
 
 
 _INDEX_CACHE: dict[str, Any] = {}
@@ -188,7 +194,6 @@ def meta() -> dict[str, Any]:
     manifest = json.loads(man.read_text()) if man.exists() else {"sources": []}
     metrics_path = art_path("metrics.json")
     metrics = json.loads(metrics_path.read_text()) if metrics_path.exists() else {}
-    shipping = metrics.get("shipping_arm") or index.get("shipping_arm")
     resolution = metrics.get("resolution_m") or index.get("resolution_m", 4000)
     status_path = Path("STATUS.md")
     verdict = "unknown"
@@ -197,8 +202,8 @@ def meta() -> dict[str, Any]:
         if ":" in head:
             verdict = head.split(":", 1)[1].strip()
     return {
-        "shipping_arm": shipping,
-        "shipping_arm_basis": "lowest validation ERC-percentile MAE on the 2023 split; tie-break drought MAE",
+        "shipping_arm": "configuration A: Markov transitions for drought, damped logistic for fire-spread, damped regression for the ERC percentile",
+        "shipping_arm_basis": "chosen on leave-one-drought-year-out folds; frozen at FREEZE_COMMIT (docs/DECISIONS.md)",
         "resolution_m": resolution,
         "resolution_note": index.get("resolution_note")
         or "gridMET native ~4 km cells. Downscaling to 10–30 m is off.",
@@ -323,12 +328,17 @@ def forecast_grid(issue: str, horizon: int = 4, variable: str = "fire") -> dict[
     feats = []
     for c in cells:
         hz = (c.get("horizons") or {}).get(str(horizon), {})
-        value = hz.get("fire_index") if variable == "fire" else hz.get("drought_point")
-        conf = hz.get("confidence", 0.5)
+        # Fire: the forecast ERC percentile. Drought: the chance, in percent, of
+        # D2 or worse at the horizon. The same values the map colours.
+        if variable == "fire":
+            value = hz.get("point")
+        else:
+            p = ((c.get("targets") or {}).get(f"d_ge2_h{horizon}") or {}).get("p")
+            value = None if p is None else round(float(p) * 100, 2)
         feats.append(
             {
                 "type": "Feature",
-                "properties": {"cell_id": c["cell_id"], "value": value, "confidence": conf},
+                "properties": {"cell_id": c["cell_id"], "domain": c.get("domain"), "value": value},
                 "geometry": {"type": "Point", "coordinates": [c["lon"], c["lat"]]},
             }
         )
@@ -438,6 +448,8 @@ def post_prediction(body: PredictionIn) -> dict[str, Any]:
         raise HTTPException(400, "fire_band must be low|moderate|high|very_high")
     index = load_index()
     issue = body.issue or (index.get("issues") or [""])[-1]
+    if not any(c["cell_id"] == body.cell_id and c["issue"] == issue for c in index.get("cells", [])):
+        raise HTTPException(404, f"no forecast cell {body.cell_id} for {issue}")
     row = PredictionRow(
         device_id=body.device_id,
         cell_id=body.cell_id,

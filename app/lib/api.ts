@@ -35,10 +35,6 @@ export async function getJson<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export function overlayUrl(issue: string, horizon: number, variable: string): string {
-  return `${API}/overlay/${issue}/${horizon}/${variable}.png`;
-}
-
 export type {
   Checklist,
   EmberItem,

@@ -240,9 +240,20 @@ export const ChecklistSchema = z.object({
   items: z.array(EmberItemSchema).default([]),
 });
 
+/**
+ * What the model said for a locked pick: the horizon block plus the drought
+ * category it makes most likely. Listed explicitly, because a zod object drops
+ * every key it does not name, which is how the drought number went missing.
+ */
+export const LockedModelSchema = HorizonSchema.extend({
+  drought_now: maybeNumber,
+  drought_likely: maybeNumber,
+  drought_likely_p: maybeNumber,
+});
+
 export const PredictionSchema = z.object({
   id: z.string().nullish(),
-  locked_model: HorizonSchema.nullish(),
+  locked_model: LockedModelSchema.nullish(),
   issue: z.string().nullish(),
 });
 
@@ -313,6 +324,7 @@ export type FiresPayload = z.infer<typeof FiresPayloadSchema>;
 export type Checklist = z.infer<typeof ChecklistSchema>;
 export type EmberItem = z.infer<typeof EmberItemSchema>;
 export type Prediction = z.infer<typeof PredictionSchema>;
+export type LockedModel = z.infer<typeof LockedModelSchema>;
 export type Nudge = z.infer<typeof NudgeSchema>;
 export type ObservationAck = z.infer<typeof ObservationAckSchema>;
 export type ObservationCell = NonNullable<ObservationAck["cell"]>;

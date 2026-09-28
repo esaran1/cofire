@@ -25,7 +25,7 @@ export function TimeScrubber({
   const single = issues.length <= 1;
 
   return (
-    <div className="absolute inset-x-4 bottom-4 z-20 rounded border border-rule bg-paper/95 p-4 shadow-[0_2px_16px_rgba(23,24,27,0.08)] backdrop-blur">
+    <div data-testid="time-scrubber" className="absolute inset-x-4 bottom-4 z-20 rounded border border-rule bg-paper/95 p-4 shadow-[0_2px_16px_rgba(23,24,27,0.08)] backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1" role="group" aria-label="Forecast horizon">
           {(["2", "4", "8"] as const).map((h) => (

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { API, LeaderRow, getParsed, postParsed } from "@/lib/api";
 import { LeaderRowSchema, PredictionSchema } from "@/lib/schemas";
+import type { LockedModel } from "@/lib/schemas";
 import { resolvePlace } from "@/lib/data";
 import { domainLabel, useDomain } from "@/lib/domain";
 import { z } from "zod";
@@ -25,14 +26,9 @@ const CATEGORIES = DROUGHT_CATEGORIES;
 const BANDS = FIRE_BANDS;
 
 type Pick = { cell_id: string; horizon: number; drought_category: number; fire_band: string; issue: string };
-// What the model said for the same cell and horizon: the dryness percentile
-// (0 to 100) and the drought category it makes most likely, with its chance.
-type Locked = {
-  point?: number | null;
-  drought_now?: number | null;
-  drought_likely?: number | null;
-  drought_likely_p?: number | null;
-};
+// What the model said for the same cell and horizon (LockedModelSchema): the
+// dryness percentile and the drought category it makes most likely.
+type Locked = LockedModel;
 
 function BeatInner() {
   const params = useSearchParams();
@@ -95,7 +91,7 @@ function BeatInner() {
         { device_id: deviceId(), cell_id: cell, horizon: 4, drought_category: cat, fire_band: band },
         PredictionSchema,
       );
-      setLocked((body.locked_model ?? {}) as Locked);
+      setLocked(body.locked_model ?? null);
       refresh();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Could not lock your pick.");

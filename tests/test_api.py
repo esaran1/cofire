@@ -100,7 +100,7 @@ def test_beat_the_model() -> None:
         "/predictions",
         json={
             "device_id": "dev1",
-            "cell_id": "40.5417_-105.0833",
+            "cell_id": "40.5250_-105.0583",
             "horizon": 4,
             "drought_category": 2,
             "fire_band": "high",
@@ -108,6 +108,7 @@ def test_beat_the_model() -> None:
         },
     )
     assert r.status_code == 200
+    assert r.json()["locked_model"]["drought_likely"] is not None
     me = client.get("/predictions/me", params={"device_id": "dev1"})
     assert len(me.json()) >= 1
 
@@ -164,3 +165,10 @@ def test_a_locked_pick_returns_the_model_numbers_the_page_shows() -> None:
                                           "horizon": 4, "drought_category": 2, "fire_band": "high"})
     m = r.json()["locked_model"]
     assert {"point", "drought_likely", "drought_likely_p"} <= set(m)
+
+
+def test_a_pick_for_a_cell_that_does_not_exist_is_refused() -> None:
+    r = client.post("/predictions", json={"device_id": "t-ghost", "cell_id": "40.5417_-105.0833",
+                                          "horizon": 4, "drought_category": 2, "fire_band": "high"})
+    assert r.status_code == 404
+    assert client.get("/predictions/me", params={"device_id": "t-ghost"}).json() == []

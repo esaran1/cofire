@@ -67,14 +67,14 @@ export function MapView({
     const map = mapRef.current;
     const b = bboxRef.current;
     if (!map || !b) return;
-    // On a phone the Place Card is a sheet fixed over the bottom of the map;
-    // keep the area in the part of the map the sheet leaves visible.
+    // The map controls float over the bottom of the map; keep the area in the
+    // part they leave visible.
     const rect = map.getContainer().getBoundingClientRect();
     let bottom = 24;
-    const sheet = document.querySelector<HTMLElement>('[data-testid="place-card"]');
-    if (sheet && getComputedStyle(sheet).position === "fixed") {
-      const overlap = rect.bottom - sheet.getBoundingClientRect().top;
-      bottom = Math.min(Math.max(24, overlap + 24), Math.max(24, rect.height - 120));
+    const controls = document.querySelector<HTMLElement>('[data-testid="time-scrubber"]');
+    if (controls) {
+      const overlap = rect.bottom - controls.getBoundingClientRect().top;
+      bottom = Math.min(Math.max(24, overlap + 16), Math.max(24, rect.height - 120));
     }
     map.fitBounds(
       [

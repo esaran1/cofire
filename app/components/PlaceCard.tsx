@@ -5,9 +5,7 @@ import { domainLabel } from "@/lib/domainNames";
 import type { Bundle, DomainMeta } from "@/lib/schemas";
 import { targetHorizon, targetLabel } from "@/lib/targets";
 import { Disclosure } from "./ui/Controls";
-import { UncertaintyBadge } from "./UncertaintyBadge";
 import { WatershedPanel } from "./WatershedPanel";
-import { WhyBars } from "./WhyBars";
 
 const HCHIPS = ["2", "4", "8"] as const;
 
@@ -217,7 +215,6 @@ export function PlaceCard({
   embedded?: boolean;
 }) {
   const hz: Horizon | undefined = place.horizons[horizon];
-  const u = place.uncertainty;
   const targets = Object.entries(place.targets ?? {})
     .filter(([name]) => targetHorizon(name) === horizon)
     .sort(([a], [b]) => a.localeCompare(b));
@@ -225,12 +222,13 @@ export function PlaceCard({
   return (
     <aside
       data-testid="place-card"
-      /* Mobile: a bottom sheet over the map. Desktop: it is rendered inside the
-         reading panel, so it must be a plain block there and not cover the map. */
+      /* In the reading panel at every width. On phones it used to be a sheet
+         fixed over the bottom of the screen, which covered the map's horizon,
+         layer and issue controls; the panel below the map already scrolls. */
       className={
         embedded
           ? "border-rule bg-paper-raised border p-5 md:p-6"
-          : "border-rule bg-paper-raised fixed inset-x-0 bottom-0 z-30 max-h-[70dvh] overflow-y-auto border-t p-5 shadow-[0_-2px_24px_rgba(23,24,27,0.12)] lg:static lg:max-h-none lg:border-0 lg:border-t lg:px-6 lg:pb-8 lg:pt-6 lg:shadow-none"
+          : "border-rule bg-paper-raised border-t px-5 pb-8 pt-5 lg:px-6 lg:pt-6"
       }
     >
       {!embedded ? (
@@ -281,13 +279,6 @@ export function PlaceCard({
 
       <WatershedPanel sources={sources} horizon={horizon} />
 
-      {u && <UncertaintyBadge u={u} />}
-      {(place.why ?? []).length > 0 ? (
-        <>
-          <h3 className="mb-2 mt-5 text-lg">Why</h3>
-          <WhyBars bars={place.why ?? []} />
-        </>
-      ) : null}
       {!embedded ? (
         <div className="mt-5 grid grid-cols-3 gap-2">
           <button onClick={onAdopt} className="bg-paper-sunk rounded-lg py-3 text-sm">

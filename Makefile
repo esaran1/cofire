@@ -112,7 +112,7 @@ score:
 demo: setup
 	@echo "Starting API on http://$(API_HOST):$(API_PORT) and web on http://127.0.0.1:3000"
 	@echo "Wording: COFIRE forecasts conditions that allow fires to spread, not ignitions."
-	$(UV) run uvicorn cofire.api.main:app --host $(API_HOST) --port $(API_PORT) & \
+	COFIRE_DEMO=1 $(UV) run uvicorn cofire.api.main:app --host $(API_HOST) --port $(API_PORT) & \
 	cd app && npm run dev -- --port 3000
 
 # torch and LightGBM must not share a process on macOS: mixing their OpenMP

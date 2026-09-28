@@ -211,6 +211,8 @@ export default function EmberPage() {
             {quickWins.map((i) => (
               <button
                 key={i.id}
+                role="checkbox"
+                aria-checked={!!state[i.id]}
                 onClick={() => toggle(i.id)}
                 className="flex w-full items-start gap-3 rounded-lg border border-ember/30 bg-ember-soft p-3 text-left transition-transform active:scale-[0.99]"
               >
@@ -239,6 +241,8 @@ export default function EmberPage() {
                   return (
                     <li key={i.id}>
                       <button
+                        role="checkbox"
+                        aria-checked={done}
                         onClick={() => toggle(i.id)}
                         className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-paper-sunk"
                       >
