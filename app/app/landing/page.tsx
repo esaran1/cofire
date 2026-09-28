@@ -156,7 +156,8 @@ export default function LandingPage() {
             <span className="num text-ink">
               {look.by_test["5"].n_total - look.by_test["5"].n_pass}
             </span>{" "}
-            forecasts now show one county-wide rate instead of a number per cell.
+            forecasts no longer show a number per cell: fire odds show the county&apos;s usual rate for the
+            season, and drought odds show none.
           </>
         }
       >

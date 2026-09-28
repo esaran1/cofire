@@ -34,3 +34,26 @@ test("a locked pick reveals the model's drought category and dryness", async ({ 
   await expect(reveal).toContainText("45");
   await expect(reveal).not.toContainText("n/a");
 });
+
+test("when a drought outcome was not checked, the reveal says so instead of a number", async ({ page }) => {
+  await page.route("**/predictions", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: "e2e", issue: "2026-09-22",
+        locked_model: { point: 47, state: "uncalibrated", drought_now: 2, drought_likely: null, drought_likely_p: null,
+          drought_note: "not every drought outcome could be checked here" },
+      }),
+    });
+  });
+  await page.goto("/beat?domain=larimer");
+  const lock = page.getByRole("button", { name: /Lock my pick|Lock another/ });
+  await expect(lock).toBeEnabled({ timeout: 20_000 });
+  await lock.click();
+  const reveal = page.getByText("The model said").locator("..");
+  await expect(reveal).toContainText("not shown");
+  await expect(reveal).toContainText("could be checked here");
+  await expect(reveal).toContainText("47");
+  await expect(reveal).not.toContainText("n/a");
+});

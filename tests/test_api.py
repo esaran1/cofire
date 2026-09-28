@@ -108,7 +108,9 @@ def test_beat_the_model() -> None:
         },
     )
     assert r.status_code == 200
-    assert r.json()["locked_model"]["drought_likely"] is not None
+    m = r.json()["locked_model"]
+    # A category, or the reason there is none (an outcome that was not checked).
+    assert m["drought_likely"] is not None or m.get("drought_note")
     me = client.get("/predictions/me", params={"device_id": "dev1"})
     assert len(me.json()) >= 1
 
@@ -158,6 +160,12 @@ def test_the_model_pick_is_the_most_likely_drought_category() -> None:
     cell["targets"]["d_nochange_h4"]["p"] = 0.20
     assert _likely_category(cell, 4)["drought_likely"] == 3  # 0.42 - 0.05 = 0.37 to D3
     assert _likely_category(None, 4)["drought_likely"] is None
+    cell["targets"]["d_intensify2_h4"]["p"] = None  # not checked, so no number
+    out = _likely_category(cell, 4)
+    assert out["drought_likely"] is None and "could be checked" in out["drought_note"]
+    # From D3 worsening by two is impossible, so an unchecked number there is no gap.
+    cell["usdm"] = 3.0
+    assert _likely_category(cell, 4)["drought_likely"] is not None
 
 
 def test_a_locked_pick_returns_the_model_numbers_the_page_shows() -> None:

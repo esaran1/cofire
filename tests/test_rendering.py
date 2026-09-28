@@ -90,10 +90,7 @@ def test_reliability_failures_render_as_base_rate() -> None:
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
 def test_base_rate_targets_are_identical_across_cells_within_an_issue() -> None:
-    """One number per area and issue (and, for drought, per current category).
-
-    Drought fallbacks are conditioned on the cell's current category, so cells
-    in the same category share one number; fire fallbacks are one per area.
+    """A fire fallback is one number per area and issue; a drought one is no number.
 
     The earlier version of this test checked identity across every issue at
     once, which a single year-round number passes. That is how a base rate
@@ -109,8 +106,12 @@ def test_base_rate_targets_are_identical_across_cells_within_an_issue() -> None:
         sel = frame[frame[col] == BASE_RATE]
         if sel.empty:
             continue
-        keys = ["domain", "time"] + (["usdm"] if key.startswith("d_") else [])
-        spread = sel.groupby(keys)[pcol].agg(lambda v: float(np.nanstd(v)))
+        if key.startswith("d_"):
+            # Drought targets that failed their check show no number at all.
+            assert sel[pcol].isna().all(), f"{key} shows a number in the base-rate state"
+            checked += 1
+            continue
+        spread = sel.groupby(["domain", "time"])[pcol].agg(lambda v: float(np.nanstd(v)))
         assert (spread < 1e-12).all(), f"{key} varies across cells within an issue"
         checked += 1
     assert checked > 0
@@ -143,8 +144,10 @@ def test_base_rate_is_the_training_record_rate_for_the_season() -> None:
     issue = pd.Timestamp(exp["time"].max())
     row = exp[(exp["domain"] == "larimer") & (exp["time"] == issue)].iloc[0]
     assert row["d_ge2_h4_state"] == BASE_RATE
-    # The rate among training cell-weeks in the same drought category as this
-    # cell, within +/- 3 weeks of the issue (cofire.ship.export.conditional_base_rate).
+    # The card shows no number for a drought target that failed its check; the
+    # recorded rate is the one among training cell-weeks in the same category,
+    # within +/- 3 weeks of the issue (cofire.ship.export.conditional_base_rate).
+    assert pd.isna(row["d_ge2_h4_p"])
     woy = train["time"].dt.isocalendar().week.astype(int).clip(1, 52)
     same = train["usdm"].round() == round(float(row["usdm"]))
     m = same & woy.isin(window_weeks(issue.isocalendar().week))
@@ -152,7 +155,7 @@ def test_base_rate_is_the_training_record_rate_for_the_season() -> None:
         m = same
     expected = float(pd.to_numeric(train.loc[m, "d_ge2_h4"], errors="coerce").dropna().mean())
     # float32 storage in the export; a probability needs no more than 1e-6.
-    assert abs(float(row["d_ge2_h4_p"]) - expected) < 1e-6
+    assert abs(float(row["d_ge2_h4_base_rate"]) - expected) < 1e-6
 
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")
@@ -254,7 +257,8 @@ def test_no_drought_number_describes_an_impossible_move() -> None:
     e = pd.read_parquet(EXPORT)
     c = e["usdm"].round()
     for h in (2, 4, 8):
-        assert (e.loc[c >= 3, f"d_intensify2_h{h}_p"] < 1e-9).all(), f"worsening two from D3+ at h{h}"
-        assert (e.loc[c >= 4, f"d_intensify1_h{h}_p"] < 1e-9).all(), f"worsening from D4 at h{h}"
-        assert (e.loc[c <= 0, f"d_improve1_h{h}_p"] < 1e-9).all(), f"easing from none at h{h}"
-        assert np.isfinite(e[f"d_ge2_h{h}_p"]).all()
+        # A hidden number (NaN) is not a claim, so it cannot be an impossible one.
+        assert (e.loc[c >= 3, f"d_intensify2_h{h}_p"].fillna(0) < 1e-9).all(), f"worsening two from D3+ at h{h}"
+        assert (e.loc[c >= 4, f"d_intensify1_h{h}_p"].fillna(0) < 1e-9).all(), f"worsening from D4 at h{h}"
+        assert (e.loc[c <= 0, f"d_improve1_h{h}_p"].fillna(0) < 1e-9).all(), f"easing from none at h{h}"
+        _ = np

@@ -249,6 +249,8 @@ export const LockedModelSchema = HorizonSchema.extend({
   drought_now: maybeNumber,
   drought_likely: maybeNumber,
   drought_likely_p: maybeNumber,
+  // Why no drought category is shown, when some outcome could not be checked.
+  drought_note: z.string().nullish(),
 });
 
 export const PredictionSchema = z.object({

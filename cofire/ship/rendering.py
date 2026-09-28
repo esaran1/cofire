@@ -12,8 +12,9 @@ The four states a target-horizon-domain can render in:
   change nothing.
 - `historical_range`: point forecast plus the labelled historical week-of-year
   range of raw ERC. Where Stage B classified the horizon climatological.
-- `base_rate`: a historical rate instead of a per-cell probability (for drought,
-  conditioned on the cell's current category; for fire, the seasonal rate). For a
+- `base_rate`: the per-cell probability is not shown. Fire targets show the
+  area's seasonal rate instead; drought targets show no number, because a
+  historical rate beside the model's other drought odds could contradict them. For a
   probabilistic target that failed the look-3 reliability criterion, or that has
   no resolution to offer.
 - `uncalibrated`: no interval at all, with the reason shown. For a horizon that
@@ -52,8 +53,8 @@ MIN_RESOLUTION = 1e-4
 def shown_instead(target: str) -> str:
     """What a base-rate target shows in place of a per-cell probability."""
     if target.startswith("d_"):
-        return ("the historical rate for cells in the same drought category at this time of "
-                "year is shown instead")
+        return ("no number is shown: a historical rate beside the model's other drought odds "
+                "could contradict them on the same card")
     return "the historical rate for this area at this time of year is shown instead"
 
 

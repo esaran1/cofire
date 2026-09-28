@@ -572,7 +572,15 @@ def attach_rendering(frame: pd.DataFrame, decisions: pd.DataFrame) -> pd.DataFra
             continue
         m = out[col] == BASE_RATE
         out[pcol] = out[pcol].astype("float64")
-        out.loc[m, pcol] = out.loc[m, bcol].astype("float64")
+        if key.startswith("d_"):
+            # A drought target that did not pass its check shows no number.
+            # Showing a historical rate beside the model's rows let one card
+            # contradict itself (D3 or worse 69% against staying at D3 76%),
+            # because the two are different estimators. The rate is kept in
+            # `{key}_base_rate` for the record.
+            out.loc[m, pcol] = np.nan
+        else:
+            out.loc[m, pcol] = out.loc[m, bcol].astype("float64")
     return out
 
 

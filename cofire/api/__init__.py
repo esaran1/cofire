@@ -480,22 +480,29 @@ def _likely_category(cell: dict[str, Any] | None, horizon: int) -> dict[str, Any
     The shipped drought model gives event probabilities, not a category: easing
     by one, staying, worsening by one, worsening by two or more, all from the
     current category. Their largest is the model's pick to set beside the
-    player's. Categories run 0 (none or D0) to 4.
+    player's. Categories run 0 (none or D0) to 4. If any of the four did not
+    pass its check it has no number, and no category is derived from the rest.
     """
+    empty: dict[str, Any] = {"drought_now": None, "drought_likely": None, "drought_likely_p": None}
     if not cell or cell.get("usdm") is None:
-        return {"drought_likely": None, "drought_likely_p": None}
+        return empty
     t = cell.get("targets", {})
-
-    def p(name: str) -> float:
-        v = (t.get(f"{name}_h{horizon}") or {}).get("p")
-        return float(v) if v is not None else 0.0
-
+    names = ("d_improve1", "d_nochange", "d_intensify1", "d_intensify2")
+    vals = {n: (t.get(f"{n}_h{horizon}") or {}).get("p") for n in names}
     now = int(round(float(cell["usdm"])))
+    # Moves that cannot happen from this category are exactly zero whatever a
+    # check said: no easing from none, no worsening from D4, no worsening by
+    # two from D3 (USDM stops at D4).
+    impossible = {"d_improve1": now <= 0, "d_intensify1": now >= 4, "d_intensify2": now >= 3}
+    vals = {n: (0.0 if impossible.get(n) else v) for n, v in vals.items()}
+    if any(v is None for v in vals.values()):
+        return empty | {"drought_now": now, "drought_note": "not every drought outcome could be checked here"}
+    p = {n: float(v) for n, v in vals.items() if v is not None}
     options = {
-        max(now - 1, 0): p("d_improve1") if now > 0 else 0.0,
-        now: p("d_nochange"),
-        min(now + 1, 4): max(p("d_intensify1") - p("d_intensify2"), 0.0),
-        min(now + 2, 4): p("d_intensify2"),
+        max(now - 1, 0): p["d_improve1"] if now > 0 else 0.0,
+        now: p["d_nochange"],
+        min(now + 1, 4): max(p["d_intensify1"] - p["d_intensify2"], 0.0),
+        min(now + 2, 4): p["d_intensify2"],
     }
     cat, chance = max(options.items(), key=lambda kv: kv[1])
     return {"drought_now": now, "drought_likely": cat, "drought_likely_p": round(chance, 4)}

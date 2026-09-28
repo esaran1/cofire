@@ -16,7 +16,8 @@ function toGeoJSON(cells: MapCell[]): GeoJSON.FeatureCollection {
     features: cells.map((c) => ({
       type: "Feature",
       id: c.id,
-      properties: { id: c.id, value: c.value },
+      // No `value` key at all when there is no number, so the layer can tell.
+      properties: c.value === null ? { id: c.id } : { id: c.id, value: c.value },
       geometry: {
         type: "Polygon",
         coordinates: [
@@ -48,7 +49,7 @@ export const LEGEND: Record<"fire" | "drought", { stops: string[]; labels: [stri
 };
 
 /** What the colours mean, in the map's corner. */
-export function MapLegend({ layer }: { layer: "drought" | "fire" }) {
+export function MapLegend({ layer, empty = false }: { layer: "drought" | "fire"; empty?: boolean }) {
   const l = LEGEND[layer];
   return (
     <div data-testid="map-legend" className="pointer-events-none absolute left-3 top-3 z-10 rounded border border-rule bg-paper/95 px-3 py-2 text-[11px] text-ink-soft shadow-sm">
@@ -59,6 +60,11 @@ export function MapLegend({ layer }: { layer: "drought" | "fire" }) {
           <span key={t}>{t}</span>
         ))}
       </div>
+      {empty ? (
+        <p className="mt-1 max-w-[10rem] text-ink" data-testid="map-legend-empty">
+          Not checked for this area at this range, so the map shows no drought odds.
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -159,7 +165,13 @@ export function MapView({
         src.setData(data);
       } else {
         map.addSource("cells", { type: "geojson", data });
-        map.addLayer({ id: "cells-fill", type: "fill", source: "cells", paint: { "fill-opacity": 0.72 } });
+        // A cell without a number is left clear rather than coloured as zero.
+        map.addLayer({
+          id: "cells-fill",
+          type: "fill",
+          source: "cells",
+          paint: { "fill-opacity": ["case", ["has", "value"], 0.72, 0] },
+        });
         map.addLayer({
           id: "cells-line",
           type: "line",
@@ -191,7 +203,7 @@ export function MapView({
   return (
     <>
       <div ref={ref} data-testid="map" className="absolute inset-0 h-full w-full" />
-      <MapLegend layer={layer} />
+      <MapLegend layer={layer} empty={cells.length > 0 && cells.every((c) => c.value === null)} />
     </>
   );
 }

@@ -92,7 +92,7 @@ test("a base-rate target says it is a historical rate, not this cell's forecast"
     // will take it for this cell's forecast. Drought rates name the category
     // they are conditioned on; fire rates name the area and season. The marker
     // is inline on the row, because it changes how the number should be read.
-    await expect(rows.first()).toContainText(/usual rate for (cells in (D\d|no drought or D0) here|this county this time of year)/);
+    await expect(rows.first()).toContainText(/not checked for this area, so no number|usual rate for this county this time of year/);
   }
 });
 

@@ -2207,7 +2207,28 @@ output look stuck or wrong:
   the map has a legend. The card's "Dryness for this week" heading showed the 2,
   4 or 8 week forecast and now says so.
 
-**Still open, for the owner:** a card mixes model rows (targets that passed
-their check) with fallback rows (targets that did not). The two are different
-estimators, so a card can still contradict itself. A Denver D3 cell shows D3
-or worse 69% (history) against staying at D3 76% (model).
+**Decided by the owner: unchecked drought targets show no number.** A card
+mixed model rows (targets that passed their check) with fallback rows
+(targets that did not). The two are different estimators, so a card could
+contradict itself: a Denver D3 cell showed D3 or worse 69% (history) against
+staying at D3 76% (model). 14 of the 15 area-and-range drought blocks were
+mixed.
+
+A drought target that did not pass its check now carries no number in the
+export. The card shows the row as "not shown" with its reason, the map leaves
+such cells clear with a legend note, and the recorded rate stays in
+`{target}_base_rate`. This is stricter than the pre-registration, which said
+the regional rate would be shown.
+
+- **Result:** 0 contradictions left among drought numbers across all 141,930
+  area, issue, cell and horizon checks.
+- **Predict's "most likely category"** is derived only when every move it
+  needs was checked. Impossible moves count as exactly zero: no easing from
+  none, no worsening from D4, no worsening by two from D3. This week it
+  covers Denver 31 of 52 cells, Dillon 59 of 79 and the Upper South Platte
+  140 of 202. It covers none of Larimer or Pueblo, whose 4-week drought
+  checks failed on look 3; there the page says so.
+- **Fire fallbacks still show the seasonal rate.** They disagree with the
+  model's rows in 874 of those checks, by at most 0.023 (for example, above
+  the 97th percentile showing more than above the 90th). Not changed without
+  a decision.

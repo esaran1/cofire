@@ -143,8 +143,10 @@ export default function HindcastPage() {
       <Section title="Reliability broke at the longer ranges">
         <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">
           A probability should be right as often as it claims. That held at two weeks and broke
-          further out. The targets that failed now show a county-wide rate instead of a per-cell
-          number, which is what the pre-registration said would happen.
+          further out. The targets that failed no longer show a per-cell number. Fire targets show the
+          county&apos;s usual rate for the season, as the pre-registration said. Drought targets show no
+          number at all, stricter than the pre-registration, because a historical rate beside the
+          model&apos;s other drought odds could contradict them on the same card.
         </p>
         <div className="mt-6">
           <ReliabilityFigure byHorizon={look.reliability_by_horizon} />

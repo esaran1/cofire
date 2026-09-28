@@ -154,19 +154,16 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
  */
 const AREA: Record<string, string> = { county: "county", urban: "city", watershed: "watershed" };
 
-function categoryName(c: number): string {
-  return c <= 0 ? "no drought or D0" : `D${c}`;
-}
-
-function TargetRow({ name, t, kind, now }: { name: string; t: Target; kind?: string | null; now?: number | null }) {
-  if (t.p === null || t.p === undefined) return null;
+function TargetRow({ name, t, kind }: { name: string; t: Target; kind?: string | null }) {
   const isBase = t.state === "base_rate";
+  const hidden = t.p === null || t.p === undefined;
+  // A drought target that did not pass its check has no number (the export
+  // drops it: a historical rate beside the model's other drought odds could
+  // contradict them). The row stays, so the reader sees what is missing and why.
+  if (hidden && !isBase) return null;
   const area = AREA[kind ?? "county"] ?? "area";
-  const drought = name.startsWith("d_");
-  // A base-rate row is the historical rate, not a forecast for this cell. For
-  // drought it is the rate among cells in the same category now, so say which.
-  const marker = drought && now !== null && now !== undefined
-    ? `usual rate for cells in ${categoryName(Math.round(now))} here`
+  const marker = hidden
+    ? "not checked for this area, so no number"
     : `usual rate for this ${area} this time of year`;
   return (
     <li
@@ -180,7 +177,9 @@ function TargetRow({ name, t, kind, now }: { name: string; t: Target; kind?: str
               <span className="block text-sm">{targetLabel(name, kind)}</span>
               {isBase ? <span className="text-mute block text-[11px]">{marker}</span> : null}
             </span>
-            <span className="num text-ink text-sm">{formatProbability(t.p)}</span>
+            <span className={`num text-sm ${hidden ? "text-mute" : "text-ink"}`} data-testid={hidden ? "target-not-shown" : undefined}>
+              {hidden ? "not shown" : formatProbability(t.p as number)}
+            </span>
           </div>
         }
       >
@@ -287,7 +286,7 @@ export function PlaceCard({
           </p>
           <ul className="mt-1">
             {targets.map(([name, t]) => (
-              <TargetRow key={name} name={name} t={t} kind={meta?.kind} now={place.usdm} />
+              <TargetRow key={name} name={name} t={t} kind={meta?.kind} />
             ))}
           </ul>
         </>

@@ -78,16 +78,18 @@ test("a watershed card has no watershed panel of its own", async ({ page }) => {
   await expect(page.getByTestId("place-card")).toContainText("Fire-spread conditions above the 90th percentile");
 });
 
-test("a target that cannot be checked shows the base rate and says why", async ({ page }) => {
+test("a drought target that cannot be checked shows no number and says why", async ({ page }) => {
   // Dillon: drought reaching D2 did not happen in 2022 or 2023 validation.
   await page.goto("/?domain=dillon");
   const card = page.getByTestId("place-card");
   await expect(card).toBeVisible({ timeout: 20_000 });
-  const base = page.getByTestId("target-base-rate").filter({ hasText: "Drought reaching D2 or worse" });
-  await expect(base).toHaveCount(1);
-  await expect(base).toContainText(/usual rate for cells in (D\d|no drought or D0) here/);
-  await base.getByRole("button").first().click();
-  await expect(base).toContainText("did not happen in this area in 2022 or 2023");
+  const row = page.getByTestId("target-base-rate").filter({ hasText: "Drought reaching D2 or worse" });
+  await expect(row).toHaveCount(1);
+  await expect(row.getByTestId("target-not-shown")).toHaveText("not shown");
+  await expect(row).toContainText("not checked for this area");
+  await row.getByRole("button").first().click();
+  await expect(row).toContainText("did not happen in this area in 2022 or 2023");
+  await expect(row).toContainText("no number is shown");
 });
 
 test("switching the area moves the map and the card", async ({ page }) => {

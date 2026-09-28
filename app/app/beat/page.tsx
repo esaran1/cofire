@@ -164,8 +164,8 @@ function BeatInner() {
                   <Numeral
                     value={
                       locked.drought_likely !== null && locked.drought_likely !== undefined
-                        ? (CATEGORIES.find((c) => c.value === locked.drought_likely)?.label ?? "n/a")
-                        : "n/a"
+                        ? (CATEGORIES.find((c) => c.value === locked.drought_likely)?.label ?? "not shown")
+                        : "not shown"
                     }
                     tone="ochre"
                     size="xl"
@@ -174,12 +174,14 @@ function BeatInner() {
                     most likely drought category in 4 weeks
                     {locked.drought_likely_p !== null && locked.drought_likely_p !== undefined
                       ? `, ${Math.round(locked.drought_likely_p * 100)}% chance`
-                      : ""}
+                      : locked.drought_note
+                        ? `: not shown, because ${locked.drought_note}`
+                        : ""}
                   </p>
                 </div>
                 <div>
                   <Numeral
-                    value={locked.point !== null && locked.point !== undefined ? locked.point.toFixed(0) : "n/a"}
+                    value={locked.point !== null && locked.point !== undefined ? locked.point.toFixed(0) : "not shown"}
                     tone="ember"
                     size="xl"
                   />
