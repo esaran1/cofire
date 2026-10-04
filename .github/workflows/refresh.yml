@@ -66,5 +66,8 @@ jobs:
             echo "nothing new this week"
           else
             git commit -m "Weekly refresh $(date -u +%F)"
+            # A push to main during the run (it takes about ten minutes) would
+            # reject this one; the bot touches only generated files, so rebase.
+            git pull --rebase origin main
             git push
           fi
