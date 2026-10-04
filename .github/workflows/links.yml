@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: "17 15 * * 1"
   workflow_dispatch:
+    inputs:
+      force_fail:
+        description: "Fail on purpose, to test the failure alert"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -15,6 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Forced failure (alert test)
+        if: ${{ inputs.force_fail }}
+        run: |
+          echo "force_fail was set: failing on purpose to test the alert"
+          exit 1
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
       - uses: actions/setup-python@v5
@@ -25,3 +35,34 @@ jobs:
         env:
           COFIRE_CHECK_LINKS: "1"
         run: uv run pytest -q tests/test_links.py
+
+  # A failed run opens an issue (or comments on the open one), which notifies
+  # the repository's owner and watchers whoever owns it. GitHub's own failure
+  # email for a scheduled workflow goes to whoever last edited the cron line,
+  # which is not reliably the owner, least of all after a transfer.
+  alert:
+    needs: [links]
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the failure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: "Link check failed"
+        run: |
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          body="The **$GITHUB_WORKFLOW** run failed on $(date -u +%F) (trigger: $GITHUB_EVENT_NAME, commit ${GITHUB_SHA::7}).
+
+          Run log: $run_url
+
+          Close this issue once a run succeeds."
+          gh label create workflow-failure --color B60205 --description "A scheduled workflow failed" 2>/dev/null || true
+          open=$(gh issue list --label workflow-failure --state open --json number,title -q ".[] | select(.title == env.TITLE) | .number" | head -1)
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body "$body"
+          else
+            gh issue create --title "$TITLE" --label workflow-failure --body "$body"
+          fi

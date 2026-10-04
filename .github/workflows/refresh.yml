@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: "30 18 * * 5"
   workflow_dispatch:
+    inputs:
+      force_fail:
+        description: "Fail on purpose, to test the failure alert"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -32,6 +37,11 @@ jobs:
       COFIRE_FETCH_SESSION_CAP: "10778277"
       GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Forced failure (alert test)
+        if: ${{ inputs.force_fail }}
+        run: |
+          echo "force_fail was set: failing on purpose to test the alert"
+          exit 1
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -75,7 +85,7 @@ jobs:
         # The commit step above runs only on success, so a failed run's
         # transfers used to vanish from the committed ledger (runs
         # 37072550722, 37237706715 and 37237839170; corrected by hand).
-        if: failure()
+        if: failure() && !inputs.force_fail
         run: |
           git config user.name "cofire-refresh"
           git config user.email "cofire-refresh@users.noreply.github.com"
@@ -85,4 +95,35 @@ jobs:
             git commit -m "Ledger of failed refresh run ${{ github.run_id }}"
             git pull --rebase origin main
             git push
+          fi
+
+  # A failed run opens an issue (or comments on the open one), which notifies
+  # the repository's owner and watchers whoever owns it. GitHub's own failure
+  # email for a scheduled workflow goes to whoever last edited the cron line,
+  # which is not reliably the owner, least of all after a transfer.
+  alert:
+    needs: [refresh]
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the failure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: "Weekly refresh failed"
+        run: |
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          body="The **$GITHUB_WORKFLOW** run failed on $(date -u +%F) (trigger: $GITHUB_EVENT_NAME, commit ${GITHUB_SHA::7}).
+
+          Run log: $run_url
+
+          Close this issue once a run succeeds."
+          gh label create workflow-failure --color B60205 --description "A scheduled workflow failed" 2>/dev/null || true
+          open=$(gh issue list --label workflow-failure --state open --json number,title -q ".[] | select(.title == env.TITLE) | .number" | head -1)
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body "$body"
+          else
+            gh issue create --title "$TITLE" --label workflow-failure --body "$body"
           fi

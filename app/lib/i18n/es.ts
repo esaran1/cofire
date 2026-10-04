@@ -118,7 +118,7 @@ export const es: Record<MessageKey, string> = {
   "ws.above": "Sobre el {t}",
   "ws.same": "Igual para toda la cuenca",
   "ws.footnote": "* La tasa habitual de la cuenca para esta época del año, que se muestra donde no se pudo comprobar una cifra por celda.",
-  "ws.history": "Después de los incendios de Buffalo Creek en 1996 y Hayman en 2002, los sedimentos siguieron llegando al embalse de Strontia Springs durante años.",
+  "ws.history": "Después de los incendios de Buffalo Creek en 1996 y Hayman en 2002, las tormentas dejaron más de 1 millón de yardas cúbicas de sedimentos en el embalse de Strontia Springs.",
 
   "ui.why": "Por qué",
   "ui.hide": "Ocultar",
@@ -170,7 +170,7 @@ export const es: Record<MessageKey, string> = {
   "brief.impossible": "no puede ocurrir",
   "brief.droughtNote": "Probabilidad en {h} semanas para una celda que hoy está en cada categoría. No se muestran las probabilidades que no pasaron su comprobación.",
   "brief.waterTitle": "De dónde viene el agua de Denver",
-  "brief.waterLede": "Denver Water señala las cuencas altas del South Platte y del río Blue entre sus fuentes principales, y considera que los incendios moderados y graves son la mayor amenaza para el agua sin tratar de Denver.",
+  "brief.waterLede": "Denver Water capta cerca de la mitad de su agua potable de afluentes del río Colorado al oeste de la Divisoria Continental, incluida el agua que el túnel Roberts trae del embalse Dillon, y el resto de la cuenca del río South Platte, al este. Considera que los incendios moderados y graves son la mayor amenaza para el agua sin tratar de Denver.",
   "brief.colArea": "Zona",
   "brief.colDryNow": "Sequedad actual",
   "brief.colDryAhead": "Sequedad en {h} semanas",
@@ -217,4 +217,5 @@ export const es: Record<MessageKey, string> = {
   "tract.itemScore": "puntaje {v}",
   "tract.announce": "Se muestra el sector censal {geoid}.",
   "map.regionBurden": "Mapa de los sectores censales de Denver, sombreados según el puntaje EnviroScreen. La lista de vecindarios del panel da la misma información.",
+  "ws.supply": "Denver Water capta cerca de la mitad de su agua potable de afluentes del río Colorado, al oeste de la Divisoria Continental; el túnel Roberts trae agua del embalse Dillon bajo la Divisoria hasta el Front Range. El resto viene de la cuenca del río South Platte, al este de la Divisoria.",
 };

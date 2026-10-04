@@ -2,6 +2,7 @@
 
 import type { Bundle } from "@/lib/schemas";
 import { useT } from "@/lib/i18n";
+import { LINKS } from "@/lib/links";
 
 const THRESHOLDS = ["80", "90", "97"] as const;
 
@@ -24,12 +25,20 @@ function pct(p: number | null | undefined): string {
  * shows the same number everywhere and is marked.
  */
 export function WatershedPanel({ sources, horizon }: { sources: Bundle["sources"]; horizon: string }) {
-  const { t } = useT();
+  const { lang, t } = useT();
+  const cite = (id: "denver_water_sources" | "denver_water_hayman") => (
+    <a href={LINKS[id].url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2" data-link={id}>
+      {LINKS[id][lang]}
+    </a>
+  );
   const entries = Object.entries(sources);
   if (entries.length === 0) return null;
   return (
     <section className="mt-6 border-t border-rule pt-5" data-testid="watershed-panel">
       <h3 className="text-lg">{t("ws.title")}</h3>
+      <p className="mt-1 text-xs leading-relaxed text-ink-soft" data-testid="watershed-supply">
+        {t("ws.supply")} <span className="text-mute">({cite("denver_water_sources")})</span>
+      </p>
       <p className="mt-1 text-xs leading-relaxed text-ink-soft">
         {t("ws.lede", { h: horizon })}
       </p>
@@ -69,7 +78,7 @@ export function WatershedPanel({ sources, horizon }: { sources: Bundle["sources"
         {t("ws.footnote")}
       </p>
       <p className="mt-3 text-xs leading-relaxed text-ink-soft">
-        {t("ws.history")}
+        {t("ws.history")} <span className="text-mute">({cite("denver_water_hayman")})</span>
       </p>
     </section>
   );

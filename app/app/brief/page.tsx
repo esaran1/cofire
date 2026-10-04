@@ -133,7 +133,7 @@ function BriefSheet({ brief, lang, todo }: { brief: Brief; lang: Lang; todo: Che
           {t("brief.waterLede")}{" "}
           <span className="text-[11px] text-mute">
             (
-            {(["denver_water_supply", "denver_water_watershed"] as const).map((id, i) => (
+            {(["denver_water_sources", "denver_water_watershed"] as const).map((id, i) => (
               <span key={id}>
                 {i > 0 ? "; " : ""}
                 <a href={LINKS[id].url} className="underline underline-offset-2" data-link={id}>

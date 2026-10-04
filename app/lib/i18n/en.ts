@@ -114,7 +114,7 @@ export const en = {
   "ws.above": "Above {t}th",
   "ws.same": "Same for the whole watershed",
   "ws.footnote": "* The watershed's usual rate for this time of year, shown where a per-cell number could not be checked.",
-  "ws.history": "After the 1996 Buffalo Creek and 2002 Hayman fires, sediment washed into Strontia Springs Reservoir for years.",
+  "ws.history": "After the 1996 Buffalo Creek and 2002 Hayman fires, rainstorms left more than 1 million cubic yards of sediment in Strontia Springs Reservoir.",
 
   "ui.why": "Why",
   "ui.hide": "Hide",
@@ -166,7 +166,7 @@ export const en = {
   "brief.impossible": "cannot happen",
   "brief.droughtNote": "Chance in {h} weeks for a cell now in each category. Odds that did not pass their check are not shown.",
   "brief.waterTitle": "Where Denver's water comes from",
-  "brief.waterLede": "Denver Water names the upper South Platte and upper Blue River watersheds among its primary sources, and calls moderate and severe wildfires the greatest threat to Denver's raw water supply.",
+  "brief.waterLede": "Denver Water collects around half its drinking water from tributaries of the Colorado River west of the Continental Divide, including water the Roberts Tunnel brings from Dillon Reservoir, and the rest from the South Platte River basin to the east. It calls moderate and severe wildfires the greatest threat to Denver's raw water supply.",
   "brief.colArea": "Area",
   "brief.colDryNow": "Dryness now",
   "brief.colDryAhead": "Dryness in {h} weeks",
@@ -213,6 +213,7 @@ export const en = {
   "tract.itemScore": "score {v}",
   "tract.announce": "Showing census tract {geoid}.",
   "map.regionBurden": "Map of Denver's census tracts, shaded by EnviroScreen score. The list of neighborhoods in the panel gives the same information.",
+  "ws.supply": "Denver Water collects around half its drinking water from tributaries of the Colorado River, west of the Continental Divide; the Roberts Tunnel brings water from Dillon Reservoir under the Divide to the Front Range. The rest comes from the South Platte River basin, east of the Divide.",
 } as const;
 
 export type MessageKey = keyof typeof en;

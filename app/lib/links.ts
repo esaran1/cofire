@@ -125,6 +125,24 @@ export const LINKS: Record<string, HelpLink> = {
     es: "Colorado EnviroScreen 2.0 (CDPHE)",
     checked: "2026-10-04",
   },
+  denver_water_sources: {
+    id: "denver_water_sources",
+    url: "https://www.denverwater.org/tap/where-does-your-water-come",
+    publisher: "Denver Water",
+    title: "Where does your water come from?",
+    en: "Denver Water: where does your water come from?",
+    es: "Denver Water: ¿de dónde viene su agua?",
+    checked: "2026-10-04",
+  },
+  denver_water_hayman: {
+    id: "denver_water_hayman",
+    url: "https://www.denverwater.org/tap/legacy-colorados-largest-wildfire",
+    publisher: "Denver Water",
+    title: "legacy of Colorado",
+    en: "Denver Water: the legacy of Colorado's largest wildfire",
+    es: "Denver Water: el legado del mayor incendio de Colorado",
+    checked: "2026-10-04",
+  },
 };
 
 /** The program behind each Ember action, where a checked page exists. */
