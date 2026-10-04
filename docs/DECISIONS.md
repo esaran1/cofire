@@ -2311,7 +2311,7 @@ the regional rate would be shown.
 - **Allowlist.** ArcGIS Online (`services3.arcgis.com`) is shared by every
   organization, so the allowlist now also checks paths on shared hosts. Only
   CDPHE's EnviroScreen layers pass.
-- **Two `safe_fetch` faults found by this fetch, both fixed with tests:**
+- **A `safe_fetch` fault found by this fetch, fixed with a test:**
   - A gzip response's `Content-Length` counts compressed bytes while the
     stream yields decompressed ones. `safe_fetch` now asks for identity
     encoding, and caps a compressed body by the caller's stated maximum.
