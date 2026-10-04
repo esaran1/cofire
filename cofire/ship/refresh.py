@@ -56,6 +56,29 @@ LOGGER = logging.getLogger("cofire.ship.refresh")
 RAW = Path("data/raw")
 USDM_URL = "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_{d:%Y%m%d}_M.zip"
 LOG = Path("artifacts/ship/refresh_log.json")
+# Sizes of the national weekly maps as published, the peers for the size check.
+# In CI the local archive is the data pack's Colorado clip, whose entries are
+# about 1/170 the size of a national map, so they cannot be the peers; the
+# first map fetched in CI was refused for exactly that (run 37072550722).
+NATIONAL_SIZES = Path("artifacts/ship/usdm_national_sizes.json")
+
+
+def national_peers(archive: Path, n: int = 8) -> list[int]:
+    """The last `n` national weekly map sizes: from the record, else the national archive."""
+    if NATIONAL_SIZES.exists():
+        sizes: dict[str, int] = json.loads(NATIONAL_SIZES.read_text())
+        if sizes:
+            return [sizes[k] for k in sorted(sizes)][-n:]
+    if archive.exists() and not archive.parent.is_symlink():
+        with zipfile.ZipFile(archive) as zf:
+            return [i.file_size for i in zf.infolist()][-n:]
+    return []
+
+
+def record_national_size(name: str, n_bytes: int) -> None:
+    sizes: dict[str, int] = json.loads(NATIONAL_SIZES.read_text()) if NATIONAL_SIZES.exists() else {}
+    sizes[name] = n_bytes
+    NATIONAL_SIZES.write_text(json.dumps(dict(sorted(sizes.items())), indent=1) + "\n")
 EXPORT = Path("artifacts/ship/forecast_issues.parquet")
 
 
@@ -73,12 +96,11 @@ def usdm_week(week: pd.Timestamp, ledger: Any) -> dict[str, Any]:
     """Fetch one weekly USDM map and add it to its year's archive."""
     archive = RAW / "usdm" / f"{week.year}_USDM_M.zip"
     name = f"USDM_{week:%Y%m%d}_M.zip"
-    peers: list[int] = []
     if archive.exists():
         with zipfile.ZipFile(archive) as zf:
             if name in zf.namelist():
                 return {"week": str(week.date()), "fetched": False}
-            peers = [i.file_size for i in zf.infolist()][-8:]
+    peers = national_peers(archive)
     incoming = RAW / "usdm" / "incoming" / name
     res = safe_fetch(USDM_URL.format(d=week), incoming, "zip", "USDM-weekly", peers=peers, ledger=ledger)
     with tempfile.TemporaryDirectory() as d:
@@ -100,6 +122,7 @@ def usdm_week(week: pd.Timestamp, ledger: Any) -> dict[str, Any]:
         part.replace(archive)
     if datapack.CLIPPED.exists():
         datapack.append_clipped(incoming, week.year)
+    record_national_size(name, res.n_bytes)
     incoming.unlink()
     return {"week": str(week.date()), "fetched": True, "bytes": res.n_bytes, "sha256": res.sha256}
 

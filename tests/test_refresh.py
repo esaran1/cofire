@@ -133,3 +133,35 @@ def test_ci_transfers_go_to_their_own_ledger(monkeypatch: pytest.MonkeyPatch) ->
     assert led.path == ci_budget.CI_LEDGER and led.budget_bytes == ci_budget.CI_BUDGET_BYTES
     monkeypatch.delenv("COFIRE_LEDGER_PATH")
     assert refresh._ledger().path == Path("data/ledger.json")
+
+
+def test_size_peers_are_national_maps_even_when_the_archive_is_the_clip(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """In CI the archive is the Colorado clip; its entries must not be the peers."""
+    import json
+    import zipfile
+
+    from cofire.ship import refresh
+
+    usdm = tmp_path / "usdm"
+    usdm.mkdir()
+    archive = usdm / "2026_USDM_M.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("USDM_20260922_M.zip", b"x" * 17_000)
+    sizes = tmp_path / "sizes.json"
+    sizes.write_text(json.dumps({"USDM_20260915_M.zip": 3_264_340, "USDM_20260922_M.zip": 3_000_870}))
+    monkeypatch.setattr(refresh, "NATIONAL_SIZES", sizes)
+    assert refresh.national_peers(archive) == [3_264_340, 3_000_870]
+    refresh.record_national_size("USDM_20260929_M.zip", 3_012_266)
+    assert refresh.national_peers(archive)[-1] == 3_012_266
+    from cofire.ship.safe_fetch import check_peer_size
+
+    check_peer_size(3_012_266, refresh.national_peers(archive))
+
+
+def test_the_committed_national_sizes_are_national() -> None:
+    import json
+
+    from cofire.ship.refresh import NATIONAL_SIZES
+
+    sizes = json.loads(NATIONAL_SIZES.read_text())
+    assert len(sizes) >= 8 and min(sizes.values()) > 500_000

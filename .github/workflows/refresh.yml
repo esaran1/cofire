@@ -61,7 +61,7 @@ jobs:
         run: |
           git config user.name "cofire-refresh"
           git config user.email "cofire-refresh@users.noreply.github.com"
-          git add artifacts/ship/forecast_issues.parquet artifacts/ship/refresh_log.json artifacts/ship/issue_vintages.json artifacts/vintages artifacts/ci/ledger.json demo app/lib/story.json
+          git add artifacts/ship/forecast_issues.parquet artifacts/ship/refresh_log.json artifacts/ship/issue_vintages.json artifacts/vintages artifacts/ci/ledger.json artifacts/ship/usdm_national_sizes.json demo app/lib/story.json
           if git diff --cached --quiet; then
             echo "nothing new this week"
           else
