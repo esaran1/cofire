@@ -11,5 +11,9 @@ import { SiteFooter } from "./SiteFooter";
 export function ConditionalFooter() {
   const path = usePathname();
   if (path === "/") return null;
-  return <SiteFooter />;
+  return (
+    <div className="print:hidden">
+      <SiteFooter />
+    </div>
+  );
 }

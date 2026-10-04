@@ -24,6 +24,7 @@ const PRODUCT: { href: string; label: MessageKey }[] = [
   { href: "/beat", label: "nav.predict" },
   { href: "/observe", label: "nav.observe" },
   { href: "/ember", label: "nav.harden" },
+  { href: "/brief", label: "nav.brief" },
 ];
 
 const EVIDENCE: { href: string; label: MessageKey }[] = [
@@ -44,7 +45,7 @@ export function SiteNav() {
   const isOn = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-rule bg-paper/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-rule bg-paper/90 backdrop-blur print:hidden">
       <div className="measure flex h-16 items-center justify-between gap-2 px-4 sm:gap-6 sm:px-6">
         <Link href="/landing" className="flex shrink-0 items-baseline gap-2" aria-label={t("nav.home")}>
           <span className="display text-xl">
@@ -58,20 +59,20 @@ export function SiteNav() {
               key={it.href}
               href={it.href}
               aria-current={isOn(it.href) ? "page" : undefined}
-              className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
+              className={`rounded-full px-2.5 py-1.5 text-sm transition-colors xl:px-3 ${
                 isOn(it.href) ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
               }`}
             >
               {t(it.label)}
             </Link>
           ))}
-          <span className="mx-2 h-4 w-px bg-rule" aria-hidden />
+          <span className="mx-1 h-4 w-px bg-rule xl:mx-2" aria-hidden />
           {EVIDENCE.map((it) => (
             <Link
               key={it.href}
               href={it.href}
               aria-current={isOn(it.href) ? "page" : undefined}
-              className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
+              className={`rounded-full px-2.5 py-1.5 text-sm transition-colors xl:px-3 ${
                 isOn(it.href) ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
               }`}
             >

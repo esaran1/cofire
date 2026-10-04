@@ -43,7 +43,7 @@ export function LangNotice() {
   const translated = TRANSLATED.some((p) => (p === "/" ? path === "/" : path.startsWith(p)));
   if (SPANISH_REVIEWED && translated) return null;
   return (
-    <div className="border-b border-ochre/40 bg-ochre-soft px-6 py-1.5 text-center text-xs text-ochre" data-testid="lang-notice">
+    <div className="border-b border-ochre/40 bg-ochre-soft px-6 py-1.5 print:hidden text-center text-xs text-ochre" data-testid="lang-notice">
       {!translated ? <span lang="es">{t("lang.untranslated")} </span> : null}
       {!SPANISH_REVIEWED ? <span lang="es">{t("lang.draft")}</span> : null}
     </div>
