@@ -83,3 +83,25 @@ test("Ember actions link their programs, and the card links current smoke", asyn
   await page.goto("/?domain=denver");
   await expect(page.getByTestId("smoke-link").locator("a")).toHaveAttribute("href", "https://fire.airnow.gov/", { timeout: 20_000 });
 });
+
+test("Denver's neighborhoods layer shows EnviroScreen as context, and only for Denver", async ({ page }) => {
+  await page.goto("/?domain=denver");
+  await expect(page.getByTestId("place-card")).toBeVisible({ timeout: 20_000 });
+  await page.getByTestId("layer-burden").click();
+  await expect(page).toHaveURL(/layer=burden/);
+  await expect(page.getByTestId("map-legend")).toContainText("context, not a forecast");
+  await expect(page.getByTestId("tract-card")).toContainText("Context, not a forecast");
+  const list = page.getByTestId("tract-list");
+  await list.locator("summary").click();
+  const first = list.getByTestId("tract-list-item").first();
+  const geoid = await first.getAttribute("data-geoid");
+  await first.click();
+  await expect(page.getByTestId("tract-card")).toContainText(`Census tract ${geoid}`);
+  await expect(page.getByTestId("tract-card").locator("[data-row]")).toHaveCount(4);
+  await expect(page.getByTestId("map-announce")).toHaveText(`Showing census tract ${geoid}.`);
+  // The forecast for the cell there is still on the card.
+  await expect(page.getByTestId("place-card")).toBeVisible();
+  await page.getByTestId("domain-switcher").selectOption("dillon");
+  await expect(page.getByTestId("layer-burden")).toHaveCount(0);
+  await expect(page).toHaveURL(/layer=fire/, { timeout: 20_000 });
+});

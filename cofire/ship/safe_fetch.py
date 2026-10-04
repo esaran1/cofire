@@ -61,7 +61,16 @@ ALLOWED_HOSTS = frozenset({
     "wcc.sc.egov.usda.gov",
     # Colorado Division of Water Resources (CDSS REST API), structured JSON only
     "dwr.state.co.us",
+    # ArcGIS Online, shared by every organization; only the paths below pass.
+    "services3.arcgis.com",
 })
+
+# Hosts shared by many publishers: a URL must also start with one of these
+# paths, so the allowlist names the publisher, not just the platform.
+ALLOWED_PATHS: dict[str, tuple[str, ...]] = {
+    # Colorado Department of Public Health and Environment (EnviroScreen 2.0)
+    "services3.arcgis.com": ("/66aUo8zsujfVXRIT/arcgis/rest/services/ColoradoEnviroScreen_v2_",),
+}
 
 # Accepted Content-Type prefixes per expected format. A mismatch refuses.
 CONTENT_TYPES = {
@@ -86,12 +95,19 @@ class FetchResult:
     sha256: str
 
 
+# Ask for the bytes as stored, so Content-Length describes what is streamed.
+IDENTITY = {"Accept-Encoding": "identity"}
+
+
 def check_url(url: str) -> None:
     u = urlparse(url)
     if u.scheme != "https":
         raise FetchRefused(f"not HTTPS: {url}")
     if u.hostname not in ALLOWED_HOSTS:
         raise FetchRefused(f"host not on the allowlist: {u.hostname}")
+    paths = ALLOWED_PATHS.get(u.hostname)
+    if paths is not None and not u.path.startswith(paths):
+        raise FetchRefused(f"path not on the allowlist for {u.hostname}: {u.path}")
 
 
 def check_magic(head: bytes, fmt: str) -> None:
@@ -175,7 +191,7 @@ def safe_fetch(
     current = url
     for _ in range(max_redirects + 1):
         check_url(current)
-        head = http.head(current, allow_redirects=False, timeout=60)  # type: ignore[attr-defined]
+        head = http.head(current, allow_redirects=False, timeout=60, headers=IDENTITY)  # type: ignore[attr-defined]
         if head.status_code in (301, 302, 303, 307, 308):
             current = urljoin(current, head.headers.get("Location", ""))
             continue
@@ -194,7 +210,11 @@ def safe_fetch(
         raise FetchRefused(f"Content-Type {ctype} is an HTML page, expected {fmt}")
     if ctype and not any(ctype.startswith(p) for p in CONTENT_TYPES[fmt]):
         raise FetchRefused(f"Content-Type {ctype} contradicts expected {fmt}")
-    length = headers.get("Content-Length")
+    # A compressed response's length counts compressed bytes, but the stream
+    # below yields decompressed ones, so it cannot cap the body; the caller's
+    # stated maximum does instead.
+    encoded = (headers.get("Content-Encoding") or "identity").lower() != "identity"
+    length = None if encoded else headers.get("Content-Length")
     projected = int(length) if length is not None and length.isdigit() else max_bytes
     if projected is None:
         raise FetchRefused(f"no Content-Length for {current} and no max_bytes stated")
@@ -206,7 +226,7 @@ def safe_fetch(
             f"{led.remaining_bytes} B remaining"  # type: ignore[attr-defined]
         )
 
-    resp = http.get(current, stream=True, allow_redirects=False, timeout=300)  # type: ignore[attr-defined]
+    resp = http.get(current, stream=True, allow_redirects=False, timeout=300, headers=IDENTITY)  # type: ignore[attr-defined]
     if resp.status_code in (301, 302, 303, 307, 308):
         raise FetchRefused(f"GET redirected after HEAD did not: {current}")
     if resp.status_code != 200:

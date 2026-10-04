@@ -2298,3 +2298,30 @@ the regional rate would be shown.
   - Past 11 days, the map and the brief say the numbers are the last good
     ones and how old they are.
   - It showed on 2026-10-04, because the 2026-10-02 refresh had failed.
+
+## EnviroScreen context layer, 2026-10-04
+
+- **Source.** Colorado EnviroScreen 2.0 (CDPHE, published 2024-11-14), by
+  census tract. Denver's 178 tracts were fetched once through `safe_fetch`:
+  77,016 B, logged in the ledger. The ledger had about 57.2 MB left
+  afterwards.
+  - The file is `app/lib/enviroscreen_denver.json`, built by
+    `cofire/ship/enviroscreen.py`. It records its source, its fetch time and
+    the sha256.
+- **Allowlist.** ArcGIS Online (`services3.arcgis.com`) is shared by every
+  organization, so the allowlist now also checks paths on shared hosts. Only
+  CDPHE's EnviroScreen layers pass.
+- **Two `safe_fetch` faults found by this fetch, both fixed with tests:**
+  - A gzip response's `Content-Length` counts compressed bytes while the
+    stream yields decompressed ones. `safe_fetch` now asks for identity
+    encoding, and caps a compressed body by the caller's stated maximum.
+- **Indicators shown:** the overall EnviroScreen percentile, extreme heat
+  days, fine particle pollution and asthma hospitalizations.
+  - **Drought is not shown.** It is county-level, the same 35.4 in every
+    Denver tract, so it says nothing about neighborhoods.
+  - **Wildfire Risk is not shown.** It reads high across urban Denver and
+    would suggest a wildland fire danger the app does not claim for the city.
+- **Context only.** The layer is labelled "context, not a forecast" on the
+  legend and the card. It enters no model and no forecast number.
+- **No neighborhood names.** Tracts are named by their census GEOID. The
+  layer carries no neighborhood names, and none were added without a source.

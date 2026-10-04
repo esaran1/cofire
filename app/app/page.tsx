@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { set } from "idb-keyval";
-import { MapCell, MapView } from "@/components/MapView";
+import { type Layer, MapCell, MapView } from "@/components/MapView";
+import { TractCard, TractList } from "@/components/TractCard";
+import { type TractFeature, type Tracts, loadTracts, tractAt, tractPoint } from "@/lib/tracts";
 import { PlaceCard } from "@/components/PlaceCard";
 import { CellList } from "@/components/CellList";
 import { StaleBadge } from "@/components/StaleBadge";
@@ -25,7 +27,9 @@ export default function HomePage() {
   const [index, setIndex] = useState<DomainsIndex | null>(null);
   const [issue, setIssue] = useState("");
   const [horizon, setHorizon] = useState("4");
-  const [layer, setLayer] = useState<"drought" | "fire">("fire");
+  const [layer, setLayer] = useState<Layer>("fire");
+  const [tracts, setTracts] = useState<Tracts | null>(null);
+  const [tract, setTract] = useState<TractFeature | null>(null);
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [place, setPlace] = useState<Place | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -42,7 +46,7 @@ export default function HomePage() {
     const h = q.get("horizon");
     if (h === "2" || h === "4" || h === "8") setHorizon(h);
     const l = q.get("layer");
-    if (l === "fire" || l === "drought") setLayer(l);
+    if (l === "fire" || l === "drought" || l === "burden") setLayer(l);
     linkedCell.current = q.get("cell") ?? undefined;
     setLinked({ issue: q.get("issue") ?? undefined, cell: linkedCell.current });
     setAdopted(readAdopted());
@@ -73,6 +77,15 @@ export default function HomePage() {
   }, [ready, domain, issue, horizon, layer, place]);
 
   const meta = index?.domains[domain] ?? null;
+
+  // The neighborhoods layer is Denver's alone; leaving Denver leaves it.
+  const burdenOk = domain === "denver";
+  useEffect(() => {
+    if (ready && !burdenOk && layer === "burden") setLayer("fire");
+  }, [ready, burdenOk, layer]);
+  useEffect(() => {
+    if (layer === "burden" && !tracts) void loadTracts().then(setTracts).catch(() => setLayer("fire"));
+  }, [layer, tracts]);
 
   // Load the area's forecast, and open the card on the cell nearest its centre
   // so the page never lands on an empty map.
@@ -107,12 +120,25 @@ export default function HomePage() {
   const onClick = useCallback(
     (lat: number, lon: number) => {
       if (!bundle || !index) return;
+      if (layer === "burden" && tracts) setTract(tractAt(tracts, lat, lon));
       const c = nearestCell(bundle, lat, lon);
       // A click well outside the area's cells selects nothing.
       if (!c || Math.abs(c.lat - lat) > 0.05 || Math.abs(c.lon - lon) > 0.05) return;
       const p = placeFromCell(bundle, c, index.history_years);
       setPlace(p);
       void set("last_place", p).catch(() => undefined);
+    },
+    [bundle, index, layer, tracts],
+  );
+
+  // A tract chosen from the list: its numbers, and the forecast for the cell there.
+  const onPickTract = useCallback(
+    (f: TractFeature) => {
+      setTract(f);
+      if (!bundle || !index) return;
+      const [lat, lon] = tractPoint(f);
+      const c = nearestCell(bundle, lat, lon);
+      if (c) setPlace(placeFromCell(bundle, c, index.history_years));
     },
     [bundle, index],
   );
@@ -161,9 +187,20 @@ export default function HomePage() {
           )}
         </div>
 
-        <CellList cells={cells} layer={layer} selectedId={place?.cell_id} onSelect={onPick} />
+        {layer === "burden" ? (
+          <>
+            <TractCard tract={tract} />
+            {tracts ? <TractList tracts={tracts} selected={tract?.properties.geoid ?? null} onSelect={onPickTract} /> : null}
+          </>
+        ) : (
+          <CellList cells={cells} layer={layer} selectedId={place?.cell_id} onSelect={onPick} />
+        )}
         <p className="sr-only" aria-live="polite" data-testid="map-announce">
-          {place ? t("map.announce", { lat: place.lat.toFixed(3), lon: place.lon.toFixed(3) }) : ""}
+          {layer === "burden" && tract
+            ? t("tract.announce", { geoid: tract.properties.geoid })
+            : place
+              ? t("map.announce", { lat: place.lat.toFixed(3), lon: place.lon.toFixed(3) })
+              : ""}
         </p>
 
         {place ? (
@@ -193,7 +230,9 @@ export default function HomePage() {
           layer={layer}
           selectedId={place?.cell_id}
           onClick={onClick}
-          label={meta ? t("map.region", { area: meta.label }) : ""}
+          label={layer === "burden" ? t("map.regionBurden") : meta ? t("map.region", { area: meta.label }) : ""}
+          tracts={burdenOk ? tracts : null}
+          selectedTract={tract?.properties.geoid ?? null}
         />
         <TimeScrubber
           issues={index?.issues ?? []}
@@ -203,6 +242,7 @@ export default function HomePage() {
           onIssue={setIssue}
           onHorizon={setHorizon}
           onLayer={setLayer}
+          burden={burdenOk}
         />
       </div>
     </div>

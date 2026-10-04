@@ -172,3 +172,28 @@ def test_a_server_that_refuses_head_is_capped_by_the_stated_maximum(tmp_path: Pa
     s = FakeSession({url: (refused, None)})
     with pytest.raises(FetchRefused, match="no Content-Length"):
         safe_fetch(url, tmp_path / "b.json", "json", "x", ledger=_ledger(tmp_path), session=s)
+
+
+def test_a_shared_host_admits_only_the_named_publisher(tmp_path: Path) -> None:
+    from cofire.ship.safe_fetch import check_url
+
+    check_url("https://services3.arcgis.com/66aUo8zsujfVXRIT/arcgis/rest/services/ColoradoEnviroScreen_v2_Tract/FeatureServer/0/query")
+    for bad in (
+        "https://services3.arcgis.com/someoneElse/arcgis/rest/services/x/FeatureServer/0/query",
+        "https://services3.arcgis.com/66aUo8zsujfVXRIT/arcgis/rest/services/Other_Layer/FeatureServer/0",
+    ):
+        with pytest.raises(FetchRefused, match="path not on the allowlist"):
+            check_url(bad)
+
+
+def test_a_compressed_response_is_capped_by_the_stated_maximum(tmp_path: Path) -> None:
+    """Content-Length counts gzip bytes; the stream yields decompressed ones."""
+    url = "https://dwr.state.co.us/Rest/GET/api/v2/y/?format=json"
+    body = b'{"ResultList": []}' + b" " * 5000
+    h = {"Content-Length": "300", "Content-Type": "application/json", "Content-Encoding": "gzip"}
+    s = FakeSession({url: (Resp(200, h), Resp(200, h, body))})
+    out = safe_fetch(url, tmp_path / "a.json", "json", "x", max_bytes=10_000, ledger=_ledger(tmp_path), session=s)
+    assert out.n_bytes == len(body)
+    s = FakeSession({url: (Resp(200, h), None)})
+    with pytest.raises(FetchRefused, match="no Content-Length"):
+        safe_fetch(url, tmp_path / "b.json", "json", "x", ledger=_ledger(tmp_path), session=s)

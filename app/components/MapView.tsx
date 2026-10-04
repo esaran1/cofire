@@ -6,6 +6,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { basemapStyle, registerPmtiles, resolveMode } from "@/lib/basemap";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
+import type { Tracts } from "@/lib/tracts";
+
+export type Layer = "drought" | "fire" | "burden";
 
 export type MapCell = { id: string; lat: number; lon: number; value: number | null };
 
@@ -45,13 +48,17 @@ const RAMP: Record<"fire" | "drought", maplibregl.ExpressionSpecification> = {
   drought: ["interpolate", ["linear"], ["coalesce", ["get", "value"], 0], 0, "#efe9da", 25, "#e6c15c", 60, "#b8862b", 100, "#6b4a12"],
 };
 
-export const LEGEND: Record<"fire" | "drought", { stops: string[]; labels: [string, string, string]; title: MessageKey }> = {
+// EnviroScreen: the statewide percentile score, 0 to 100.
+const BURDEN_RAMP: maplibregl.ExpressionSpecification = ["interpolate", ["linear"], ["coalesce", ["get", "score"], 0], 0, "#eef0ea", 50, "#b9b3d6", 80, "#7b6db3", 100, "#3b2a78"];
+
+export const LEGEND: Record<Layer, { stops: string[]; labels: [string, string, string]; title: MessageKey }> = {
+  burden: { title: "legend.burden", stops: ["#eef0ea", "#b9b3d6", "#7b6db3", "#3b2a78"], labels: ["legend.less", "50", "legend.more"] },
   fire: { title: "legend.fire", stops: ["#8fb3c4", "#d9e3e2", "#efe9da", "#eab26b", "#cf6a2c", "#8a2410"], labels: ["legend.wetter", "legend.typical", "legend.drier"] },
   drought: { title: "legend.drought", stops: ["#efe9da", "#e6c15c", "#b8862b", "#6b4a12"], labels: ["0%", "50%", "100%"] },
 };
 
 /** What the colours mean, in the map's corner. */
-export function MapLegend({ layer, empty = false }: { layer: "drought" | "fire"; empty?: boolean }) {
+export function MapLegend({ layer, empty = false }: { layer: Layer; empty?: boolean }) {
   const { t } = useT();
   const l = LEGEND[layer];
   const text = (k: string) => (k.startsWith("legend.") ? t(k as MessageKey) : k);
@@ -64,7 +71,7 @@ export function MapLegend({ layer, empty = false }: { layer: "drought" | "fire";
           <span key={k}>{text(k)}</span>
         ))}
       </div>
-      {empty ? (
+      {empty && layer === "drought" ? (
         <p className="mt-1 max-w-[10rem] text-ink" data-testid="map-legend-empty">
           {t("legend.empty")}
         </p>
@@ -80,12 +87,17 @@ export function MapView({
   selectedId,
   onClick,
   label = "",
+  tracts = null,
+  selectedTract = null,
 }: {
+  /** Denver's EnviroScreen tracts, drawn when the layer is "burden". */
+  tracts?: Tracts | null;
+  selectedTract?: string | null;
   /** What the map shows, for screen readers; the panel's cell list is the accessible equivalent. */
   label?: string;
   cells: MapCell[];
   bbox: [number, number, number, number] | null;
-  layer: "drought" | "fire";
+  layer: Layer;
   selectedId?: string | null;
   onClick: (lat: number, lon: number) => void;
 }) {
@@ -202,8 +214,20 @@ export function MapView({
           filter: ["==", ["get", "id"], ""],
         });
       }
-      map.setPaintProperty("cells-fill", "fill-color", RAMP[layer]);
+      const burden = layer === "burden";
+      if (!burden) map.setPaintProperty("cells-fill", "fill-color", RAMP[layer]);
+      for (const id of ["cells-fill", "cells-line", "cells-selected"]) map.setLayoutProperty(id, "visibility", burden ? "none" : "visible");
       map.setFilter("cells-selected", ["==", ["get", "id"], selectedId ?? ""]);
+      if (tracts) {
+        if (!map.getSource("tracts")) {
+          map.addSource("tracts", { type: "geojson", data: tracts as unknown as GeoJSON.FeatureCollection, promoteId: "geoid" });
+          map.addLayer({ id: "tracts-fill", type: "fill", source: "tracts", paint: { "fill-color": BURDEN_RAMP, "fill-opacity": 0.7 } });
+          map.addLayer({ id: "tracts-line", type: "line", source: "tracts", paint: { "line-color": "#17181b", "line-opacity": 0.25, "line-width": 0.6 } });
+          map.addLayer({ id: "tracts-selected", type: "line", source: "tracts", paint: { "line-color": "#17181b", "line-width": 2.5 }, filter: ["==", ["get", "geoid"], ""] });
+        }
+        for (const id of ["tracts-fill", "tracts-line", "tracts-selected"]) map.setLayoutProperty(id, "visibility", burden ? "visible" : "none");
+        map.setFilter("tracts-selected", ["==", ["get", "geoid"], selectedTract ?? ""]);
+      }
     };
     // Draw now if the style is parsed; otherwise when it is.
     if (styleReady.current) draw();
@@ -215,7 +239,7 @@ export function MapView({
       fittedFor.current = key;
       setTimeout(() => fit.current(true), 50);
     }
-  }, [cells, layer, selectedId]);
+  }, [cells, layer, selectedId, tracts, selectedTract]);
 
   return (
     <>

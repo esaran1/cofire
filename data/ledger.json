@@ -1,9 +1,9 @@
 {
   "budget_bytes": 3000000000,
-  "recorded_bytes": 4420313521,
+  "recorded_bytes": 4420541974,
   "correction_bytes": -1477701654,
-  "total_bytes": 2942611867,
-  "remaining_bytes": 57388133,
+  "total_bytes": 2942840320,
+  "remaining_bytes": 57159680,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
@@ -29509,6 +29509,27 @@
       "bytes": 1497,
       "timestamp": "2026-10-04T21:25:59+00:00",
       "note": "session=v1.1; sha256=1ff5ee746cdba0cee8988998d4bd2545f850b76399c840472345344d89df2418"
+    },
+    {
+      "source": "EnviroScreen-v2-Denver",
+      "url": "https://services3.arcgis.com/66aUo8zsujfVXRIT/arcgis/rest/services/ColoradoEnviroScreen_v2_Tract_24118_Final/FeatureServer/0/query?where=GEOID+LIKE+%2708031%25%27&outFields=GEOID%2CTtl_P%2CES_S_%2CDrg_P%2CE___P%2CF___P%2CWl__P%2CAs___P&outSR=4326&geometryPrecision=4&maxAllowableOffset=0.0003&returnGeometry=true&f=geojson",
+      "bytes": 65536,
+      "timestamp": "2026-10-04T22:07:08+00:00",
+      "note": "session=v1.1; REJECTED"
+    },
+    {
+      "source": "EnviroScreen-v2-Denver",
+      "url": "https://services3.arcgis.com/66aUo8zsujfVXRIT/arcgis/rest/services/ColoradoEnviroScreen_v2_Tract_24118_Final/FeatureServer/0/query?where=GEOID+LIKE+%2708031%25%27&outFields=GEOID%2CTtl_P%2CES_S_%2CDrg_P%2CE___P%2CF___P%2CWl__P%2CAs___P&outSR=4326&geometryPrecision=4&maxAllowableOffset=0.0003&returnGeometry=true&f=geojson",
+      "bytes": 85901,
+      "timestamp": "2026-10-04T22:07:27+00:00",
+      "note": "session=v1.1; sha256=e2bb5ff2fb7e7dea929d8fb6bfcb4f814cf655b8b2f2aadd48a66360a483e5c3"
+    },
+    {
+      "source": "EnviroScreen-v2-Denver",
+      "url": "https://services3.arcgis.com/66aUo8zsujfVXRIT/arcgis/rest/services/ColoradoEnviroScreen_v2_Tract_24118_Final/FeatureServer/0/query?where=GEOID+LIKE+%2708031%25%27&outFields=GEOID%2CTtl_P%2CES_S_%2CE___P%2CF___P%2CAs___P&outSR=4326&geometryPrecision=4&maxAllowableOffset=0.0003&returnGeometry=true&f=geojson",
+      "bytes": 77016,
+      "timestamp": "2026-10-04T22:07:53+00:00",
+      "note": "session=v1.1; sha256=ae4777dd0f98b6407aef9e2157557c263ea24787f4569f74a91be5e60d73064f"
     }
   ]
 }

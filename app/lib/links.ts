@@ -116,6 +116,15 @@ export const LINKS: Record<string, HelpLink> = {
     es: "AirNow: hojas informativas sobre el humo, incluidas mascarillas y personas con más riesgo",
     checked: "2026-10-04",
   },
+  enviroscreen: {
+    id: "enviroscreen",
+    url: "https://cdphe.colorado.gov/enviroscreen",
+    publisher: "Colorado Department of Public Health and Environment",
+    title: "Colorado EnviroScreen",
+    en: "Colorado EnviroScreen 2.0 (CDPHE)",
+    es: "Colorado EnviroScreen 2.0 (CDPHE)",
+    checked: "2026-10-04",
+  },
 };
 
 /** The program behind each Ember action, where a checked page exists. */

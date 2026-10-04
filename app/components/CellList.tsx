@@ -17,7 +17,7 @@ export function CellList({
   onSelect,
 }: {
   cells: MapCell[];
-  layer: "drought" | "fire";
+  layer: "drought" | "fire" | "burden";
   selectedId?: string | null;
   onSelect: (c: MapCell) => void;
 }) {

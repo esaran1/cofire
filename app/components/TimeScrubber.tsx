@@ -14,14 +14,17 @@ export function TimeScrubber({
   onIssue,
   onHorizon,
   onLayer,
+  burden = false,
 }: {
   issues: string[];
   issue: string;
   horizon: string;
-  layer: "drought" | "fire";
+  layer: "drought" | "fire" | "burden";
   onIssue: (v: string) => void;
   onHorizon: (v: string) => void;
-  onLayer: (v: "drought" | "fire") => void;
+  onLayer: (v: "drought" | "fire" | "burden") => void;
+  /** Offer the EnviroScreen neighborhoods layer (Denver only). */
+  burden?: boolean;
 }) {
   const { t } = useT();
   const idx = Math.max(0, issues.indexOf(issue));
@@ -64,6 +67,18 @@ export function TimeScrubber({
           >
             {t("scrub.drought")}
           </button>
+          {burden ? (
+            <button
+              onClick={() => onLayer("burden")}
+              aria-pressed={layer === "burden"}
+              data-testid="layer-burden"
+              className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
+                layer === "burden" ? "bg-[#3b2a78] text-paper" : "text-ink-soft hover:text-ink"
+              }`}
+            >
+              {t("scrub.burden")}
+            </button>
+          ) : null}
         </div>
       </div>
 
