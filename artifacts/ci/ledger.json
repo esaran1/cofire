@@ -1,10 +1,29 @@
 {
   "budget_bytes": 1000000000,
   "recorded_bytes": 184328,
-  "correction_bytes": 0,
-  "total_bytes": 184328,
-  "remaining_bytes": 999815672,
-  "corrections": [],
+  "correction_bytes": 9216891,
+  "total_bytes": 9401219,
+  "remaining_bytes": 990598781,
+  "corrections": [
+    {
+      "at": "2026-10-04T22:19:14.647153+00:00",
+      "reason": "refresh run 37072550722 failed or had its commit rejected, so its transfers never reached this ledger",
+      "delta_bytes": 3012266,
+      "evidence": "ci_budget check output in https://github.com/esaran1/cofire/actions/runs/37072550722"
+    },
+    {
+      "at": "2026-10-04T22:19:14.647419+00:00",
+      "reason": "refresh run 37237706715 failed or had its commit rejected, so its transfers never reached this ledger",
+      "delta_bytes": 3012266,
+      "evidence": "ci_budget check output in https://github.com/esaran1/cofire/actions/runs/37237706715"
+    },
+    {
+      "at": "2026-10-04T22:19:14.647609+00:00",
+      "reason": "refresh run 37237839170 failed or had its commit rejected, so its transfers never reached this ledger",
+      "delta_bytes": 3192359,
+      "evidence": "ci_budget check output in https://github.com/esaran1/cofire/actions/runs/37237839170"
+    }
+  ],
   "transfers": [
     {
       "source": "gridMET-DAP-meta",

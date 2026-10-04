@@ -2325,3 +2325,22 @@ the regional rate would be shown.
   legend and the card. It enters no model and no forecast number.
 - **No neighborhood names.** Tracts are named by their census GEOID. The
   layer carries no neighborhood names, and none were added without a source.
+
+## CI ledger gap, found 2026-10-04
+
+The refresh workflow committed its ledger only when a run succeeded, so three
+runs' transfers never reached `artifacts/ci/ledger.json`:
+
+| Run | Transfers | Bytes | Why it was lost |
+|---|---|---|---|
+| 37072550722 | 1 | 3,012,266 | refused by the size check (the clipped-archive peers fault) |
+| 37237706715 | 1 | 3,012,266 | gridMET refused connections |
+| 37237839170 | 11 | 3,192,359 | push rejected by a concurrent push |
+
+- **The fix.** The totals, read from each run's `ci_budget check` output,
+  were added to the ledger as corrections (9,216,891 B). Corrections were
+  used rather than invented per-URL entries.
+- **The September 29 national map size** (3,012,266 B, seen in two of those
+  runs) was added to `usdm_national_sizes.json`.
+- **Going forward.** A failed run now commits its ledger and size record in
+  a separate step, and the success path rebases before pushing.

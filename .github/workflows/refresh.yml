@@ -71,3 +71,18 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+      - name: Keep the ledger of a failed run
+        # The commit step above runs only on success, so a failed run's
+        # transfers used to vanish from the committed ledger (runs
+        # 37072550722, 37237706715 and 37237839170; corrected by hand).
+        if: failure()
+        run: |
+          git config user.name "cofire-refresh"
+          git config user.email "cofire-refresh@users.noreply.github.com"
+          git reset -q
+          git add artifacts/ci/ledger.json artifacts/ship/usdm_national_sizes.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Ledger of failed refresh run ${{ github.run_id }}"
+            git pull --rebase origin main
+            git push
+          fi
