@@ -159,3 +159,16 @@ def test_a_clean_archive_extracts_into_its_scope(tmp_path: Path) -> None:
         zf.writestr("dir/file.txt", "hello")
     out = safe_extract(z, tmp_path / "out")
     assert out == [(tmp_path / "out" / "dir" / "file.txt").resolve()]
+
+
+def test_a_server_that_refuses_head_is_capped_by_the_stated_maximum(tmp_path: Path) -> None:
+    """A 405 to HEAD carries the error body's length, not the file's."""
+    url = "https://dwr.state.co.us/Rest/GET/api/v2/x/?format=json"
+    body = b'{"ResultList": []}' + b" " * 500
+    refused = Resp(405, {"Content-Length": "73", "Content-Type": "application/json"})
+    s = FakeSession({url: (refused, Resp(200, {"Content-Type": "application/json"}, body))})
+    out = safe_fetch(url, tmp_path / "a.json", "json", "x", max_bytes=10_000, ledger=_ledger(tmp_path), session=s)
+    assert out.n_bytes == len(body)
+    s = FakeSession({url: (refused, None)})
+    with pytest.raises(FetchRefused, match="no Content-Length"):
+        safe_fetch(url, tmp_path / "b.json", "json", "x", ledger=_ledger(tmp_path), session=s)

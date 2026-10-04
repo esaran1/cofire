@@ -1,9 +1,9 @@
 {
   "budget_bytes": 3000000000,
-  "recorded_bytes": 4420300599,
+  "recorded_bytes": 4420313521,
   "correction_bytes": -1477701654,
-  "total_bytes": 2942598945,
-  "remaining_bytes": 57401055,
+  "total_bytes": 2942611867,
+  "remaining_bytes": 57388133,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
@@ -29488,6 +29488,27 @@
       "bytes": 385,
       "timestamp": "2026-09-27T22:12:48+00:00",
       "note": "session=v1.1; sha256=7dfcbb01561be434cb6cd2501af32be952a042103565e8a80bda0c05f4617d35"
+    },
+    {
+      "source": "cdss-probe",
+      "url": "https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/telemetrystation/?format=json&county=SUMMIT&fields=abbrev,stationName,parameter",
+      "bytes": 1195,
+      "timestamp": "2026-10-04T21:25:20+00:00",
+      "note": "session=v1.1; REJECTED"
+    },
+    {
+      "source": "cdss-probe",
+      "url": "https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/telemetrystation/?format=json&county=SUMMIT",
+      "bytes": 10230,
+      "timestamp": "2026-10-04T21:25:52+00:00",
+      "note": "session=v1.1; sha256=9ec23d9b8f6c1c311edd06a2628a4f605c945d87a9ca9d4303b84317326890c9"
+    },
+    {
+      "source": "cdss-probe",
+      "url": "https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/telemetrytimeseriesday/?format=json&abbrev=DILRESCO&parameter=STORAGE&startDate=09/27/2026",
+      "bytes": 1497,
+      "timestamp": "2026-10-04T21:25:59+00:00",
+      "note": "session=v1.1; sha256=1ff5ee746cdba0cee8988998d4bd2545f850b76399c840472345344d89df2418"
     }
   ]
 }

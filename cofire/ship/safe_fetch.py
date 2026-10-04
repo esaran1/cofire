@@ -59,6 +59,8 @@ ALLOWED_HOSTS = frozenset({
     # NOAA and NRCS hosts already in use
     "downloads.psl.noaa.gov",
     "wcc.sc.egov.usda.gov",
+    # Colorado Division of Water Resources (CDSS REST API), structured JSON only
+    "dwr.state.co.us",
 })
 
 # Accepted Content-Type prefixes per expected format. A mismatch refuses.
@@ -183,12 +185,16 @@ def safe_fetch(
     if head.status_code >= 400 and head.status_code != 405:
         raise FetchRefused(f"HEAD {current} returned {head.status_code}")
 
-    ctype = (head.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+    # A server that refuses HEAD (405) answers with headers describing its error
+    # body, not the file, so neither its length nor its type is trusted; the
+    # caller's stated maximum caps the GET and the magic bytes check the type.
+    headers = {} if head.status_code == 405 else head.headers
+    ctype = (headers.get("Content-Type") or "").split(";")[0].strip().lower()
     if ctype and ctype.startswith("text/html"):
         raise FetchRefused(f"Content-Type {ctype} is an HTML page, expected {fmt}")
     if ctype and not any(ctype.startswith(p) for p in CONTENT_TYPES[fmt]):
         raise FetchRefused(f"Content-Type {ctype} contradicts expected {fmt}")
-    length = head.headers.get("Content-Length")
+    length = headers.get("Content-Length")
     projected = int(length) if length is not None and length.isdigit() else max_bytes
     if projected is None:
         raise FetchRefused(f"no Content-Length for {current} and no max_bytes stated")

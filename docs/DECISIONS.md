@@ -2232,3 +2232,44 @@ the regional rate would be shown.
   model's rows in 874 of those checks, by at most 0.023 (for example, above
   the 97th percentile showing more than above the 90th). Not changed without
   a decision.
+
+## App Challenge plan: decisions by the owner, 2026-10-04
+
+- **The 2026 seal stays until 2027-01-12.** The model is shown in Beat the
+  Model but never scored, and no metric of any kind is computed against 2026
+  outcomes before that date. 2027-01-12 is the second Tuesday after the last
+  2026 drought map (week of 2026-12-29, released 2026-12-31). It is set now
+  and not moved. What is computed at the unseal is to be written down and
+  committed before that date; the unseal is look 4. gridMET values for late
+  2026 will still be provisional on that date, and the unseal report must
+  say so.
+- **Denver's-water context numbers.** No exception to the HTML rule in
+  `safe_fetch`.
+  - **Dillon storage:** the Colorado Division of Water Resources REST API
+    (`dwr.state.co.us`, now allowlisted) has a structured feed. Station
+    `DILRESCO`, parameter `STORAGE`, daily values in acre-feet, through
+    `telemetrystations/telemetrytimeseriesday`. Probed through `safe_fetch`
+    and logged in the ledger. On 2026-10-03 it read 164,566 acre-feet, flag
+    `O` (provisional).
+  - **The watering-rule stage** is hand-entered, with its date and source
+    link.
+  - **Both are labeled current conditions, not forecasts.**
+  - **The probe found a `safe_fetch` fault.** That API answers HEAD with 405,
+    and `safe_fetch` read the 405's own headers as the file's length and
+    type. It now ignores them and caps the GET by the caller's stated
+    maximum; a test covers it.
+- **The Denver's-water view is the student's to build.** The AI agent reviews
+  it and does not write it. The repository transfer, making it public, the
+  student's rewrite and the student's section of `AI_USAGE.md` are the
+  student's too.
+- **No unsourced fact goes into the app or the video.** The planned claims
+  about new Colorado River operating rules and "the worst hydrologic year on
+  record" are dropped unless cited.
+- **The upstream step-size issue is drafted** in `docs/UPSTREAM_ISSUE_PID.md`,
+  for the student to file.
+- **Build order:**
+  1. Spanish localization and screen-reader parity for the map. The Spanish
+     needs review by a person before release.
+  2. The weekly brief.
+  3. Tested links and a staleness badge.
+  4. EnviroScreen, once its size is confirmed against the ledger.
