@@ -1,0 +1,123 @@
+{
+  "_note": "DRAFT Spanish for the Ember checklists (cofire/ship/ember_city.yaml and the frozen cofire/model/ember_checklist.yaml), keyed by group and item id. Written by the AI agent; needs review by a fluent reader (docs/SPANISH_REVIEW.md). Source names stay in English: they name real documents.",
+  "groups": {
+    "water": "Agua antes de las restricciones",
+    "smoke": "Listos para los días de humo",
+    "ignition": "No provocar un incendio",
+    "zone0_vents": "Zona 0 y respiraderos",
+    "structure": "Estructura",
+    "defensible_space": "Espacio defendible",
+    "ignition_behavior": "Conductas que provocan incendios",
+    "readiness": "Preparación"
+  },
+  "items": {
+    "water_schedule": {
+      "label": "Regar el césped solo en un horario fijo, temprano o tarde en el día",
+      "rationale": "Las reglas de riego de verano de Denver Water limitan el riego durante el día, y reducir el consumo antes de que se declare una etapa de sequía alarga el agua almacenada en los embalses."
+    },
+    "water_leaks": {
+      "label": "Reparar inodoros que no dejan de correr, llaves que gotean y fugas de los aspersores",
+      "rationale": "Las fugas desperdician agua cada hora de cada día, haya sequía o no."
+    },
+    "water_stage": {
+      "label": "Saber qué etapa de sequía de Denver Water está vigente",
+      "rationale": "Las etapas de restricción cambian lo que está permitido; conocer la etapa antes de que se endurezca evita prisas."
+    },
+    "water_turf": {
+      "label": "Reemplazar parte del césped con plantas que necesitan poca agua",
+      "rationale": "El césped es el mayor uso de agua al aire libre; un jardín de bajo consumo sigue vivo bajo las restricciones."
+    },
+    "smoke_alerts": {
+      "label": "Suscribirse a las alertas de calidad del aire",
+      "rationale": "El humo de incendios lejanos llega a Denver; una alerta es la señal para cerrar la casa y filtrar el aire."
+    },
+    "smoke_filter": {
+      "label": "Un purificador HEPA o un filtro MERV 13 para una habitación",
+      "rationale": "Una habitación con aire filtrado reduce la exposición al humo dentro de casa cuando el aire de afuera es malo."
+    },
+    "smoke_masks": {
+      "label": "Respiradores N95 en casa para cada persona que necesite salir",
+      "rationale": "Las mascarillas de tela no detienen las partículas del humo; un N95 bien ajustado sí."
+    },
+    "smoke_plan": {
+      "label": "Un plan para niños, personas mayores y cualquier persona con asma o enfermedades del corazón",
+      "rationale": "El humo afecta primero y más a estos grupos, así que su plan debe estar listo antes de un día de humo."
+    },
+    "ign_fireworks": {
+      "label": "Nada de fuegos artificiales",
+      "rationale": "Los fuegos artificiales son ilegales en Denver y cada verano provocan incendios de pasto y de edificios."
+    },
+    "ign_smoking": {
+      "label": "Apagar los cigarrillos en agua o arena, nunca en el mantillo, el pasto o las macetas",
+      "rationale": "Los cigarrillos mal apagados son una de las causas principales de incendios al aire libre que llegan a las casas."
+    },
+    "ign_grill": {
+      "label": "Parrillas y fogatas lejos de la casa, la terraza y las cercas, y nunca encendidas sin vigilancia",
+      "rationale": "Las parrillas sin vigilancia o demasiado cerca encienden terrazas, revestimientos y vegetación seca."
+    },
+    "ign_redflag": {
+      "label": "No hacer trabajos que saquen chispas al aire libre en días de Bandera Roja",
+      "rationale": "Cortar pasto seco, esmerilar y soldar lanzan chispas; en un día de Bandera Roja, el fuego de una chispa puede avanzar más rápido que usted."
+    },
+    "0_5_noncombustible": {
+      "label": "Superficie no combustible en los primeros 0 a 5 pies",
+      "rationale": "Las brasas encienden el mantillo y los desechos junto a las paredes mucho antes de que llegue el frente de llamas."
+    },
+    "vents_mesh": {
+      "label": "Malla metálica de 1/8 de pulgada en los respiraderos",
+      "rationale": "Los respiraderos sin malla son una vía para que las brasas entren al ático y al espacio bajo el piso."
+    },
+    "gutters_clean": {
+      "label": "Canaletas y uniones del techo libres de agujas de pino",
+      "rationale": "La hojarasca acumulada atrapa brasas en el borde del techo."
+    },
+    "no_firewood_walls": {
+      "label": "Leña y madera guardadas lejos de las paredes",
+      "rationale": "La madera apilada contra el revestimiento es combustible pegado a la casa."
+    },
+    "roof_class_a": {
+      "label": "Techo con cubierta de Clase A",
+      "rationale": "La clasificación de la cubierta del techo es lo que más influye en la estructura durante una lluvia de brasas."
+    },
+    "ember_resistant_eaves": {
+      "label": "Aleros cerrados o resistentes a las brasas",
+      "rationale": "Los aleros abiertos acumulan brasas y exponen la madera del borde del techo."
+    },
+    "dual_pane_windows": {
+      "label": "Ventanas de doble panel o de vidrio templado",
+      "rationale": "El vidrio sencillo se rompe con el calor radiante y deja entrar las brasas."
+    },
+    "5_30_trees": {
+      "label": "Árboles entre 5 y 30 pies separados para que sus copas no se toquen",
+      "rationale": "Las copas continuas llevan el fuego hasta la casa."
+    },
+    "grass_mowed": {
+      "label": "Pasto corto en un radio de 30 pies",
+      "rationale": "El pasto seco es un combustible fino por el que el fuego avanza rápido."
+    },
+    "propane_clear": {
+      "label": "Vegetación despejada alrededor de los tanques de propano",
+      "rationale": "Los tanques se vuelven una fuente de ignición si la vegetación arde debajo de ellos."
+    },
+    "no_burn_red_flag": {
+      "label": "No quemar desechos en días de bandera roja",
+      "rationale": "Los incendios provocados por personas se concentran en días de ERC alto y mucho viento."
+    },
+    "spark_arrestor": {
+      "label": "Parachispas en chimeneas y quemadores al aire libre",
+      "rationale": "Las chispas sin parachispas son brasas que salen de la propiedad."
+    },
+    "go_bag": {
+      "label": "Mochila de emergencia de la familia preparada",
+      "rationale": "El tiempo para evacuar se acorta cuando empieza la lluvia de brasas."
+    },
+    "address_visible": {
+      "label": "Número de la casa visible desde la calle",
+      "rationale": "Los bomberos no pueden defender una casa que no encuentran."
+    },
+    "hose_reach": {
+      "label": "Una manguera exterior que alcance la Zona 0",
+      "rationale": "Una manguera al alcance permite mojar los puntos donde caen las brasas antes de irse, si así se decide."
+    }
+  }
+}

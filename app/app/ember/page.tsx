@@ -8,34 +8,33 @@ import { IS_STATIC, getDomains, localScore, staticChecklist } from "@/lib/data";
 import { deviceId } from "@/lib/device";
 import { useDomain } from "@/lib/domain";
 import { Action, ErrorNote, Numeral, OfflineNote, Panel, Segmented, Skeleton } from "@/components/ui/Controls";
+import { type Lang, useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
+import emberEs from "@/lib/i18n/ember_es.json";
 
 // "city" is the Urban Ember Score, written for Denver (cofire/ship/ember_city.yaml):
 // water before restrictions, smoke readiness, not starting a fire. "wui" is the
 // wildland-edge hardening checklist for the foothills and mountain watersheds.
-const ZONES = [
-  { value: "city", label: "In the city" },
-  { value: "wui", label: "Wildland edge" },
+const ZONES: { value: string; label: MessageKey }[] = [
+  { value: "city", label: "ember.zoneCity" },
+  { value: "wui", label: "ember.zoneWui" },
 ];
 
-const COPY: Record<string, { title: string; lede: string; ring: string }> = {
-  city: {
-    title: "Urban Ember Score",
-    lede: "For Denver: save water before restrictions, get ready for smoke days, and do not start a fire.",
-    ring: "ready",
-  },
-  wui: {
-    title: "Ember Score",
-    lede: "For homes at the wildland edge, weighted by how much each action cuts ember ignition risk.",
-    ring: "hardened",
-  },
+const COST_LABEL: Record<string, MessageKey> = {
+  free: "ember.cost.free",
+  under_100: "ember.cost.under_100",
+  over_100: "ember.cost.over_100",
+  contractor: "ember.cost.contractor",
 };
 
-const COST_LABEL: Record<string, string> = {
-  free: "Free",
-  under_100: "Under $100",
-  over_100: "Over $100",
-  contractor: "Contractor",
-};
+// The checklists' own text is English (the wildland-edge list is in the frozen
+// model tree); the Spanish is kept beside the app, keyed by item and group id.
+const ES = emberEs as { groups: Record<string, string>; items: Record<string, { label: string; rationale: string }> };
+
+function itemText(i: EmberItem, lang: Lang): { label: string; rationale: string } {
+  const es = lang === "es" ? ES.items[i.id] : undefined;
+  return es ?? { label: i.label.replace(/\u2013/g, " to "), rationale: i.rationale };
+}
 
 function Ring({ score, label }: { score: number; label: string }) {
   const reduce = useReducedMotion();
@@ -70,6 +69,7 @@ function Ring({ score, label }: { score: number; label: string }) {
 }
 
 export default function EmberPage() {
+  const { lang, t } = useT();
   const [domain, , ready] = useDomain();
   const [zone, setZone] = useState("");
   const [data, setData] = useState<Checklist | null>(null);
@@ -127,7 +127,8 @@ export default function EmberPage() {
     if (zone) load(zone);
   }, [zone, load]);
 
-  const copy = COPY[zone] ?? COPY.wui;
+  const z = zone === "city" ? "city" : "wui";
+  const copy = { title: t(`ember.${z}.title`), lede: t(`ember.${z}.lede`), ring: t(`ember.${z}.ring`) };
 
   async function save(next: Record<string, boolean>) {
     if (IS_STATIC) {
@@ -144,7 +145,7 @@ export default function EmberPage() {
     try {
       setData(await postParsed("/ember/state", { device_id: deviceId(), zone, state: next }, ChecklistSchema));
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Could not save that change.");
+      setErr(e instanceof Error ? e.message : t("ember.saveFailed"));
     } finally {
       setBusy(false);
     }
@@ -174,12 +175,12 @@ export default function EmberPage() {
     const by = new Map<string, { label: string; items: EmberItem[] }>();
     for (const it of data.items) {
       if (surfaced.has(it.id)) continue;
-      const g = by.get(it.group) ?? { label: it.group_label, items: [] };
+      const g = by.get(it.group) ?? { label: (lang === "es" && ES.groups[it.group]) || it.group_label, items: [] };
       g.items.push(it);
       by.set(it.group, g);
     }
     return [...by.values()];
-  }, [data, quickWins]);
+  }, [data, quickWins, lang]);
 
   return (
     <div className="reading px-6 pb-24 pt-12">
@@ -200,7 +201,12 @@ export default function EmberPage() {
       )}
 
       <div className="mt-8">
-        <Segmented label="Where do you live" options={ZONES} value={zone} onChange={setZone} />
+        <Segmented
+          label={t("ember.where")}
+          options={ZONES.map((o) => ({ value: o.value, label: t(o.label) }))}
+          value={zone}
+          onChange={setZone}
+        />
       </div>
 
       <div className="mt-8 flex items-center gap-6">
@@ -208,16 +214,16 @@ export default function EmberPage() {
         <div className="flex-1">
           <p className="text-sm leading-relaxed text-ink-soft">
             {data
-              ? `${data.items.filter((i) => state[i.id]).length} of ${data.items.length} actions done.`
-              : "Loading your checklist."}
+              ? t("ember.done", { n: data.items.filter((i) => state[i.id]).length, total: data.items.length })
+              : t("ember.loading")}
           </p>
-          {busy && <p className="mt-1 text-xs text-ink-soft">Saving.</p>}
+          {busy && <p className="mt-1 text-xs text-ink-soft">{t("ember.saving")}</p>}
         </div>
       </div>
 
       {quickWins.length > 0 && (
         <>
-          <h2 className="mt-10 text-lg font-medium">Start here. These are free.</h2>
+          <h2 className="mt-10 text-lg font-medium">{t("ember.start")}</h2>
           <div className="mt-3 space-y-2">
             {quickWins.map((i) => (
               <button
@@ -229,8 +235,8 @@ export default function EmberPage() {
               >
                 <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-ember/60" />
                 <span>
-                  <span className="block text-sm text-ink">{i.label.replace(/\u2013/g, " to ")}</span>
-                  <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{i.rationale}</span>
+                  <span className="block text-sm text-ink">{itemText(i, lang).label}</span>
+                  <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{itemText(i, lang).rationale}</span>
                 </span>
               </button>
             ))}
@@ -238,7 +244,7 @@ export default function EmberPage() {
         </>
       )}
 
-      <h2 className="mt-10 text-lg font-medium">Everything else</h2>
+      <h2 className="mt-10 text-lg font-medium">{t("ember.rest")}</h2>
       <div className="mt-3 space-y-6">
         {data === null ? (
           <Skeleton rows={6} />
@@ -266,11 +272,11 @@ export default function EmberPage() {
                         </span>
                         <span className="flex-1">
                           <span className={`block text-sm ${done ? "text-mute line-through" : "text-ink"}`}>
-                            {i.label.replace(/\u2013/g, " to ")}
+                            {itemText(i, lang).label}
                           </span>
-                          <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{i.rationale}</span>
+                          <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{itemText(i, lang).rationale}</span>
                           <span className="mt-1 block text-xs text-mute">
-                            {COST_LABEL[i.cost] ?? i.cost} · {i.source}
+                            {COST_LABEL[i.cost] ? t(COST_LABEL[i.cost]) : i.cost} · <span lang="en">{i.source}</span>
                           </span>
                         </span>
                       </button>
@@ -292,7 +298,7 @@ export default function EmberPage() {
               void save({});
             }}
           >
-            Reset checklist
+            {t("ember.reset")}
           </Action>
         </div>
       )}

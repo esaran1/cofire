@@ -3,6 +3,8 @@ import { IBM_Plex_Mono, Newsreader, Outfit } from "next/font/google";
 import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
 import { ConditionalFooter } from "@/components/SiteChrome";
+import { LangNotice } from "@/components/LangSwitch";
+import { LangProvider } from "@/lib/i18n";
 
 /**
  * Type system, three roles, no more.
@@ -47,9 +49,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
       <body className="min-h-dvh bg-paper font-sans text-ink antialiased">
-        <SiteNav />
-        <main id="main">{children}</main>
-        <ConditionalFooter />
+        <LangProvider>
+          <SiteNav />
+          <LangNotice />
+          <main id="main">{children}</main>
+          <ConditionalFooter />
+        </LangProvider>
       </body>
     </html>
   );

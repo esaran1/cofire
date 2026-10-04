@@ -1,6 +1,7 @@
 "use client";
 
 import type { Bundle } from "@/lib/schemas";
+import { useT } from "@/lib/i18n";
 
 const THRESHOLDS = ["80", "90", "97"] as const;
 
@@ -23,21 +24,22 @@ function pct(p: number | null | undefined): string {
  * shows the same number everywhere and is marked.
  */
 export function WatershedPanel({ sources, horizon }: { sources: Bundle["sources"]; horizon: string }) {
+  const { t } = useT();
   const entries = Object.entries(sources);
   if (entries.length === 0) return null;
   return (
     <section className="mt-6 border-t border-rule pt-5" data-testid="watershed-panel">
-      <h3 className="text-lg">Where Denver&apos;s water comes from</h3>
+      <h3 className="text-lg">{t("ws.title")}</h3>
       <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-        Chance of fire-spread conditions in {horizon} weeks, averaged over each watershed.
+        {t("ws.lede", { h: horizon })}
       </p>
       <table className="mt-3 w-full text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wide text-mute">
-            <th className="pb-1 font-normal">Watershed</th>
-            {THRESHOLDS.map((t) => (
-              <th key={t} className="pb-1 text-right font-normal">
-                Above {t}th
+            <th className="pb-1 font-normal">{t("ws.col")}</th>
+            {THRESHOLDS.map((th) => (
+              <th key={th} className="pb-1 text-right font-normal">
+                {t("ws.above", { t: th })}
               </th>
             ))}
           </tr>
@@ -48,11 +50,11 @@ export function WatershedPanel({ sources, horizon }: { sources: Bundle["sources"
             return (
               <tr key={id} className="border-t border-rule" data-testid={`watershed-${id}`}>
                 <td className="py-2 pr-2">{s.label}</td>
-                {THRESHOLDS.map((t) => {
-                  const o = blk[`f_gt${t}_h${horizon}`] as Odds | undefined;
+                {THRESHOLDS.map((th) => {
+                  const o = blk[`f_gt${th}_h${horizon}`] as Odds | undefined;
                   const base = o?.state === "base_rate";
                   return (
-                    <td key={t} className="num py-2 text-right" title={base ? "Same for the whole watershed" : undefined}>
+                    <td key={th} className="num py-2 text-right" title={base ? t("ws.same") : undefined}>
                       {pct(o?.mean)}
                       {base ? <sup className="ml-0.5 text-mute">*</sup> : null}
                     </td>
@@ -64,12 +66,10 @@ export function WatershedPanel({ sources, horizon }: { sources: Bundle["sources"
         </tbody>
       </table>
       <p className="mt-2 text-[11px] leading-relaxed text-mute">
-        * The watershed&apos;s usual rate for this time of year, shown where a per-cell number could not be
-        checked.
+        {t("ws.footnote")}
       </p>
       <p className="mt-3 text-xs leading-relaxed text-ink-soft">
-        After the 1996 Buffalo Creek and 2002 Hayman fires, sediment washed into Strontia Springs Reservoir for
-        years.
+        {t("ws.history")}
       </p>
     </section>
   );

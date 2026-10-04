@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { List, X } from "@phosphor-icons/react";
 import { DomainSwitcher } from "./DomainSwitcher";
+import { LangSwitch } from "./LangSwitch";
+import { useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
 
 /**
  * One nav, one line at desktop, drawer below md.
@@ -16,21 +19,22 @@ import { DomainSwitcher } from "./DomainSwitcher";
  * Grouping here is the fix. "Forecast" is the product. "Evidence" is the
  * research. "Get started" is the single primary action, one label per intent.
  */
-const PRODUCT = [
-  { href: "/", label: "Map" },
-  { href: "/beat", label: "Predict" },
-  { href: "/observe", label: "Observe" },
-  { href: "/ember", label: "Harden" },
+const PRODUCT: { href: string; label: MessageKey }[] = [
+  { href: "/", label: "nav.map" },
+  { href: "/beat", label: "nav.predict" },
+  { href: "/observe", label: "nav.observe" },
+  { href: "/ember", label: "nav.harden" },
 ];
 
-const EVIDENCE = [
-  { href: "/hindcast", label: "Hindcast" },
-  { href: "/about", label: "Method" },
+const EVIDENCE: { href: string; label: MessageKey }[] = [
+  { href: "/hindcast", label: "nav.hindcast" },
+  { href: "/about", label: "nav.method" },
 ];
 
 export function SiteNav() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const { t } = useT();
 
   // A route change must close the drawer, or the panel survives navigation.
   useEffect(() => {
@@ -41,14 +45,14 @@ export function SiteNav() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-rule bg-paper/90 backdrop-blur">
-      <div className="measure flex h-16 items-center justify-between gap-6 px-6">
-        <Link href="/landing" className="flex shrink-0 items-baseline gap-2" aria-label="COFIRE home">
+      <div className="measure flex h-16 items-center justify-between gap-2 px-4 sm:gap-6 sm:px-6">
+        <Link href="/landing" className="flex shrink-0 items-baseline gap-2" aria-label={t("nav.home")}>
           <span className="display text-xl">
             CO<em className="not-italic text-ember">FIRE</em>
           </span>
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+        <nav aria-label={t("nav.primary")} className="hidden items-center gap-1 lg:flex">
           {PRODUCT.map((it) => (
             <Link
               key={it.href}
@@ -58,7 +62,7 @@ export function SiteNav() {
                 isOn(it.href) ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
               }`}
             >
-              {it.label}
+              {t(it.label)}
             </Link>
           ))}
           <span className="mx-2 h-4 w-px bg-rule" aria-hidden />
@@ -71,20 +75,21 @@ export function SiteNav() {
                 isOn(it.href) ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
               }`}
             >
-              {it.label}
+              {t(it.label)}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+          <LangSwitch />
           <DomainSwitcher />
           {/* One label per intent, and never pointed at the page you are on. */}
           {path !== "/" && (
             <Link
               href="/"
-              className="hidden rounded-full bg-ember px-4 py-2 text-sm font-medium text-paper transition-transform active:scale-[0.98] md:inline-flex"
+              className="hidden rounded-full bg-ember px-4 py-2 text-sm font-medium text-paper transition-transform active:scale-[0.98] xl:inline-flex"
             >
-              Open the map
+              {t("nav.openMap")}
             </Link>
           )}
           <button
@@ -92,8 +97,8 @@ export function SiteNav() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="mobile-nav"
-            aria-label={open ? "Close menu" : "Open menu"}
-            className="rounded-full p-2 text-ink md:hidden"
+            aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
+            className="rounded-full p-2 text-ink lg:hidden"
           >
             {open ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
           </button>
@@ -101,7 +106,7 @@ export function SiteNav() {
       </div>
 
       {open && (
-        <nav id="mobile-nav" aria-label="Primary" className="border-t border-rule bg-paper md:hidden">
+        <nav id="mobile-nav" aria-label={t("nav.primary")} className="border-t border-rule bg-paper lg:hidden">
           <ul className="measure px-6 py-2">
             {[...PRODUCT, ...EVIDENCE].map((it) => (
               <li key={it.href} className="border-b border-rule/60 last:border-0">
@@ -110,7 +115,7 @@ export function SiteNav() {
                   aria-current={isOn(it.href) ? "page" : undefined}
                   className={`block py-3 ${isOn(it.href) ? "text-ember" : "text-ink"}`}
                 >
-                  {it.label}
+                  {t(it.label)}
                 </Link>
               </li>
             ))}

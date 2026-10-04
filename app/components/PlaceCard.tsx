@@ -4,6 +4,9 @@ import { Horizon, Place, Target } from "@/lib/api";
 import { domainLabel } from "@/lib/domainNames";
 import type { Bundle, DomainMeta } from "@/lib/schemas";
 import { targetHorizon, targetLabel } from "@/lib/targets";
+import { type Lang, locale, useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
+import { reasonEs } from "@/lib/i18n/reasons";
 import { Disclosure } from "./ui/Controls";
 import { WatershedPanel } from "./WatershedPanel";
 
@@ -34,6 +37,20 @@ function sentence(text: string): string {
   return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 }
 
+/**
+ * A reason in the reader's language. The export writes reasons in English; a
+ * Spanish reader gets the template translation, or the English marked as
+ * such when a reason has a clause the table does not know.
+ */
+function Reason({ text, lang }: { text: string | null | undefined; lang: Lang }) {
+  if (lang === "es") {
+    const es = reasonEs(text);
+    if (es !== null) return <>{sentence(es)}</>;
+    return <span lang="en">{sentence(text ?? "")} (en inglés)</span>;
+  }
+  return <>{sentence(text ?? "")}</>;
+}
+
 
 /**
  * The continuous ERC percentile, in whichever state the preregistration fixed.
@@ -43,16 +60,17 @@ function sentence(text: string): string {
  * something a reader needs in order to read the number, so it sits behind a
  * disclosure.
  */
-function formatWeek(iso: string): string {
-  return new Date(`${iso}T12:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric" });
+function formatWeek(iso: string, lang: Lang): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString(locale(lang), { month: "long", day: "numeric" });
 }
 
 function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null }) {
+  const { lang, t } = useT();
   const point = hz?.point;
   const state = hz?.state;
 
   if (point === null || point === undefined) {
-    return <p className="text-ink-soft mt-2 text-xs">No forecast for this cell and range.</p>;
+    return <p className="text-ink-soft mt-2 text-xs">{t("card.noForecast")}</p>;
   }
 
   const hasInterval =
@@ -79,7 +97,7 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
             />
           </div>
           <p className="text-ink-soft mt-1.5 text-xs">
-            Forecast range {hz!.lo!.toFixed(0)} to {hz!.hi!.toFixed(0)} out of 100.
+            {t("card.interval", { lo: hz!.lo!.toFixed(0), hi: hz!.hi!.toFixed(0) })}
           </p>
         </div>
       ) : null}
@@ -96,8 +114,7 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
             />
           </div>
           <p className="text-ink-soft mt-1.5 text-xs">
-            Typical for this week: {hz!.range_lo!.toFixed(0)} to {hz!.range_hi!.toFixed(0)}. No
-            forecast band, because it would be no narrower than this.
+            {t("card.typical", { lo: hz!.range_lo!.toFixed(0), hi: hz!.range_hi!.toFixed(0) })}
           </p>
         </div>
       ) : null}
@@ -106,37 +123,33 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
         // History, in raw ERC units, kept apart from the percentile above so
         // the two scales are never drawn against each other.
         <div className="border-rule mt-3 border-l-2 pl-3" data-testid="erc-history">
-          <p className="text-mute text-[11px] uppercase tracking-wide">History, not a forecast</p>
+          <p className="text-mute text-[11px] uppercase tracking-wide">{t("card.historyTitle")}</p>
           <p className="text-ink-soft mt-1 text-xs leading-relaxed">
-            In {hz.hist_years ?? "past years"}, raw ERC in this cell around{" "}
-            {hz.target_week ? formatWeek(hz.target_week) : "this week"} was usually{" "}
-            <span className="num text-ink">
-              {hz.hist_lo.toFixed(0)} to {hz.hist_hi.toFixed(0)}
-            </span>
+            {t("card.historyLead", {
+              years: hz.hist_years ?? t("card.historyYears"),
+              week: hz.target_week ? formatWeek(hz.target_week, lang) : t("card.historyWeek"),
+            })}{" "}
+            <span className="num text-ink">{t("card.range", { lo: hz.hist_lo.toFixed(0), hi: hz.hist_hi.toFixed(0) })}</span>.
             {erc !== null && erc !== undefined ? (
-              <>
-                . It is <span className="num text-ink">{erc.toFixed(0)}</span> now.
-              </>
-            ) : (
-              "."
-            )}
+              <> {t("card.historyNow", { erc: erc.toFixed(0) })}</>
+            ) : null}
           </p>
         </div>
       ) : null}
 
       {state === "uncalibrated" ? (
         <p className="text-ink-soft mt-3 text-xs" data-testid="erc-uncalibrated">
-          No forecast band: the range method we shipped did not hold up in real time, so none is drawn.
+          {t("card.uncalibrated")}
         </p>
       ) : null}
 
       {hz?.reason ? (
         <div className="mt-2" data-testid="erc-reason">
           <Disclosure
-            summary={<span className="text-mute text-[11px]">{state === "uncalibrated" ? "Why there is no band" : "How this band was chosen"}</span>}
-            detail="Show"
+            summary={<span className="text-mute text-[11px]">{state === "uncalibrated" ? t("card.whyNoBand") : t("card.howBand")}</span>}
+            detail={t("card.show")}
           >
-            {sentence(hz.reason)}
+            <Reason text={hz.reason} lang={lang} />
           </Disclosure>
         </div>
       ) : null}
@@ -154,19 +167,18 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
  * a county-wide number" changes how the value should be read and cannot wait
  * for a click.
  */
-const AREA: Record<string, string> = { county: "county", urban: "city", watershed: "watershed" };
+const AREA: Record<string, MessageKey> = { county: "area.county", urban: "area.urban", watershed: "area.watershed" };
 
-function TargetRow({ name, t, kind }: { name: string; t: Target; kind?: string | null }) {
-  const isBase = t.state === "base_rate";
-  const hidden = t.p === null || t.p === undefined;
+function TargetRow({ name, t: target, kind }: { name: string; t: Target; kind?: string | null }) {
+  const { lang, t } = useT();
+  const isBase = target.state === "base_rate";
+  const hidden = target.p === null || target.p === undefined;
   // A drought target that did not pass its check has no number (the export
   // drops it: a historical rate beside the model's other drought odds could
   // contradict them). The row stays, so the reader sees what is missing and why.
   if (hidden && !isBase) return null;
-  const area = AREA[kind ?? "county"] ?? "area";
-  const marker = hidden
-    ? "not checked for this area, so no number"
-    : `usual rate for this ${area} this time of year`;
+  const area = t(AREA[kind ?? "county"] ?? "area.other");
+  const marker = hidden ? t("card.notChecked") : t("card.usualRate", { area });
   return (
     <li
       className="border-rule border-b py-2.5 last:border-b-0"
@@ -177,16 +189,16 @@ function TargetRow({ name, t, kind }: { name: string; t: Target; kind?: string |
         summary={
           <div className="flex items-baseline justify-between gap-3">
             <span className="min-w-0">
-              <span className="block text-sm">{targetLabel(name, kind)}</span>
+              <span className="block text-sm">{targetLabel(name, kind, lang)}</span>
               {isBase ? <span className="text-mute block text-[11px]">{marker}</span> : null}
             </span>
             <span className={`num text-sm ${hidden ? "text-mute" : "text-ink"}`} data-testid={hidden ? "target-not-shown" : undefined}>
-              {hidden ? "not shown" : formatProbability(t.p as number)}
+              {hidden ? t("card.notShown") : formatProbability(target.p as number)}
             </span>
           </div>
         }
       >
-        {sentence(t.reason ?? "")}
+        <Reason text={target.reason} lang={lang} />
       </Disclosure>
     </li>
   );
@@ -225,6 +237,7 @@ export function PlaceCard({
    */
   embedded?: boolean;
 }) {
+  const { t } = useT();
   const hz: Horizon | undefined = place.horizons[horizon];
   const targets = Object.entries(place.targets ?? {})
     .filter(([name]) => targetHorizon(name) === horizon)
@@ -244,7 +257,7 @@ export function PlaceCard({
     >
       {!embedded ? (
         <button className="text-ink-soft text-sm" onClick={onClose}>
-          Close
+          {t("card.close")}
         </button>
       ) : null}
       <p className="text-ink-soft mt-1 text-xs" data-testid="place-domain">
@@ -253,7 +266,7 @@ export function PlaceCard({
       </p>
       {meta?.evaluation === "validation" ? (
         <p className="text-mute mt-1 text-[11px] leading-relaxed" data-testid="validation-note">
-          Added after the sealed 2026 test, so these numbers were checked on 2022 and 2023 only.
+          {t("card.validation")}
         </p>
       ) : null}
       <div className="mt-3 flex gap-2">
@@ -261,34 +274,32 @@ export function PlaceCard({
           <button
             key={h}
             onClick={() => onHorizon(h)}
+            aria-pressed={horizon === h}
+            aria-label={t("card.chipLabel", { h })}
             className={`rounded-full px-3 py-1 text-sm ${horizon === h ? "bg-paper text-ink" : "bg-paper-sunk"}`}
           >
-            {h}w
+            {t("card.chip", { h })}
           </button>
         ))}
       </div>
 
       <h2 className="mt-4 text-xl font-semibold" data-testid="dryness-heading">
-        Dryness in {horizon} weeks
+        {t("card.dryness", { h: horizon })}
       </h2>
-      <p className="text-mute mt-1 text-[11px] leading-relaxed">
-        Forecast fuel dryness (ERC) as a percentile of what is usual for that week here: 50 is typical,
-        90 is drier than nine in ten past weeks at that time of year.
-      </p>
+      <p className="text-mute mt-1 text-[11px] leading-relaxed">{t("card.drynessHelp")}</p>
       <ErcBlock hz={hz} erc={place.erc} />
 
       {place.usdm !== null && place.usdm !== undefined ? (
         <p className="text-ink-soft mt-3 text-xs">
-          Drought now: {Math.round(place.usdm) === 0 ? "none or D0" : `D${Math.round(place.usdm)}`}.
+          {t("card.droughtNow", { cat: Math.round(place.usdm) === 0 ? t("card.droughtNone") : `D${Math.round(place.usdm)}` })}
         </p>
       ) : null}
 
       {targets.length > 0 ? (
         <>
-          <h3 className="mt-5 text-lg">What could happen in {horizon} weeks</h3>
+          <h3 className="mt-5 text-lg">{t("card.whatCould", { h: horizon })}</h3>
           <p className="text-mute mt-1 text-[11px] leading-relaxed" data-testid="drought-note">
-            Drought odds come from a cell&apos;s current drought category and the season, so nearby cells
-            in the same category show the same drought odds. Fire-spread odds are per cell.
+            {t("card.droughtNote")}
           </p>
           <ul className="mt-1">
             {targets.map(([name, t]) => (
@@ -308,13 +319,13 @@ export function PlaceCard({
             data-testid="adopt"
             className={`rounded-lg py-3 text-sm ${adopted ? "bg-ink text-paper" : "bg-paper-sunk"}`}
           >
-            {adopted ? "Adopted" : "Adopt"}
+            {adopted ? t("card.adopted") : t("card.adopt")}
           </button>
           <button onClick={onPredict} className="bg-paper-sunk rounded-lg py-3 text-sm">
-            Predict here
+            {t("card.predict")}
           </button>
           <button onClick={onReport} className="bg-paper-sunk rounded-lg py-3 text-sm">
-            Report here
+            {t("card.report")}
           </button>
         </div>
       ) : null}

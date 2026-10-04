@@ -235,3 +235,20 @@ def test_a_horizon_that_is_not_forecast_is_refused() -> None:
     r = client.post("/predictions", json={"device_id": "t-h", "cell_id": "40.5250_-105.0583", "horizon": 5,
                                           "drought_category": 2, "fire_band": "high"})
     assert r.status_code == 422
+
+
+def test_every_ember_item_has_spanish() -> None:
+    import json
+    from pathlib import Path
+
+    import yaml
+
+    es = json.loads(Path("app/lib/i18n/ember_es.json").read_text())
+    for f in ("cofire/ship/ember_city.yaml", "cofire/model/ember_checklist.yaml"):
+        for gid, group in yaml.safe_load(Path(f).read_text()).items():
+            if not isinstance(group, dict):
+                continue
+            assert es["groups"].get(gid), gid
+            for item in group.get("items", []):
+                t = es["items"].get(item["id"])
+                assert t and t["label"] and t["rationale"], item["id"]

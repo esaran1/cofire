@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { set } from "idb-keyval";
 import { MapCell, MapView } from "@/components/MapView";
 import { PlaceCard } from "@/components/PlaceCard";
+import { CellList } from "@/components/CellList";
 import { TimeScrubber } from "@/components/TimeScrubber";
 import { ErrorNote } from "@/components/ui/Controls";
 import type { Place } from "@/lib/api";
@@ -12,9 +13,13 @@ import { getBundle, getDomains, nearestCell, placeFromCell } from "@/lib/data";
 import { useDomain } from "@/lib/domain";
 import { Adopted, readAdopted, toggleAdopted } from "@/lib/adopted";
 import type { Bundle, DomainsIndex } from "@/lib/schemas";
+import { useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
+import { DOMAIN_LABELS } from "@/lib/domainNames";
 
 export default function HomePage() {
   const router = useRouter();
+  const { t } = useT();
   const [domain, , ready] = useDomain();
   const [index, setIndex] = useState<DomainsIndex | null>(null);
   const [issue, setIssue] = useState("");
@@ -111,6 +116,20 @@ export default function HomePage() {
     [bundle, index],
   );
 
+  // The cell list selects exactly the cell named, as a click on it would.
+  const onPick = useCallback(
+    (mc: MapCell) => {
+      const c = bundle?.cells.find((x) => x.id === mc.id);
+      if (!bundle || !index || !c) return;
+      const p = placeFromCell(bundle, c, index.history_years);
+      setPlace(p);
+      void set("last_place", p).catch(() => undefined);
+    },
+    [bundle, index],
+  );
+
+  const noteKey = `domain.note.${domain}` as MessageKey;
+
   const cells: MapCell[] = useMemo(() => {
     if (!bundle) return [];
     const ti = bundle.targets.indexOf(`d_ge2_h${horizon}`);
@@ -127,18 +146,23 @@ export default function HomePage() {
       <aside className="row-start-2 overflow-y-auto border-t border-rule bg-paper-raised lg:col-start-1 lg:row-start-1 lg:border-r lg:border-t-0">
         <div className="p-6 pb-0">
           <h1 className="display text-2xl" data-testid="map-title">
-            {meta?.label ?? "Loading"}
+            {meta?.label ?? t("map.loading")}
           </h1>
-          {meta ? <p className="mt-1 text-sm leading-relaxed text-ink-soft">{meta.note}</p> : null}
-          <p className="mt-2 text-xs leading-relaxed text-mute">
-            Drought and the conditions that let fire spread, 2 to 8 weeks ahead. Not a forecast of ignitions.
-          </p>
+          {meta ? (
+            <p className="mt-1 text-sm leading-relaxed text-ink-soft">{domain in DOMAIN_LABELS ? t(noteKey) : meta.note}</p>
+          ) : null}
+          <p className="mt-2 text-xs leading-relaxed text-mute">{t("map.intro")}</p>
           {err && (
             <div className="mt-4">
               <ErrorNote message={err} onRetry={() => setErr(null)} />
             </div>
           )}
         </div>
+
+        <CellList cells={cells} layer={layer} selectedId={place?.cell_id} onSelect={onPick} />
+        <p className="sr-only" aria-live="polite" data-testid="map-announce">
+          {place ? t("map.announce", { lat: place.lat.toFixed(3), lon: place.lon.toFixed(3) }) : ""}
+        </p>
 
         {place ? (
           <PlaceCard
@@ -156,12 +180,19 @@ export default function HomePage() {
             onReport={() => router.push(`/observe?lat=${place.lat}&lon=${place.lon}&domain=${domain}`)}
           />
         ) : (
-          <p className="px-6 pt-5 text-sm text-mute">Select a cell on the map to see its forecast.</p>
+          <p className="px-6 pt-5 text-sm text-mute">{t("map.selectCell")}</p>
         )}
       </aside>
 
       <div className="relative row-start-1 min-h-0 lg:col-start-2 lg:row-start-1">
-        <MapView cells={cells} bbox={meta?.bbox ?? null} layer={layer} selectedId={place?.cell_id} onClick={onClick} />
+        <MapView
+          cells={cells}
+          bbox={meta?.bbox ?? null}
+          layer={layer}
+          selectedId={place?.cell_id}
+          onClick={onClick}
+          label={meta ? t("map.region", { area: meta.label }) : ""}
+        />
         <TimeScrubber
           issues={index?.issues ?? []}
           issue={issue}

@@ -2,6 +2,7 @@
 
 import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "motion/react";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 
 /**
  * Shared control layer. One radius rule (surfaces near-sharp at 2px,
@@ -148,12 +149,13 @@ export function EmptyState({ title, body, action }: { title: string; body: strin
 
 /** Inline, contextual error. Never a toast for a persistent problem. */
 export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  const { t } = useT();
   return (
     <div className="rounded border border-ember/40 bg-ember-soft p-4">
       <p className="text-sm text-ember">{message}</p>
       {onRetry && (
         <button onClick={onRetry} className="mt-2 text-xs text-ink underline underline-offset-4">
-          Try again
+          {t("ui.retry")}
         </button>
       )}
     </div>
@@ -164,12 +166,11 @@ export function OfflineNote() {
   // The static site has no service at all; saying "no connection" there would
   // suggest retrying something that will never answer.
   const isStatic = !!process.env.NEXT_PUBLIC_DATA_BASE;
+  const { t } = useT();
   return (
     <div className="rounded border border-ochre/40 bg-ochre-soft p-4" data-testid="offline-note">
       <p className="text-sm text-ochre">
-        {isStatic
-          ? "This is the static preview. Picks and reports need the live service, so they are not stored here; the forecast itself is complete."
-          : "No connection to the forecast service. Showing what is cached on this device."}
+        {isStatic ? t("ui.offlineStatic") : t("ui.offline")}
       </p>
     </div>
   );
@@ -214,6 +215,7 @@ export function Disclosure({
 }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
+  const { t } = useT();
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3">
@@ -223,7 +225,7 @@ export function Disclosure({
           aria-expanded={open}
           className="text-mute hover:text-ink shrink-0 text-[11px] underline underline-offset-2 transition-colors"
         >
-          {open ? "Hide" : (detail ?? "Why")}
+          {open ? t("ui.hide") : (detail ?? t("ui.why"))}
         </button>
       </div>
       <AnimatePresence initial={false}>

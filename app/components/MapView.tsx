@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { basemapStyle, registerPmtiles, resolveMode } from "@/lib/basemap";
+import { useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
 
 export type MapCell = { id: string; lat: number; lon: number; value: number | null };
 
@@ -43,26 +45,28 @@ const RAMP: Record<"fire" | "drought", maplibregl.ExpressionSpecification> = {
   drought: ["interpolate", ["linear"], ["coalesce", ["get", "value"], 0], 0, "#efe9da", 25, "#e6c15c", 60, "#b8862b", 100, "#6b4a12"],
 };
 
-export const LEGEND: Record<"fire" | "drought", { stops: string[]; labels: [string, string, string]; title: string }> = {
-  fire: { title: "Dryness vs usual for the week", stops: ["#8fb3c4", "#d9e3e2", "#efe9da", "#eab26b", "#cf6a2c", "#8a2410"], labels: ["wetter", "typical", "drier"] },
-  drought: { title: "Chance of D2 or worse", stops: ["#efe9da", "#e6c15c", "#b8862b", "#6b4a12"], labels: ["0%", "50%", "100%"] },
+export const LEGEND: Record<"fire" | "drought", { stops: string[]; labels: [string, string, string]; title: MessageKey }> = {
+  fire: { title: "legend.fire", stops: ["#8fb3c4", "#d9e3e2", "#efe9da", "#eab26b", "#cf6a2c", "#8a2410"], labels: ["legend.wetter", "legend.typical", "legend.drier"] },
+  drought: { title: "legend.drought", stops: ["#efe9da", "#e6c15c", "#b8862b", "#6b4a12"], labels: ["0%", "50%", "100%"] },
 };
 
 /** What the colours mean, in the map's corner. */
 export function MapLegend({ layer, empty = false }: { layer: "drought" | "fire"; empty?: boolean }) {
+  const { t } = useT();
   const l = LEGEND[layer];
+  const text = (k: string) => (k.startsWith("legend.") ? t(k as MessageKey) : k);
   return (
     <div data-testid="map-legend" className="pointer-events-none absolute left-3 top-3 z-10 rounded border border-rule bg-paper/95 px-3 py-2 text-[11px] text-ink-soft shadow-sm">
-      <p className="text-ink">{l.title}</p>
+      <p className="text-ink">{t(l.title)}</p>
       <div className="mt-1 h-2 w-40 rounded-sm" style={{ background: `linear-gradient(to right, ${l.stops.join(", ")})` }} />
       <div className="mt-0.5 flex w-40 justify-between">
-        {l.labels.map((t) => (
-          <span key={t}>{t}</span>
+        {l.labels.map((k) => (
+          <span key={k}>{text(k)}</span>
         ))}
       </div>
       {empty ? (
         <p className="mt-1 max-w-[10rem] text-ink" data-testid="map-legend-empty">
-          Not checked for this area at this range, so the map shows no drought odds.
+          {t("legend.empty")}
         </p>
       ) : null}
     </div>
@@ -75,7 +79,10 @@ export function MapView({
   layer,
   selectedId,
   onClick,
+  label = "",
 }: {
+  /** What the map shows, for screen readers; the panel's cell list is the accessible equivalent. */
+  label?: string;
   cells: MapCell[];
   bbox: [number, number, number, number] | null;
   layer: "drought" | "fire";
@@ -212,7 +219,7 @@ export function MapView({
 
   return (
     <>
-      <div ref={ref} data-testid="map" className="absolute inset-0 h-full w-full" />
+      <div ref={ref} data-testid="map" role="region" aria-label={label || undefined} className="absolute inset-0 h-full w-full" />
       <MapLegend layer={layer} empty={cells.length > 0 && cells.every((c) => c.value === null)} />
     </>
   );

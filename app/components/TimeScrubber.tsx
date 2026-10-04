@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
+
 /**
  * Map controls. Floats over the map because it controls the map, but it is a
  * real surface on paper rather than a dark box, so it belongs to the page.
@@ -21,13 +23,14 @@ export function TimeScrubber({
   onHorizon: (v: string) => void;
   onLayer: (v: "drought" | "fire") => void;
 }) {
+  const { t } = useT();
   const idx = Math.max(0, issues.indexOf(issue));
   const single = issues.length <= 1;
 
   return (
     <div data-testid="time-scrubber" className="absolute inset-x-4 bottom-4 z-20 rounded border border-rule bg-paper/95 p-4 shadow-[0_2px_16px_rgba(23,24,27,0.08)] backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1" role="group" aria-label="Forecast horizon">
+        <div className="flex items-center gap-1" role="group" aria-label={t("scrub.horizon")}>
           {(["2", "4", "8"] as const).map((h) => (
             <button
               key={h}
@@ -37,12 +40,12 @@ export function TimeScrubber({
                 horizon === h ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
               }`}
             >
-              {h} weeks
+              {t("scrub.weeks", { h })}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-1" role="group" aria-label="Layer">
+        <div className="flex items-center gap-1" role="group" aria-label={t("scrub.layer")}>
           <button
             onClick={() => onLayer("fire")}
             aria-pressed={layer === "fire"}
@@ -50,7 +53,7 @@ export function TimeScrubber({
               layer === "fire" ? "bg-ember text-paper" : "text-ink-soft hover:text-ink"
             }`}
           >
-            Fire-spread
+            {t("scrub.fire")}
           </button>
           <button
             onClick={() => onLayer("drought")}
@@ -59,7 +62,7 @@ export function TimeScrubber({
               layer === "drought" ? "bg-ochre text-paper" : "text-ink-soft hover:text-ink"
             }`}
           >
-            Drought
+            {t("scrub.drought")}
           </button>
         </div>
       </div>
@@ -67,7 +70,7 @@ export function TimeScrubber({
       {!single && (
         <div className="mt-4">
           <label htmlFor="issue-scrub" className="flex items-baseline justify-between text-xs">
-            <span className="text-mute">Issue date</span>
+            <span className="text-mute">{t("scrub.issue")}</span>
             <span className="num text-ink">{issue || "n/a"}</span>
           </label>
           <input
@@ -83,7 +86,7 @@ export function TimeScrubber({
       )}
       {single && issue && (
         <p className="mt-3 text-xs text-mute">
-          Issued <span className="num text-ink">{issue}</span>. This build ships a single issue date.
+          {t("scrub.issued")} <span className="num text-ink">{issue}</span>. {t("scrub.single")}
         </p>
       )}
     </div>
