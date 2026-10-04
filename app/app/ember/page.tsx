@@ -11,6 +11,7 @@ import { Action, ErrorNote, Numeral, OfflineNote, Panel, Segmented, Skeleton } f
 import { type Lang, useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import emberEs from "@/lib/i18n/ember_es.json";
+import { EMBER_LINKS, LINKS } from "@/lib/links";
 
 // "city" is the Urban Ember Score, written for Denver (cofire/ship/ember_city.yaml):
 // water before restrictions, smoke readiness, not starting a fire. "wui" is the
@@ -30,6 +31,18 @@ const COST_LABEL: Record<string, MessageKey> = {
 // The checklists' own text is English (the wildland-edge list is in the frozen
 // model tree); the Spanish is kept beside the app, keyed by item and group id.
 const ES = emberEs as { groups: Record<string, string>; items: Record<string, { label: string; rationale: string }> };
+
+/** The checked program page behind an action, under its row. */
+function ProgramLink({ id, lang, className }: { id: string; lang: Lang; className: string }) {
+  const { t } = useT();
+  const link = LINKS[EMBER_LINKS[id] ?? ""];
+  if (!link) return null;
+  return (
+    <a href={link.url} target="_blank" rel="noopener noreferrer" className={`block text-xs text-ink-soft underline underline-offset-2 ${className}`} data-link={link.id}>
+      {t("ember.more", { publisher: link[lang] })}
+    </a>
+  );
+}
 
 function itemText(i: EmberItem, lang: Lang): { label: string; rationale: string } {
   const es = lang === "es" ? ES.items[i.id] : undefined;
@@ -226,8 +239,8 @@ export default function EmberPage() {
           <h2 className="mt-10 text-lg font-medium">{t("ember.start")}</h2>
           <div className="mt-3 space-y-2">
             {quickWins.map((i) => (
+              <div key={i.id}>
               <button
-                key={i.id}
                 role="checkbox"
                 aria-checked={!!state[i.id]}
                 onClick={() => toggle(i.id)}
@@ -239,6 +252,8 @@ export default function EmberPage() {
                   <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{itemText(i, lang).rationale}</span>
                 </span>
               </button>
+              <ProgramLink id={i.id} lang={lang} className="mt-1 pl-10" />
+              </div>
             ))}
           </div>
         </>
@@ -280,6 +295,7 @@ export default function EmberPage() {
                           </span>
                         </span>
                       </button>
+                      <ProgramLink id={i.id} lang={lang} className="px-4 pb-3 pl-11" />
                     </li>
                   );
                 })}

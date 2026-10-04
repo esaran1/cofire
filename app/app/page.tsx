@@ -6,6 +6,7 @@ import { set } from "idb-keyval";
 import { MapCell, MapView } from "@/components/MapView";
 import { PlaceCard } from "@/components/PlaceCard";
 import { CellList } from "@/components/CellList";
+import { StaleBadge } from "@/components/StaleBadge";
 import { TimeScrubber } from "@/components/TimeScrubber";
 import { ErrorNote } from "@/components/ui/Controls";
 import type { Place } from "@/lib/api";
@@ -152,6 +153,7 @@ export default function HomePage() {
             <p className="mt-1 text-sm leading-relaxed text-ink-soft">{domain in DOMAIN_LABELS ? t(noteKey) : meta.note}</p>
           ) : null}
           <p className="mt-2 text-xs leading-relaxed text-mute">{t("map.intro")}</p>
+          <StaleBadge issue={index?.issues[index.issues.length - 1]} className="mt-3" />
           {err && (
             <div className="mt-4">
               <ErrorNote message={err} onRetry={() => setErr(null)} />

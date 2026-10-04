@@ -194,4 +194,8 @@ export const es: Record<MessageKey, string> = {
   "brief.helpTitle": "Dónde obtener ayuda e información actual",
   "brief.emergency": "En una emergencia, llame al 911. Este resumen pronostica condiciones, no incendios.",
   "brief.source": "Hecho por COFIRE con datos del U.S. Drought Monitor y gridMET. Los pronósticos pueden fallar; la página Método explica cómo se comprobó cada cifra.",
+  "ember.more": "Cómo hacerlo: {publisher}",
+  "card.smokeTitle": "Humo en este momento",
+  "card.smokeNote": "Esta aplicación no pronostica el humo. Para ver el humo y la calidad del aire actuales:",
+  "stale.text": "No se actualizó a tiempo: estas son las cifras válidas más recientes, del pronóstico emitido el {date} (hace {days} días). Todavía no han llegado datos más nuevos.",
 };

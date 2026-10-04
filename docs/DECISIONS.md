@@ -2273,3 +2273,28 @@ the regional rate would be shown.
   2. The weekly brief.
   3. Tested links and a staleness badge.
   4. EnviroScreen, once its size is confirmed against the ledger.
+
+## Links and staleness, 2026-10-04
+
+- **Every outside link is in one registry.** That covers the help links on
+  the brief, the program behind each Ember action, the smoke-map link on the
+  Place Card, and the data credits (`app/lib/links.ts`, `app/lib/facts.json`).
+  - A test fails if a page renders an outside link that is in neither.
+  - A weekly workflow (`links.yml`) opens every link and checks the page's
+    title, which catches a page that moved and left a soft 404.
+  - The link check reads web pages, not data: nothing is cached or parsed
+    past the title. So it does not go through `safe_fetch` (which refuses
+    HTML by design) or the ledger.
+- **Ignition actions get no link.** No checked Denver page was found for
+  fireworks, smoking materials, grills or Red Flag work, so those Ember
+  actions have no program link rather than a guessed one.
+- **The smoke link makes no claim.** It says the app does not forecast smoke
+  and points to the AirNow Fire and Smoke Map. The plan's line "when the
+  source watersheds burn, Denver gets the smoke" was not used, because no
+  source for it was cited.
+- **Staleness badge.** A Tuesday issue goes live with Friday's refresh and
+  stays the newest until the next Friday, so a current issue is at most 10
+  days old.
+  - Past 11 days, the map and the brief say the numbers are the last good
+    ones and how old they are.
+  - It showed on 2026-10-04, because the 2026-10-02 refresh had failed.

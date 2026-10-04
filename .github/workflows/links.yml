@@ -1,0 +1,27 @@
+name: link check
+
+# Every outside link the app shows residents (app/lib/links.ts and the data
+# credits) still opens the page it names. Weekly, and on demand.
+on:
+  schedule:
+    - cron: "17 15 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --extra dev
+      - name: Open every link
+        env:
+          COFIRE_CHECK_LINKS: "1"
+        run: uv run pytest -q tests/test_links.py

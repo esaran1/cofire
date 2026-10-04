@@ -3,13 +3,16 @@
  * check them all (e2e/links.spec.ts). Each was opened and its page title read
  * when added; `checked` is that date.
  */
-export type HelpLink = { id: string; url: string; publisher: string; en: string; es: string; checked: string };
+// `title` is a phrase the page's <title> must contain; the link check fails
+// when it does not, which catches a page that moved and left a soft 404.
+export type HelpLink = { id: string; url: string; publisher: string; title: string; en: string; es: string; checked: string };
 
 export const LINKS: Record<string, HelpLink> = {
   denver_water_supply: {
     id: "denver_water_supply",
     url: "https://www.denverwater.org/your-water/water-supply-and-planning/collection-system",
     publisher: "Denver Water",
+    title: "Collection System",
     en: "Denver Water: where the city's water comes from",
     es: "Denver Water: de dónde viene el agua de la ciudad",
     checked: "2026-10-04",
@@ -18,6 +21,7 @@ export const LINKS: Record<string, HelpLink> = {
     id: "denver_water_watershed",
     url: "https://www.denverwater.org/your-water/water-supply-and-planning/watershed-protection-and-management",
     publisher: "Denver Water",
+    title: "Watershed Protection",
     en: "Denver Water: wildfire and the water supply",
     es: "Denver Water: los incendios y el suministro de agua",
     checked: "2026-10-04",
@@ -26,6 +30,7 @@ export const LINKS: Record<string, HelpLink> = {
     id: "smoke_map",
     url: "https://fire.airnow.gov/",
     publisher: "EPA and USFS",
+    title: "AirNow Fire and Smoke Map",
     en: "AirNow Fire and Smoke Map: current smoke and air quality",
     es: "Mapa de Incendios y Humo de AirNow: humo y calidad del aire actuales",
     checked: "2026-10-04",
@@ -34,6 +39,7 @@ export const LINKS: Record<string, HelpLink> = {
     id: "air_advisory",
     url: "https://www.colorado.gov/airquality/advisory.aspx",
     publisher: "Colorado Department of Public Health and Environment",
+    title: "AirQuality",
     en: "Colorado air quality advisories, including wildfire smoke",
     es: "Avisos de calidad del aire de Colorado, incluido el humo de incendios",
     checked: "2026-10-04",
@@ -42,6 +48,7 @@ export const LINKS: Record<string, HelpLink> = {
     id: "denver_water_drought",
     url: "https://www.denverwater.org/drought",
     publisher: "Denver Water",
+    title: "Drought | Denver Water",
     en: "Denver Water: the drought stage in effect and its watering rules",
     es: "Denver Water: la etapa de sequía vigente y sus reglas de riego",
     checked: "2026-10-04",
@@ -50,6 +57,7 @@ export const LINKS: Record<string, HelpLink> = {
     id: "denver_water_conserve",
     url: "https://www.denverwater.org/residential/rebates-and-conservation-tips",
     publisher: "Denver Water",
+    title: "Conserve | Denver Water",
     en: "Denver Water: rebates and ways to save water",
     es: "Denver Water: reembolsos y formas de ahorrar agua",
     checked: "2026-10-04",
@@ -58,6 +66,7 @@ export const LINKS: Record<string, HelpLink> = {
     id: "denver_311",
     url: "https://www.denvergov.org/311",
     publisher: "City and County of Denver",
+    title: "311 City Services",
     en: "Denver 311: city services and questions",
     es: "Denver 311: servicios y preguntas para la ciudad",
     checked: "2026-10-04",
@@ -66,6 +75,7 @@ export const LINKS: Record<string, HelpLink> = {
     id: "csfs_mitigation",
     url: "https://csfs.colostate.edu/wildfire-mitigation/",
     publisher: "Colorado State Forest Service",
+    title: "Wildfire Mitigation",
     en: "Colorado State Forest Service: protecting a home from wildfire",
     es: "Servicio Forestal del Estado de Colorado: cómo proteger una casa de los incendios",
     checked: "2026-10-04",
@@ -74,8 +84,61 @@ export const LINKS: Record<string, HelpLink> = {
     id: "firewise",
     url: "https://www.nfpa.org/education-and-research/wildfire/firewise-usa",
     publisher: "NFPA",
+    title: "Firewise USA",
     en: "Firewise USA: wildfire preparedness for neighborhoods",
     es: "Firewise USA: preparación para incendios en los vecindarios",
     checked: "2026-10-04",
   },
+  air_alerts: {
+    id: "air_alerts",
+    url: "https://www.enviroflash.info/",
+    publisher: "EPA AirNow",
+    title: "EnviroFlash",
+    en: "EnviroFlash: free air-quality alerts by email or text",
+    es: "EnviroFlash: alertas gratuitas de calidad del aire por correo o mensaje",
+    checked: "2026-10-04",
+  },
+  indoor_smoke: {
+    id: "indoor_smoke",
+    url: "https://www.epa.gov/emergencies-iaq/wildfires-and-indoor-air-quality-iaq",
+    publisher: "EPA",
+    title: "Wildfires and Indoor Air Quality",
+    en: "EPA: keeping smoke out of the air indoors",
+    es: "EPA: cómo mantener el humo fuera del aire de la casa",
+    checked: "2026-10-04",
+  },
+  smoke_guides: {
+    id: "smoke_guides",
+    url: "https://www.airnow.gov/wildfire-guide-factsheets/",
+    publisher: "AirNow",
+    title: "Wildfire Guide Factsheets",
+    en: "AirNow: wildfire smoke factsheets, including masks and people at higher risk",
+    es: "AirNow: hojas informativas sobre el humo, incluidas mascarillas y personas con más riesgo",
+    checked: "2026-10-04",
+  },
+};
+
+/** The program behind each Ember action, where a checked page exists. */
+export const EMBER_LINKS: Record<string, string> = {
+  water_schedule: "denver_water_drought",
+  water_stage: "denver_water_drought",
+  water_leaks: "denver_water_conserve",
+  water_turf: "denver_water_conserve",
+  smoke_alerts: "air_alerts",
+  smoke_filter: "indoor_smoke",
+  smoke_masks: "smoke_guides",
+  smoke_plan: "smoke_guides",
+  "0_5_noncombustible": "csfs_mitigation",
+  vents_mesh: "csfs_mitigation",
+  gutters_clean: "csfs_mitigation",
+  no_firewood_walls: "csfs_mitigation",
+  roof_class_a: "csfs_mitigation",
+  ember_resistant_eaves: "csfs_mitigation",
+  dual_pane_windows: "csfs_mitigation",
+  "5_30_trees": "csfs_mitigation",
+  grass_mowed: "csfs_mitigation",
+  propane_clear: "csfs_mitigation",
+  go_bag: "firewise",
+  address_visible: "firewise",
+  hose_reach: "firewise",
 };

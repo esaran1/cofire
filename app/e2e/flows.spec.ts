@@ -58,3 +58,28 @@ test("the map keeps its state in the URL, so Back returns to it", async ({ page 
   await expect(page.getByTestId("dryness-heading")).toContainText("8 weeks", { timeout: 20_000 });
   await expect(page).toHaveURL(/domain=dillon/);
 });
+
+test("a missed refresh is shown as stale, and a current issue is not", async ({ page }) => {
+  await page.goto("/brief");
+  const latest = await page.getByTestId("brief-issue").locator("option").first().textContent();
+  const day = (offset: number) => new Date(new Date(`${latest}T12:00:00Z`).getTime() + offset * 86_400_000);
+  await page.clock.setFixedTime(day(4));
+  await page.goto("/?domain=denver");
+  await expect(page.getByTestId("place-card")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByTestId("stale-badge")).toHaveCount(0);
+  await page.clock.setFixedTime(day(19));
+  await page.goto("/?domain=denver");
+  await expect(page.getByTestId("stale-badge")).toContainText("19 days ago", { timeout: 20_000 });
+  await page.goto("/brief");
+  await expect(page.getByTestId("stale-badge")).toContainText("latest good numbers");
+});
+
+test("Ember actions link their programs, and the card links current smoke", async ({ page }) => {
+  await page.goto("/ember");
+  await expect(page.getByText("Everything else")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole("checkbox").first()).toBeVisible({ timeout: 20_000 });
+  await expect.poll(() => page.locator("a[data-link]").count()).toBeGreaterThanOrEqual(6);
+  await expect(page.locator('a[data-link="air_alerts"]')).toHaveAttribute("href", "https://www.enviroflash.info/");
+  await page.goto("/?domain=denver");
+  await expect(page.getByTestId("smoke-link").locator("a")).toHaveAttribute("href", "https://fire.airnow.gov/", { timeout: 20_000 });
+});

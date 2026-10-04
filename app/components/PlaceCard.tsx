@@ -7,6 +7,7 @@ import { targetHorizon, targetLabel } from "@/lib/targets";
 import { type Lang, locale, useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import { reasonEs } from "@/lib/i18n/reasons";
+import { LINKS } from "@/lib/links";
 import { Disclosure } from "./ui/Controls";
 import { WatershedPanel } from "./WatershedPanel";
 
@@ -237,7 +238,7 @@ export function PlaceCard({
    */
   embedded?: boolean;
 }) {
-  const { t } = useT();
+  const { lang, t } = useT();
   const hz: Horizon | undefined = place.horizons[horizon];
   const targets = Object.entries(place.targets ?? {})
     .filter(([name]) => targetHorizon(name) === horizon)
@@ -310,6 +311,16 @@ export function PlaceCard({
       ) : null}
 
       <WatershedPanel sources={sources} horizon={horizon} />
+
+      <section className="border-rule mt-6 border-t pt-4" data-testid="smoke-link">
+        <h3 className="text-sm font-medium">{t("card.smokeTitle")}</h3>
+        <p className="text-ink-soft mt-1 text-xs leading-relaxed">
+          {t("card.smokeNote")}{" "}
+          <a href={LINKS.smoke_map.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2" data-link="smoke_map">
+            {LINKS.smoke_map[lang]}
+          </a>
+        </p>
+      </section>
 
       {!embedded ? (
         <div className="mt-5 grid grid-cols-3 gap-2">

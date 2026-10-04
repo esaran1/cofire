@@ -190,6 +190,10 @@ export const en = {
   "brief.helpTitle": "Where to get help and current information",
   "brief.emergency": "For an emergency, call 911. This brief forecasts conditions, not fires.",
   "brief.source": "Made by COFIRE from the U.S. Drought Monitor and gridMET. Forecasts can be wrong; the Method page says how each number was checked.",
+  "ember.more": "How: {publisher}",
+  "card.smokeTitle": "Smoke right now",
+  "card.smokeNote": "This app does not forecast smoke. For current smoke and air quality:",
+  "stale.text": "Not updated on schedule: these are the latest good numbers, from the forecast issued {date} ({days} days ago). Newer data has not arrived yet.",
 } as const;
 
 export type MessageKey = keyof typeof en;

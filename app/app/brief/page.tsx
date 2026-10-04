@@ -10,6 +10,7 @@ import emberEs from "@/lib/i18n/ember_es.json";
 import { LINKS } from "@/lib/links";
 import { ChecklistSchema, type DomainsIndex } from "@/lib/schemas";
 import { ErrorNote } from "@/components/ui/Controls";
+import { StaleBadge } from "@/components/StaleBadge";
 
 /**
  * The weekly district brief: one printable page for a Denver resident or a
@@ -311,6 +312,7 @@ export default function BriefPage() {
         </button>
       </div>
 
+      <StaleBadge issue={index?.issues[index.issues.length - 1]} className="mb-4" />
       {err ? <ErrorNote message={err} onRetry={() => setErr(null)} /> : null}
       {!brief && !err ? <p className="text-sm text-mute">{t("brief.loading")}</p> : null}
       {brief ? <BriefSheet brief={brief} lang={lang} todo={todo} /> : null}
