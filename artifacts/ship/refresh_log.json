@@ -483,5 +483,86 @@
   "bytes": 180093,
   "looks": 3,
   "outcome": "updated"
+ },
+ {
+  "run_at": "2026-10-05 01:13:56.865602",
+  "session": "refresh-37250521594",
+  "target_published": "2026-09-29",
+  "usdm": [],
+  "erc": [
+   {
+    "domain": "denver",
+    "year": 2026,
+    "new_days": 1,
+    "last_day": "2026-10-03",
+    "vintage": "gridmet_erc/denver/2026/20261005T011356Z",
+    "revised_cell_days": 430,
+    "bytes": 15544,
+    "materialized": "data/cache/erc_ext/denver_2026.nc"
+   },
+   {
+    "domain": "upper_south_platte",
+    "year": 2026,
+    "new_days": 1,
+    "last_day": "2026-10-03",
+    "vintage": "gridmet_erc/upper_south_platte/2026/20261005T011356Z",
+    "revised_cell_days": 1379,
+    "bytes": 33224,
+    "materialized": "data/cache/erc_ext/upper_south_platte_2026.nc"
+   },
+   {
+    "domain": "dillon",
+    "year": 2026,
+    "new_days": 1,
+    "last_day": "2026-10-03",
+    "vintage": "gridmet_erc/dillon/2026/20261005T011356Z",
+    "revised_cell_days": 524,
+    "bytes": 16384,
+    "materialized": "data/cache/erc_ext/dillon_2026.nc"
+   },
+   {
+    "domain": "larimer",
+    "year": 2026,
+    "new_days": 1,
+    "last_day": "2026-10-03",
+    "vintage": "gridmet_erc/larimer/2026/20261005T011356Z",
+    "revised_cell_days": 2131,
+    "bytes": 39808,
+    "materialized": "data/cache/erc_ext/larimer_2026.nc"
+   },
+   {
+    "domain": "pueblo",
+    "year": 2026,
+    "new_days": 1,
+    "last_day": "2026-10-03",
+    "vintage": "gridmet_erc/pueblo/2026/20261005T011356Z",
+    "revised_cell_days": 1779,
+    "bytes": 36704,
+    "materialized": "data/cache/erc_ext/pueblo_2026.nc"
+   }
+  ],
+  "revised_cell_days": {
+   "denver": 430,
+   "upper_south_platte": 1379,
+   "dillon": 524,
+   "larimer": 2131,
+   "pueblo": 1779
+  },
+  "target": "2026-09-29",
+  "export_changed": false,
+  "issues": [
+   "2026-01-06",
+   "2026-09-29"
+  ],
+  "usdm_mean_at_target": {
+   "denver": 2.019,
+   "dillon": 3.734,
+   "larimer": 2.362,
+   "pueblo": 1.963,
+   "upper_south_platte": 2.713
+  },
+  "bytes": 143589,
+  "looks": 3,
+  "outcome": "no change"
  }
 ]
