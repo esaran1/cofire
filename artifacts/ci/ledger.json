@@ -1,9 +1,9 @@
 {
   "budget_bytes": 1000000000,
-  "recorded_bytes": 327917,
+  "recorded_bytes": 3257033,
   "correction_bytes": 9216891,
-  "total_bytes": 9544808,
-  "remaining_bytes": 990455192,
+  "total_bytes": 12473924,
+  "remaining_bytes": 987526076,
   "corrections": [
     {
       "at": "2026-10-04T22:19:14.647153+00:00",
@@ -241,6 +241,27 @@
       "bytes": 36704,
       "timestamp": "2026-10-05T01:14:10+00:00",
       "note": "session=refresh-37250521594; sha256=856e132d2acd1166610f18706ee3588e4aed9a24afef20d7a4228297810a0757; vintage=gridmet_erc/pueblo/2026/20261005T011356Z; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "USDM-weekly",
+      "url": "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20261006_M.zip",
+      "bytes": 2911491,
+      "timestamp": "2026-10-09T22:49:03+00:00",
+      "note": "session=refresh-38001162592; sha256=dcfae9e96e5940be853f95d0d7bcde16262d8b76f6a85c4ae53c347b7bb98d00"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-10-09T22:49:04+00:00",
+      "note": "session=refresh-38001162592; sha256=df29c54c08d6c4584718c1b61054dd9433052ce58abc3eb9adc226f0e6494721"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[262:281] bbox=(-105.110417, 39.597916, -104.589583, 39.910417)",
+      "bytes": 17240,
+      "timestamp": "2026-10-09T22:49:07+00:00",
+      "note": "session=refresh-38001162592; REJECTED"
     }
   ]
 }
