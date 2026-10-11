@@ -1,12 +1,14 @@
 """Data vintages: every fetch kept, never overwritten, every issue pinned to one.
 
-gridMET revises its provisional data. Measured on this project's own records,
-a re-read a week apart changed days as far back as 202 days before the older
-copy's last day (Larimer; 198 in Pueblo), and none before that: January and
-February 2026 and the fourth quarter of 2025 re-read exactly
-(`artifacts/audit/gridmet_revision_window.json`). gridMET's documentation as
-available to this project states no provisional period, so the window is the
-measured reach plus a margin: WINDOW_DAYS = 240.
+gridMET revises its provisional data, and the reach is not a fixed lag. On
+2026-09-27 a re-read changed days back to 2026-02-28, 202 days before the older
+copy's last day (`artifacts/audit/gridmet_revision_window.json`), so the window
+was first set to 240 days. On 2026-10-09 the refresh's gate day failed: the
+revisions then reached 2026-01-31 in every domain, about 250 days back, up to
+21 ERC units (`artifacts/audit/gridmet_revision_reach.json`). The front moved
+48 days in three weeks. The fourth quarter of 2025 still re-read exactly. So a
+full year is provisional: WINDOW_DAYS = 365, and the gate day (window plus a
+margin) falls in the previous year's file, which must re-read exactly.
 
 The rules:
 
@@ -39,7 +41,7 @@ from cofire.ship.safe_fetch import FetchRefused
 
 SOURCE = "gridmet_erc"
 VAR = "energy_release_component-g"
-WINDOW_DAYS = 240
+WINDOW_DAYS = 365
 ROOT = Path("data/vintages")
 MANIFEST = Path("artifacts/vintages/manifest.json")
 REVISIONS = Path("artifacts/vintages/revisions")

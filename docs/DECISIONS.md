@@ -2344,3 +2344,25 @@ runs' transfers never reached `artifacts/ci/ledger.json`:
   runs) was added to `usdm_national_sizes.json`.
 - **Going forward.** A failed run now commits its ledger and size record in
   a separate step, and the success path rebases before pushing.
+
+## gridMET's revision reach outgrew the 240-day window, 2026-10-11
+
+- **What happened.** The 2026-10-09 scheduled refresh failed its gate day.
+  Denver 2026-02-03 re-read as 63 against 62 held. Alert issue #3 opened, as
+  designed.
+- **The measured reach** (`cofire/ship/gridmet_reach.py`,
+  `artifacts/audit/gridmet_revision_reach.json`). 2026 days 1 to 120 were
+  re-read for all five domains, 752,940 B, logged in the project ledger as a
+  probe and not stored as a vintage. Revisions start at **2026-01-31 in every
+  domain**, about 250 days before the newest day, with up to 21 ERC units of
+  change. Changed cell-days: Denver 1,826, Upper South Platte 12,229, Dillon
+  3,459, Larimer 11,553, Pueblo 9,864.
+- **The reach is not a fixed lag.** On 2026-09-27 it was 2026-02-28. The front
+  moved 48 days in three weeks.
+- **New rule: a full year is provisional.** `WINDOW_DAYS = 365`. The gate day
+  (window plus 7 days, about 2025-10-02 for an October 2026 refresh) now lies
+  in the previous year's file, and that day must re-read exactly. The fourth
+  quarter of 2025 re-read exactly in September.
+- **What does not change.** Published issues stay pinned to their vintages,
+  so no published forecast changes. The refresh still re-reads only the newest
+  14 days, so older revised days keep their held values.

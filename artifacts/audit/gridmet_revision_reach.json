@@ -1,0 +1,71 @@
+{
+ "year": 2026,
+ "days_read": 120,
+ "domains": {
+  "denver": {
+   "bytes": 55348,
+   "changed_days": 90,
+   "first_changed": "2026-01-31",
+   "changed_cell_days": 1826,
+   "max_abs_change": 18.0,
+   "by_month": {
+    "01": 8,
+    "02": 314,
+    "03": 741,
+    "04": 763
+   }
+  },
+  "upper_south_platte": {
+   "bytes": 187012,
+   "changed_days": 90,
+   "first_changed": "2026-01-31",
+   "changed_cell_days": 12229,
+   "max_abs_change": 19.0,
+   "by_month": {
+    "01": 68,
+    "02": 3742,
+    "03": 4648,
+    "04": 3771
+   }
+  },
+  "dillon": {
+   "bytes": 61596,
+   "changed_days": 90,
+   "first_changed": "2026-01-31",
+   "changed_cell_days": 3459,
+   "max_abs_change": 15.0,
+   "by_month": {
+    "01": 25,
+    "02": 1191,
+    "03": 1159,
+    "04": 1084
+   }
+  },
+  "larimer": {
+   "bytes": 236028,
+   "changed_days": 90,
+   "first_changed": "2026-01-31",
+   "changed_cell_days": 11553,
+   "max_abs_change": 20.0,
+   "by_month": {
+    "01": 44,
+    "02": 3182,
+    "03": 3702,
+    "04": 4625
+   }
+  },
+  "pueblo": {
+   "bytes": 212956,
+   "changed_days": 90,
+   "first_changed": "2026-01-31",
+   "changed_cell_days": 9864,
+   "max_abs_change": 21.0,
+   "by_month": {
+    "01": 22,
+    "02": 4068,
+    "03": 3607,
+    "04": 2167
+   }
+  }
+ }
+}

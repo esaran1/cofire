@@ -1,9 +1,9 @@
 {
   "budget_bytes": 3000000000,
-  "recorded_bytes": 4420541974,
+  "recorded_bytes": 4421294914,
   "correction_bytes": -1477701654,
-  "total_bytes": 2942840320,
-  "remaining_bytes": 57159680,
+  "total_bytes": 2943593260,
+  "remaining_bytes": 56406740,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
@@ -29530,6 +29530,41 @@
       "bytes": 77016,
       "timestamp": "2026-10-04T22:07:53+00:00",
       "note": "session=v1.1; sha256=ae4777dd0f98b6407aef9e2157557c263ea24787f4569f74a91be5e60d73064f"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[0:120] bbox=(-105.110417, 39.597916, -104.589583, 39.910417)",
+      "bytes": 55348,
+      "timestamp": "2026-10-11T22:09:18+00:00",
+      "note": "session=v1.2; revision-reach probe, not stored as a vintage; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[0:120] bbox=(-105.860417, 38.889583, -105.00625, 39.61875)",
+      "bytes": 187012,
+      "timestamp": "2026-10-11T22:09:20+00:00",
+      "note": "session=v1.2; revision-reach probe, not stored as a vintage; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[0:120] bbox=(-106.277084, 39.347916, -105.75625, 39.702084)",
+      "bytes": 61596,
+      "timestamp": "2026-10-11T22:09:21+00:00",
+      "note": "session=v1.2; revision-reach probe, not stored as a vintage; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[0:120] bbox=(-106.192, 40.324, -104.943, 40.998)",
+      "bytes": 236028,
+      "timestamp": "2026-10-11T22:09:23+00:00",
+      "note": "session=v1.2; revision-reach probe, not stored as a vintage; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[0:120] bbox=(-105.051, 37.735, -104.054, 38.522)",
+      "bytes": 212956,
+      "timestamp": "2026-10-11T22:09:25+00:00",
+      "note": "session=v1.2; revision-reach probe, not stored as a vintage; bytes computed from the DAP2 wire format"
     }
   ]
 }

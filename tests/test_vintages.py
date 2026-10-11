@@ -77,3 +77,14 @@ def test_published_issues_are_pinned_and_the_adopted_revision_is_logged() -> Non
     lar = vintages.records("larimer", 2026)
     assert len(lar) >= 2 and lar[1]["revisions"]["n_cell_days"] > 0
     assert pins["larimer"]["2026-09-15"] == lar[0]["fetched_at"], "old issues keep the store's vintage"
+
+
+def test_the_gate_day_lies_a_year_and_a_week_back_in_the_previous_file() -> None:
+    from cofire.ship.erc_fetch import GATE_MARGIN_DAYS, gate_target
+
+    assert vintages.WINDOW_DAYS == 365 and GATE_MARGIN_DAYS == 7
+    # Server newest day 2026-10-09 (day index 281): the gate is 2025-10-02.
+    assert gate_target(2026, 282) == (2025, pd.Timestamp("2025-10-02").dayofyear - 1)
+    # 2026-01-31, where the 2026-10-09 revisions began, is inside the window.
+    newest = pd.Timestamp("2026-10-09")
+    assert newest - pd.Timestamp("2026-01-31") < pd.Timedelta(days=vintages.WINDOW_DAYS)

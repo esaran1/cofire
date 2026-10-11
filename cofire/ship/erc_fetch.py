@@ -258,6 +258,17 @@ OVERLAP_DAYS = 14  # re-read the last two cached weeks; revisions there become a
 GATE_MARGIN_DAYS = 7  # one day this far beyond the provisional window must re-read exactly
 
 
+def gate_target(year: int, n_server: int) -> tuple[int, int]:
+    """The (year, day index) that must re-read exactly: one day GATE_MARGIN_DAYS
+    beyond the provisional window, counted back from the server's newest day.
+    With a full-year window it lies in the previous year's file."""
+    from cofire.ship import vintages
+
+    newest = pd.Timestamp(f"{year}-01-01") + pd.Timedelta(days=n_server - 1)
+    gate = newest - pd.Timedelta(days=vintages.WINDOW_DAYS + GATE_MARGIN_DAYS)
+    return int(gate.year), int(gate.dayofyear) - 1
+
+
 def rect(domain: str) -> tuple[int, int]:
     """Rows and columns the frozen bbox selection gives for a domain."""
     from cofire.model import config
@@ -307,9 +318,12 @@ def extend(domain: str, year: int, ledger: DownloadLedger, now: pd.Timestamp | N
         return {"domain": domain, "year": year, "new_days": 0, "last_day": str(have.day.values[-1])[:10]}
     start = max(0, n_have - OVERLAP_DAYS)
     n_days = n_server - start
-    gate_day = n_server - 1 - vintages.WINDOW_DAYS - GATE_MARGIN_DAYS
+    gate_year, gate_day = gate_target(year, n_server)
+    gate_have = have if gate_year == year else (
+        vintages.assemble(domain, gate_year) if vintages.records(domain, gate_year) else None)
+    check_gate = gate_have is not None and have is not None and 0 <= gate_day < int(gate_have.sizes["day"])
     cost = n_days * n_lat * n_lon * 4 + (n_days + n_lat + n_lon) * 8 + _OPEN_OVERHEAD
-    if have is not None and 0 <= gate_day < n_have:
+    if check_gate:
         cost += n_lat * n_lon * 4 + _OPEN_OVERHEAD
     if session_bytes(ledger) + cost > SESSION_CAP_BYTES or not ledger.can_afford(cost):
         raise FetchRefused(f"{domain} {year}: {cost} B would exceed the session cap or the ledger")
@@ -317,11 +331,12 @@ def extend(domain: str, year: int, ledger: DownloadLedger, now: pd.Timestamp | N
     try:
         new = _read_days(domain, year, start, n_server)
         validate(new, n_lat, n_lon, n_days)
-        if have is not None and 0 <= gate_day < n_have:
-            g = _read_days(domain, year, gate_day, gate_day + 1)
-            r = ext.reconcile(g, have.isel(day=slice(gate_day, gate_day + 1)))
+        if check_gate:
+            assert gate_have is not None
+            g = _read_days(domain, gate_year, gate_day, gate_day + 1)
+            r = ext.reconcile(g, gate_have.isel(day=slice(gate_day, gate_day + 1)))
             if not r.ok:
-                raise FetchRefused(f"{domain} {year} day {gate_day}, beyond the provisional window: {r.first_mismatch}")
+                raise FetchRefused(f"{domain} {gate_year} day {gate_day}, beyond the provisional window: {r.first_mismatch}")
         rec = vintages.record(domain, year, new, fetched_at=now)
     except FetchRefused:
         ledger.record("gridMET-OPeNDAP", constraint, cost, note=f"session={SESSION}; REJECTED")
