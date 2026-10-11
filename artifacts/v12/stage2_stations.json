@@ -1,0 +1,174 @@
+{
+ "rule": "in the footprint box + 0.25 deg, April 1 SWE in >= 15 of 19 years; else the 3 nearest qualifying; Denver = Upper South Platte + Dillon",
+ "domains": {
+  "upper_south_platte": {
+   "how": "box",
+   "stations": [
+    "1014:CO:SNTL",
+    "1057:CO:SNTL",
+    "335:CO:SNTL",
+    "505:CO:SNTL",
+    "531:CO:SNTL",
+    "602:CO:SNTL",
+    "935:CO:SNTL",
+    "936:CO:SNTL",
+    "937:CO:SNTL",
+    "939:CO:SNTL",
+    "970:CO:SNTL"
+   ],
+   "names": [
+    "Middle Fork Camp",
+    "Glen Cove",
+    "Berthoud Summit",
+    "Grizzly Peak",
+    "Hoosier Pass",
+    "Loveland Basin",
+    "Jackwhacker Gulch",
+    "Echo Lake",
+    "Michigan Creek",
+    "Rough And Tumble",
+    "Jones Pass"
+   ]
+  },
+  "dillon": {
+   "how": "box",
+   "stations": [
+    "1014:CO:SNTL",
+    "1041:CO:SNTL",
+    "1120:CO:SNTL",
+    "335:CO:SNTL",
+    "415:CO:SNTL",
+    "485:CO:SNTL",
+    "505:CO:SNTL",
+    "531:CO:SNTL",
+    "564:CO:SNTL",
+    "602:CO:SNTL",
+    "802:CO:SNTL",
+    "842:CO:SNTL",
+    "935:CO:SNTL",
+    "936:CO:SNTL",
+    "937:CO:SNTL",
+    "938:CO:SNTL",
+    "970:CO:SNTL"
+   ],
+   "names": [
+    "Middle Fork Camp",
+    "Beaver Ck Village",
+    "Elliot Ridge",
+    "Berthoud Summit",
+    "Copper Mountain",
+    "Fremont Pass",
+    "Grizzly Peak",
+    "Hoosier Pass",
+    "Lake Eldora",
+    "Loveland Basin",
+    "Summit Ranch",
+    "Vail Mountain",
+    "Jackwhacker Gulch",
+    "Echo Lake",
+    "Michigan Creek",
+    "Buckskin Joe",
+    "Jones Pass"
+   ]
+  },
+  "larimer": {
+   "how": "box",
+   "stations": [
+    "1030:CO:SNTL",
+    "1031:CO:SNTL",
+    "1032:CO:SNTL",
+    "1042:CO:SNTL",
+    "1122:CO:SNTL",
+    "1123:CO:SNTL",
+    "1161:CO:SNTL",
+    "322:CO:SNTL",
+    "412:CO:SNTL",
+    "438:CO:SNTL",
+    "551:CO:SNTL",
+    "565:CO:SNTL",
+    "688:CO:SNTL",
+    "718:CO:SNTL",
+    "793:CO:SNTL",
+    "869:CO:SNTL",
+    "870:CO:SNTL"
+   ],
+   "names": [
+    "Arapaho Ridge",
+    "Never Summer",
+    "Rawah",
+    "Wild Basin",
+    "Hourglass Lake",
+    "Long Draw Resv",
+    "Black Mountain",
+    "Bear Lake",
+    "Copeland Lake",
+    "Deadman Hill",
+    "Joe Wright",
+    "Lake Irene",
+    "Phantom Valley",
+    "Roach",
+    "Stillwater Creek",
+    "Willow Creek Pass",
+    "Willow Park"
+   ]
+  },
+  "pueblo": {
+   "how": "nearest",
+   "stations": [
+    "1005:CO:SNTL",
+    "773:CO:SNTL",
+    "914:CO:SNTL"
+   ],
+   "names": [
+    "Ute Creek",
+    "South Colony",
+    "Medano Pass"
+   ]
+  },
+  "denver": {
+   "how": "union of upper_south_platte and dillon",
+   "stations": [
+    "1014:CO:SNTL",
+    "1041:CO:SNTL",
+    "1057:CO:SNTL",
+    "1120:CO:SNTL",
+    "335:CO:SNTL",
+    "415:CO:SNTL",
+    "485:CO:SNTL",
+    "505:CO:SNTL",
+    "531:CO:SNTL",
+    "564:CO:SNTL",
+    "602:CO:SNTL",
+    "802:CO:SNTL",
+    "842:CO:SNTL",
+    "935:CO:SNTL",
+    "936:CO:SNTL",
+    "937:CO:SNTL",
+    "938:CO:SNTL",
+    "939:CO:SNTL",
+    "970:CO:SNTL"
+   ],
+   "names": [
+    "Middle Fork Camp",
+    "Beaver Ck Village",
+    "Glen Cove",
+    "Elliot Ridge",
+    "Berthoud Summit",
+    "Copper Mountain",
+    "Fremont Pass",
+    "Grizzly Peak",
+    "Hoosier Pass",
+    "Lake Eldora",
+    "Loveland Basin",
+    "Summit Ranch",
+    "Vail Mountain",
+    "Jackwhacker Gulch",
+    "Echo Lake",
+    "Michigan Creek",
+    "Buckskin Joe",
+    "Rough And Tumble",
+    "Jones Pass"
+   ]
+  }
+ }
+}

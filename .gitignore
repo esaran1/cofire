@@ -56,3 +56,6 @@ artifacts/frontend/screens/*.png
 artifacts/ship/domains/
 # Built by scripts/build_static.sh from the bundles.
 app/public/data/
+
+# v1.2 intermediate predictions (regenerable, large)
+data/v12/
