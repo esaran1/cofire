@@ -2366,3 +2366,39 @@ runs' transfers never reached `artifacts/ci/ledger.json`:
 - **What does not change.** Published issues stay pinned to their vintages,
   so no published forecast changes. The refresh still re-reads only the newest
   14 days, so older revised days keep their held values.
+
+## Audits and tool downloads, 2026-10-11
+
+- **npm audit.**
+  - Before: 2 critical (`next` 14.2.35, `maplibre-gl` 4.7.1), 7 high, 2
+    moderate.
+  - Fixed by moving to Next 15.5.27 (React 19) and MapLibre 6.14.0, with
+    overrides patching the nested `postcss` and `source-map-js`. MapLibre 6
+    parses tiles in a module worker the bundler does not emit, so the worker
+    is copied to `public/maplibre` on install (without it no forecast cell
+    rendered).
+  - After: 0 critical, 0 moderate, **5 high**, all in Tailwind 3's
+    build-time file watcher (`braces` <= 3.0.3, through `chokidar` and
+    `micromatch`). No 3.x release of `braces` fixes it; the fix is a Tailwind
+    4 migration.
+  - The exposure is build time only: the patterns are the project's own
+    config, and none of it ships to a browser. See the Tailwind entry below.
+- **pip-audit**, over the 145 locked packages (`uv export --frozen`).
+  - One finding: `multidict` 6.9.0 (CVE-2026-104874), upgraded to 6.9.1.
+  - After: 0 findings.
+- **Tool and package downloads, recorded in the project ledger** with size
+  and reason, under session `v1.2-tools`:
+
+  | What | Bytes |
+  |---|---|
+  | npm packages for the upgrade, 34 for darwin-arm64, sized from each tarball's Content-Range | 94,804,032 |
+  | pip-audit tool, measured as uv cache growth | 52,854,784 |
+  | multidict 6.9.1 | 1,654,784 |
+
+  - They are not data-source transfers, so a correction takes them out of
+    the data budget's total; the entries stay as written. This follows the
+    ledger's earlier CI-split correction.
+  - **v1.2 data downloads: 1,020,885 B**, against the session's 40 MB cap:
+    SNOTEL April 1 (267,945 B), the gridMET revision-reach probe (752,940 B)
+    and one 1,497 B DWR probe.
+- **Lighthouse** was run from the local npx cache; nothing was downloaded.

@@ -1,7 +1,7 @@
 {
   "budget_bytes": 3000000000,
-  "recorded_bytes": 4421562859,
-  "correction_bytes": -1477701654,
+  "recorded_bytes": 4570876459,
+  "correction_bytes": -1627015254,
   "total_bytes": 2943861205,
   "remaining_bytes": 56138795,
   "corrections": [
@@ -16,6 +16,12 @@
       "reason": "The weekly refresh on GitHub now records to its own ledger (artifacts/ci/ledger.json). Its first transfers, recorded here before the split, are copied there and taken out of this total; the entries themselves are left as written.",
       "delta_bytes": -2310,
       "evidence": "2026-09-27T21:10:04+00:00 385 B session=refresh-36350647529; 2026-09-27T21:10:06+00:00 385 B session=refresh-36350647529; 2026-09-27T21:10:07+00:00 385 B session=refresh-36350647529; 2026-09-27T21:20:00+00:00 385 B session=refresh-36351274426; 2026-09-27T21:20:02+00:00 385 B session=refresh-36351274426; 2026-09-27T21:20:02+00:00 385 B session=refresh-36351274426"
+    },
+    {
+      "at": "2026-10-11T23:23:33.572836+00:00",
+      "reason": "Tool and package downloads (npm packages for the dependency upgrade, the pip-audit tool, multidict 6.9.1) are recorded in this ledger with size and reason, as the v1.2 brief asks, but they are not data-source transfers and are taken out of the data budget's total. The entries themselves are left as written.",
+      "delta_bytes": -149313600,
+      "evidence": "three entries tagged session=v1.2-tools on 2026-10-11: 94,804,032 B + 52,854,784 B + 1,654,784 B"
     }
   ],
   "transfers": [
@@ -29705,6 +29711,27 @@
       "bytes": 14524,
       "timestamp": "2026-10-11T22:24:05+00:00",
       "note": "session=v1.2; sha256=fbe251d88558ae53d512933fdf6ac29729a3c116ec1da641f3abfeca4ab37d79"
+    },
+    {
+      "source": "npm-packages",
+      "url": "https://registry.npmjs.org/ (Next 15.5.27, React 19, MapLibre 6.14 and their dependencies, 34 packages for darwin-arm64)",
+      "bytes": 94804032,
+      "timestamp": "2026-10-11T23:23:01+00:00",
+      "note": "session=v1.2-tools; reason: fix the critical npm audit findings; sizes from each tarball's Content-Range"
+    },
+    {
+      "source": "pypi-tool",
+      "url": "uvx pip-audit (tool and its dependencies)",
+      "bytes": 52854784,
+      "timestamp": "2026-10-11T23:23:01+00:00",
+      "note": "session=v1.2-tools; reason: the brief's pip-audit check; measured as uv cache growth"
+    },
+    {
+      "source": "pypi-packages",
+      "url": "multidict 6.9.1",
+      "bytes": 1654784,
+      "timestamp": "2026-10-11T23:23:01+00:00",
+      "note": "session=v1.2-tools; reason: fix pip-audit finding CVE-2026-104874; measured as uv cache growth"
     }
   ]
 }
