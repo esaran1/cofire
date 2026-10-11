@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { type Checklist, getParsed } from "@/lib/api";
+import latest from "@/lib/brief_latest.json";
 import { BRIEF_HORIZON, type AreaBrief, type Brief, buildBrief } from "@/lib/brief";
-import { IS_STATIC, getBundle, getDomains, staticChecklist } from "@/lib/data";
+import { getBundle, getDomains } from "@/lib/data";
 import { type Lang, SPANISH_REVIEWED, locale, translate, useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import emberEs from "@/lib/i18n/ember_es.json";
 import { LINKS } from "@/lib/links";
-import { ChecklistSchema, type DomainsIndex } from "@/lib/schemas";
+import type { DomainsIndex } from "@/lib/schemas";
 import { ErrorNote } from "@/components/ui/Controls";
 import { StaleBadge } from "@/components/StaleBadge";
 
@@ -39,7 +39,13 @@ function plusWeeks(iso: string, w: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-function BriefSheet({ brief, lang, todo }: { brief: Brief; lang: Lang; todo: Checklist["items"] }) {
+type Todo = { id: string; label: string }[];
+
+// The newest week, precomputed by the weekly refresh (cofire/v12/brief_static.py),
+// so the page renders at once; older weeks are built from their bundles.
+const LATEST = latest as unknown as { brief: Brief; todo: Todo };
+
+function BriefSheet({ brief, lang, todo }: { brief: Brief; lang: Lang; todo: Todo }) {
   const t = (k: MessageKey, v?: Record<string, string | number>) => translate(lang, k, v);
   const h = BRIEF_HORIZON;
   const catName = (c: number) => t(`brief.cat${Math.min(4, Math.max(0, c))}` as MessageKey);
@@ -212,9 +218,9 @@ function BriefSheet({ brief, lang, todo }: { brief: Brief; lang: Lang; todo: Che
 export default function BriefPage() {
   const { lang, t } = useT();
   const [index, setIndex] = useState<DomainsIndex | null>(null);
-  const [issue, setIssue] = useState("");
-  const [brief, setBrief] = useState<Brief | null>(null);
-  const [todo, setTodo] = useState<Checklist["items"]>([]);
+  const [issue, setIssue] = useState(LATEST.brief.issue);
+  const [brief, setBrief] = useState<Brief | null>(LATEST.brief);
+  const todo = LATEST.todo;
   const [both, setBoth] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -226,23 +232,17 @@ export default function BriefPage() {
         setIssue(wanted && d.issues.includes(wanted) ? wanted : (d.issues[d.issues.length - 1] ?? ""));
       })
       .catch((e: Error) => setErr(e.message));
-    const get = IS_STATIC
-      ? staticChecklist<Checklist>("city").then((c) => ChecklistSchema.parse(c))
-      : getParsed("/ember/checklist?zone=city", ChecklistSchema);
-    get
-      .then((c) =>
-        setTodo(
-          c.items
-            .filter((i) => i.cost === "free")
-            .sort((a, b) => b.item_weight - a.item_weight)
-            .slice(0, 3),
-        ),
-      )
-      .catch(() => setTodo([]));
   }, []);
 
   useEffect(() => {
     if (!index || !issue) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("issue", issue);
+    window.history.replaceState(window.history.state, "", url.toString());
+    if (issue === LATEST.brief.issue) {
+      setBrief(LATEST.brief);
+      return;
+    }
     let live = true;
     const i = index.issues.indexOf(issue);
     const prev = i > 0 ? index.issues[i - 1] : null;
@@ -261,9 +261,6 @@ export default function BriefPage() {
             { upper_south_platte: pusp, dillon: pdil },
           ),
         );
-        const url = new URL(window.location.href);
-        url.searchParams.set("issue", issue);
-        window.history.replaceState(window.history.state, "", url.toString());
       })
       .catch((e: Error) => live && setErr(e.message));
     return () => {

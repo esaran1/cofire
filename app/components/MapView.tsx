@@ -141,10 +141,25 @@ export function MapView({
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
     const mode = resolveMode();
-    void registerPmtiles(mode);
+    // The pmtiles protocol must be registered before the style asks for tiles,
+    // or the first requests fail with an unsupported URL scheme.
+    void registerPmtiles(mode).then(() => {
+      if (cancelled || !ref.current || mapRef.current) return;
+      cleanup = createMap(mode);
+    });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+  }, []);
+
+  function createMap(mode: ReturnType<typeof resolveMode>): () => void {
+    const container = ref.current as HTMLDivElement;
     const map = new maplibregl.Map({
-      container: ref.current,
+      container,
       style: basemapStyle(mode),
       center: [-104.99, 39.74],
       zoom: 9,
@@ -168,7 +183,7 @@ export function MapView({
       clearTimeout(t);
       t = setTimeout(() => fit.current(false), 150);
     });
-    ro.observe(ref.current);
+    ro.observe(container);
     return () => {
       clearTimeout(t);
       ro.disconnect();
@@ -176,7 +191,7 @@ export function MapView({
       mapRef.current = null;
       styleReady.current = false;
     };
-  }, []);
+  }
 
   // Fly to the area when it changes.
   useEffect(() => {
@@ -184,9 +199,11 @@ export function MapView({
   }, [bbox]);
 
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
+    // The map is created once its tile protocol is registered, which can be
+    // after the first cells arrive; then this draw waits in `pending`.
     const draw = () => {
+      const map = mapRef.current;
+      if (!map) return;
       const data = toGeoJSON(cells);
       const src = map.getSource("cells") as maplibregl.GeoJSONSource | undefined;
       if (src) {
@@ -229,8 +246,8 @@ export function MapView({
         map.setFilter("tracts-selected", ["==", ["get", "geoid"], selectedTract ?? ""]);
       }
     };
-    // Draw now if the style is parsed; otherwise when it is.
-    if (styleReady.current) draw();
+    // Draw now if the map and its style are ready; otherwise when they are.
+    if (mapRef.current && styleReady.current) draw();
     else pending.current = draw;
     // A new area's cells (and its card) have just arrived: fit once more, now
     // that the sheet's size is known. Horizon and layer changes keep the view.

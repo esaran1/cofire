@@ -173,10 +173,11 @@ export default function HomePage() {
       <aside className="row-start-2 overflow-y-auto border-t border-rule bg-paper-raised lg:col-start-1 lg:row-start-1 lg:border-r lg:border-t-0">
         <div className="p-6 pb-0">
           <h1 className="display text-2xl" data-testid="map-title">
-            {meta?.label ?? t("map.loading")}
+            {meta?.label ?? DOMAIN_LABELS[domain] ?? t("map.loading")}
           </h1>
-          {meta ? (
-            <p className="mt-1 text-sm leading-relaxed text-ink-soft">{domain in DOMAIN_LABELS ? t(noteKey) : meta.note}</p>
+          {/* Known areas carry their description in the app, so it paints before any data arrives. */}
+          {domain in DOMAIN_LABELS || meta ? (
+            <p className="mt-1 text-sm leading-relaxed text-ink-soft">{domain in DOMAIN_LABELS ? t(noteKey) : meta?.note}</p>
           ) : null}
           <p className="mt-2 text-xs leading-relaxed text-mute">{t("map.intro")}</p>
           <StaleBadge issue={index?.issues[index.issues.length - 1]} className="mt-3" />

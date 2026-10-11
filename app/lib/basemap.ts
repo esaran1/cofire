@@ -16,7 +16,7 @@
 import { asset } from "./asset";
 import type maplibregl from "maplibre-gl";
 
-export type BasemapMode = "osm" | "selfhost";
+export type BasemapMode = "osm" | "selfhost" | "plain";
 
 /** Identifies the project and a contact, as the OSM tile policy requires. */
 export const TILE_UA = "COFIRE/0.7 (Congressional App Challenge 2026; contact: tech.mahi@gmail.com)";
@@ -27,9 +27,20 @@ export const SELFHOST_PMTILES =
 
 export function resolveMode(): BasemapMode {
   const explicit = process.env.NEXT_PUBLIC_BASEMAP;
-  if (explicit === "osm" || explicit === "selfhost") return explicit;
-  // auto: OSM for local dev, self-hosted for a deployed build.
-  return process.env.NODE_ENV === "production" ? "selfhost" : "osm";
+  if (explicit === "osm" || explicit === "selfhost" || explicit === "plain") return explicit;
+  // auto: OSM for local dev; self-hosted tiles for a deployed build when the
+  // archive was built, and a plain background when it was not.
+  if (process.env.NODE_ENV !== "production") return "osm";
+  return process.env.NEXT_PUBLIC_HAS_TILES ? "selfhost" : "plain";
+}
+
+/** No basemap: the paper colour, so the forecast cells still read. */
+function plainStyle(): maplibregl.StyleSpecification {
+  return {
+    version: 8,
+    sources: {},
+    layers: [{ id: "bg", type: "background", paint: { "background-color": "#eceae2" } }],
+  } as unknown as maplibregl.StyleSpecification;
 }
 
 /** Raster OSM style. Local demo only - see the policy note above. */
@@ -100,6 +111,7 @@ function selfhostStyle(): maplibregl.StyleSpecification {
 }
 
 export function basemapStyle(mode: BasemapMode = resolveMode()): maplibregl.StyleSpecification {
+  if (mode === "plain") return plainStyle();
   return mode === "selfhost" ? selfhostStyle() : osmStyle();
 }
 

@@ -22,7 +22,7 @@ const config: Config = {
         "paper-raised": "#faf9f5",
         ink: "#17181b",
         "ink-soft": "#3d3f45",
-        mute: "#77797f",
+        mute: "#66686e",
         rule: "#d9d6cc",
         ember: "#b33a1a",
         "ember-soft": "#e8ddd6",

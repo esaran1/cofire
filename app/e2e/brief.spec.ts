@@ -55,10 +55,26 @@ test("the brief page shows this week, compares last week, and links only checked
   }
   // Another week: the URL follows, and the dates change.
   const sel = page.getByTestId("brief-issue");
+  await expect.poll(() => sel.locator("option").count()).toBeGreaterThan(3);
   const options = await sel.locator("option").allTextContents();
   await sel.selectOption(options[3]);
   await expect(page).toHaveURL(new RegExp(`issue=${options[3]}`));
   await page.getByTestId("lang-es").click();
   await expect(page.getByTestId("brief-title")).toHaveText("Resumen semanal de sequía e incendios para Denver");
   await expect(page.getByTestId("brief-es")).not.toContainText("Denver cells are in");
+});
+
+test("the precomputed latest brief equals the one built from the bundles", () => {
+  const latest = JSON.parse(fs.readFileSync("lib/brief_latest.json", "utf8"));
+  const issue = latest.brief.issue as string;
+  const prev = latest.brief.prevIssue as string | null;
+  const idx = JSON.parse(fs.readFileSync(path.join(root(), "index.json"), "utf8"));
+  const b = buildBrief(
+    read("denver", issue),
+    ["upper_south_platte", "dillon"].map((id) => ({ id, label: idx.domains[id].label, bundle: read(id, issue) })),
+    prev ? read("denver", prev) : null,
+    { upper_south_platte: prev ? read("upper_south_platte", prev) : null, dillon: prev ? read("dillon", prev) : null },
+  );
+  expect(JSON.parse(JSON.stringify(b))).toEqual(latest.brief);
+  expect(latest.todo).toHaveLength(3);
 });

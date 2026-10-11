@@ -1,0 +1,143 @@
+{
+ "brief": {
+  "issue": "2026-10-06",
+  "prevIssue": "2026-09-29",
+  "denver": {
+   "id": "denver",
+   "label": "Denver",
+   "cells": 52,
+   "dryNow": 39.0,
+   "dryNowPrev": 18.1,
+   "dryAhead": 46.5,
+   "f80": {
+    "mean": 0.1395,
+    "state": "probability"
+   },
+   "f90": {
+    "mean": 0.0494,
+    "state": "probability"
+   },
+   "f80Prev": 0.0919,
+   "rows": [
+    {
+     "cat": 3,
+     "cells": 2,
+     "cellsPrev": 1,
+     "stay": 0.7628,
+     "ease": 0.2262,
+     "worsen": 0.011
+    },
+    {
+     "cat": 2,
+     "cells": 50,
+     "cellsPrev": 51,
+     "stay": 0.4756,
+     "ease": 0.3449,
+     "worsen": 0.1794
+    }
+   ]
+  },
+  "water": [
+   {
+    "id": "upper_south_platte",
+    "label": "Upper South Platte",
+    "cells": 202,
+    "dryNow": 29.5,
+    "dryNowPrev": 17.6,
+    "dryAhead": 44.4,
+    "f80": {
+     "mean": 0.1231,
+     "state": "probability"
+    },
+    "f90": {
+     "mean": 0.0411,
+     "state": "probability"
+    },
+    "f80Prev": 0.0933,
+    "rows": [
+     {
+      "cat": 4,
+      "cells": 4,
+      "cellsPrev": 4,
+      "stay": 0.7526,
+      "ease": 0.2474,
+      "worsen": "impossible"
+     },
+     {
+      "cat": 3,
+      "cells": 136,
+      "cellsPrev": 136,
+      "stay": 0.4902,
+      "ease": 0.2905,
+      "worsen": 0.2193
+     },
+     {
+      "cat": 2,
+      "cells": 62,
+      "cellsPrev": 62,
+      "stay": 0.7773,
+      "ease": 0.0763,
+      "worsen": 0.1464
+     }
+    ]
+   },
+   {
+    "id": "dillon",
+    "label": "Dillon",
+    "cells": 79,
+    "dryNow": 41.9,
+    "dryNowPrev": 13.3,
+    "dryAhead": 48.0,
+    "f80": {
+     "mean": 0.1549,
+     "state": "probability"
+    },
+    "f90": {
+     "mean": 0.0575,
+     "state": "probability"
+    },
+    "f80Prev": 0.0897,
+    "rows": [
+     {
+      "cat": 4,
+      "cells": 59,
+      "cellsPrev": 59,
+      "stay": 0.7508,
+      "ease": 0.2492,
+      "worsen": "impossible"
+     },
+     {
+      "cat": 3,
+      "cells": 19,
+      "cellsPrev": 19,
+      "stay": 0.695,
+      "ease": 0.2793,
+      "worsen": null
+     },
+     {
+      "cat": 2,
+      "cells": 1,
+      "cellsPrev": 1,
+      "stay": 0.5777,
+      "ease": 0.2479,
+      "worsen": null
+     }
+    ]
+   }
+  ]
+ },
+ "todo": [
+  {
+   "id": "water_schedule",
+   "label": "Water the lawn only on a set schedule, early or late in the day"
+  },
+  {
+   "id": "water_stage",
+   "label": "Know which Denver Water drought stage is in effect"
+  },
+  {
+   "id": "smoke_alerts",
+   "label": "Sign up for air-quality alerts"
+  }
+ ]
+}

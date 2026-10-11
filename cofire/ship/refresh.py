@@ -192,7 +192,9 @@ def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
     demo.build()
     story.write()
     # Each new issue is published once, with its hash, and never changed.
-    from cofire.v12 import forward
+    from cofire.v12 import brief_static, forward
+
+    brief_static.write()
 
     log["published"] = [e["issue"] for e in forward.publish(now=now)]
     log["bytes"] = session_bytes(ledger) - bytes_before
