@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
 import { ConditionalFooter } from "@/components/SiteChrome";
 import { LangNotice } from "@/components/LangSwitch";
+import { OfflineSupport } from "@/components/Offline";
 import { LangProvider } from "@/lib/i18n";
 
 /**
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh bg-paper font-sans text-ink antialiased">
         <LangProvider>
           <SiteNav />
+          <OfflineSupport />
           <LangNotice />
           <main id="main">{children}</main>
           <ConditionalFooter />

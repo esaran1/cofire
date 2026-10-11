@@ -428,4 +428,5 @@ export const es: Record<MessageKey, string> = {
   "land.harden": "Convierta un mal panorama en una lista de tareas para su propiedad.",
   "land.predict": "Fije su predicción antes de que el modelo muestre la suya.",
   "land.observe": "Reporte lo que el satélite no puede ver.",
+  "offline.banner": "No hay conexión. Se muestra el pronóstico guardado en este dispositivo; la fecha en el mapa y el resumen indica su antigüedad.",
 };

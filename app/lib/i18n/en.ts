@@ -424,6 +424,7 @@ export const en = {
   "land.harden": "Turn a bad outlook into a checklist for your property.",
   "land.predict": "Lock your call before the model shows its own.",
   "land.observe": "Report what the satellite cannot see.",
+  "offline.banner": "You are offline. Showing the forecast saved on this device; the date on the map and brief says how old it is.",
 } as const;
 
 export type MessageKey = keyof typeof en;
