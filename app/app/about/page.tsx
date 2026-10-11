@@ -6,6 +6,8 @@ import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
 import { domainLabel } from "@/lib/domainNames";
 import { targetLabel } from "@/lib/targets";
+import { useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
 
 /**
  * What ships, and what it is allowed to claim.
@@ -29,6 +31,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function AboutPage() {
   const reduce = useReducedMotion();
+  const { lang, t } = useT();
   const survivors = facts.survivors;
   const byDomain = survivors.reduce<Record<string, typeof survivors>>((acc, s) => {
     (acc[s.domain] ||= []).push(s);
@@ -42,41 +45,35 @@ export default function AboutPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       >
-        <h1 className="display text-4xl font-normal md:text-5xl">How it works</h1>
-        <p className="text-ink-soft mt-3 max-w-[58ch] leading-relaxed">
-          Drought and fire-spread conditions for Denver, the two watersheds its water comes from, and
-          Larimer and Pueblo counties, 2 to 8 weeks out, with an honest account of how far to trust
-          each number. Not a forecast of ignitions.
-        </p>
+        <h1 className="display text-4xl font-normal md:text-5xl">{t("meth.title")}</h1>
+        <p className="text-ink-soft mt-3 max-w-[58ch] leading-relaxed">{t("meth.lede")}</p>
       </motion.header>
 
       <div className="border-rule mt-10 grid gap-8 border-y py-8 sm:grid-cols-3">
         <Verdict
           value={String(survivors.length)}
-          label="forecasts beat their baseline"
-          sub={`of ${facts.multiplicity.n_comparisons} tested`}
+          label={t("meth.beat")}
+          sub={t("meth.ofTested", { n: facts.multiplicity.n_comparisons })}
         />
-        <Verdict value={String(facts.hindcast_looks)} label="looks at the sealed year" sub="the last one pre-registered" />
-        <Verdict value={gb(facts.ledger.total_bytes)} label="data downloaded" sub={`against a ${gb(facts.ledger.budget_bytes)} cap`} />
+        <Verdict value={String(facts.hindcast_looks)} label={t("meth.looks")} sub={t("meth.looksSub")} />
+        <Verdict value={gb(facts.ledger.total_bytes)} label={t("meth.data")} sub={t("meth.cap", { cap: gb(facts.ledger.budget_bytes) })} />
       </div>
 
-      <Section title="Where the forecasts beat their baselines">
-        <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">
-          Skill is claimed here and nowhere else. Each of these had to beat its own outcomes
-          shuffled in place, because a forecast can beat a baseline on spread alone.
-        </p>
+      <Section title={t("meth.skillTitle")}>
+        <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">{t("meth.skillText")}</p>
         {facts.multiplicity.withdrawn_by_leak_free_refit.length > 0 ? (
           <p className="text-mute mt-2 max-w-[58ch] text-xs leading-relaxed">
-            {facts.multiplicity.n_survivors_original} passed the original test.{" "}
-            {facts.multiplicity.withdrawn_by_leak_free_refit.length} no longer passes once training
-            labels are kept out of the evaluation period, so it is not claimed:{" "}
-            {facts.multiplicity.withdrawn_by_leak_free_refit.join(", ")}.
+            {t("meth.withdrawn", {
+              orig: facts.multiplicity.n_survivors_original,
+              n: facts.multiplicity.withdrawn_by_leak_free_refit.length,
+              list: facts.multiplicity.withdrawn_by_leak_free_refit.join(", "),
+            })}
           </p>
         ) : null}
         <p className="text-mute mt-2 max-w-[58ch] text-xs leading-relaxed" data-testid="agreement-note">
           {facts.multiplicity.agreeing_targets.length === 0
-            ? "None of these holds in every area where it can be tested, so each is claimed for its own area only."
-            : `Holding in every area where it can be tested: ${facts.multiplicity.agreeing_targets.map((t) => targetLabel(t)).join(", ")}.`}
+            ? t("meth.noAgree")
+            : t("meth.agree", { list: facts.multiplicity.agreeing_targets.map((x) => targetLabel(x, null, lang)).join(", ") })}
         </p>
         {Object.entries(byDomain).map(([dom, rows]) => (
           <div key={dom} className="mt-6">
@@ -85,7 +82,7 @@ export default function AboutPage() {
               {rows.map((s) => (
                 <StatRow
                   key={s.target}
-                  label={`${targetLabel(s.target)}, ${s.horizon}w`}
+                  label={`${targetLabel(s.target, null, lang)}, ${s.horizon}w`}
                   value={s.paired_diff.toFixed(3)}
                 />
               ))}
@@ -95,46 +92,44 @@ export default function AboutPage() {
       </Section>
 
       {facts.interval_audit.retraction ? (
-        <Section title={facts.interval_audit.retraction.title}>
+        <Section title={lang === "es" ? t("hind.retractionTitle") : facts.interval_audit.retraction.title}>
           <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">
-            {facts.interval_audit.retraction.summary}
+            {lang === "es" ? t("hind.retractionSummary") : facts.interval_audit.retraction.summary}
           </p>
           <p className="text-mute mt-3 text-xs">
-            Full record: {facts.interval_audit.retraction.doc}, and{" "}
-            {facts.interval_audit.retraction.sweep}.
+            {t("meth.fullRecord", { doc: facts.interval_audit.retraction.doc, sweep: facts.interval_audit.retraction.sweep })}
           </p>
         </Section>
       ) : null}
 
-      <Section title="What ships">
+      <Section title={t("meth.shipsTitle")}>
         <dl className="border-rule mt-4 divide-y divide-rule border-y">
           {Object.entries(facts.configuration).map(([k, v]) => (
             <div key={k} className="grid gap-1 py-2.5 sm:grid-cols-[9rem_1fr] sm:gap-4">
-              <dt className="text-mute text-sm capitalize">{k.replace(/_/g, " ")}</dt>
-              <dd className="text-ink-soft text-sm">{String(v)}</dd>
+              <dt className="text-mute text-sm">{t(`meth.cfg.${k}` as MessageKey)}</dt>
+              <dd className="text-ink-soft text-sm">{lang === "es" ? t(`meth.cfgv.${k}` as MessageKey) : String(v)}</dd>
             </div>
           ))}
         </dl>
         <p className="text-ink-soft mt-4 max-w-[58ch] text-sm leading-relaxed">
-          These are empirical conditional models, not machine learning. On this record a
-          transition table and a damped persistence rule beat every trained arm tried.
+          {t("meth.notML")}
         </p>
       </Section>
 
-      <Section title="Where the data comes from">
+      <Section title={t("meth.dataTitle")}>
         <div className="mt-4">
           {facts.sources.map((s) => (
-            <StatRow key={s.name} label={s.name} value={s.span} />
+            <StatRow key={s.name} label={s.name} value={lang === "es" ? s.span.replace(" to ", " a ") : s.span} />
           ))}
         </div>
         <p className="text-ink-soft mt-4 max-w-[58ch] text-sm leading-relaxed">
-          A sub-seasonal weather model was tested once by a rule fixed in advance and did not
-          qualify, so no target uses it.
+          {t("meth.subx")}
         </p>
       </Section>
 
-      <Section title="Credits and licenses">
-        <ul className="border-rule mt-4 divide-y divide-rule border-y" data-testid="credits">
+      <Section title={t("meth.creditsTitle")}>
+        {lang === "es" ? <p className="text-mute mt-2 text-xs">{t("meth.creditsNote")}</p> : null}
+        <ul className="border-rule mt-4 divide-y divide-rule border-y" data-testid="credits" lang="en">
           {facts.credits.map((c) => (
             <li key={c.name} className="py-3">
               <p className="text-sm">
@@ -149,35 +144,31 @@ export default function AboutPage() {
         </ul>
       </Section>
 
-      <Section title="Provenance">
+      <Section title={t("meth.provTitle")}>
         <div className="mt-4">
-          <StatRow label="Training" value={facts.split.train} />
-          <StatRow label="Validation" value={facts.split.validate} />
-          <StatRow label="Calibration" value={facts.split.calibrate} />
-          <StatRow label="Held out" value={facts.split.holdout} />
+          <StatRow label={t("meth.training")} value={facts.split.train} />
+          <StatRow label={t("meth.validation")} value={facts.split.validate} />
+          <StatRow label={t("meth.calibration")} value={facts.split.calibrate} />
+          <StatRow label={t("meth.heldOut")} value={facts.split.holdout} />
         </div>
         <div className="mt-4">
-          <Disclosure summary={<span className="sr-only">Hashes</span>} detail="Hashes and ledger">
+          <Disclosure summary={<span className="sr-only">{t("meth.hashes")}</span>} detail={t("meth.hashes")}>
             <dl className="space-y-2">
               <div>
-                <dt>Pre-registration sha256</dt>
+                <dt>{t("hind.preregSha")}</dt>
                 <dd className="num text-ink break-all">{facts.preregistration_sha256}</dd>
               </div>
               <div>
-                <dt>Configuration hash</dt>
+                <dt>{t("hind.configHash")}</dt>
                 <dd className="num text-ink break-all">{facts.config_hash}</dd>
               </div>
               <div>
-                <dt>Freeze commit</dt>
+                <dt>{t("hind.freeze")}</dt>
                 <dd className="num text-ink break-all">{facts.freeze_commit}</dd>
               </div>
               <div>
-                <dt>Download ledger</dt>
-                <dd>
-                  {gb(facts.ledger.total_bytes)} across{" "}
-                  {facts.ledger.n_transfers.toLocaleString()} transfers. Append-only: a
-                  mis-estimate is corrected by appending evidence, never by rewriting an entry.
-                </dd>
+                <dt>{t("meth.ledger")}</dt>
+                <dd>{t("meth.ledgerText", { gb: gb(facts.ledger.total_bytes), n: facts.ledger.n_transfers.toLocaleString() })}</dd>
               </div>
             </dl>
           </Disclosure>

@@ -138,9 +138,14 @@ def predict(domain: str) -> Path:
     common.assert_looks()
     period = common.record(domain)
     clim = climate(period["time"])
-    out_rows: list[pd.DataFrame] = []
-    warm: list[dict[str, Any]] = []
+    parts_dir = PRED / "parts"
+    parts_dir.mkdir(parents=True, exist_ok=True)
     for Y in common.FOLDS:
+        part = parts_dir / f"{domain}_{Y}.parquet"
+        if part.exists():
+            continue  # checkpointed: a killed run resumes at the next fold
+        out_rows: list[pd.DataFrame] = []
+        warm: list[dict[str, Any]] = []
         f = pd.read_parquet(preds.path(domain, Y))
         train_years = tuple(y for y in common.YEARS if y != Y)
         g = common.frame_without(period, (Y,))
@@ -193,12 +198,15 @@ def predict(domain: str) -> Path:
                                  "a_only": th_a[0], "a": th_ab[0], "b": th_ab[1]})
                 res["train_rate"] = np.float32(tw["k"].sum() / tw["n"].sum() if len(tw) else np.nan)
                 out_rows.append(res)
+        pd.concat(out_rows, ignore_index=True).to_parquet(part.with_suffix(".part"), index=False)
+        part.with_suffix(".part").replace(part)
+        pd.DataFrame(warm).to_csv(parts_dir / f"warm_{domain}_{Y}.csv", index=False)
         LOGGER.info("%s fold %d done", domain, Y)
-    frame = pd.concat(out_rows, ignore_index=True)
-    PRED.mkdir(parents=True, exist_ok=True)
+    frame = pd.concat([pd.read_parquet(parts_dir / f"{domain}_{Y}.parquet") for Y in common.FOLDS], ignore_index=True)
     frame.to_parquet(dest, index=False)
     OUT.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(warm).to_csv(OUT / f"warm_start_{domain}.csv", index=False)
+    pd.concat([pd.read_csv(parts_dir / f"warm_{domain}_{Y}.csv") for Y in common.FOLDS]).to_csv(
+        OUT / f"warm_start_{domain}.csv", index=False)
     common.assert_looks()
     return dest
 

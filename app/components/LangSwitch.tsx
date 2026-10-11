@@ -33,7 +33,7 @@ export function LangSwitch() {
 }
 
 // The screens with Spanish text so far. Others say so rather than mixing.
-const TRANSLATED = ["/", "/ember", "/brief", "/scoreboard", "/beat", "/observe", "/hindcast", "/landing"];
+const TRANSLATED = ["/", "/ember", "/brief", "/scoreboard", "/beat", "/observe", "/hindcast", "/landing", "/about"];
 
 /** Under the nav, in Spanish only: the draft notice, and a note on untranslated pages. */
 export function LangNotice() {

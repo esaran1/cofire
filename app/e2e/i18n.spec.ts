@@ -71,7 +71,7 @@ test("a ?lang=es link opens in Spanish, and untranslated pages say so", async ({
   await expect(page.getByText("Todo lo demás")).toBeVisible();
   await expect(page.getByText("Nada de fuegos artificiales").or(page.getByText("Número de la casa visible desde la calle")).first()).toBeVisible();
   await page.goto("/about");
-  await expect(page.getByTestId("lang-notice")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Cómo funciona");
 });
 
 test("every map cell can be reached from the list, and the choice is announced", async ({ page }) => {
@@ -97,6 +97,9 @@ test("text translated from facts.json is still the text in facts.json", () => {
   const r = facts.interval_audit.retraction;
   expect(en["hind.retractionTitle"]).toBe(r.title);
   expect(en["hind.retractionSummary"]).toBe(r.summary);
+  for (const [k, v] of Object.entries(facts.configuration)) {
+    expect(en[`meth.cfgv.${k}` as keyof typeof en], k).toBe(v);
+  }
 });
 
 for (const [path, heading] of [
