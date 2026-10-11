@@ -57,7 +57,11 @@ def test_publishing_never_rewrites_a_file(tmp_path: Path, monkeypatch: pytest.Mo
     monkeypatch.setattr(forward, "ROOT", tmp_path)
     monkeypatch.setattr(forward, "MANIFEST", tmp_path / "manifest.json")
     monkeypatch.setattr(forward, "APP_COPY", tmp_path / "app.json")
-    first = json.loads((Path("artifacts/ship/domains") / "index.json").read_text())["issues"][0]
+    bundles = tmp_path / "bundles"
+    bundles.mkdir()
+    first = "2026-01-06"
+    (bundles / "index.json").write_text(json.dumps({"issues": [first]}))
+    monkeypatch.setattr(forward, "BUNDLES", bundles)
     (tmp_path / "manifest.json").write_text("[]")
     (tmp_path / f"{first}.json.gz").write_bytes(b"tampered")
     with pytest.raises(RuntimeError, match="never rewritten|backfill"):
