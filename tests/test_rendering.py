@@ -233,16 +233,23 @@ def test_hindcast_criteria_labels_state_the_recorded_thresholds() -> None:
     facts = json.loads(Path("app/lib/facts.json").read_text())
     page = Path("app/app/hindcast/page.tsx").read_text()
     block = page[page.index("const CRITERIA") : page.index("};", page.index("const CRITERIA"))]
-    labels = dict(re.findall(r'"(\d)":\s*"([^"]+)"', block))
+    keys = dict(re.findall(r'"(\d)":\s*"([^"]+)"', block))
     by_test = facts["look3"]["by_test"]
-    assert set(labels) == set(by_test), "every recorded test needs a label, and no more"
-    for k, t in by_test.items():
-        nums = re.findall(r"\d+(?:\.\d+)?", t["threshold"])
-        for n in nums:
-            want = f"{float(n):.2f}".rstrip("0").rstrip(".") if "." in n else n
-            assert want in labels[k] or n in labels[k] or f"{float(n):.2f}" in labels[k], (
-                f"test {k} threshold {t['threshold']!r} is not stated in {labels[k]!r}"
-            )
+    assert set(keys) == set(by_test), "every recorded test needs a label, and no more"
+
+    def table(path: str) -> dict[str, str]:
+        return dict(re.findall(r'^\s*"([\w.]+)":\s*"((?:[^"\\]|\\.)*)",?$', Path(path).read_text(), re.M))
+
+    # The labels are translation keys; both languages must state the thresholds.
+    for lang_table in (table("app/lib/i18n/en.ts"), table("app/lib/i18n/es.ts")):
+        labels = {k: lang_table.get(v, v) for k, v in keys.items()}
+        for k, t in by_test.items():
+            nums = re.findall(r"\d+(?:\.\d+)?", t["threshold"])
+            for n in nums:
+                want = f"{float(n):.2f}".rstrip("0").rstrip(".") if "." in n else n
+                assert want in labels[k] or n in labels[k] or f"{float(n):.2f}" in labels[k], (
+                    f"test {k} threshold {t['threshold']!r} is not stated in {labels[k]!r}"
+                )
 
 
 @pytest.mark.skipif(not EXPORT.exists(), reason="export not built")

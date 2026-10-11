@@ -1,0 +1,57 @@
+{
+ "kappa_selected": "S3-drought@256",
+ "w_selected": "S3-fire@0.25",
+ "pooled_mean_brier_drought": {
+  "A": 0.088485,
+  "S3-drought@16": 0.086385,
+  "S3-drought@256": 0.085262,
+  "S3-drought@4": 0.087542,
+  "S3-drought@64": 0.085481
+ },
+ "pooled_mean_brier_fire": {
+  "A": 0.111767,
+  "S3-fire@0.0": 0.111767,
+  "S3-fire@0.25": 0.111741,
+  "S3-fire@0.5": 0.111744,
+  "S3-fire@0.75": 0.111776,
+  "S3-fire@1.0": 0.111837
+ },
+ "estimable": 131,
+ "ci_above_zero": 18,
+ "qualifying": 0,
+ "adopted": 0,
+ "survivors_configuration_A": 22,
+ "survivors_stage3": 23,
+ "survivors_gained": [
+  "pueblo d_improve1_h2",
+  "pueblo d_improve1_h4"
+ ],
+ "survivors_lost": [
+  "pueblo f_gt90_h8"
+ ],
+ "estimable_validation_pairs_configuration_A": 83,
+ "estimable_validation_pairs_stage3": 83,
+ "mean_reliability_by_domain": {
+  "denver": {
+   "A": 0.01183,
+   "S3": 0.00998
+  },
+  "dillon": {
+   "A": 0.00984,
+   "S3": 0.00631
+  },
+  "larimer": {
+   "A": 0.00743,
+   "S3": 0.00556
+  },
+  "pueblo": {
+   "A": 0.00803,
+   "S3": 0.00587
+  },
+  "upper_south_platte": {
+   "A": 0.00507,
+   "S3": 0.00413
+  }
+ },
+ "base_rate_h4_h8_moving_to_per_cell": 0
+}

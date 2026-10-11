@@ -1,0 +1,49 @@
+{
+ "gate": "every online variant passed at its real delay (h = 2, 4, 8); each fails with the delay shortened",
+ "selected": {
+  "S1-static-a": "S1-static-a",
+  "S1-static-ab": "S1-static-ab",
+  "S1-online-a": "S1-online-a@0.05",
+  "S1-online-ab": "S1-online-ab@0.05",
+  "S1-ew": "S1-ew@8"
+ },
+ "static_eligible_arm": "S1-static-ab",
+ "pooled_mean_brier": {
+  "A": 0.096246,
+  "S1-ew@26": 0.097214,
+  "S1-ew@8": 0.09541,
+  "S1-online-a@0.05": 0.095471,
+  "S1-online-a@0.2": 0.095678,
+  "S1-online-a@0.5": 0.098255,
+  "S1-online-ab@0.05": 0.096102,
+  "S1-online-ab@0.2": 0.102642,
+  "S1-online-ab@0.5": 0.112731,
+  "S1-static-a": 0.096244,
+  "S1-static-ab": 0.096101
+ },
+ "pairs": 135,
+ "estimable": {
+  "S1-ew@8": 131,
+  "S1-online-a@0.05": 131,
+  "S1-online-ab@0.05": 131,
+  "S1-static-a": 131,
+  "S1-static-ab": 131
+ },
+ "ci_above_zero": {
+  "S1-ew@8": 0,
+  "S1-online-a@0.05": 6,
+  "S1-online-ab@0.05": 1,
+  "S1-static-a": 2,
+  "S1-static-ab": 4
+ },
+ "qualifying": {
+  "S1-ew@8": 0,
+  "S1-online-a@0.05": 0,
+  "S1-online-ab@0.05": 0,
+  "S1-static-a": 0,
+  "S1-static-ab": 1
+ },
+ "adopted": 1,
+ "base_rate_h4_h8_for_reliability_now": 17,
+ "base_rate_h4_h8_moving_to_per_cell": 0
+}

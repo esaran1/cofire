@@ -442,6 +442,11 @@ def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | Non
     from cofire.ship import vintages
 
     pins = vintages.issue_vintages()
+    # Adopted v1.2 arms (docs/PREREGISTRATION_V12.md), for issues on or after
+    # their `applies_from` only, so no published issue changes.
+    from cofire.v12 import live
+
+    live_entries = live.load()
     for dom in DOMAINS:
         new = dom in domains.NEW
         choices = fit_v11.load_choices(dom) if new else frozen_choices
@@ -524,6 +529,7 @@ def build_export(last_issue: pd.Timestamp | None = None, now: pd.Timestamp | Non
                     if c.family == "markov"
                     else _fire_prediction(c.family, train, target, issues)
                 )
+                pred = live.apply(dom, target, h, issues["time"], pred, live_entries)
                 per_issue[f"{target}_p"] = pred
                 per_issue[f"{target}_base_rate"] = conditional_base_rate(train, target, issues)
                 if target.startswith("d_"):
