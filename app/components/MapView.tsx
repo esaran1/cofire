@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { basemapStyle, registerPmtiles, resolveMode } from "@/lib/basemap";
+import { asset } from "@/lib/asset";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import type { Tracts } from "@/lib/tracts";
@@ -158,6 +159,10 @@ export function MapView({
 
   function createMap(mode: ReturnType<typeof resolveMode>): () => void {
     const container = ref.current as HTMLDivElement;
+    // MapLibre 6 runs its tile parsing in a module worker that bundlers do not
+    // emit; the worker and its shared chunk are copied to public/maplibre on
+    // install (scripts/copy-maplibre-worker.mjs).
+    maplibregl.setWorkerUrl(asset("/maplibre/maplibre-gl-worker.mjs"));
     const map = new maplibregl.Map({
       container,
       style: basemapStyle(mode),

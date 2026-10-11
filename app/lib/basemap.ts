@@ -14,7 +14,7 @@
  */
 
 import { asset } from "./asset";
-import type maplibregl from "maplibre-gl";
+import type * as maplibregl from "maplibre-gl";
 
 export type BasemapMode = "osm" | "selfhost" | "plain";
 
@@ -120,7 +120,7 @@ export async function registerPmtiles(mode: BasemapMode = resolveMode()): Promis
   if (mode !== "selfhost") return;
   try {
     const pmtiles = await import("pmtiles");
-    const maplibregl = (await import("maplibre-gl")).default;
+    const maplibregl = await import("maplibre-gl");
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
   } catch {
