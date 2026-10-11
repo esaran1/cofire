@@ -1,6 +1,8 @@
 "use client";
 
 import { OBSERVATION_TYPES } from "@/lib/options";
+import { useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -23,11 +25,12 @@ import {
   Skeleton,
 } from "@/components/ui/Controls";
 
-const TYPES = OBSERVATION_TYPES;
 
 
 
 function ObserveInner() {
+  const { t } = useT();
+  const TYPES = OBSERVATION_TYPES.map((o) => ({ ...o, label: t(`obs.type.${o.value}` as MessageKey) }));
   const params = useSearchParams();
   const reduce = useReducedMotion();
   const [lat, setLat] = useState(params.get("lat") ?? "");
@@ -81,7 +84,7 @@ function ObserveInner() {
 
   function useMyLocation() {
     if (!("geolocation" in navigator)) {
-      setErr("This browser cannot share its location. Enter coordinates instead.");
+      setErr(t("obs.noGeo"));
       return;
     }
     setLocating(true);
@@ -92,7 +95,7 @@ function ObserveInner() {
         setLocating(false);
       },
       () => {
-        setErr("Location was not shared. Enter coordinates instead.");
+        setErr(t("obs.geoDenied"));
         setLocating(false);
       },
       { enableHighAccuracy: false, timeout: 8000 },
@@ -106,7 +109,7 @@ function ObserveInner() {
     // number, and its error is not written for a reader.
     const la = Number(lat), lo = Number(lon);
     if (!lat.trim() || !lon.trim() || !Number.isFinite(la) || !Number.isFinite(lo) || Math.abs(la) > 90 || Math.abs(lo) > 180) {
-      setErr("Enter the location as decimal degrees: latitude north and longitude west of Greenwich, which is negative in Colorado.");
+      setErr(t("obs.badCoords"));
       return;
     }
     setBusy(true);
@@ -121,7 +124,7 @@ function ObserveInner() {
       setPhoto("");
       load();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Could not file that report.");
+      setErr(e instanceof Error ? e.message : t("obs.fileFailed"));
     } finally {
       setBusy(false);
     }
@@ -131,15 +134,12 @@ function ObserveInner() {
   // so a new visitor inherited everyone else's total.
   const me = deviceId();
   const count = rows?.filter((r) => r.device_id === me).length ?? 0;
-  const rank = count >= 12 ? "Sentinel" : count >= 4 ? "Ranger" : count >= 1 ? "Scout" : "Not ranked yet";
+  const rank = t(count >= 12 ? "obs.rank.sentinel" : count >= 4 ? "obs.rank.ranger" : count >= 1 ? "obs.rank.scout" : "obs.rank.none");
 
   return (
     <div className="reading px-6 pb-24 pt-12">
-      <h1 className="display text-4xl">Observer Streaks</h1>
-      <p className="mt-2 leading-relaxed text-ink-soft">
-        Report what the satellite cannot see. Reports are logged against their forecast cell for
-        anyone reading it. They do not change the forecast.
-      </p>
+      <h1 className="display text-4xl">{t("obs.title")}</h1>
+      <p className="mt-2 leading-relaxed text-ink-soft">{t("obs.intro")}</p>
 
       {offline && (
         <div className="mt-4">
@@ -153,11 +153,11 @@ function ObserveInner() {
       )}
 
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
-        <Segmented label="What did you see" options={TYPES} value={type} onChange={setType} tone="ochre" />
+        <Segmented label={t("obs.what")} options={TYPES} value={type} onChange={setType} tone="ochre" />
 
         <div className="flex flex-col gap-2">
           <label htmlFor="note" className="text-sm font-medium text-ink">
-            Note
+            {t("obs.note")}
           </label>
           <textarea
             id="note"
@@ -165,14 +165,14 @@ function ObserveInner() {
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             className="rounded-lg border border-rule bg-paper-raised px-3 py-2 text-ink placeholder:text-mute focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
-            placeholder="Optional detail, e.g. third week with no runoff"
+            placeholder={t("obs.notePlaceholder")}
           />
-          <p className="text-xs text-ink-soft">Optional. Helps the next person reading this cell.</p>
+          <p className="text-xs text-ink-soft">{t("obs.noteHelp")}</p>
         </div>
 
         <div className="flex flex-col gap-2">
           <label htmlFor="photo" className="text-sm font-medium text-ink">
-            Photo
+            {t("obs.photo")}
           </label>
           <input
             id="photo"
@@ -181,12 +181,12 @@ function ObserveInner() {
             onChange={(e) => setPhoto(e.target.files?.[0]?.name ?? "")}
             className="text-sm text-mute file:mr-3 file:rounded-full file:border-0 file:bg-paper-sunk file:px-4 file:py-2 file:text-sm file:text-ink hover:file:bg-rule"
           />
-          <p className="text-xs text-ink-soft">Optional. Stored on this device for the demo.</p>
+          <p className="text-xs text-ink-soft">{t("obs.photoHelp")}</p>
         </div>
 
         {adopted.length > 0 ? (
           <div className="flex flex-col gap-2" data-testid="adopted-picks">
-            <p className="text-sm font-medium text-ink">Your adopted cells</p>
+            <p className="text-sm font-medium text-ink">{t("obs.adopted")}</p>
             <div className="flex flex-wrap gap-2">
               {adopted.map((a) => (
                 <button
@@ -208,7 +208,7 @@ function ObserveInner() {
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-2">
             <label htmlFor="lat" className="text-sm font-medium text-ink">
-              Latitude
+              {t("obs.lat")}
             </label>
             <input
               id="lat"
@@ -220,7 +220,7 @@ function ObserveInner() {
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="lon" className="text-sm font-medium text-ink">
-              Longitude
+              {t("obs.lon")}
             </label>
             <input
               id="lon"
@@ -234,7 +234,7 @@ function ObserveInner() {
 
         <div className="flex flex-wrap items-center gap-3">
           <Action type="submit" busy={busy} disabled={!lat || !lon}>
-            File this report
+            {t("obs.file")}
           </Action>
           <button
             type="button"
@@ -242,7 +242,7 @@ function ObserveInner() {
             disabled={locating}
             className="rounded-full border border-rule px-5 py-2.5 text-sm text-ink transition-colors hover:bg-paper-sunk active:scale-[0.98] disabled:opacity-60"
           >
-            {locating ? "Finding you" : "Use my location"}
+            {locating ? t("obs.finding") : t("obs.useLocation")}
           </button>
         </div>
       </form>
@@ -260,11 +260,11 @@ function ObserveInner() {
             role="status"
           >
             <Panel>
-              <p className="text-sm font-medium text-ink">Report filed</p>
+              <p className="text-sm font-medium text-ink">{t("obs.filed")}</p>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                 {filed.cell
-                  ? `Logged against the ${filed.cell.domain ? filed.cell.domain.charAt(0).toUpperCase() + filed.cell.domain.slice(1) : ""} cell at ${filed.cell.lat.toFixed(2)}, ${filed.cell.lon.toFixed(2)}. Anyone reading that cell will see it.`
-                  : "Logged. This point is outside both forecast areas, so it is not attached to a forecast cell."}
+                  ? t("obs.filedCell", { area: domainLabel(filed.cell.domain), lat: filed.cell.lat.toFixed(2), lon: filed.cell.lon.toFixed(2) })
+                  : t("obs.filedOutside")}
               </p>
             </Panel>
           </motion.div>
@@ -273,32 +273,32 @@ function ObserveInner() {
 
       <div className="mt-12 grid grid-cols-2 gap-4">
         <Panel>
-          <p className="text-sm font-medium text-ink">Rank</p>
+          <p className="text-sm font-medium text-ink">{t("obs.rank")}</p>
           <p className="mt-2 text-2xl font-medium">{rank}</p>
         </Panel>
         <Panel>
-          <p className="text-sm font-medium text-ink">Reports</p>
+          <p className="text-sm font-medium text-ink">{t("obs.reports")}</p>
           <div className="mt-2">
             <Numeral value={count} size="xl" />
           </div>
         </Panel>
       </div>
 
-      <h2 className="mt-10 text-lg font-medium">Recent reports</h2>
+      <h2 className="mt-10 text-lg font-medium">{t("obs.recent")}</h2>
       <div className="mt-3">
         {rows === null ? (
           <Skeleton rows={3} />
         ) : rows.length === 0 ? (
           <EmptyState
-            title="No reports yet"
-            body="File the first one above. Reports from this area show here with their location and type."
+            title={t("obs.noReports")}
+            body={t("obs.noReportsBody")}
           />
         ) : (
           <ul className="divide-y divide-rule rounded-lg border border-rule">
             {rows.slice(-8).reverse().map((r) => (
               <li key={r.id} className="flex items-center justify-between px-4 py-3">
                 <span className="text-sm">
-                  {TYPES.find((t) => t.value === r.type)?.label ?? r.type}
+                  {TYPES.find((o) => o.value === r.type)?.label ?? r.type}
                   {r.note && <span className="block text-xs text-ink-soft">{r.note}</span>}
                 </span>
                 <span className="font-mono text-xs text-ink-soft">

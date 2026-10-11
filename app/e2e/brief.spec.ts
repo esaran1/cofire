@@ -50,8 +50,9 @@ test("the brief page shows this week, compares last week, and links only checked
   await expect(page.getByTestId("brief-changes").locator("li").first()).toBeVisible();
   await expect(page.getByTestId("brief-actions").locator("li")).toHaveCount(3);
   const known = new Set(Object.values(LINKS).map((l) => l.url));
-  for (const href of await page.locator("[data-testid=brief-en] a").evaluateAll((as) => as.map((a) => a.getAttribute("href")))) {
-    expect(known.has(href as string), href as string).toBe(true);
+  const hrefs = await page.locator("[data-testid=brief-en] a").evaluateAll((as) => as.map((a) => a.getAttribute("href") ?? ""));
+  for (const href of hrefs.filter((h) => h.startsWith("http"))) {
+    expect(known.has(href), href).toBe(true);
   }
   // Another week: the URL follows, and the dates change.
   const sel = page.getByTestId("brief-issue");

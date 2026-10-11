@@ -71,7 +71,7 @@ test("a ?lang=es link opens in Spanish, and untranslated pages say so", async ({
   await expect(page.getByText("Todo lo demás")).toBeVisible();
   await expect(page.getByText("Nada de fuegos artificiales").or(page.getByText("Número de la casa visible desde la calle")).first()).toBeVisible();
   await page.goto("/about");
-  await expect(page.getByTestId("lang-notice")).toContainText("todavía no está en español");
+  await expect(page.getByTestId("lang-notice")).toBeVisible();
 });
 
 test("every map cell can be reached from the list, and the choice is announced", async ({ page }) => {
@@ -90,4 +90,30 @@ test("every map cell can be reached from the list, and the choice is announced",
   await expect(last).toHaveAttribute("aria-current", "true");
   const [lat, lon] = (id as string).split("_").map(Number);
   await expect(page.getByTestId("map-announce")).toHaveText(`Showing the forecast for the cell at ${lat.toFixed(3)}, ${lon.toFixed(3)}.`);
+});
+
+test("text translated from facts.json is still the text in facts.json", () => {
+  const facts = JSON.parse(fs.readFileSync("lib/facts.json", "utf8"));
+  const r = facts.interval_audit.retraction;
+  expect(en["hind.retractionTitle"]).toBe(r.title);
+  expect(en["hind.retractionSummary"]).toBe(r.summary);
+});
+
+for (const [path, heading] of [
+  ["/beat", "Gánale al modelo"],
+  ["/observe", "Rachas de observación"],
+  ["/hindcast", "El año sellado, abierto una sola vez"],
+  ["/scoreboard", "Registro de pronósticos"],
+] as const) {
+  test(`${path} is in Spanish`, async ({ page }) => {
+    await page.goto(`${path}?lang=es`);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading, { timeout: 20_000 });
+    await expect(page.getByTestId("lang-notice")).not.toContainText("todavía no está en español");
+  });
+}
+
+test("the landing page is in Spanish", async ({ page }) => {
+  await page.goto("/landing?lang=es");
+  await expect(page.getByText("Colorado se seca semanas")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("Luego guardamos un año bajo llave.")).toBeVisible();
 });

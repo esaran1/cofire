@@ -29,6 +29,27 @@ export function fireBandFor(point: number): (typeof FIRE_BANDS)[number] {
   return FIRE_BANDS.find((b) => point >= b.min && point < b.max) ?? FIRE_BANDS[FIRE_BANDS.length - 1];
 }
 
+import type { MessageKey } from "./i18n/en";
+import { type Lang, translate } from "./i18n/translate";
+
+/** The drought categories in the reader's language; values unchanged. */
+export function droughtCategories(lang: Lang): typeof DROUGHT_CATEGORIES {
+  return DROUGHT_CATEGORIES.map((c) => ({
+    ...c,
+    label: c.value === 0 ? translate(lang, "opt.cat0") : c.label,
+    hint: translate(lang, `opt.cat${c.value}hint` as MessageKey),
+  }));
+}
+
+/** The fire-spread bands in the reader's language; values and edges unchanged. */
+export function fireBands(lang: Lang): typeof FIRE_BANDS {
+  return FIRE_BANDS.map((b) => ({
+    ...b,
+    label: translate(lang, `opt.band.${b.value}` as MessageKey),
+    hint: translate(lang, `opt.bandhint.${b.value}` as MessageKey),
+  }));
+}
+
 export const OBSERVATION_TYPES = [
   { value: "stock_tank_dry", label: "Stock tank dry" },
   { value: "creek_low", label: "Creek low" },

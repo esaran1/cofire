@@ -1,5 +1,6 @@
 "use client";
 
+import { type Lang, locale, useT } from "@/lib/i18n";
 import { domainLabel } from "@/lib/domainNames";
 import { ReactNode, useState } from "react";
 import story from "@/lib/story.json";
@@ -40,13 +41,14 @@ function colour(v: number): string {
   return t >= 0 ? mix(PAPER, EMBER, t) : mix(PAPER, SLATE, -t);
 }
 
-function fmtDate(iso: string): string {
+function fmtDate(iso: string, lang: Lang): string {
   const d = new Date(`${iso}T12:00:00`);
-  return d.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString(locale(lang), { day: "numeric", month: "long", year: "numeric" });
 }
 
 /** Colorado, with the cropped region marked, so the reader knows where this is. */
 function Locator() {
+  const { t } = useT();
   const m = story.map;
   const [vx, vy, vw, vh] = m.view;
   return (
@@ -54,7 +56,7 @@ function Locator() {
       viewBox={`-4 -4 ${m.width + 8} ${m.height + 8}`}
       className="h-auto w-20 md:w-24"
       role="img"
-      aria-label="Colorado, with the forecast region marked"
+      aria-label={t("land.mapAria")}
     >
       <path d={m.state} fill="#eceae2" stroke="#77797f" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
       <rect
@@ -72,6 +74,7 @@ function Locator() {
 }
 
 export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode }) {
+  const { lang, t } = useT();
   const [hi, setHi] = useState(0);
   const m = story.map;
   const h = String(story.horizons[hi]);
@@ -96,7 +99,7 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
           viewBox={`${vx} ${vy} ${vw} ${vh}`}
           className="h-auto max-h-[82dvh] w-full"
           role="img"
-          aria-label={`Forecast areas from Larimer to Pueblo, including Denver and its watersheds, coloured by expected dryness ${h} weeks out`}
+          aria-label={t("land.areasAria", { h })}
         >
           {m.outlines.map((o) => (
             <path
@@ -149,7 +152,7 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
       </figure>
 
       <div className="lg:col-start-1 lg:row-start-2 lg:self-start">
-        <div className="flex flex-wrap gap-2 lg:mt-12" role="radiogroup" aria-label="Forecast range">
+        <div className="flex flex-wrap gap-2 lg:mt-12" role="radiogroup" aria-label={t("land.range")}>
           {story.horizons.map((hz, i) => (
             <button
               key={hz}
@@ -160,7 +163,7 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
                 i === hi ? "bg-ink text-paper" : "bg-paper-sunk text-ink-soft hover:text-ink"
               }`}
             >
-              {hz} weeks out
+              {t("land.weeksOut", { h: hz })}
             </button>
           ))}
         </div>
@@ -173,22 +176,22 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
             }}
           />
           <div className="text-mute mt-1.5 flex justify-between text-xs">
-            <span>less dry than usual</span>
-            <span>typical</span>
-            <span>drier</span>
+            <span>{t("land.lessDry")}</span>
+            <span>{t("legend.typical")}</span>
+            <span>{t("legend.drier")}</span>
           </div>
         </div>
 
         <p className="text-ink-soft mt-8 max-w-[38ch] leading-relaxed">
-          Issued {fmtDate(story.issue)}.{" "}
-          <span className="num text-ink">{Math.round(summary.share_below_typical * 100)}%</span> of
-          cells are forecast less dry than usual {h} weeks out.
+          {t("land.issued", { date: fmtDate(story.issue, lang) })}{" "}
+          <span className="num text-ink">{Math.round(summary.share_below_typical * 100)}%</span>{" "}
+          {t("land.share", { h })}
         </p>
 
         <div className="mt-10 flex items-center gap-4">
           <Locator />
           <span className="text-mute max-w-[16ch] text-xs leading-snug">
-            The region shown, within Colorado
+            {t("land.region")}
           </span>
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useState } from "react";
 import { PlaceCard } from "@/components/PlaceCard";
 import { PlaceSchema } from "@/lib/schemas";
@@ -20,22 +21,23 @@ import story from "@/lib/story.json";
  */
 
 export function CardPair() {
+  const { t } = useT();
   const entry = story.card;
   const place = PlaceSchema.parse(entry.place);
   const [horizon, setHorizon] = useState(entry.horizon);
 
   const notes = [
     {
-      head: "A forecast, not a guess",
-      body: "How dry this cell will be for the time of year, 2 to 8 weeks out.",
+      head: t("land.card1h"),
+      body: t("land.card1b"),
     },
     {
-      head: "No band it cannot back",
-      body: "The range method we shipped failed in real time, so no range is drawn.",
+      head: t("land.card2h"),
+      body: t("land.card2b"),
     },
     {
-      head: `${entry.n_probability} numbers it stands behind, ${entry.n_base_rate} it does not`,
-      body: "Where the odds proved unreliable, it shows how often that happens here instead.",
+      head: t("land.card3h", { p: entry.n_probability, b: entry.n_base_rate }),
+      body: t("land.card3b"),
     },
   ];
 

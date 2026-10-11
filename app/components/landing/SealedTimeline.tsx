@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { LockSimpleOpen } from "@phosphor-icons/react";
 import facts from "@/lib/facts.json";
 
@@ -21,11 +22,12 @@ function years(span: string): [number, number] {
 }
 
 export function SealedTimeline() {
+  const { t } = useT();
   const segs = [
-    { key: "train", label: "Learn", span: years(facts.split.train), tone: "bg-ink" },
-    { key: "validate", label: "Choose", span: years(facts.split.validate), tone: "bg-ink-soft" },
-    { key: "calibrate", label: "Tune", span: years(facts.split.calibrate), tone: "bg-mute" },
-    { key: "holdout", label: "Sealed", span: years(facts.split.holdout), tone: "bg-ember" },
+    { key: "train", label: t("land.seg.train"), span: years(facts.split.train), tone: "bg-ink" },
+    { key: "validate", label: t("land.seg.validate"), span: years(facts.split.validate), tone: "bg-ink-soft" },
+    { key: "calibrate", label: t("land.seg.calibrate"), span: years(facts.split.calibrate), tone: "bg-mute" },
+    { key: "holdout", label: t("land.seg.holdout"), span: years(facts.split.holdout), tone: "bg-ember" },
   ];
   const first = segs[0].span[0];
   const last = segs[segs.length - 1].span[1];
@@ -80,7 +82,7 @@ export function SealedTimeline() {
         ))}
       </dl>
       <figcaption className="sr-only">
-        {`${total} years of record: learned from ${segs[0].span[0]} to ${segs[0].span[1]}, sealed ${last}.`}
+        {t("land.timeline", { total, a: segs[0].span[0], b: segs[0].span[1], last })}
       </figcaption>
     </figure>
   );

@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Check } from "@phosphor-icons/react";
 import { Segmented } from "@/components/ui/Controls";
-import { DROUGHT_CATEGORIES, OBSERVATION_TYPES } from "@/lib/options";
+import { OBSERVATION_TYPES, droughtCategories } from "@/lib/options";
+import { useT } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/en";
+import emberEs from "@/lib/i18n/ember_es.json";
+
+const ES_ITEMS = (emberEs as { items: Record<string, { label: string }> }).items;
 import story from "@/lib/story.json";
 
 /**
@@ -31,6 +36,7 @@ function Tile({
   children: React.ReactNode;
   large?: boolean;
 }) {
+  const { t } = useT();
   return (
     <div className={`bg-paper flex flex-col p-7 md:p-10 ${large ? "lg:col-span-3" : ""}`}>
       <h4 className={`display ${large ? "text-4xl md:text-5xl" : "text-3xl"}`}>{verb}</h4>
@@ -40,7 +46,7 @@ function Tile({
         href={href}
         className="text-ember mt-8 inline-flex items-center gap-1.5 text-sm font-medium"
       >
-        Open {verb.toLowerCase()}
+        {t("land.open", { verb: verb.toLowerCase() })}
         <ArrowRight size={15} weight="bold" />
       </Link>
     </div>
@@ -50,7 +56,8 @@ function Tile({
 function HardenPreview() {
   const [done, setDone] = useState<Record<string, boolean>>({});
   const n = Object.values(done).filter(Boolean).length;
-  const items = story.quick_wins;
+  const { lang, t } = useT();
+  const items = story.quick_wins.map((i) => ({ ...i, label: lang === "es" ? (ES_ITEMS[i.id]?.label ?? i.label) : i.label }));
   return (
     <div>
       <ul className="space-y-2">
@@ -77,7 +84,7 @@ function HardenPreview() {
         })}
       </ul>
       <p className="text-mute mt-4 text-sm">
-        <span className="num text-ink">{n}</span> of {items.length} free actions done
+        <span className="num text-ink">{n}</span> {t("land.freeDone", { n: items.length })}
       </p>
     </div>
   );
@@ -85,12 +92,13 @@ function HardenPreview() {
 
 function PredictPreview() {
   const [v, setV] = useState(2);
+  const { lang, t } = useT();
   return (
     <Segmented
-      options={DROUGHT_CATEGORIES}
+      options={droughtCategories(lang)}
       value={v}
       onChange={setV}
-      label="Your call for 4 weeks out"
+      label={t("land.yourCall")}
       tone="ochre"
     />
   );
@@ -98,22 +106,25 @@ function PredictPreview() {
 
 function ObservePreview() {
   const [v, setV] = useState("lawn_crispy");
+  const { t } = useT();
+  const opts = OBSERVATION_TYPES.map((o) => ({ ...o, label: t(`obs.type.${o.value}` as MessageKey) }));
   return (
-    <Segmented options={OBSERVATION_TYPES} value={v} onChange={setV} label="What you saw" tone="ochre" />
+    <Segmented options={opts} value={v} onChange={setV} label={t("land.youSaw")} tone="ochre" />
   );
 }
 
 export function ActPreviews() {
+  const { t } = useT();
   return (
     <div className="bg-rule grid gap-px overflow-hidden border border-rule lg:grid-cols-5">
-      <Tile verb="Harden" line="Turn a bad outlook into a checklist for your property." href="/ember" large>
+      <Tile verb={t("nav.harden")} line={t("land.harden")} href="/ember" large>
         <HardenPreview />
       </Tile>
       <div className="bg-rule grid gap-px lg:col-span-2">
-        <Tile verb="Predict" line="Lock your call before the model shows its own." href="/beat">
+        <Tile verb={t("nav.predict")} line={t("land.predict")} href="/beat">
           <PredictPreview />
         </Tile>
-        <Tile verb="Observe" line="Report what the satellite cannot see." href="/observe">
+        <Tile verb={t("nav.observe")} line={t("land.observe")} href="/observe">
           <ObservePreview />
         </Tile>
       </div>
