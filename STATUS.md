@@ -1,4 +1,18 @@
-# STATUS: merged to main, v1.1 adds Denver (CO-01) and its source watersheds
+# STATUS: v1.2 in progress, preregistered
+
+## v1.2, started 2026-10-11
+
+Preregistration: `docs/PREREGISTRATION_V12.md`, sha256
+`7af6a4a3c55eda1fbdc07a8ebde77fe6ef982a36ba8af90d8046f149818090da`, committed before any v1.2 model run. Stages 1 to 4 run under it;
+new code lives in `cofire/v12/`. The look counter reads 3 and must read 3
+after every stage. Configuration A stays the configuration for the
+2027-01-12 unseal.
+
+| stage | state |
+|---|---|
+| 0, preregistration | committed |
+
+## v1.1: merged to main, adds Denver (CO-01) and its source watersheds
 
 ## Correction, 2026-09-27: a missing drought map read as "no drought"
 
