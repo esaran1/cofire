@@ -244,4 +244,9 @@ export const es: Record<MessageKey, string> = {
   "score.backfilled": "publicado tarde",
   "score.count": "{n} pronósticos publicados",
   "score.verify": "Para comprobar un archivo, calcule su sha256 y compárelo con la huella de aquí. Los archivos están en artifacts/forecasts, en el repositorio del proyecto.",
+  "card.share": "Compartir esta vista",
+  "card.copied": "Enlace copiado",
+  "card.shareFailed": "Copie la dirección de esta página para compartirla",
+  "brief.mapLink": "Abrir el pronóstico de Denver en el mapa",
+  "brief.burdenLink": "Ver qué vecindarios de Denver tienen más carga",
 };

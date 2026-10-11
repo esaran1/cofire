@@ -240,6 +240,11 @@ export const en = {
   "score.backfilled": "published late",
   "score.count": "{n} forecasts published",
   "score.verify": "To check a file, compute its sha256 and compare it with the fingerprint here. The files are in artifacts/forecasts in the project repository.",
+  "card.share": "Share this view",
+  "card.copied": "Link copied",
+  "card.shareFailed": "Copy this page's address to share it",
+  "brief.mapLink": "Open Denver's forecast on the map",
+  "brief.burdenLink": "See which Denver neighborhoods carry the most burden",
 } as const;
 
 export type MessageKey = keyof typeof en;

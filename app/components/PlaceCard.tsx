@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Horizon, Place, Target } from "@/lib/api";
 import { domainLabel } from "@/lib/domainNames";
 import type { Bundle, DomainMeta } from "@/lib/schemas";
@@ -205,6 +207,37 @@ function TargetRow({ name, t: target, kind }: { name: string; t: Target; kind?: 
   );
 }
 
+/** Share the page's address, which carries the area, cell, range and language. */
+function ShareButton() {
+  const { t } = useT();
+  const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
+  async function share() {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ url, title: document.title });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setState("copied");
+    } catch (e) {
+      // A dismissed share sheet is not a failure.
+      if (e instanceof DOMException && e.name === "AbortError") return;
+      setState("failed");
+    }
+  }
+  return (
+    <div className="mt-3">
+      <button type="button" onClick={share} data-testid="share-view" className="text-sm text-ink-soft underline underline-offset-4">
+        {t("card.share")}
+      </button>
+      <span role="status" aria-live="polite" className="ml-2 text-xs text-mute" data-testid="share-status">
+        {state === "copied" ? t("card.copied") : state === "failed" ? t("card.shareFailed") : ""}
+      </span>
+    </div>
+  );
+}
+
 export function PlaceCard({
   place,
   horizon,
@@ -340,6 +373,7 @@ export function PlaceCard({
           </button>
         </div>
       ) : null}
+      {!embedded ? <ShareButton /> : null}
     </aside>
   );
 }

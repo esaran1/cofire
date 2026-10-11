@@ -119,3 +119,30 @@ test("the forecast record lists every published forecast and shows no score", as
   await expect(page.getByTestId("score-title")).toHaveText("Registro de pronósticos");
   await page.getByTestId("lang-en").click();
 });
+
+test("a shared link reopens the same area, cell, range and language", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/?domain=dillon&lang=es");
+  await expect(page.getByTestId("place-card")).toBeVisible({ timeout: 20_000 });
+  await page.getByTestId("cell-list").locator("summary").click();
+  const item = page.getByTestId("cell-list").getByTestId("cell-list-item").nth(3);
+  const cell = await item.getAttribute("data-cell");
+  await item.click();
+  await page.getByTestId("place-card").getByRole("button", { name: "8 semanas de anticipación" }).click();
+  await expect(page).toHaveURL(new RegExp(`cell=${cell}`));
+  await expect(page).toHaveURL(/lang=es/);
+  const shared = page.url();
+  const fresh = await context.newPage();
+  await fresh.goto(shared);
+  await expect(fresh.getByTestId("place-domain")).toContainText("Dillon", { timeout: 20_000 });
+  await expect(fresh.getByTestId("dryness-heading")).toHaveText(/Sequedad en 8 semanas/);
+  await expect(fresh).toHaveURL(new RegExp(`cell=${cell}`));
+});
+
+test("the brief links straight to Denver's map and neighborhoods views", async ({ page }) => {
+  await page.goto("/brief?lang=en");
+  await expect(page.getByTestId("brief-map-links")).toBeVisible({ timeout: 20_000 });
+  await page.getByRole("link", { name: "See which Denver neighborhoods carry the most burden" }).click();
+  await expect(page).toHaveURL(/layer=burden/);
+  await expect(page.getByTestId("tract-card")).toBeVisible({ timeout: 20_000 });
+});

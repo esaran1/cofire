@@ -22,7 +22,7 @@ import { DOMAIN_LABELS } from "@/lib/domainNames";
 
 export default function HomePage() {
   const router = useRouter();
-  const { t } = useT();
+  const { lang, t } = useT();
   const [domain, , ready] = useDomain();
   const [index, setIndex] = useState<DomainsIndex | null>(null);
   const [issue, setIssue] = useState("");
@@ -71,10 +71,11 @@ export default function HomePage() {
     url.searchParams.set("issue", issue);
     url.searchParams.set("horizon", horizon);
     url.searchParams.set("layer", layer);
+    url.searchParams.set("lang", lang);
     if (place && place.domain === domain) url.searchParams.set("cell", place.cell_id);
     else url.searchParams.delete("cell");
     window.history.replaceState(window.history.state, "", url.toString());
-  }, [ready, domain, issue, horizon, layer, place]);
+  }, [ready, domain, issue, horizon, layer, place, lang]);
 
   const meta = index?.domains[domain] ?? null;
 

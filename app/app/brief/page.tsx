@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import latest from "@/lib/brief_latest.json";
 import { BRIEF_HORIZON, type AreaBrief, type Brief, buildBrief } from "@/lib/brief";
@@ -208,6 +209,18 @@ function BriefSheet({ brief, lang, todo }: { brief: Brief; lang: Lang; todo: Tod
             </li>
           ))}
         </ul>
+        <ul className="mt-3 space-y-1 text-sm print:hidden" data-testid="brief-map-links">
+          <li>
+            <Link href={`/?domain=denver&layer=fire&horizon=${h}&lang=${lang}`} className="underline underline-offset-2">
+              {t("brief.mapLink")}
+            </Link>
+          </li>
+          <li>
+            <Link href={`/?domain=denver&layer=burden&lang=${lang}`} className="underline underline-offset-2">
+              {t("brief.burdenLink")}
+            </Link>
+          </li>
+        </ul>
         <p className="mt-3 text-sm font-medium">{t("brief.emergency")}</p>
         <p className="mt-2 text-[11px] leading-relaxed text-mute">{t("brief.source")}</p>
       </section>
@@ -238,6 +251,7 @@ export default function BriefPage() {
     if (!index || !issue) return;
     const url = new URL(window.location.href);
     url.searchParams.set("issue", issue);
+    url.searchParams.set("lang", lang);
     window.history.replaceState(window.history.state, "", url.toString());
     if (issue === LATEST.brief.issue) {
       setBrief(LATEST.brief);
@@ -266,7 +280,7 @@ export default function BriefPage() {
     return () => {
       live = false;
     };
-  }, [index, issue]);
+  }, [index, issue, lang]);
 
   // Print both languages: render the second copy, then open the print dialog.
   useEffect(() => {
