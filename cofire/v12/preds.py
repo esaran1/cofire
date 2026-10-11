@@ -22,6 +22,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 
@@ -39,7 +40,7 @@ def path(domain: str, fold: int) -> Path:
 
 
 def _predict_year(g: pd.DataFrame, excluded: tuple[int, ...], target_year: int,
-                  choices: dict[tuple[str, int], object]) -> pd.DataFrame:
+                  choices: dict[tuple[str, int], Any]) -> pd.DataFrame:
     """Configuration A fitted without `excluded`, predicting `target_year`."""
     from cofire.model.targets import HORIZONS, target_names
     from cofire.ship import fit_v11

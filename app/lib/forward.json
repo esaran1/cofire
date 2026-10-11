@@ -1,0 +1,242 @@
+[
+ {
+  "issue": "2026-01-06",
+  "sha256": "623a44fe572ca02892efa0522425be845b837c3ee628a88abff8ad5ba175c57c",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-01-13",
+  "sha256": "dc71ae1c2ab3baefa94778a369a6b0a28956f927b4aac50010c2905018cc5bf1",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-01-20",
+  "sha256": "2efd57b80d233a687dde1a95f9e7f039b1d0e07b7cef6e521805e0b3a12dc8a6",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-01-27",
+  "sha256": "80bf7b571ffb9cc0a902b944e892d367c407701aed3a106e29fb38d6725e3807",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-02-03",
+  "sha256": "df1685eb3f0172ed1c044d5df0b7afc09dd5672f4b694b2caa041c2d9c56e49c",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-02-10",
+  "sha256": "5c2bbea76d9cf97d45e8fc7e114e526a8fc5e2ca0098ba30fd06664285c80ed6",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-02-17",
+  "sha256": "430db121cbd1d5ebf8ee4012439f04c99802c67f255fed43238d0f382867c3af",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-02-24",
+  "sha256": "70baef14e9e2431c526e76283a6622053bc9bac3acc88f28aaf13e1067ed3937",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-03-03",
+  "sha256": "d6861ecc72e2fce1008115b3bf6f85c9ea44234a00a21a0a832ea37999b480b6",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-03-10",
+  "sha256": "0aa98200e781c624f3b73bfc31a486195d6d3d618301f84dd670f32e6f0d5380",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-03-17",
+  "sha256": "91b3607d4dcd04d7be7b01313abeaf2580aa9e401697e52f5c3cfa5c84ce70e3",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-03-24",
+  "sha256": "c481fe143f00e576e3b8ef38728e84c330f159168f46737ab7c84babbf2cadc9",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-03-31",
+  "sha256": "2434ea9d4bcdcf1d02154f572fa57bc14cbe0d9a08fff753ab734f10e96dddb1",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-04-07",
+  "sha256": "adf75491981a49eac8ffbc54c4e5864abae7e027f04bfb8e32a0db2a654efc71",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-04-14",
+  "sha256": "1b85542449d234c397e4ac62d38dfdd7673e6b0ef7ff57d78e7ad0224fa9a36f",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-04-21",
+  "sha256": "b11bbb7c65c387539f211009871efd688990eefcdfb07e70ec54db8f11a6cb73",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-04-28",
+  "sha256": "e0f22f92588d70985b2d7c3b141ce1ba93af83c3df118535cedacb3580a9c8ab",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-05-05",
+  "sha256": "a1afce5b9f66111a0302abebf5e4b9c0676c2caf7a199c69472e484d70ffa3b6",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-05-12",
+  "sha256": "b9f1b5fe377193eeaf82f10b45bb6fbbda6ddffd8550813b079c3027bcac2e1a",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-05-19",
+  "sha256": "1c1e4552c8374c5c9e8fec8453937656d5b695e33643a1482c07b831dbbe69f4",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-05-26",
+  "sha256": "1e89bcd5232db643bb24d4546d216ca4208415c2bf52a45d6a8629c6838e81c5",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-06-02",
+  "sha256": "01f8c05fc5b779c4857db29dbf4720c4330ab52b01f8dca7934ab7e8329b24e8",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-06-09",
+  "sha256": "cfa18eeef6a4edab13d7eb0916bc1e81a506f795cb5f83f14d9e7e48914ec470",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-06-16",
+  "sha256": "94c6cd4ad65ac979abbba2c93c7661a50edb0c92407e2b93efad622f40803bdb",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-06-23",
+  "sha256": "9888bfd0360af6d80077db49a123a136577200bdeb0c90cda46d12bc6fcc1512",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-06-30",
+  "sha256": "a3efaf1603de54a8546f101a787e31c2eeaa313c742c91f24989feadd670268d",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-07-07",
+  "sha256": "fb4d0a1fbb9822597942a0fea7baaf850e975819fdda1a789885369cbe353f79",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-07-14",
+  "sha256": "e4df8ab74ddcef7aab426ff36e626a84d41837e4915bb6585c5e4e090766d8bf",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-07-21",
+  "sha256": "3949f951d6b1c08ea1077643eb8868830ed0e18b7d887b90433e3bb76872f4a7",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-07-28",
+  "sha256": "58c08ccfc5b71cc8c885dfa77c851f52ef7e11eb877d3bab2ce233f8b5851e6b",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-08-04",
+  "sha256": "fcb4a288db5ace0853596a39edb8ab0c7a6c67033bd5b0697f17e3938fda8732",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-08-11",
+  "sha256": "e4f702fd76686cc3bf07c1ca0c976443098786d959c16da3cd358d0e117a0b43",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-08-18",
+  "sha256": "4a19609b714dc776b42843d44e01dfb7436385fb0f9efb4af7e5e435ca48a4d9",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-08-25",
+  "sha256": "f7bd2d71203d7414f2a480adee4cf21adb957a2cc114ca63c6f20c4ba94c2de0",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-09-01",
+  "sha256": "61f5dd73606599df41c271982e7050389b5f64feecf86865593bc328b8a42c65",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-09-08",
+  "sha256": "2799f64934ce71e01cba5dac5c728aa59b804c264036a7a18bd34bf246e650e8",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-09-15",
+  "sha256": "445db94954b9dec467c39af768a867bc413c149a70c7e082591fcf76fe4f8079",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-09-22",
+  "sha256": "69d67eb286c3c4524da12c80678ff72b4cac4c3be02a60d7d189f731b715a442",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-09-29",
+  "sha256": "007c60b6a7079863e896d38c2b920b65e52bf860de880f8ec6a97a0523cb83ec",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ },
+ {
+  "issue": "2026-10-06",
+  "sha256": "0e26d95008acac4fa57d45bc1d68f6390d0cf2ebcb00444a25ab6376e027c693",
+  "published_at": "2026-10-11T22:38:26Z",
+  "backfilled": true
+ }
+]

@@ -83,80 +83,9 @@ def predict(domain: str) -> Path:
     return dest
 
 
-def _metrics(p: np.ndarray, y: np.ndarray) -> dict[str, float]:
-    from cofire.model.prob_metrics import brier, brier_decomposition
-
-    m = np.isfinite(p) & np.isfinite(y)
-    if m.sum() < 100:
-        return {"brier": float("nan"), "reliability": float("nan"), "resolution": float("nan"), "n": int(m.sum())}
-    d = brier_decomposition(p[m], y[m])
-    return {"brier": brier(p[m], y[m]), "reliability": float(d["reliability"]),
-            "resolution": float(d["resolution"]), "n": int(m.sum())}
-
-
-def paired_job(args: tuple[str, str, str, int]) -> dict[str, Any]:
-    """The paired test of one arm against configuration A on one pair."""
-    from cofire.model.stats_lib import bootstrap_pvalue, paired_bss_shuffled
-
-    domain, target, arm, n_shuffles = args
-    f = pd.read_parquet(PRED / f"{domain}.parquet", columns=["target", "time", "y", "A", arm])
-    f = f[f["target"] == target]
-    res = paired_bss_shuffled(f[arm].to_numpy(float), f["A"].to_numpy(float), f["y"].to_numpy(float),
-                              pd.to_datetime(f["time"]).to_numpy(), n_boot=400, n_shuffles=n_shuffles,
-                              seed=common.SEED)
-    from cofire.model.prob_metrics import brier
-
-    yy, pa, pq = f["y"].to_numpy(float), f["A"].to_numpy(float), f[arm].to_numpy(float)
-    m = np.isfinite(yy) & np.isfinite(pa) & np.isfinite(pq)
-    real = 1 - brier(pq[m], yy[m]) / brier(pa[m], yy[m]) if m.any() else float("nan")
-    return {"domain": domain, "target": target, "arm": arm, "n_shuffles": n_shuffles,
-            "n_positive_weeks": res.n_positive_weeks, "estimable": res.estimable,
-            "paired_diff": res.point, "paired_lo": res.lo, "paired_hi": res.hi,
-            "pvalue": bootstrap_pvalue(res), "bss_real_vs_A": real}
-
-
-def run_paired(jobs: list[tuple[str, str, str, int]], workers: int = 4) -> pd.DataFrame:
-    import multiprocessing as mp
-
-    ctx = mp.get_context("spawn")
-    with ctx.Pool(workers) as pool:
-        return pd.DataFrame(pool.map(paired_job, jobs, chunksize=1))
-
-
-def multiplicity(df: pd.DataFrame) -> pd.DataFrame:
-    from cofire.model.multiplicity import ALPHA_HOLM, Q, family_of
-    from cofire.model.stats_lib import multipletests_bh, multipletests_holm
-
-    df = df.copy()
-    est = df["estimable"].astype(bool) & df["pvalue"].notna()
-    df["bh_reject"] = False
-    if est.any():
-        df.loc[est, "bh_reject"] = multipletests_bh(df.loc[est, "pvalue"].tolist(), q=Q)
-    df["family"] = df["target"].map(family_of)
-    df["holm_reject"] = False
-    for _k, grp in df[est].groupby(["domain", "family"]):
-        df.loc[grp.index, "holm_reject"] = multipletests_holm(grp["pvalue"].tolist(), alpha=ALPHA_HOLM)
-    df["ci_above_zero"] = df["paired_lo"].notna() & (df["paired_lo"] > 0)
-    return df
-
-
-def current_rendering() -> pd.DataFrame:
-    """Each pair's live state and reason, from the newest bundle per domain."""
-    from cofire.ship import domains
-
-    rows = []
-    idx = json.loads(Path("artifacts/ship/domains/index.json").read_text())
-    issue = idx["issues"][-1]
-    for d in domains.ORDER:
-        b = json.loads((Path("artifacts/ship/domains") / d / f"{issue}.json").read_text())
-        for t, (state, reason) in b["decisions"]["targets"].items():
-            rows.append({"domain": d, "target": t, "state": state, "reason": reason or ""})
-    return pd.DataFrame(rows)
-
-
 def report() -> dict[str, Any]:
     from cofire.ship import domains
-    from cofire.v12 import gate
+    from cofire.v12 import evaluate, gate
 
     common.assert_looks()
     failed = [r for r in gate.check_all() if not r.passed]
@@ -164,71 +93,34 @@ def report() -> dict[str, Any]:
         r = failed[0]
         raise SystemExit(f"gate failed: {r.name} h{r.horizon} first leaking probe {r.first_leak}")
 
-    # Metrics for every variant and every pair.
-    mrows = []
-    for d in domains.ORDER:
-        f = pd.read_parquet(PRED / f"{d}.parquet")
-        for target, g in f.groupby("target"):
-            y = g["y"].to_numpy(float)
-            for arm in ["A", *recal.VARIANTS]:
-                mrows.append({"domain": d, "target": target, "arm": arm, **_metrics(g[arm].to_numpy(float), y)})
-    met = pd.DataFrame(mrows)
+    tables = {d: PRED / f"{d}.parquet" for d in domains.ORDER}
+    arms = list(recal.VARIANTS)
+    met = evaluate.metrics(tables, arms)
     OUT.mkdir(parents=True, exist_ok=True)
     met.to_csv(OUT / "metrics_all_variants.csv", index=False)
 
-    # Selection: per family, the grid value with the lowest pooled Brier
-    # averaged with equal weight over every pair.
-    mean = met.groupby("arm")["brier"].mean()
-    selected = {fam: min(members, key=lambda k: mean[k]) for fam, members in recal.FAMILIES.items()}
+    selected, mean = evaluate.select(met, recal.FAMILIES)
     static = min(("S1-static-a", "S1-static-ab"), key=lambda k: mean[k])
-
-    # Paired tests for every selected configuration.
-    pairs = met[met["arm"] == "A"][["domain", "target"]].drop_duplicates().to_records(index=False)
-    jobs = [(str(d), str(t), arm, 20) for arm in sorted(set(selected.values())) for d, t in pairs]
-    tests = run_paired(jobs)
-    tests = pd.concat([multiplicity(g) for _a, g in tests.groupby("arm")], ignore_index=True)
-    tests = tests.merge(met.rename(columns={"arm": "arm"}), on=["domain", "target", "arm"], how="left")
-    a_rel = met[met["arm"] == "A"].set_index(["domain", "target"])["reliability"]
-    tests["reliability_A"] = [a_rel.get((d, t), np.nan) for d, t in zip(tests["domain"], tests["target"], strict=True)]
-    tests["reliability_no_worse"] = tests["reliability"] <= tests["reliability_A"]
-    tests["qualifies"] = (tests["estimable"].astype(bool) & tests["ci_above_zero"] & tests["bh_reject"]
-                          & tests["holm_reject"] & tests["reliability_no_worse"])
-
-    # Surprisingly strong: rerun with 100 shuffles before the rule is applied.
-    strong = tests[tests["qualifies"] & (tests["bss_real_vs_A"] > 0.10)]
-    rerun = run_paired([(r.domain, r.target, r.arm, 100) for r in strong.itertuples()]) if len(strong) else pd.DataFrame()
-    if len(rerun):
-        for r in rerun.itertuples():
-            m = (tests["domain"] == r.domain) & (tests["target"] == r.target) & (tests["arm"] == r.arm)
-            tests.loc[m, ["paired_diff_100", "paired_lo_100", "paired_hi_100"]] = [r.paired_diff, r.paired_lo, r.paired_hi]
-            tests.loc[m, "qualifies"] = tests.loc[m, "qualifies"] & (r.paired_lo > 0)
+    pairs = met[met["arm"] == "A"][["domain", "target"]].drop_duplicates()
+    jobs = [(str(tables[d]), d, t, arm, 20) for arm in sorted(set(selected.values()))
+            for d, t in pairs.itertuples(index=False)]
+    tests = evaluate.adoption(evaluate.run_paired(jobs), met, tables)
     tests["eligible_for_adoption"] = tests["arm"] == static
     tests["adopted"] = tests["qualifies"] & tests["eligible_for_adoption"]
     tests.to_csv(OUT / "paired_tests.csv", index=False)
-
-    # Pairs on the regional base rate today because of reliability, at h4 and h8,
-    # that the adoption rule would move back to per-cell odds.
-    cur = current_rendering()
-    val = pd.read_csv("artifacts/v11/survivors_v11.csv")[["domain", "target", "n_positive_weeks"]]
-    rel_fail = cur[(cur["state"] == "base_rate") & cur["reason"].str.contains("reliability")]
-    rel_fail = rel_fail[rel_fail["target"].str.endswith(("_h4", "_h8"))]
-    ad = tests[tests["adopted"]]
-    moving = rel_fail.merge(ad, on=["domain", "target"]).merge(val, on=["domain", "target"], how="left",
-                                                                 suffixes=("", "_validation"))
-    moving = moving[(moving["reliability"] <= 0.05) & (moving["n_positive_weeks_validation"] >= 12)]
-
+    moving = evaluate.moving_to_per_cell(tests[tests["adopted"]])
     summary = {
-        "gate": "every online variant passed at its real delay (h = 2, 4, 8)",
+        "gate": "every online variant passed at its real delay (h = 2, 4, 8); each fails with the delay shortened",
         "selected": selected,
         "static_eligible_arm": static,
         "pooled_mean_brier": {k: round(float(v), 6) for k, v in mean.items()},
         "pairs": int(len(pairs)),
         "estimable": {a: int(g["estimable"].astype(bool).sum()) for a, g in tests.groupby("arm")},
+        "ci_above_zero": {a: int(g["ci_above_zero"].sum()) for a, g in tests.groupby("arm")},
         "qualifying": {a: int(g["qualifies"].sum()) for a, g in tests.groupby("arm")},
         "adopted": int(tests["adopted"].sum()),
-        "base_rate_h4_h8_for_reliability_now": int(len(rel_fail)),
+        "base_rate_h4_h8_for_reliability_now": int(len(evaluate.base_rate_reliability_pairs())),
         "base_rate_h4_h8_moving_to_per_cell": int(len(moving)),
-        "surprisingly_strong_reruns": int(len(rerun)),
     }
     (OUT / "summary.json").write_text(json.dumps(summary, indent=1) + "\n")
     common.assert_looks()

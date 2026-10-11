@@ -191,6 +191,10 @@ def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
     bundles.build()
     demo.build()
     story.write()
+    # Each new issue is published once, with its hash, and never changed.
+    from cofire.v12 import forward
+
+    log["published"] = [e["issue"] for e in forward.publish(now=now)]
     log["bytes"] = session_bytes(ledger) - bytes_before
     assert look_count() == 3, "look counter moved during a refresh"
     log["looks"] = 3

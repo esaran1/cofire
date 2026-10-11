@@ -11,6 +11,7 @@ after every stage. Configuration A stays the configuration for the
 | stage | state |
 |---|---|
 | 0, preregistration | committed |
+| 5, forward forecasts | 40 issues published (backfilled 2026-10-11), manifest append-only, `/scoreboard` |
 
 ## v1.1: merged to main, adds Denver (CO-01) and its source watersheds
 

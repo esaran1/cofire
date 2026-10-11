@@ -105,3 +105,17 @@ test("Denver's neighborhoods layer shows EnviroScreen as context, and only for D
   await expect(page.getByTestId("layer-burden")).toHaveCount(0);
   await expect(page).toHaveURL(/layer=fire/, { timeout: 20_000 });
 });
+
+test("the forecast record lists every published forecast and shows no score", async ({ page }) => {
+  const forward = JSON.parse(require("node:fs").readFileSync("lib/forward.json", "utf8")) as { issue: string; sha256: string }[];
+  await page.goto("/scoreboard");
+  await expect(page.getByTestId("score-title")).toHaveText("Forecast record", { timeout: 20_000 });
+  await expect(page.getByTestId("score-table").locator("tbody tr")).toHaveCount(forward.length);
+  const last = forward[forward.length - 1];
+  await expect(page.locator(`tr[data-issue="${last.issue}"] td`).nth(2)).toHaveAttribute("title", last.sha256);
+  await expect(page.getByTestId("score-seal")).toContainText("2027");
+  await expect(page.getByTestId("score-table")).not.toContainText(/Brier|reliability|%/);
+  await page.getByTestId("lang-es").click();
+  await expect(page.getByTestId("score-title")).toHaveText("Registro de pronósticos");
+  await page.getByTestId("lang-en").click();
+});

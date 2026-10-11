@@ -203,9 +203,78 @@ def predict(domain: str) -> Path:
     return dest
 
 
+def report() -> dict[str, Any]:
+    from cofire.model.prob_metrics import brier
+    from cofire.ship import domains
+    from cofire.v12 import evaluate
+
+    common.assert_looks()
+    s1 = json.loads((common.OUT / "stage1" / "summary.json").read_text())
+    static = s1["static_eligible_arm"].replace("S1-", "")
+    tables = {d: PRED / f"{d}.parquet" for d in domains.ORDER}
+    offset = [f"S2-offset@{lam}" for lam in LAMBDAS]
+    combo = [f"S2+S1-{static}@{lam}" for lam in LAMBDAS]
+    met = evaluate.metrics(tables, offset + combo)
+    OUT.mkdir(parents=True, exist_ok=True)
+    met.to_csv(OUT / "metrics_all_variants.csv", index=False)
+
+    # The ridge weight is chosen once, on S2-offset; S2+S1 uses the same weight.
+    selected, mean = evaluate.select(met, {"S2-offset": offset})
+    lam = selected["S2-offset"].split("@")[1]
+    arms = [f"S2-offset@{lam}", f"S2+S1-{static}@{lam}"]
+    pairs = met[met["arm"] == "A"][["domain", "target"]].drop_duplicates()
+    jobs = [(str(tables[d]), d, t, arm, 20) for arm in arms for d, t in pairs.itertuples(index=False)]
+    tests = evaluate.adoption(evaluate.run_paired(jobs), met, tables)
+    # Within the stage, the larger paired difference wins a pair both arms qualify for.
+    tests["adopted"] = False
+    for (_d, _t), g in tests[tests["qualifies"]].groupby(["domain", "target"]):
+        tests.loc[g["paired_diff"].idxmax(), "adopted"] = True
+    tests.to_csv(OUT / "paired_tests.csv", index=False)
+
+    # Base-rate cost recovered, by the oracle decomposition's definitions.
+    rec = []
+    for d, path in tables.items():
+        f = pd.read_parquet(path, columns=["fold", "target", "y", "train_rate", f"rhat@{lam}"])
+        for target, g in f.groupby("target"):
+            m = g["y"].notna() & g[f"rhat@{lam}"].notna() & g["train_rate"].notna()
+            g = g[m]
+            if g.empty:
+                continue
+            y = g["y"].to_numpy(float)
+            true = g.groupby("fold")["y"].transform("mean").to_numpy(float)
+            b_train = brier(g["train_rate"].to_numpy(float), y)
+            b_oracle = brier(true, y)
+            b_rhat = brier(g[f"rhat@{lam}"].to_numpy(float), y)
+            cost = b_train - b_oracle
+            rec.append({"domain": d, "target": target, "brier_train_constant": b_train,
+                        "brier_oracle_constant": b_oracle, "brier_rhat_constant": b_rhat,
+                        "base_rate_cost": cost,
+                        "recovered": (b_train - b_rhat) / cost if cost > 1e-9 else np.nan})
+    recovered = pd.DataFrame(rec)
+    recovered.to_csv(OUT / "base_rate_recovered.csv", index=False)
+    moving = evaluate.moving_to_per_cell(tests[tests["adopted"]])
+    summary = {
+        "lambda_selected": float(lam), "static_stage1_arm": s1["static_eligible_arm"],
+        "pooled_mean_brier": {k: round(float(v), 6) for k, v in met.groupby("arm")["brier"].mean().items()},
+        "estimable": {a: int(g["estimable"].astype(bool).sum()) for a, g in tests.groupby("arm")},
+        "ci_above_zero": {a: int(g["ci_above_zero"].sum()) for a, g in tests.groupby("arm")},
+        "qualifying": {a: int(g["qualifies"].sum()) for a, g in tests.groupby("arm")},
+        "adopted": int(tests["adopted"].sum()),
+        "median_recovered": float(recovered["recovered"].median()),
+        "pairs_with_positive_recovery": int((recovered["recovered"] > 0).sum()),
+        "pairs_recovery_estimated": int(recovered["recovered"].notna().sum()),
+        "base_rate_h4_h8_moving_to_per_cell": int(len(moving)),
+    }
+    (OUT / "summary.json").write_text(json.dumps(summary, indent=1) + "\n")
+    common.assert_looks()
+    return summary
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     if sys.argv[1] == "predict":
         print(predict(sys.argv[2]))
+    elif sys.argv[1] == "report":
+        print(json.dumps(report(), indent=1))
     else:
         raise SystemExit(__doc__)

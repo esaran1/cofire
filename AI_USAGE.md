@@ -55,6 +55,23 @@ with records kept rather than rewritten:
 - a drought map missing from the 2022 archive and a missing map in the latest
   2026 issue (`STATUS.md`, `docs/DECISIONS.md`).
 
+### v1.2 modules (all agent-generated)
+
+| Module | What it does | Author |
+|---|---|---|
+| `cofire/v12/common.py` | v1.2 folds, embargo, the look-counter guard | AI agent |
+| `cofire/v12/preds.py` | configuration A's held-out and nested out-of-fold predictions | AI agent |
+| `cofire/v12/recal.py` | stage 1 recalibration variants | AI agent |
+| `cofire/v12/gate.py` | stage 1 variants through the delayed-feedback gate | AI agent |
+| `cofire/v12/stage1.py` | stage 1 runner and report | AI agent |
+| `cofire/v12/snotel.py` | stage 2 SNOTEL April 1 fetch and station rule | AI agent |
+| `cofire/v12/stage2.py` | stage 2 climate level model and report | AI agent |
+| `cofire/v12/stage3.py` | stage 3 cross-domain pooling and report | AI agent |
+| `cofire/v12/evaluate.py` | shared scoring, paired test, adoption rule | AI agent |
+| `cofire/v12/forward.py` | stage 5 published forecasts and manifest | AI agent |
+| `cofire/ship/gridmet_reach.py` | measures gridMET's revision reach | AI agent |
+| `app/app/scoreboard/page.tsx` | the forecast record page | AI agent |
+
 ## What the student wrote or decided
 
 _To be completed by the student. This section is intentionally left blank.
