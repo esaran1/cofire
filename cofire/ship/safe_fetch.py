@@ -63,6 +63,8 @@ ALLOWED_HOSTS = frozenset({
     "dwr.state.co.us",
     # ArcGIS Online, shared by every organization; only the paths below pass.
     "services3.arcgis.com",
+    # Protomaps daily basemap builds (the basemap extract); daily-build paths only.
+    "build.protomaps.com",
 })
 
 # Hosts shared by many publishers: a URL must also start with one of these
@@ -70,6 +72,8 @@ ALLOWED_HOSTS = frozenset({
 ALLOWED_PATHS: dict[str, tuple[str, ...]] = {
     # Colorado Department of Public Health and Environment (EnviroScreen 2.0)
     "services3.arcgis.com": ("/66aUo8zsujfVXRIT/arcgis/rest/services/ColoradoEnviroScreen_v2_",),
+    # Protomaps: the dated daily planet builds, /YYYYMMDD.pmtiles.
+    "build.protomaps.com": ("/2026", "/2027"),
 }
 
 # Accepted Content-Type prefixes per expected format. A mismatch refuses.

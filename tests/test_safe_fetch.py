@@ -197,3 +197,11 @@ def test_a_compressed_response_is_capped_by_the_stated_maximum(tmp_path: Path) -
     s = FakeSession({url: (Resp(200, h), None)})
     with pytest.raises(FetchRefused, match="no Content-Length"):
         safe_fetch(url, tmp_path / "b.json", "json", "x", ledger=_ledger(tmp_path), session=s)
+
+
+def test_protomaps_admits_only_dated_daily_builds() -> None:
+    from cofire.ship.safe_fetch import check_url
+
+    check_url("https://build.protomaps.com/20261011.pmtiles")
+    with pytest.raises(FetchRefused, match="path not on the allowlist"):
+        check_url("https://build.protomaps.com/other/file.bin")

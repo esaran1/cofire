@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { basemapStyle, registerPmtiles, resolveMode } from "@/lib/basemap";
+import { BASEMAP_LAYERS, basemapStyle, registerPmtiles, resolveMode } from "@/lib/basemap";
 import { asset } from "@/lib/asset";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
@@ -168,6 +168,21 @@ export function MapView({
       style: basemapStyle(mode),
       center: [-104.99, 39.74],
       zoom: 9,
+      // Added below, top right: the map controls cover the bottom corners.
+      attributionControl: false,
+    });
+    // OSM and Protomaps credit stays visible on phones too.
+    map.addControl(new maplibregl.AttributionControl({ compact: false }), "top-right");
+    // If the tile archive cannot be read (a host without range requests, a
+    // missing file), hide its layers and keep the plain background: the
+    // forecast cells still draw.
+    let basemapFailed = false;
+    map.on("error", (e) => {
+      const sourceId = (e as unknown as { sourceId?: string }).sourceId;
+      if (basemapFailed || sourceId !== "basemap" || mode !== "selfhost") return;
+      basemapFailed = true;
+      for (const id of BASEMAP_LAYERS) if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", "none");
+      if (map.getLayer("bg")) map.setPaintProperty("bg", "background-color", "#eceae2");
     });
     map.on("click", (e) => clickRef.current(e.lngLat.lat, e.lngLat.lng));
     const ready = () => {

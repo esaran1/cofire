@@ -62,3 +62,6 @@ data/v12/
 
 # MapLibre's worker, copied from node_modules on install
 app/public/maplibre/
+
+# The Colorado basemap extract (51 MB), kept as the 'basemap' release asset
+app/public/tiles/

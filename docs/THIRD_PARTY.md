@@ -67,3 +67,11 @@ was removed rather than credited. It remains in git history, where its CC BY
 There is no LICENSE file. Until the owner adds one, the code is all rights
 reserved by default even in a public repository. Choosing a license is the
 owner's decision.
+
+## Deployed basemap (added 2026-10-12)
+
+| What | Source | License | Credit shown |
+|---|---|---|---|
+| Colorado vector tiles, `colorado.pmtiles` (release asset `basemap`) | Protomaps daily build 2026-10-11, from OpenStreetMap and Natural Earth | map data ODbL (OpenStreetMap); Protomaps basemap | "© OpenStreetMap contributors · © Protomaps", on the map |
+| Glyphs, Noto Sans Regular (`app/public/fonts/`) | protomaps/basemaps-assets | SIL OFL 1.1 (`app/public/fonts/OFL.txt`) | none required |
+| `pmtiles` CLI 1.31.2 (tool, not shipped) | Homebrew bottle | BSD-3-Clause | none required |

@@ -1,9 +1,9 @@
 {
-  "budget_bytes": 3000000000,
-  "recorded_bytes": 4570876459,
-  "correction_bytes": -1627015254,
-  "total_bytes": 2943861205,
-  "remaining_bytes": 56138795,
+  "budget_bytes": 3200000000,
+  "recorded_bytes": 4640991445,
+  "correction_bytes": -1642922096,
+  "total_bytes": 2998069349,
+  "remaining_bytes": 201930651,
   "corrections": [
     {
       "at": "2026-09-21T02:40:19.655828+00:00",
@@ -22,6 +22,12 @@
       "reason": "Tool and package downloads (npm packages for the dependency upgrade, the pip-audit tool, multidict 6.9.1) are recorded in this ledger with size and reason, as the v1.2 brief asks, but they are not data-source transfers and are taken out of the data budget's total. The entries themselves are left as written.",
       "delta_bytes": -149313600,
       "evidence": "three entries tagged session=v1.2-tools on 2026-10-11: 94,804,032 B + 52,854,784 B + 1,654,784 B"
+    },
+    {
+      "at": "2026-10-12T07:36:22.960409+00:00",
+      "reason": "The pmtiles Homebrew bottle is a tool download, recorded with size and checksum but kept out of the data budget's total, as for the earlier v1.2 tool downloads. The entry is left as written.",
+      "delta_bytes": -15906842,
+      "evidence": "entry 'homebrew-tool' 2026-10-12, 15,906,842 B, session=v1.2-basemap-tools"
     }
   ],
   "transfers": [
@@ -29732,6 +29738,27 @@
       "bytes": 1654784,
       "timestamp": "2026-10-11T23:23:01+00:00",
       "note": "session=v1.2-tools; reason: fix pip-audit finding CVE-2026-104874; measured as uv cache growth"
+    },
+    {
+      "source": "homebrew-tool",
+      "url": "https://ghcr.io/v2/homebrew/core/pmtiles (pmtiles 1.31.2 bottle, arm64_tahoe)",
+      "bytes": 15906842,
+      "timestamp": "2026-10-12T07:36:07+00:00",
+      "note": "session=v1.2-basemap-tools; tool download; bottle sha256 97a0329f0e88fbbac341495b5615b1d4086dc1401f60d68c5ac1a4971de70e96 matches the formula and brew verified it; installed binary 54,309,250 B"
+    },
+    {
+      "source": "protomaps-extract",
+      "url": "https://build.protomaps.com/20261011.pmtiles bbox=-106.377,37.635,-103.954,41.098 maxzoom=13",
+      "bytes": 54000000,
+      "timestamp": "2026-10-12T07:36:07+00:00",
+      "note": "session=v1.2-basemap; pmtiles extract range reads; transfer as reported by the CLI, rounded to 54 MB; archive 51,261,167 B sha256 b661b095ddda73c62b705e478a31deea66c7f3b745e2411e9361c79b7bb50fba; five dry runs (z10-z14) read directories only"
+    },
+    {
+      "source": "protomaps-glyphs",
+      "url": "https://github.com/protomaps/basemaps-assets fonts/Noto Sans Regular/{0-255,256-511}.pbf and fonts/OFL.txt",
+      "bytes": 208144,
+      "timestamp": "2026-10-12T07:47:44+00:00",
+      "note": "session=v1.2-basemap; via the GitHub contents API; blob hashes 7f65901599b368dc8c1d70d5fed9642148db9836 and f0302889321b2fb9f83e13b5df1a9a6b0b10e6f3 match; SIL OFL 1.1"
     }
   ]
 }

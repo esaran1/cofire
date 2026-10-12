@@ -12,7 +12,9 @@ cd app
 STATIC_EXPORT=1 \
 NEXT_PUBLIC_BASE_PATH="$BASE" \
 NEXT_PUBLIC_DATA_BASE="$BASE/data" \
-NEXT_PUBLIC_BASEMAP=osm \
   npx next build
+# The basemap: the self-hosted Colorado extract when public/tiles holds it
+# (the site workflow downloads it from the 'basemap' release), otherwise a
+# plain background. OSM's own tile servers are for local development only.
 touch out/.nojekyll
 echo "static site: $(du -sh out | cut -f1) in app/out, base path $BASE"

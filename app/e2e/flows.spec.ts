@@ -161,3 +161,21 @@ test("the Method page reports every v1.2 stage and the live arm from the artifac
   await expect(page.getByRole("heading", { name: "Qué probó la versión 1.2 y qué cambió" })).toBeVisible();
   await page.getByTestId("lang-en").click();
 });
+
+test("the basemap credit is visible on the map and clear of the legend", async ({ page }) => {
+  for (const width of [375, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/?domain=denver");
+    const attrib = page.locator(".maplibregl-ctrl-attrib");
+    await expect(attrib).toBeVisible({ timeout: 20_000 });
+    await expect(attrib).toContainText("OpenStreetMap");
+    const a = await attrib.boundingBox();
+    const l = await page.getByTestId("map-legend").boundingBox();
+    const s = await page.getByTestId("time-scrubber").boundingBox();
+    expect(a && l && s).toBeTruthy();
+    const overlaps = (p: NonNullable<typeof a>, q: NonNullable<typeof a>) =>
+      p.x < q.x + q.width && q.x < p.x + p.width && p.y < q.y + q.height && q.y < p.y + p.height;
+    expect(overlaps(a!, l!), `credit overlaps the legend at ${width}px`).toBe(false);
+    expect(overlaps(a!, s!), `credit is under the map controls at ${width}px`).toBe(false);
+  }
+});

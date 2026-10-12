@@ -2549,3 +2549,66 @@ against configuration A; "qualify" applies the owner's adoption rule.
 **Ideas logged as future work, not run:** a larger kappa grid; a miss-run
 criterion counted in weeks rather than cell-weeks; online recalibration after
 the unseal, when 2026 outcomes may be used.
+
+## Basemap for the deployed build, 2026-10-12
+
+- **Secrets scan, rerun over the full history** before the repository goes
+  public. 142 commits, 110 MB of patch text: no key, token, private-key,
+  credential or bearer matches; no tracked env, key, database or log files
+  besides `.env.example` (directory names only, every revision); no local
+  paths. The two personal addresses already noted remain the owner's call:
+  `tech.mahi@gmail.com` in `app/lib/basemap.ts`, and the commit author
+  address on 134 commits.
+- **The `pmtiles` CLI**, by the owner's choice of Homebrew because no
+  go-pmtiles release publishes checksums.
+  - The bottle (pmtiles 1.31.2, arm64_tahoe) is 15,906,842 B, sha256
+    `97a0329f0e88fbbac341495b5615b1d4086dc1401f60d68c5ac1a4971de70e96`. That
+    matches the formula, and `brew` printed "Verifying checksum".
+  - Installed binary: 54,309,250 B.
+  - Recorded in the ledger as a tool download and corrected out of the data
+    total, like the other tool downloads.
+- **The data cap** was raised to 3.2 GB by the owner.
+- **Allowlist.** `build.protomaps.com` is added, restricted to the dated
+  daily builds (`/2026`, `/2027`). The CLI makes its own range requests, so
+  the URL was checked with `safe_fetch`'s `check_url` and the transfer is
+  recorded from the CLI's report.
+- **The extract.** Daily build 2026-10-11, bounding box
+  -106.377, 37.635, -103.954, 41.098 (all five areas plus 0.1 degree).
+  - Dry runs: max zoom 10 gives 6.7 MB, 11 gives 12 MB, 12 gives 23 MB,
+    13 gives 51 MB, 14 gives 112 MB. **Max zoom 13** is the largest under
+    60 MB.
+  - Archive: 51,261,167 B, sha256
+    `b661b095ddda73c62b705e478a31deea66c7f3b745e2411e9361c79b7bb50fba`.
+  - About 54 MB transferred; the CLI reports it rounded, and that is what the
+    ledger records.
+- **Kept out of git** (GitHub warns above 50 MB, and history keeps
+  everything) as the release asset `basemap`. The site workflow downloads it
+  and checks its sha256 before building.
+- **Glyphs.** Noto Sans Regular, ranges 0-255 and 256-511 (OFL), 208,144 B
+  with the license. Self-hosted, so the deployed map calls no third-party
+  server. Blob hashes verified against GitHub.
+- **Style.** Dark and low contrast from the ink tokens; place names in a
+  muted light grey with a dark halo. The OSM and Protomaps credit sits top
+  right, visible at 375 px and clear of the legend and controls.
+  - It was hidden by CSS before, on the claim that the legend carried it,
+    which it did not.
+  - If the archive cannot be read, its layers hide and the plain background
+    shows; the forecast cells still draw.
+  - Local development keeps OSM.
+  - `scripts/build_static.sh` no longer forces OSM, which the project's own
+    tile policy rules out for a deployed build.
+- **Local check of the static export** (Pages layout under `/cofire/`, with a
+  range-capable test server):
+  - every tile request answered **206**;
+  - the basemap renders at zooms 7 to 14 in all five areas and both
+    languages;
+  - place labels show at each area's fitted zoom;
+  - with the archive blocked, the fallback holds.
+- **Lighthouse**, mobile, median of three, with gzip as Pages serves files:
+  map 91/100/100, Place Card 90/100/100. Without compression the test server
+  measured 73 and 74; the difference is the 1.07 MB MapLibre chunk served
+  raw.
+- **Not yet done:** the deployed checks (206 against the Pages URL, every
+  area in both languages, Lighthouse, screenshots) and the alert test in the
+  new repository. They wait until the repository is public with
+  `PAGES_ENABLED=true`, a manual step for the owner.

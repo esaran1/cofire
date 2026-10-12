@@ -38,6 +38,16 @@ jobs:
       - run: uv sync
       - run: npm install
         working-directory: app
+      - name: Basemap extract (51 MB, kept as a release asset, not in git)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p app/public/tiles
+          gh release download basemap --pattern colorado.pmtiles --dir app/public/tiles \
+            || echo "no basemap release: the map draws on a plain background"
+          if [ -f app/public/tiles/colorado.pmtiles ]; then
+            echo "b661b095ddda73c62b705e478a31deea66c7f3b745e2411e9361c79b7bb50fba  app/public/tiles/colorado.pmtiles" | sha256sum -c -
+          fi
       - run: BASE_PATH=/${{ github.event.repository.name }} ./scripts/build_static.sh
       - uses: actions/upload-pages-artifact@v3
         with:

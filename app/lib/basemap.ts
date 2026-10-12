@@ -61,50 +61,73 @@ function osmStyle(): maplibregl.StyleSpecification {
 }
 
 /**
- * Self-hosted vector style from a PMTiles extract. Needs the pmtiles protocol
- * registered (see registerPmtiles). Falls back to a plain background if the
- * archive is missing, so the forecast layer still renders.
+ * Self-hosted vector style from the Protomaps extract of Colorado
+ * (app/public/tiles/colorado.pmtiles, zooms 0 to 13, overzoomed beyond).
+ * Dark and low contrast, built from the app's ink tokens, so the forecast
+ * cells carry the colour; place names in a muted light grey with a dark halo,
+ * legible on a phone. Glyphs are self-hosted (Noto Sans Regular, OFL), so the
+ * deployed map needs no third-party server.
  */
+const INK = "#17181b";
+const LAND = "#1f2126";
+const MUTED = "#2a2d33";
+const ROAD = "#353941";
+const ROAD_MAJOR = "#454a54";
+const WATER = "#142130";
+const LABEL = "#b9bcc3";
+
+function glyphsUrl(): string {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}${asset("/fonts/{fontstack}/{range}.pbf")}`;
+}
+
+/** Ids of the layers drawn from the tile archive, hidden if it fails to load. */
+export const BASEMAP_LAYERS = ["earth", "landcover", "landuse", "water", "roads-minor", "roads-major", "boundaries", "buildings", "places"];
+
 function selfhostStyle(): maplibregl.StyleSpecification {
   return {
     version: 8,
+    glyphs: glyphsUrl(),
     sources: {
       basemap: {
         type: "vector",
         url: `pmtiles://${SELFHOST_PMTILES}`,
         attribution:
-          '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://protomaps.com">Protomaps</a>',
+          '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · © <a href="https://protomaps.com">Protomaps</a>',
       },
     },
     layers: [
-      { id: "bg", type: "background", paint: { "background-color": "#0d0f14" } },
+      { id: "bg", type: "background", paint: { "background-color": INK } },
+      { id: "earth", type: "fill", source: "basemap", "source-layer": "earth", paint: { "fill-color": LAND } },
+      { id: "landcover", type: "fill", source: "basemap", "source-layer": "landcover", paint: { "fill-color": MUTED, "fill-opacity": 0.35 } },
+      { id: "landuse", type: "fill", source: "basemap", "source-layer": "landuse", paint: { "fill-color": MUTED, "fill-opacity": 0.45 } },
+      { id: "water", type: "fill", source: "basemap", "source-layer": "water", paint: { "fill-color": WATER } },
       {
-        id: "water",
-        type: "fill",
-        source: "basemap",
-        "source-layer": "water",
-        paint: { "fill-color": "#16202e" },
+        id: "roads-minor", type: "line", source: "basemap", "source-layer": "roads",
+        filter: ["!", ["in", ["get", "kind"], ["literal", ["highway", "major_road"]]]],
+        minzoom: 11,
+        paint: { "line-color": ROAD, "line-width": ["interpolate", ["linear"], ["zoom"], 11, 0.3, 14, 1.2] },
       },
       {
-        id: "landuse",
-        type: "fill",
-        source: "basemap",
-        "source-layer": "landuse",
-        paint: { "fill-color": "#141a17", "fill-opacity": 0.6 },
+        id: "roads-major", type: "line", source: "basemap", "source-layer": "roads",
+        filter: ["in", ["get", "kind"], ["literal", ["highway", "major_road"]]],
+        paint: { "line-color": ROAD_MAJOR, "line-width": ["interpolate", ["linear"], ["zoom"], 6, 0.4, 10, 1, 14, 2.4] },
       },
       {
-        id: "roads",
-        type: "line",
-        source: "basemap",
-        "source-layer": "roads",
-        paint: { "line-color": "#2a2f3a", "line-width": 0.6 },
+        id: "boundaries", type: "line", source: "basemap", "source-layer": "boundaries",
+        paint: { "line-color": "#565c67", "line-width": 0.8, "line-dasharray": [3, 2] },
       },
+      { id: "buildings", type: "fill", source: "basemap", "source-layer": "buildings", minzoom: 13, paint: { "fill-color": MUTED, "fill-opacity": 0.6 } },
       {
-        id: "boundaries",
-        type: "line",
-        source: "basemap",
-        "source-layer": "boundaries",
-        paint: { "line-color": "#3a4150", "line-width": 0.8 },
+        id: "places", type: "symbol", source: "basemap", "source-layer": "places",
+        filter: ["==", ["get", "kind"], "locality"],
+        layout: {
+          "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+          "text-font": ["Noto Sans Regular"],
+          "text-size": ["interpolate", ["linear"], ["zoom"], 6, 11, 10, 13, 13, 15],
+          "text-max-width": 8,
+        },
+        paint: { "text-color": LABEL, "text-halo-color": INK, "text-halo-width": 1.4 },
       },
     ],
   } as unknown as maplibregl.StyleSpecification;
