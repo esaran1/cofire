@@ -125,6 +125,6 @@ test:
 
 lint:
 	$(UV) run ruff check cofire tests scripts
-	$(UV) run mypy --strict cofire/model cofire/ship
+	$(UV) run mypy --strict cofire/model cofire/ship cofire/v12
 	$(PY) scripts/check_copy.py
 	$(PY) scripts/check_stats.py
