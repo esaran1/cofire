@@ -70,7 +70,7 @@ for (const d of DOMAINS) {
 
     const seen = new Set<string>();
     for (const horizon of ["2", "4", "8"]) {
-      await card.getByRole("button", { name: `${horizon}w` }).click();
+      await card.getByRole("button", { name: `${horizon} weeks ahead` }).click();
       await expect(card).toContainText(`in ${horizon} weeks`, { timeout: 10_000 });
       await page.waitForTimeout(500);
       const state =
