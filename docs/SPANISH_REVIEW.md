@@ -35,8 +35,13 @@ Terms chosen, worth a second opinion:
    reason in the shipped bundles has a full translation that keeps its
    numbers, and that every `{slot}` in English is also in Spanish.
 
-## Not yet in Spanish
+## Coverage
 
-Predict, Observe, Hindcast, Method and the landing page. In Spanish mode
-they show "Esta página todavía no está en español" rather than mixing the
-two languages.
+Every page is now in Spanish under the draft notice: the map, Place Card,
+brief, Ember, Predict, Observe, Hindcast, Method, the landing page, the
+forecast record and the footer. Two kinds of text stay in English by design:
+
+- the credits on the Method page, which quote licenses and authors as
+  published;
+- a few generated explanation strings, if they ever contain a clause the
+  translation table does not know (shown with "(en inglés)").

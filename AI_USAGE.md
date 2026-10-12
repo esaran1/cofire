@@ -71,6 +71,14 @@ with records kept rather than rewritten:
 | `cofire/v12/forward.py` | stage 5 published forecasts and manifest | AI agent |
 | `cofire/ship/gridmet_reach.py` | measures gridMET's revision reach | AI agent |
 | `app/app/scoreboard/page.tsx` | the forecast record page | AI agent |
+| `cofire/v12/stage4.py` | stage 4 lag-aware interval evaluation | AI agent |
+| `cofire/v12/live.py` | adopted arms, live parameters, survivor recheck | AI agent |
+| `cofire/v12/facts.py` | v1.2 results for the app, from the artifacts | AI agent |
+| `cofire/v12/brief_static.py` | the precomputed latest brief | AI agent |
+| `app/components/V12Results.tsx` | v1.2 section of the Method page | AI agent |
+| `app/components/Offline.tsx`, `app/public/sw.js` | offline viewing | AI agent |
+| `app/scripts/copy-maplibre-worker.mjs` | serves MapLibre 6's worker | AI agent |
+| Spanish text in `app/lib/i18n/` for every page | draft translation, pending human review | AI agent |
 
 ## What the student wrote or decided
 

@@ -1,4 +1,4 @@
-# STATUS: v1.2 in progress, preregistered
+# STATUS: v1.2 complete (2026-10-11), preregistered
 
 ## v1.2, started 2026-10-11
 
@@ -15,6 +15,8 @@ after every stage. Configuration A stays the configuration for the
 | 2, climate level | worse than configuration A (mean Brier 0.1179 against 0.0962); 0 adopted |
 | 3, cross-domain pooling | drought Brier 0.0853 against 0.0885, reliability better in every domain; 0 survive BH |
 | 4, lag-aware intervals | 0 of 15 pass (miss runs 86 to 1,600 against 60); no band |
+| 6, polish | Spanish on every page (draft), shareable views, offline, Lighthouse 91 to 97 performance and 100 accessibility and best practices, npm 0 critical, pip-audit clean |
+| 7, verification | lint, mypy strict, tests, tsc, build, 86 browser tests, clean clone driven on every route, domain and language |
 | 5, forward forecasts | 40 issues published (backfilled 2026-10-11), manifest append-only, `/scoreboard` |
 
 ## v1.1: merged to main, adds Denver (CO-01) and its source watersheds
