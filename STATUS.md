@@ -11,6 +11,10 @@ after every stage. Configuration A stays the configuration for the
 | stage | state |
 |---|---|
 | 0, preregistration | committed |
+| 1, recalibration | gate passed; 1 pair adopted (Larimer d_improve1_h4, static intercept and slope) |
+| 2, climate level | worse than configuration A (mean Brier 0.1179 against 0.0962); 0 adopted |
+| 3, cross-domain pooling | drought Brier 0.0853 against 0.0885, reliability better in every domain; 0 survive BH |
+| 4, lag-aware intervals | 0 of 15 pass (miss runs 86 to 1,600 against 60); no band |
 | 5, forward forecasts | 40 issues published (backfilled 2026-10-11), manifest append-only, `/scoreboard` |
 
 ## v1.1: merged to main, adds Denver (CO-01) and its source watersheds

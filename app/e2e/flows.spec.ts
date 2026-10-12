@@ -146,3 +146,18 @@ test("the brief links straight to Denver's map and neighborhoods views", async (
   await expect(page).toHaveURL(/layer=burden/);
   await expect(page.getByTestId("tract-card")).toBeVisible({ timeout: 20_000 });
 });
+
+test("the Method page reports every v1.2 stage and the live arm from the artifacts", async ({ page }) => {
+  const v12 = JSON.parse(require("node:fs").readFileSync("lib/facts_v12.json", "utf8"));
+  await page.goto("/about?lang=en");
+  await expect(page.getByTestId("v12-table").locator("tbody tr")).toHaveCount(v12.stages.length, { timeout: 20_000 });
+  if (v12.live.changed.length) {
+    await expect(page.getByTestId("v12-live")).toContainText(`${v12.live.on_configuration_A} of the ${v12.live.pairs}`);
+  } else {
+    await expect(page.getByTestId("v12-live")).toContainText("still uses the shipped configuration");
+  }
+  await expect(page.getByTestId("v12-intervals")).toContainText(`${v12.intervals.pairs}`);
+  await page.getByTestId("lang-es").click();
+  await expect(page.getByRole("heading", { name: "Qué probó la versión 1.2 y qué cambió" })).toBeVisible();
+  await page.getByTestId("lang-en").click();
+});

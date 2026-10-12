@@ -2402,3 +2402,150 @@ runs' transfers never reached `artifacts/ci/ledger.json`:
     SNOTEL April 1 (267,945 B), the gridMET revision-reach probe (752,940 B)
     and one 1,497 B DWR probe.
 - **Lighthouse** was run from the local npx cache; nothing was downloaded.
+
+
+## v1.2 results, 2026-10-11 (preregistration sha256 7af6a4a3...)
+
+The look counter read 3 before and after every stage; nothing was computed on
+2026. Folds: held-out years 2012, 2013, 2020 to 2025, with the h-week embargo
+and per-fold `erc_pct`. Configuration A on the folds reproduces the frozen
+predictors exactly. There are 135 target and domain pairs, 131 of them
+estimable.
+
+**Every variant**, pooled over the folds (per-pair means). The paired test is
+against configuration A; "qualify" applies the owner's adoption rule.
+
+| Stage | Arm | Mean Brier | Mean reliability | Mean resolution | Paired CI > 0 (of estimable) | Qualify |
+|---|---|---|---|---|---|---|
+| 1 | A | 0.096246 | 0.00844 | 0.02785 | not selected, not tested |  |
+| 1 | S1-ew@26 | 0.097214 | 0.00809 | 0.02641 | not selected, not tested |  |
+| 1 | S1-ew@8 | 0.095410 | 0.00705 | 0.02714 | 0 of 131 | 0 |
+| 1 | S1-online-a@0.05 | 0.095471 | 0.00759 | 0.02782 | 6 of 131 | 0 |
+| 1 | S1-online-a@0.2 | 0.095678 | 0.00735 | 0.02734 | not selected, not tested |  |
+| 1 | S1-online-a@0.5 | 0.098255 | 0.00979 | 0.02707 | not selected, not tested |  |
+| 1 | S1-online-ab@0.05 | 0.096102 | 0.00800 | 0.02769 | 1 of 131 | 0 |
+| 1 | S1-online-ab@0.2 | 0.102642 | 0.01301 | 0.02593 | not selected, not tested |  |
+| 1 | S1-online-ab@0.5 | 0.112731 | 0.02173 | 0.02444 | not selected, not tested |  |
+| 1 | S1-static-a | 0.096244 | 0.00844 | 0.02786 | 2 of 131 | 0 |
+| 1 | S1-static-ab | 0.096101 | 0.00839 | 0.02790 | 4 of 131 | 1 |
+| 2 | S2+S1-static-ab@0.1 | 0.117798 | 0.00621 | 0.00426 | 11 of 131 | 0 |
+| 2 | S2+S1-static-ab@1.0 | 0.117856 | 0.00813 | 0.00591 | not selected, not tested |  |
+| 2 | S2+S1-static-ab@10.0 | 0.118102 | 0.00834 | 0.00589 | not selected, not tested |  |
+| 2 | S2+S1-static-ab@100.0 | 0.118136 | 0.00829 | 0.00581 | not selected, not tested |  |
+| 2 | S2-offset@0.1 | 0.117901 | 0.00635 | 0.00426 | 12 of 131 | 0 |
+| 2 | S2-offset@1.0 | 0.117963 | 0.00818 | 0.00580 | not selected, not tested |  |
+| 2 | S2-offset@10.0 | 0.118227 | 0.00844 | 0.00584 | not selected, not tested |  |
+| 2 | S2-offset@100.0 | 0.118265 | 0.00845 | 0.00579 | not selected, not tested |  |
+| 3 | S3-drought@16 | 0.086385 | 0.01001 | 0.03824 | not selected, not tested |  |
+| 3 | S3-drought@256 | 0.085262 | 0.00859 | 0.03756 | not selected, not tested |  |
+| 3 | S3-drought@4 | 0.087542 | 0.01091 | 0.03810 | not selected, not tested |  |
+| 3 | S3-drought@64 | 0.085481 | 0.00888 | 0.03787 | not selected, not tested |  |
+| 3 | S3-fire@0.0 | 0.111767 | 0.00190 | 0.00763 | not selected, not tested |  |
+| 3 | S3-fire@0.25 | 0.111741 | 0.00192 | 0.00766 | not selected, not tested |  |
+| 3 | S3-fire@0.5 | 0.111744 | 0.00195 | 0.00767 | not selected, not tested |  |
+| 3 | S3-fire@0.75 | 0.111776 | 0.00198 | 0.00767 | not selected, not tested |  |
+| 3 | S3-fire@1.0 | 0.111837 | 0.00203 | 0.00766 | not selected, not tested |  |
+| 3 | S3 (kappa 256 drought, w 0.25 fire) | 0.094088 | see S3 rows | see S3 rows | 18 of 131 | 0 |
+
+### Stage 1: recalibration
+
+- **Gate.** All eight online variants passed the delayed-feedback gate at
+  h = 2, 4, 8, and each fails it with the delay shortened by one week or
+  removed (`tests/test_v12_gate.py`).
+- **Selected:** online learning rate 0.05 for both online families; EW
+  half-life 8. Of the static variants, intercept and slope.
+- **Online variants** lower the mean Brier most (EW 0.095410 against
+  0.096246). None can ship before the unseal, and none qualifies once BH is
+  applied.
+- **The preregistered warm-start penalty was strong.** It held the static
+  recalibrations near identity: intercepts within +/-0.01, slopes 0.93 to
+  1.00.
+- **One pair qualifies and is adopted:** Larimer `d_improve1_h4` with
+  S1-static-ab.
+  - Paired difference +0.000616 [+0.000252, +0.000944], p 0.0005; BH and Holm
+    reject.
+  - Reliability 0.01122 against 0.01130; BSS against configuration A
+    +0.00097.
+  - Below the 0.10 "surprisingly strong" threshold, so no rerun.
+- **Base rate to per-cell.** 17 h4 and h8 pairs render the regional base rate
+  for reliability today; **0** move to per-cell odds.
+
+### Stage 2: level from slow climate state
+
+- **Ridge weight selected:** 0.1.
+- **S2-offset makes things worse:** mean Brier 0.117901 against 0.096246.
+  Forcing each week's average to a climate-predicted rate, which varies
+  little between years, removes configuration A's knowledge of the current
+  drought state.
+- **Base-rate cost recovered:** median **0.6%**, positive in 80 of 135 pairs.
+- **Recalibrating on top** does not rescue it (0.117798).
+- **Adopted:** 0.
+- **Not included:** the precipitation deficit. Precipitation for 2007 to 2017
+  is not on disk, and precipitation was not a source this session could
+  fetch.
+- **SWE feature.** Implemented as written ("percent of median ... April
+  through October, and 0 otherwise").
+
+### Stage 3: partial pooling
+
+- **Selected:** drought kappa 256 effective weeks, the largest grid value;
+  fire w = 0.25.
+- **Pooled drought Brier** 0.085262 against configuration A's 0.088485.
+  Mean reliability improves in all five domains:
+
+  | Domain | A | S3 |
+  |---|---|---|
+  | Denver | 0.0118 | 0.0100 |
+  | Dillon | 0.0098 | 0.0063 |
+  | Larimer | 0.0074 | 0.0056 |
+  | Pueblo | 0.0080 | 0.0059 |
+  | Upper South Platte | 0.0051 | 0.0041 |
+
+- **Fire** barely changes (0.111741 against 0.111767).
+- **Paired test.** 18 pairs have a CI above zero, and **none survives BH**:
+  the smallest p is 0.0029 against a first-rank threshold of about 0.00076
+  across 131 tests. Adopted: 0.
+- **Survivors.** The validation test with the stage-3 arm gives 23 against
+  configuration A's 22: Pueblo `d_improve1_h2` and `d_improve1_h4` gained,
+  Pueblo `f_gt90_h8` lost. No stage-3 arm is live, so the app's claims are
+  unchanged. Estimable validation pairs are unchanged (83), as they must be.
+- **Two corrections to the preregistration's own wording:**
+  - Configuration A's Dirichlet prior is applied as 4 rows, not 4 weeks as
+    its docstring says, so the remark that "kappa = 4 is configuration A's
+    strength" was wrong. The binding conversion (weeks times cells) was used.
+  - The selected kappa sits at the edge of the grid. More pooling might help;
+    that is future work, not run.
+
+### Stage 4: lag-aware intervals
+
+- **Gate.** The fixed-step lagged reference PID passed at h = 2, 4, 8.
+- **Result: 0 of 15** domain and horizon pairs pass every criterion, so no
+  band is drawn. Passes per criterion:
+  - minimum rolling 13-week coverage: 9;
+  - conditional coverage: 7;
+  - longest miss run: 0;
+  - width ratio CI below 1: 3.
+- **The miss-run bound fails everywhere** (runs 86 to 1,600 cell-weeks
+  against 60). A stream ordered week then cell with 52 to 480 cells per week
+  turns one bad week into a run that long. Recorded as future work; the bound
+  stands.
+
+### What went live
+
+- **Only Larimer `d_improve1_h4`**, recalibrated (S1-static-ab), for issues
+  from 2026-10-13. No published issue changes.
+- **The live parameters** were fitted on the shipped configuration A's
+  2022 to 2025 predictions (98,400 rows): a = 0.0279, b = 0.9562. They are in
+  `artifacts/v12/live_arms.json` with a calibration-scope fit window, read
+  through the strict loader.
+- **Rendering** is unchanged: the pair already renders per-cell odds, and its
+  pooled reliability 0.0112 is under 0.05.
+- **Survivor recheck, leak-free.** The recalibration was fitted on
+  training-year out-of-fold predictions only. The claim holds: +0.3336
+  [+0.1901, +0.5119] against configuration A's +0.3266, and no other pair's
+  status changes.
+- **The other 134 pairs** stay on configuration A.
+
+**Ideas logged as future work, not run:** a larger kappa grid; a miss-run
+criterion counted in weeks rather than cell-weeks; online recalibration after
+the unseal, when 2026 outcomes may be used.

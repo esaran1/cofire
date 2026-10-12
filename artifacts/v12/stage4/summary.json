@@ -1,0 +1,12 @@
+{
+ "gate": "fixed-step lagged reference PID passed at h = 2, 4, 8",
+ "pairs": 15,
+ "band_allowed": 0,
+ "pass_counts": {
+  "pass_roll13": 9,
+  "pass_conditional": 7,
+  "pass_miss_run": 0,
+  "pass_width": 3
+ },
+ "allowed": []
+}

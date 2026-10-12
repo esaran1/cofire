@@ -1,0 +1,24 @@
+{
+ "applies_from": "2026-10-13",
+ "fit_window": [
+  "2022-01-01",
+  "2025-12-31"
+ ],
+ "entries": [
+  {
+   "domain": "larimer",
+   "target": "d_improve1_h4",
+   "horizon": 4,
+   "arm": "S1-static-ab",
+   "stage": 1,
+   "a": 0.027920013994938323,
+   "b": 0.9561673821397557,
+   "paired_diff": 0.0006158366468328,
+   "paired_lo": 0.0002522063538439,
+   "reliability": 0.0112234800561549,
+   "reliability_A": 0.0113037137219078,
+   "applies_from": "2026-10-13",
+   "n_fit_rows": 98400
+  }
+ ]
+}

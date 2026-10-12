@@ -1,0 +1,2 @@
+domain,target,arm,warm_a,warm_b,paired_diff,paired_lo,paired_hi,survivor_with_configuration_A,survivor_with_live_arm,other_pairs_whose_status_changed
+larimer,d_improve1_h4,S1-static-ab,-0.0016889447107921582,0.9914611543399117,0.33362674375803475,0.19005771878447433,0.5118504954482366,True,True,0

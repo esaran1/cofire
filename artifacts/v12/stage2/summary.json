@@ -1,0 +1,32 @@
+{
+ "lambda_selected": 0.1,
+ "static_stage1_arm": "S1-static-ab",
+ "pooled_mean_brier": {
+  "A": 0.096246,
+  "S2+S1-static-ab@0.1": 0.117798,
+  "S2+S1-static-ab@1.0": 0.117856,
+  "S2+S1-static-ab@10.0": 0.118102,
+  "S2+S1-static-ab@100.0": 0.118136,
+  "S2-offset@0.1": 0.117901,
+  "S2-offset@1.0": 0.117963,
+  "S2-offset@10.0": 0.118227,
+  "S2-offset@100.0": 0.118265
+ },
+ "estimable": {
+  "S2+S1-static-ab@0.1": 131,
+  "S2-offset@0.1": 131
+ },
+ "ci_above_zero": {
+  "S2+S1-static-ab@0.1": 11,
+  "S2-offset@0.1": 12
+ },
+ "qualifying": {
+  "S2+S1-static-ab@0.1": 0,
+  "S2-offset@0.1": 0
+ },
+ "adopted": 0,
+ "median_recovered": 0.006277405505055585,
+ "pairs_with_positive_recovery": 80,
+ "pairs_recovery_estimated": 135,
+ "base_rate_h4_h8_moving_to_per_cell": 0
+}

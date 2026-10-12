@@ -1,0 +1,154 @@
+{
+ "prereg_sha256": "7af6a4a3c55eda1fbdc07a8ebde77fe6ef982a36ba8af90d8046f149818090da",
+ "stages": [
+  {
+   "stage": 1,
+   "arm": "S1-static-a",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.096244,
+   "estimable": 131,
+   "beat_A_paired": 2,
+   "qualifying": 0,
+   "adopted": 0,
+   "family": "S1-static-a",
+   "shippable": true
+  },
+  {
+   "stage": 1,
+   "arm": "S1-static-ab",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.096101,
+   "estimable": 131,
+   "beat_A_paired": 4,
+   "qualifying": 1,
+   "adopted": 1,
+   "family": "S1-static-ab",
+   "shippable": true
+  },
+  {
+   "stage": 1,
+   "arm": "S1-online-a@0.05",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.095471,
+   "estimable": 131,
+   "beat_A_paired": 6,
+   "qualifying": 0,
+   "adopted": 0,
+   "family": "S1-online-a",
+   "shippable": false
+  },
+  {
+   "stage": 1,
+   "arm": "S1-online-ab@0.05",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.096102,
+   "estimable": 131,
+   "beat_A_paired": 1,
+   "qualifying": 0,
+   "adopted": 0,
+   "family": "S1-online-ab",
+   "shippable": false
+  },
+  {
+   "stage": 1,
+   "arm": "S1-ew@8",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.09541,
+   "estimable": 131,
+   "beat_A_paired": 0,
+   "qualifying": 0,
+   "adopted": 0,
+   "family": "S1-ew",
+   "shippable": false
+  },
+  {
+   "stage": 2,
+   "arm": "S2+S1-static-ab@0.1",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.117798,
+   "estimable": 131,
+   "beat_A_paired": 11,
+   "qualifying": 0,
+   "adopted": 0,
+   "ridge": 0.1,
+   "median_recovered": 0.006277405505055585
+  },
+  {
+   "stage": 2,
+   "arm": "S2-offset@0.1",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.117901,
+   "estimable": 131,
+   "beat_A_paired": 12,
+   "qualifying": 0,
+   "adopted": 0,
+   "ridge": 0.1,
+   "median_recovered": 0.006277405505055585
+  },
+  {
+   "stage": 3,
+   "arm": "S3",
+   "pairs": 135,
+   "mean_brier_A": 0.096246,
+   "mean_brier_arm": 0.094088,
+   "estimable": 131,
+   "beat_A_paired": 18,
+   "qualifying": 0,
+   "adopted": 0,
+   "kappa": "S3-drought@256",
+   "w": "S3-fire@0.25",
+   "survivors_A": 22,
+   "survivors_arm": 23
+  }
+ ],
+ "live": {
+  "pairs": 135,
+  "on_configuration_A": 134,
+  "changed": [
+   {
+    "domain": "larimer",
+    "target": "d_improve1_h4",
+    "arm": "S1-static-ab",
+    "stage": 1,
+    "applies_from": "2026-10-13",
+    "paired_diff": 0.0006158366468328,
+    "reliability": 0.0112234800561549,
+    "reliability_A": 0.0113037137219078
+   }
+  ],
+  "survivor_recheck": [
+   {
+    "domain": "larimer",
+    "target": "d_improve1_h4",
+    "arm": "S1-static-ab",
+    "warm_a": -0.0016889447107921,
+    "warm_b": 0.9914611543399116,
+    "paired_diff": 0.3336267437580347,
+    "paired_lo": 0.1900577187844743,
+    "paired_hi": 0.5118504954482366,
+    "survivor_with_configuration_A": true,
+    "survivor_with_live_arm": true,
+    "other_pairs_whose_status_changed": 0
+   }
+  ]
+ },
+ "intervals": {
+  "gate": "fixed-step lagged reference PID passed at h = 2, 4, 8",
+  "pairs": 15,
+  "band_allowed": 0,
+  "pass_counts": {
+   "pass_roll13": 9,
+   "pass_conditional": 7,
+   "pass_miss_run": 0,
+   "pass_width": 3
+  },
+  "allowed": []
+ }
+}

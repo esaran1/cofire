@@ -6,6 +6,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
 import { domainLabel } from "@/lib/domainNames";
 import { targetLabel } from "@/lib/targets";
+import { V12Results } from "@/components/V12Results";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 
@@ -101,6 +102,10 @@ export default function AboutPage() {
           </p>
         </Section>
       ) : null}
+
+      <Section title={t("v12.title")}>
+        <V12Results />
+      </Section>
 
       <Section title={t("meth.shipsTitle")}>
         <dl className="border-rule mt-4 divide-y divide-rule border-y">
