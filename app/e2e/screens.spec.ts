@@ -24,6 +24,9 @@ const ROUTES: [string, string][] = [
   ["/beat", "beat"],
   ["/ember", "ember"],
   ["/observe", "observe"],
+  ["/brief", "brief"],
+  ["/scoreboard", "scoreboard"],
+  ["/data", "data"],
 ];
 
 for (const [route, name] of ROUTES) {
