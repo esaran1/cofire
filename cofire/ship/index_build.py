@@ -78,6 +78,7 @@ def continuous_block(row: pd.Series, h: int) -> dict[str, Any]:
 
 
 def target_block(row: pd.Series, target: str) -> dict[str, Any]:
+    """One target's probability, rendering state and reason from an export row."""
     return {
         "p": _clean(row.get(f"{target}_p")),
         "state": row.get(f"{target}_state"),
@@ -86,6 +87,9 @@ def target_block(row: pd.Series, target: str) -> dict[str, Any]:
 
 
 def build(export: Path = EXPORT) -> dict[str, Any]:
+    """The forecast index from the export: every cell and issue with its ERC, USDM, horizon blocks
+    and target blocks.
+    """
     frame = pd.read_parquet(export)
     frame["time"] = pd.to_datetime(frame["time"])
     frame["issue"] = frame["time"].dt.strftime("%Y-%m-%d")
@@ -127,6 +131,7 @@ def build(export: Path = EXPORT) -> dict[str, Any]:
 
 
 def write(out: Path = OUT, export: Path = EXPORT) -> Path:
+    """Build the forecast index, write it as JSON to `out`, and return the path."""
     index = build(export)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(index))

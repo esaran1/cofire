@@ -1,6 +1,6 @@
 """Serve the production static build (app/out) locally, as GitHub Pages would.
 
-    python film/capture/serve.py [--port 4100] [--root app/out] [--base /cofire]
+    python scripts/serve_static.py [--port 4100] [--root app/out] [--base /cofire]
 
 The site is served under its base path, with HTTP range requests (the
 basemap is a PMTiles archive read by byte ranges, and Pages answers those

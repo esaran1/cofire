@@ -39,6 +39,9 @@ _WRITE_HITS: dict[str, list[float]] = defaultdict(list)
 
 
 class PredictionRow(SQLModel, table=True):
+    """A stored player pick: the device, cell, issue and horizon, and the drought category and
+    fire-spread band chosen, with when it was made.
+    """
     id: str = SQLField(default_factory=lambda: uuid4().hex, primary_key=True)
     device_id: str
     cell_id: str
@@ -50,6 +53,9 @@ class PredictionRow(SQLModel, table=True):
 
 
 class ObservationRow(SQLModel, table=True):
+    """A stored ground report: the device, its location and report type, an optional note and photo
+    path, and when it was filed.
+    """
     id: str = SQLField(default_factory=lambda: uuid4().hex, primary_key=True)
     device_id: str
     lat: float
@@ -61,12 +67,16 @@ class ObservationRow(SQLModel, table=True):
 
 
 class EmberRow(SQLModel, table=True):
+    """A device's saved Ember checklist: the zone it last saved and its ticked items as JSON."""
     device_id: str = SQLField(primary_key=True)
     zone: str = "wui"
     state_json: str = "{}"
 
 
 class PredictionIn(BaseModel):
+    """The body of a pick: device, cell, horizon (2, 4 or 8 weeks), drought category 0 to 4,
+    fire-spread band, and the issue, which defaults to the latest.
+    """
     device_id: str
     cell_id: str
     horizon: int
@@ -83,6 +93,9 @@ class PredictionIn(BaseModel):
 
 
 class ObservationIn(BaseModel):
+    """The body of a ground report: device, latitude and longitude, report type, and an optional
+    note and photo path.
+    """
     device_id: str
     lat: float
     lon: float
@@ -92,6 +105,7 @@ class ObservationIn(BaseModel):
 
 
 class EmberIn(BaseModel):
+    """The body of an Ember save: device, zone, and the ticked state of each item by id."""
     device_id: str
     zone: str
     state: dict[str, bool]
@@ -105,6 +119,9 @@ FIRE_BAND_EDGES = (("low", 0.0, 50.0), ("moderate", 50.0, 80.0), ("high", 80.0, 
 
 
 def fire_band_for(value: float) -> str:
+    """The fire-spread band (low, moderate, high or very_high) for a value on the dryness scale, by
+    FIRE_BAND_EDGES; a value outside every band reads as very_high.
+    """
     for name, lo, hi in FIRE_BAND_EDGES:
         if lo <= value < hi:
             return name
@@ -213,14 +230,17 @@ def load_index() -> dict[str, Any]:
     path = art_path("forecast_index.json")
     fixture = Path("tests/fixtures/forecast_index.json")
     if path.exists():
-        return json.loads(path.read_text())
+        idx: dict[str, Any] = json.loads(path.read_text())
+        return idx
     if fixture.exists():
-        return json.loads(fixture.read_text())
+        fx: dict[str, Any] = json.loads(fixture.read_text())
+        return fx
     return {"issues": [], "cells": [], "resolution_m": 4000, "shipping_arm": "unknown", "resolution_note": "no forecast exported"}
 
 
 def nearest_cell(lat: float, lon: float, index: dict[str, Any], issue: str | None = None) -> dict[str, Any] | None:
-    cells = index.get("cells") or []
+    """The index cell nearest a point, in the given issue or the latest one."""
+    cells: list[dict[str, Any]] = index.get("cells") or []
     # With no issue named, answer with the latest one. Every issue has a cell at
     # every location, so the unfiltered minimum used to return whichever issue
     # came first in the index, which was the oldest.
@@ -235,16 +255,22 @@ def nearest_cell(lat: float, lon: float, index: dict[str, Any], issue: str | Non
 
 @app.on_event("startup")
 def startup() -> None:
+    """Create the database tables at startup if they do not exist yet."""
     SQLModel.metadata.create_all(engine)
 
 
 @app.get("/health")
 def health() -> dict[str, str]:
+    """Liveness check; always answers with status ok."""
     return {"status": "ok"}
 
 
 @app.get("/meta")
 def meta() -> dict[str, Any]:
+    """App metadata: the shipping configuration, resolution, disclaimer, data manifest, hashes, the
+    verdict from STATUS.md, hindcast looks, issue dates, and a map camera fitted to the exported
+    grid.
+    """
     index = load_index()
     man = DEMO_ROOT / "MANIFEST.json"
     if not man.exists():
@@ -329,6 +355,9 @@ def _regime_status(issue: str | None = None) -> dict[str, Any]:
 
 @app.get("/uncertainty/status")
 def uncertainty_status(issue: str | None = None) -> dict[str, Any]:
+    """The three-state uncertainty status for an issue (the latest when none is given), from the
+    calibration pool on disk; uncalibrated when there is no pool.
+    """
     return _regime_status(issue)
 
 
@@ -392,6 +421,7 @@ def open_data_file(name: str) -> Any:
 
 @app.get("/forecast/issues")
 def issues() -> dict[str, Any]:
+    """Every forecast issue date the index holds."""
     index = load_index()
     return {"issues": index.get("issues", [])}
 
@@ -400,6 +430,9 @@ def issues() -> dict[str, Any]:
 def forecast(
     lat: float = Query(...), lon: float = Query(...), issue: str | None = None, domain: str | None = None
 ) -> dict[str, Any]:
+    """The forecast for the cell nearest a point, in the given issue (the latest by default) and
+    optionally one domain, with its uncertainty status attached; 404 when no cell matches.
+    """
     index = load_index()
     if domain:
         index = {**index, "cells": [c for c in index.get("cells", []) if c.get("domain") == domain]}
@@ -415,6 +448,9 @@ def forecast(
 
 @app.get("/forecast/grid")
 def forecast_grid(issue: str, horizon: int = 4, variable: str = "fire") -> dict[str, Any]:
+    """One issue's cells as a GeoJSON FeatureCollection of points, each valued by the forecast ERC
+    percentile at the horizon for fire, otherwise by the percent chance of D2 or worse.
+    """
     index = load_index()
     cells = [c for c in index.get("cells", []) if c.get("issue") == issue]
     feats = []
@@ -439,6 +475,9 @@ def forecast_grid(issue: str, horizon: int = 4, variable: str = "fire") -> dict[
 
 @app.get("/overlay/{issue}/{horizon}/{variable}.png")
 def overlay(issue: str, horizon: int, variable: str) -> FileResponse:
+    """The pre-rendered PNG overlay for an issue, horizon and variable; 404 when it was not
+    rendered.
+    """
     path = settings.artifacts_dir / "overlays" / f"{issue}_{horizon}_{variable}.png"
     if not path.exists():
         raise HTTPException(404, "overlay not found")
@@ -447,6 +486,7 @@ def overlay(issue: str, horizon: int, variable: str) -> FileResponse:
 
 @app.get("/overlay/{issue}/{horizon}/{variable}.json")
 def overlay_bounds(issue: str, horizon: int, variable: str) -> Any:
+    """The JSON bounds that go with a pre-rendered overlay; 404 when missing."""
     path = settings.artifacts_dir / "overlays" / f"{issue}_{horizon}_{variable}.json"
     if not path.exists():
         raise HTTPException(404, "overlay bounds not found")
@@ -455,6 +495,9 @@ def overlay_bounds(issue: str, horizon: int, variable: str) -> Any:
 
 @app.get("/tiles/{issue}/{horizon}/{variable}/{z}/{x}/{y}.png")
 def tiles(issue: str, horizon: int, variable: str, z: int, x: int, y: int) -> FileResponse:
+    """A map tile request, answered with the whole pre-rendered overlay PNG; the tile coordinates
+    are ignored.
+    """
     # Demo: fall back to the pre-rendered overlay (4 km cells; no sub-field implication).
     del z, x, y
     return overlay(issue, horizon, variable)
@@ -462,6 +505,10 @@ def tiles(issue: str, horizon: int, variable: str, z: int, x: int, y: int) -> Fi
 
 @app.get("/hindcast/summary")
 def hindcast_summary() -> dict[str, Any]:
+    """The hindcast summary: the coverage plot link, the comparison text, the overall coverage rows
+    per split, method and horizon, the nominal level, and the latest look index with its
+    contamination flag and note.
+    """
     cov = art_path("uncertainty/coverage_2026.png")
     cmp = art_path("uncertainty/comparison.md")
     cmp_json = art_path("uncertainty/comparison.json")
@@ -506,6 +553,9 @@ def hindcast_summary() -> dict[str, Any]:
 
 @app.get("/hindcast/coverage.png")
 def coverage_png() -> FileResponse:
+    """The coverage plot PNG, the 2026 uncertainty plot if present, else the hindcast one; 404 when
+    neither exists.
+    """
     path = art_path("uncertainty/coverage_2026.png")
     if not path.exists():
         path = art_path("hindcast/coverage.png")
@@ -516,6 +566,9 @@ def coverage_png() -> FileResponse:
 
 @app.get("/hindcast/fires")
 def hindcast_fires() -> Any:
+    """The hindcast fire table with its control ranks, the number of fires inside the domain, the
+    1000 acre threshold, and a note on how to read it.
+    """
     path = art_path("hindcast/fires.json")
     ctrl = art_path("hindcast/control.json")
     fires = json.loads(path.read_text()) if path.exists() else []
@@ -535,6 +588,10 @@ def hindcast_fires() -> Any:
 
 @app.post("/predictions")
 def post_prediction(body: PredictionIn) -> dict[str, Any]:
+    """Store a player's pick for a cell and issue (the latest by default) and return its id with the
+    model's call for that cell locked beside it. Rate limited; 400 for an unknown band, 404 for a
+    cell with no forecast in that issue.
+    """
     _rate_limit(body.device_id)
     if body.fire_band not in FIRE_BANDS:
         raise HTTPException(400, "fire_band must be low|moderate|high|very_high")
@@ -648,6 +705,10 @@ def leaderboard(county: str | None = None) -> list[dict[str, Any]]:
 
 @app.post("/observations")
 def post_observation(body: ObservationIn) -> dict[str, Any]:
+    """Store a ground report and return its id and the forecast cell it was logged against, if one
+    is within reach; the report never changes the forecast. Rate limited; 400 for an unknown report
+    type.
+    """
     _rate_limit(body.device_id)
     if body.type not in OBS_TYPES:
         raise HTTPException(400, f"type must be one of {sorted(OBS_TYPES)}")
@@ -690,6 +751,9 @@ def post_observation(body: ObservationIn) -> dict[str, Any]:
 
 @app.get("/observations")
 def get_observations(bbox: str | None = None) -> list[dict[str, Any]]:
+    """Every stored ground report, optionally only those inside a bbox given as
+    west,south,east,north.
+    """
     with Session(engine) as session:
         rows = session.exec(select(ObservationRow)).all()
         out = [r.model_dump() for r in rows]
@@ -702,6 +766,7 @@ def get_observations(bbox: str | None = None) -> list[dict[str, Any]]:
 
 @app.get("/ember/checklist")
 def ember_checklist(zone: str = "wui") -> dict[str, Any]:
+    """The Ember checklist for a zone, scored with nothing ticked; 400 for an unknown zone."""
     if zone not in EMBER_ZONES:
         raise HTTPException(400, f"zone must be one of {'|'.join(EMBER_ZONES)}")
     return ember_score({}, zone)
@@ -709,6 +774,9 @@ def ember_checklist(zone: str = "wui") -> dict[str, Any]:
 
 @app.post("/ember/state")
 def ember_state(body: EmberIn) -> dict[str, Any]:
+    """Save a device's ticked Ember items for a zone and return the checklist scored against them.
+    Rate limited; 400 for an unknown zone.
+    """
     if body.zone not in EMBER_ZONES:
         raise HTTPException(400, f"zone must be one of {'|'.join(EMBER_ZONES)}")
     _rate_limit(body.device_id)
@@ -739,6 +807,8 @@ def get_ember_score(device_id: str, zone: str = "wui") -> dict[str, Any]:
 
 @app.get("/manifest")
 def manifest() -> Any:
+    """The data source manifest from the data directory, or an empty source list when there is none.
+    """
     path = settings.data_dir / "MANIFEST.json"
     if not path.exists():
         return {"sources": []}

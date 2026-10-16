@@ -60,6 +60,7 @@ def shown_instead(target: str) -> str:
 
 @dataclass(frozen=True)
 class Decision:
+    """How one domain's target renders at one horizon, and the reason shown for it."""
     domain: str
     target: str
     horizon: int
@@ -300,6 +301,9 @@ def new_domain_decisions() -> list[Decision]:
 
 
 def all_decisions() -> pd.DataFrame:
+    """Every continuous, probabilistic and v1.1 domain decision as one frame, sorted by domain,
+    target and horizon.
+    """
     rows = [
         {
             "domain": d.domain, "target": d.target, "horizon": d.horizon,
@@ -311,6 +315,7 @@ def all_decisions() -> pd.DataFrame:
 
 
 def write(out_dir: Path = ART / "ship") -> Path:
+    """Write every rendering decision to rendering.csv under `out_dir` and return the path."""
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / "rendering.csv"
     frame = all_decisions()

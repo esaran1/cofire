@@ -6,7 +6,7 @@
  *
  * Deterministic by construction:
  * - The site is the production static build (app/out, scripts/build_static.sh)
- *   with its self-hosted basemap, served locally by capture/serve.py exactly
+ *   with its self-hosted basemap, served locally by scripts/serve_static.py exactly
  *   as GitHub Pages would serve it. Any request that is not to that local
  *   server is aborted, so nothing reaches the network.
  * - The issue, area, cell, horizon, layer and language are fixed in the URL
@@ -50,16 +50,16 @@ async function up() {
 let server = null;
 if (!(await up())) {
   if (!existsSync(join(REPO, "app", "out", "index.html"))) throw new Error("app/out is missing: run scripts/build_static.sh first");
-  server = spawn("python3", [join(FILM, "capture", "serve.py"), "--port", String(PORT), "--root", join(REPO, "app", "out")], { stdio: "ignore" });
+  server = spawn("python3", [join(REPO, "scripts", "serve_static.py"), "--port", String(PORT), "--root", join(REPO, "app", "out")], { stdio: "ignore" });
   for (let i = 0; i < 50 && !(await up()); i++) await new Promise((r) => setTimeout(r, 100));
-  if (!(await up())) throw new Error("capture/serve.py did not start");
+  if (!(await up())) throw new Error("scripts/serve_static.py did not start");
 }
 
 const browser = await chromium.launch({ channel: "chrome" });
 const manifest = existsSync(join(OUT, "manifest.json")) ? JSON.parse(readFileSync(join(OUT, "manifest.json"), "utf8")) : { shots: {} };
 manifest.issue = SHOTS.issue;
 manifest.clock = SHOTS.clock;
-manifest.site = "app/out (production static build), served by film/capture/serve.py";
+manifest.site = "app/out (production static build), served by scripts/serve_static.py";
 mkdirSync(OUT, { recursive: true });
 const save = () => writeFileSync(join(OUT, "manifest.json"), JSON.stringify(manifest, null, 1));
 
@@ -100,6 +100,8 @@ async function newPage(kind) {
       await page.waitForTimeout(25);
       const ready = await page.evaluate(() => {
         const m = window.__cofireMap;
+        // The map loads on its own (next/dynamic): wait while its placeholder is up.
+        if (document.querySelector('[data-testid="map-loading"]')) return false;
         const mapOk = !m || (m.loaded() && m.areTilesLoaded() && !m.isMoving());
         return document.fonts.status === "loaded" && mapOk;
       });
@@ -135,6 +137,9 @@ async function newPage(kind) {
   };
   const shoot = async (name, extra = {}) => {
     const file = `${name}.png`;
+    // No loading state, error, or debug value may be on screen in a shot.
+    const bad = await page.evaluate(() => (document.body.innerText.match(/\b(Loading|Cargando|Error|NaN|undefined)\b/) ?? [])[0] ?? null);
+    if (bad) throw new Error(`${name}: "${bad}" is on screen`);
     await page.screenshot({ path: join(OUT, file), fullPage: !!extra.fullPage, animations: "disabled", caret: "hide" });
     if (errors.length) throw new Error(`${name}: page errors: ${errors.join(" | ")}`);
     const vp = page.viewportSize();

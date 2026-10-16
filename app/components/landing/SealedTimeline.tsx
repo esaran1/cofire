@@ -68,16 +68,16 @@ export function SealedTimeline() {
           move into a legend instead of truncating to "Choo" and "Se". */}
       <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 md:hidden">
         {segs.map((s) => (
-          <div key={s.key} className="flex items-start gap-3">
-            <span className={`mt-1 h-3 w-3 shrink-0 ${s.tone}`} aria-hidden />
-            <div>
-              <dt className={`text-sm font-medium ${s.key === "holdout" ? "text-ember" : "text-ink"}`}>
-                {s.label}
-              </dt>
-              <dd className="num text-mute text-xs">
-                {s.span[0] === s.span[1] ? s.span[0] : `${s.span[0]} to ${s.span[1]}`}
-              </dd>
-            </div>
+          // A <dl> may hold only dt and dd groups (axe: definition-list), so
+          // the colour swatch sits inside the term.
+          <div key={s.key}>
+            <dt className={`flex items-start gap-3 text-sm font-medium ${s.key === "holdout" ? "text-ember" : "text-ink"}`}>
+              <span className={`mt-1 h-3 w-3 shrink-0 ${s.tone}`} aria-hidden />
+              {s.label}
+            </dt>
+            <dd className="num text-mute pl-6 text-xs">
+              {s.span[0] === s.span[1] ? s.span[0] : `${s.span[0]} to ${s.span[1]}`}
+            </dd>
           </div>
         ))}
       </dl>

@@ -2,7 +2,8 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigure";
-import { CountUp, Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
+import { Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
+import { CountUp } from "@/components/ui/Animated";
 import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
 import { domainLabel, useDomain } from "@/lib/domain";
@@ -204,7 +205,7 @@ export default function HindcastPage() {
 
       <a
         href="/?issue=2026-05-05&horizon=2"
-        className="bg-ochre text-ink mt-12 inline-block rounded-full px-5 py-2.5 text-sm font-medium transition-transform active:scale-[0.98]"
+        className="bg-ochre text-paper mt-12 inline-block rounded-full px-5 py-2.5 text-sm font-medium transition-transform active:scale-[0.98]"
       >
         {t("hind.replay")}
       </a>

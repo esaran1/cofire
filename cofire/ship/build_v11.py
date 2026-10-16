@@ -33,6 +33,10 @@ VALID = (pd.Timestamp("2022-01-01"), pd.Timestamp("2023-12-31"))
 
 
 def settings(domain: str) -> Any:
+    """Frozen settings for one domain: registers the v1.1 domains, selects the domain's subset
+    through the environment, clears the settings cache, and asserts the processed paths are scoped
+    to that domain.
+    """
     from cofire.model.config import get_settings
 
     domains.register()
@@ -47,6 +51,10 @@ def settings(domain: str) -> Any:
 
 
 def write_template(domain: str) -> Path:
+    """Write the coordinates-only weekly template (the footprint mask on the domain's ERC cache
+    grid) where the frozen builder looks for a processed cube, and return its path; asserts the
+    cache grid is the footprint rectangle.
+    """
     st = settings(domain)
     out: Path = st.processed_dir / "gridmet" / "weekly_template.nc"
     with xr.open_dataset(ext.cache_path(domain, 2020)) as ds:
@@ -60,6 +68,10 @@ def write_template(domain: str) -> Path:
 
 
 def build(domain: str) -> Path:
+    """Build one domain's configuration A store with the frozen builder and return its path, after
+    asserting the USDM archive holds every week 2007 to 2025. A new domain gets its template first,
+    must have ERC caches for 2004 to 2025, and its store must end before 2026.
+    """
     from cofire.model.features_a import build as build_a
     from cofire.ship.usdm_calendar import assert_complete
 
@@ -98,6 +110,10 @@ def load(domain: str) -> pd.DataFrame:
 
 
 def check(domain: str) -> dict[str, Any]:
+    """Summary checks on one domain's store: cell and week counts, USDM category shares by year, the
+    spread of erc_pct over the training years, and positive weeks per target in training and
+    validation, with the targets not estimable in validation.
+    """
     from cofire.model.features_a import add_horizons
     from cofire.model.prob_metrics import MIN_POSITIVE_WEEKS, positive_weeks
     from cofire.model.targets import HORIZONS, all_event_targets, target_names
@@ -138,6 +154,9 @@ def check(domain: str) -> dict[str, Any]:
 
 
 def check_all() -> dict[str, Any]:
+    """Run `check` on every domain, assert erc_pct is near uniform in training for each, and write
+    the report to artifacts/domains/stage3.json; the look counter must read 3 before and after.
+    """
     from cofire.model.freeze import look_count
 
     assert look_count() == 3

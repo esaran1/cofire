@@ -13,16 +13,8 @@ import { resolvePlace } from "@/lib/data";
 import { domainLabel, useDomain } from "@/lib/domain";
 import { z } from "zod";
 import { deviceId } from "@/lib/device";
-import {
-  Action,
-  EmptyState,
-  ErrorNote,
-  Numeral,
-  OfflineNote,
-  Panel,
-  Segmented,
-  Skeleton,
-} from "@/components/ui/Controls";
+import { Action, EmptyState, ErrorNote, Numeral, OfflineNote, Panel, Skeleton } from "@/components/ui/Controls";
+import { Segmented } from "@/components/ui/Animated";
 
 
 // What the model said for the same cell and horizon (LockedModelSchema): the

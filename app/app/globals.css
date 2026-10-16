@@ -240,3 +240,20 @@
     text-decoration: none;
   }
 }
+
+/* A disclosure opening (components/ui/Controls.tsx): a short slide into place,
+ * transform only, so its content is never hidden in any renderer. */
+@media (prefers-reduced-motion: no-preference) {
+  .disclosure-in {
+    animation: disclosure-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes disclosure-in {
+  from {
+    transform: translateY(-6px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

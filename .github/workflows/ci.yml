@@ -23,8 +23,9 @@ jobs:
         with:
           node-version: "20"
       - run: uv sync --extra dev
-      - run: uv run ruff check cofire tests scripts
-      - run: uv run mypy --strict cofire/model cofire/ship
+      - run: uv run ruff check cofire research tests scripts
+      - run: uv run mypy --strict cofire/model cofire/ship cofire/v12 cofire/v13 cofire/api research
+      - run: uv run python scripts/architecture.py --check
       - run: uv run python scripts/check_copy.py
       - run: uv run python scripts/check_stats.py
       - run: uv run pytest -q
@@ -34,3 +35,44 @@ jobs:
         working-directory: app
       - run: npx tsc --noEmit
         working-directory: app
+
+  # Accessibility (axe, WCAG 2.1 A and AA) on every route in both languages,
+  # and the smoke checks, against the production static build with its
+  # self-hosted basemap, served as GitHub Pages serves it. Serious and
+  # critical violations fail the build.
+  a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: uv sync
+      - run: npm install
+        working-directory: app
+      - name: Basemap extract (release asset, checksum verified)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p app/public/tiles
+          gh release download basemap --pattern colorado.pmtiles --dir app/public/tiles
+          echo "b661b095ddda73c62b705e478a31deea66c7f3b745e2411e9361c79b7bb50fba  app/public/tiles/colorado.pmtiles" | sha256sum -c -
+      - run: BASE_PATH=/cofire ./scripts/build_static.sh
+      - name: Serve the build locally
+        run: |
+          python3 scripts/serve_static.py --port 4100 --root app/out --base /cofire &
+          for i in $(seq 1 50); do curl -sf http://127.0.0.1:4100/cofire/ >/dev/null && break; sleep 0.2; done
+      - name: axe and smoke checks (Chrome on the runner)
+        working-directory: app
+        env:
+          STATIC_URL: http://127.0.0.1:4100/cofire/
+        run: npx playwright test -c playwright.static.config.ts
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-static
+          path: app/playwright-report-static

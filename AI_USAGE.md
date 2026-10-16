@@ -92,6 +92,12 @@ with records kept rather than rewritten:
 | `scripts/ledger_tool.py` | records a tool download in the ledger | AI agent |
 | `cofire/v13/open_data.py`, `/open` API route | open data: CSV, GeoJSON, JSON and the index, CC BY 4.0 | AI agent |
 | `app/app/data/page.tsx` and its strings | the open data page and data dictionary (Spanish draft, pending review) | AI agent |
+| `research/README.md`, `tests/test_shipped_path.py` | which arms do not ship and why; the boundary and docstring checks | AI agent |
+| Docstrings on the shipped path (96) | added without code changes | AI agent |
+| `scripts/architecture.py`, `docs/architecture.svg`, README "For reviewers" | the architecture diagram and reviewer guide | AI agent |
+| `docs/PREREGISTRATION_UNSEAL.md` | the unseal scoring plan, a draft for the owner to review before 2027-01-12 | AI agent (draft) |
+| `scripts/unseal_2026.py`, `tests/test_unseal_2026.py` | the executable unseal and its refusal tests (not run) | AI agent |
+| `scripts/serve_static.py`, `app/e2e/static/`, `app/playwright.static.config.ts`, `.github/workflows/smoke.yml` | local static server, daily smoke run, axe checks | AI agent |
 | `film/` Remotion project (`src/`, `scripts/`, `capture/`) | the demo film: scenes, captures, number tracing, audio mix, captions, renders | AI agent |
 | `film/SCRIPT.md`, `film/script/narration.json` | the narration, a draft for the student to rewrite and record | AI agent (draft) |
 | `film/STORYBOARD.md`, `film/SOURCES.md`, `film/REVIEW.md`, `film/RECORDING_GUIDE.md` | the film's storyboard, sources, review checklist, recording guide | AI agent |

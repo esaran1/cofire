@@ -67,3 +67,4 @@ app/public/maplibre/
 
 # The Colorado basemap extract (51 MB), kept as the 'basemap' release asset
 app/public/tiles/
+app/playwright-report-static/

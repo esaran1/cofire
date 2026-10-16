@@ -115,6 +115,9 @@ def _summary(frame: pd.DataFrame, targets: list[str]) -> dict[str, Any]:
 
 
 def build(export: Path = EXPORT, out: Path = OUT) -> dict[str, Any]:
+    """Write one compact JSON bundle per domain and issue from the export, and an index of the
+    domains, issues and targets, under `out`; returns the index.
+    """
     frame = pd.read_parquet(export)
     frame["time"] = pd.to_datetime(frame["time"])
     targets = sorted(c[: -len("_p")] for c in frame.columns if c.endswith("_p"))

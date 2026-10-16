@@ -87,6 +87,10 @@ def quick_wins(n: int = 3) -> list[dict[str, Any]]:
 
 
 def build() -> dict[str, Any]:
+    """The landing page's data from the export and county boundaries: the latest issue's cells on a
+    projected Colorado map with its outlines, crop and area labels, the caption figures per horizon,
+    one real Place Card, and the quick wins.
+    """
     import geopandas as gpd
 
     frame = pd.read_parquet(EXPORT)
@@ -217,6 +221,7 @@ def build() -> dict[str, Any]:
 
 
 def write(out: Path = OUT) -> Path:
+    """Build the story data, write it as compact JSON to `out`, and return the path."""
     story = build()
     out.write_text(json.dumps(story, separators=(",", ":")))
     LOGGER.info(

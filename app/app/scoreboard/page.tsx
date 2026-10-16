@@ -47,7 +47,7 @@ export default function ScoreboardPage() {
       ) : null}
 
       <p className="mt-8 text-sm text-mute" data-testid="score-count">{t("score.count", { n: entries.length })}</p>
-      <div className="mt-2 overflow-x-auto">
+      <div className="mt-2 overflow-x-auto" tabIndex={0} role="region" aria-label={t("score.title")}>
         <table className="w-full min-w-[30rem] text-sm" data-testid="score-table">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wide text-mute">

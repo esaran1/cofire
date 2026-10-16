@@ -1,0 +1,47 @@
+{
+ "map": {
+  "performance_runs": [
+   94,
+   94,
+   94
+  ],
+  "performance_median": 94,
+  "accessibility_median": 100,
+  "best_practices_median": 100,
+  "lcp_ms": 3058,
+  "tbt_ms": 72,
+  "fcp_ms": 755,
+  "cls": 0.02,
+  "si_ms": 1886
+ },
+ "card": {
+  "performance_runs": [
+   94,
+   94,
+   94
+  ],
+  "performance_median": 94,
+  "accessibility_median": 100,
+  "best_practices_median": 100,
+  "lcp_ms": 3056,
+  "tbt_ms": 88,
+  "fcp_ms": 755,
+  "cls": 0.02,
+  "si_ms": 1895
+ },
+ "brief": {
+  "performance_runs": [
+   94,
+   94,
+   94
+  ],
+  "performance_median": 94,
+  "accessibility_median": 100,
+  "best_practices_median": 100,
+  "lcp_ms": 3057,
+  "tbt_ms": 0,
+  "fcp_ms": 755,
+  "cls": 0.001,
+  "si_ms": 755
+ }
+}

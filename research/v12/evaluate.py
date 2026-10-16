@@ -16,7 +16,6 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-
 from cofire.v12 import common  # noqa: E402
 
 RELIABILITY_MAX = 0.05

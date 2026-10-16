@@ -53,7 +53,7 @@ Outputs land in `out/`, which is not committed:
   use `{field}` references and refuse typed digits (`scripts/lib.mjs`).
 - **The product is real.**
   - `capture/capture.mjs` drives the production static build with
-    Playwright, served locally by `capture/serve.py` with range requests
+    Playwright, served locally by `scripts/serve_static.py` with range requests
     and gzip, as GitHub Pages serves it.
   - Every other request is aborted, and the clock is fixed.
   - Stills are 1920x1080 at twice the resolution. Phones are 390x844 at
@@ -85,4 +85,4 @@ Outputs land in `out/`, which is not committed:
 - **Address on the end card:** set `site_url` in `config.json` (it is
   derived from the git remote until the repository moves).
 - **Preview:** `npm run studio` opens Remotion Studio locally. The map
-  scenes need `python3 capture/serve.py` running.
+  scenes need `python3 scripts/serve_static.py` (from the repository root) running.

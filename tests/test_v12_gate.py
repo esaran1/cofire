@@ -4,7 +4,8 @@ it the moment the delay is shortened."""
 from __future__ import annotations
 
 import pytest
-from cofire.v12 import gate, recal
+from cofire.v12 import recal
+from research.v12 import gate
 
 ONLINE = {k: v for k, v in recal.VARIANTS.items() if isinstance(v, recal.Online)}
 

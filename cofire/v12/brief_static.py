@@ -75,6 +75,9 @@ def _area(id_: str, label: str, b: dict[str, Any], prev: dict[str, Any] | None) 
 
 
 def build() -> dict[str, Any]:
+    """The latest weekly brief for Denver and its two source watersheds, each compared with the
+    previous issue, and the top three free actions from the city Ember list.
+    """
     from cofire.ship.ember_zones import score
 
     index = json.loads((BUNDLES / "index.json").read_text())
@@ -98,6 +101,7 @@ def build() -> dict[str, Any]:
 
 
 def write() -> Path:
+    """Build the brief, write it to app/lib/brief_latest.json, and return the path."""
     OUT.write_text(json.dumps(build(), indent=1) + "\n")
     return OUT
 

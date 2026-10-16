@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
-import { ExplainSchema, categoryOf, decompose, frequency, liveProbability, monthOf, weeksLikeThis } from "../lib/explain";
+import { ExplainSchema } from "../lib/explainSchema";
+import { categoryOf, decompose, frequency, liveProbability, monthOf, weeksLikeThis } from "../lib/explain";
 
 /** v1.3 explanations: frequency framing, weeks like this one, why did this change. None writes to the database. */
 

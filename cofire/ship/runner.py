@@ -41,6 +41,10 @@ def _cpu(pid: int) -> float:
 
 
 def run(label: str, cmd: list[str], threads: int = 4) -> int:
+    """Run `cmd` as a child process with the thread count set, killing and restarting it when it
+    idles below 1% CPU for five minutes. Returns its exit code, 124 if the stage runs past 60
+    minutes, or 125 after MAX_RESUMES restarts.
+    """
     env = {**os.environ, "OMP_NUM_THREADS": str(threads), "MKL_NUM_THREADS": str(threads)}
     start = time.monotonic()
     for attempt in range(MAX_RESUMES + 1):

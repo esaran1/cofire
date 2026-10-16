@@ -64,6 +64,10 @@ def shipped_predictions(domain: str, target: str, h: int, lo: pd.Timestamp, hi: 
 
 
 def adopt(applies_from: str) -> dict[str, Any]:
+    """Fit each adopted static stage-1 recalibration on the shipped predictions for 2022 to 2025 and
+    write the live arms, applying from `applies_from`, with their fit-window sidecar. Raises if an
+    adopted arm is not static stage 1 or the look counter is not 3.
+    """
     from cofire.model.fit_window import THROUGH_CALIBRATION, FitWindow, checked_load, write_sidecar
 
     common.assert_looks()

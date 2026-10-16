@@ -47,6 +47,10 @@ def pick_issues(index: dict[str, Any]) -> list[str]:
 
 
 def build() -> Path:
+    """Freeze the demo fixture under demo/: two issues of every domain's bundle, the look-3 and
+    rerun result files, the facts, the preregistration and a manifest, and return its directory.
+    Exits if no bundles are built or the fixture is over the size cap.
+    """
     DEMO.mkdir(parents=True, exist_ok=True)
     src = ART / "ship" / "domains"
     if not (src / "index.json").exists():

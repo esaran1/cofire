@@ -22,6 +22,10 @@ OUT = Path("app/public/data")
 
 
 def build(out: Path = OUT, src: Path = bundles.OUT) -> dict[str, int]:
+    """Copy the bundles, explanation tables, open data and blank Ember checklists into `out` for the
+    static site, replacing what was there, and return the bundle count and total bytes; exits if no
+    bundles are built.
+    """
     if not (src / "index.json").exists():
         raise SystemExit(f"no bundles at {src}; run `python -m cofire.ship.bundles`")
     if out.exists():

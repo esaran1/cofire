@@ -30,7 +30,7 @@ export function V12Results() {
   return (
     <div data-testid="v12-results">
       <p className="text-ink-soft mt-2 max-w-[58ch] text-sm leading-relaxed">{t("v12.lede", { n: rows[0]?.estimable ?? nPairs })}</p>
-      <div className="mt-4 overflow-x-auto">
+      <div className="mt-4 overflow-x-auto" tabIndex={0} role="region" aria-label={t("v12.title")}>
         <table className="w-full min-w-[34rem] text-sm" data-testid="v12-table">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wide text-mute">

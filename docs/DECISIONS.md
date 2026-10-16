@@ -2696,7 +2696,7 @@ the unseal, when 2026 outcomes may be used.
   constant in the scoreboard page.
 - **Captures are the production build, frame-stepped.**
   - Playwright drives the static build, served locally with range requests
-    by `film/capture/serve.py`, with the clock fixed and every other request
+    by `scripts/serve_static.py`, with the clock fixed and every other request
     aborted.
   - MapLibre animates on the real clock, which a frame-stepped capture
     cannot follow. The fly-in therefore sets the camera on every frame (an
@@ -2754,3 +2754,145 @@ the unseal, when 2026 outcomes may be used.
 - **The API serves the same files** at `/open/{name}`. It builds them once
   into a gitignored cache, including when serving the demo fixture, which
   is never written to.
+
+## v1.3 Stage 5: reviewer legibility, 2026-10-15
+
+- **`research/` holds what does not ship:**
+  - the v1.2 stage runners and their scoring (`stage1` to `stage4`,
+    `snotel`, `preds`, `evaluate`, `gate`);
+  - four one-off diagnostics (`sensitivity`, `pid_audit`, `gridmet_reach`,
+    `vintage_migration`).
+
+  `research/README.md` says, for each, why it does not ship. The one
+  adopted v1.2 arm still ships through `cofire/v12/live.py` and `recal.py`.
+- **What "shipped" means:**
+  - every module reachable by import from the product's entry points: the
+    API, the refresh, the export, the site build, the open data, the forecast
+    record and the facts;
+  - found by `tests/test_shipped_path.py`, which also fails if any `cofire/`
+    module imports `research`, or if loading the entry points loads it.
+- **`cofire/model/` was not touched.** Its own non-shipping arms (LightGBM,
+  the physics-informed ConvLSTM, the ensemble, SubX, the ablations) stay where
+  they are. Moving any of them would change the configuration hash, and the
+  frozen-model test would rightly fail. The README says so.
+- **Documentation and types:**
+  - 96 docstrings were added on the shipped path, with no code changed; a
+    test requires one on every public function and class there;
+  - mypy strict now also covers `cofire/v12`, `cofire/v13`, `cofire/api` and
+    `research` (three typing fixes in the API);
+  - CI runs the same scope.
+- **The architecture diagram** is defined once in `scripts/architecture.py`,
+  which writes both the README's Mermaid block and `docs/architecture.svg`.
+  Mermaid's own renderer is not on the allowed-tools list. CI checks that
+  both are current.
+- **The README opens with "For reviewers":** a summary, the one-command run,
+  where things live, and links to the preregistrations, corrections and film.
+
+## v1.3 Stage 7: the executable unseal, 2026-10-15
+
+- **The unseal is written down before the date, as the owner decided.**
+  `docs/PREREGISTRATION_UNSEAL.md` is new. It fixes what is scored, and it
+  mirrors look 3 and the scoreboard's promise:
+  - every published forecast, verified by sha256, scored as published;
+  - only target weeks on or before 2026-12-29 count;
+  - Brier score, reliability and resolution terms, and a reliability
+    diagram;
+  - the pass criterion: reliability at most 0.05 where at least 100
+    cell-weeks are scored, for targets shown as a per-cell probability;
+  - regional rates are reported but not judged;
+  - dryness errors (MAE, RMSE, bias) are reported without a criterion;
+  - no skill claim, and no refit.
+- **This preregistration was drafted by the AI agent.** The owner should read
+  it, and change it if needed, before 2027-01-12. Any change must update the
+  pinned hash in the script, and the tests fail until it does.
+- **`scripts/unseal_2026.py` checks seven preconditions before reading
+  anything from 2026:**
+  - the date, from `app/lib/seal.json`;
+  - `COFIRE_ALLOW_LOOK=4`;
+  - `cofire/model/` matches `FREEZE_COMMIT`;
+  - the configuration hash;
+  - both preregistrations' hashes;
+  - the look counter at 3;
+  - a new output directory and a clean tree.
+
+  It names every failure at once. It writes once, into a new directory,
+  then records look 4 through the frozen `record_look`.
+- **Tests** (`tests/test_unseal_2026.py`, 15):
+  - each refusal is exercised with a mocked clock and mocked repository
+    checks;
+  - the readers of published forecasts and of 2026 outcomes are traps, so a
+    test fails if anything is read early;
+  - the scoring functions run on synthetic data only.
+- **It was not run.** `artifacts/unseal_2026/` does not exist.
+
+## v1.3 Stage 8: monitoring, accessibility, performance, 2026-10-15
+
+### Monitoring
+
+- **The daily smoke run** is in `.github/workflows/smoke.yml`, 13:17 UTC. It
+  runs every route in both languages, a Place Card from the latest issue, a
+  206 on the basemap and the open data index (`app/e2e/static/smoke.spec.ts`).
+  - Until `PAGES_ENABLED` is `true` it builds the static site with the
+    verified basemap and serves it locally (`scripts/serve_static.py`).
+  - After that it checks the deployed address.
+  - A failure opens an issue, or comments on the open one, the same way the
+    refresh's alert does.
+  - `force_fail` tests the alert.
+- **The local static server** is now `scripts/serve_static.py`, used by the
+  film, CI and Lighthouse. It was the film's.
+
+### Accessibility
+
+- **axe on every route in both languages**, at desktop and phone sizes, runs
+  in a new CI job (`a11y`) against the production static build, with
+  WCAG 2.1 A and AA rules (`app/e2e/static/axe.spec.ts`).
+  `@axe-core/playwright` 4.13.0 is pinned and recorded in the ledger.
+- **Before the fixes:**
+  - 15 of 20 desktop routes had serious violations, all color contrast,
+    from one token;
+  - on phones there were also four horizontally scrolling tables that could
+    not be reached by keyboard, and a definition list with wrapped terms.
+- **After:** 0 serious or critical violations on all 40 route, language and
+  size combinations.
+- **The fixes:**
+  - ochre darkened from #9a7420 to #7d5e14, the same hue: ochre text on
+    paper rises from 3.8 to 5.4, and on ochre-soft from 3.4 to 4.8;
+  - the segmented controls' sub-labels go from 75% to 90% opacity;
+  - the Hindcast replay button uses paper text;
+  - each scrolling table is a labeled, focusable region;
+  - the timeline legend's swatch moved inside its term.
+- **The Spanish review notice is unchanged.** It shares the ochre token, so
+  it is now darker too, but its text and its reviewed flag were not edited.
+- **The test checks the settled page.** It waits for finite animations to
+  end, because a fade caught halfway is not the page a reader sees.
+
+### Performance
+
+Lighthouse mobile, median of three, against the static build served with
+gzip (`scripts/lighthouse_static.sh`; `artifacts/v13/lighthouse/`):
+
+| Page | Before | After | LCP before to after |
+|---|---|---|---|
+| Map | 90 | 94 | 3.6 s to 3.1 s |
+| Place Card | 90 | 94 | 3.6 s to 3.1 s |
+| Brief | 91 | 94 | 3.5 s to 3.1 s |
+
+Accessibility and best practices are 100 on all three.
+
+- **What moved the scores:**
+  - MapLibre loads with `next/dynamic`, so the map page's first-load
+    script fell from 505 kB to 148 kB;
+  - the Motion animation library left the shared controls (`ui/Animated`
+    holds the two animated ones, and the disclosure uses a transform-only
+    CSS slide), so the map and the brief no longer load it;
+  - the schemas and their validator load with the first fetch, not with
+    the page.
+- **Tried and reverted:**
+  - not preloading the serif (first paint got worse);
+  - inlining the CSS (the map dropped to 92).
+- **Not reached: 95.**
+  - Removing every web font as an experiment did not move the simulated
+    LCP at all. What remains before first paint is the framework's own
+    script (about 100 kB) and the two translation tables.
+  - Loading Spanish only when asked for would mean moving the reserved
+    review flag out of `es.ts`, so it was left for the owner to decide.

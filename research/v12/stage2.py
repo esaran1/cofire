@@ -1,7 +1,7 @@
 """v1.2 Stage 2: the event rate from slow climate state, as a logit offset.
 
-    python -m cofire.v12.stage2 predict <domain>   # checkpointed per domain
-    python -m cofire.v12.stage2 report
+    python -m research.v12.stage2 predict <domain>   # checkpointed per domain
+    python -m research.v12.stage2 report
 
 Fixed specification (docs/PREREGISTRATION_V12.md): one ridge-penalized
 logistic per target, horizon and domain on domain-week event counts, with
@@ -27,11 +27,12 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+from cofire.v12 import common, recal  # noqa: E402
 from scipy.optimize import minimize  # noqa: E402
 
-from cofire.v12 import common, preds, recal, snotel  # noqa: E402
+from research.v12 import preds, snotel
 
-LOGGER = logging.getLogger("cofire.v12.stage2")
+LOGGER = logging.getLogger("research.v12.stage2")
 OUT = common.OUT / "stage2"
 PRED = common.DATA / "stage2"
 LAMBDAS = (0.1, 1.0, 10.0, 100.0)
@@ -214,7 +215,8 @@ def predict(domain: str) -> Path:
 def report() -> dict[str, Any]:
     from cofire.model.prob_metrics import brier
     from cofire.ship import domains
-    from cofire.v12 import evaluate
+
+    from research.v12 import evaluate
 
     common.assert_looks()
     s1 = json.loads((common.OUT / "stage1" / "summary.json").read_text())

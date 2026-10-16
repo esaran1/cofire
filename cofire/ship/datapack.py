@@ -78,6 +78,9 @@ def clip_weekly(member: bytes, name: str) -> bytes:
 
 
 def clip_year(year: int, src: Path = DATA / "raw" / "usdm", dst: Path = CLIPPED) -> Path:
+    """Clip one year's national USDM archive to Colorado, week by week, into the same layout under
+    `dst`, and return the clipped archive's path; resumable, weeks already clipped are skipped.
+    """
     out = dst / f"{year}_USDM_M.zip"
     have: set[str] = set()
     if out.exists():

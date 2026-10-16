@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { set } from "idb-keyval";
-import { type Layer, MapCell, MapView } from "@/components/MapView";
+import dynamic from "next/dynamic";
+import type { Layer, MapCell } from "@/components/MapView";
 import { TractCard, TractList } from "@/components/TractCard";
 import { type TractFeature, type Tracts, loadTracts, tractAt, tractPoint } from "@/lib/tracts";
 import { PlaceCard } from "@/components/PlaceCard";
@@ -20,6 +21,13 @@ import type { Bundle, DomainsIndex } from "@/lib/schemas";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import { DOMAIN_LABELS } from "@/lib/domainNames";
+
+// MapLibre is most of this page's script. Loaded on its own, it no longer holds
+// back the panel beside it, which is what a reader (and Lighthouse) sees first.
+const MapView = dynamic(() => import("@/components/MapView").then((m) => m.MapView), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-ink" data-testid="map-loading" aria-hidden="true" />,
+});
 
 export default function HomePage() {
   const router = useRouter();

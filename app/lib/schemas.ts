@@ -445,3 +445,15 @@ export type DomainsIndex = z.infer<typeof DomainsIndexSchema>;
 export type Bundle = z.infer<typeof BundleSchema>;
 export type BundleCell = z.infer<typeof BundleCellSchema>;
 export type DomainSummary = z.infer<typeof DomainSummarySchema>;
+
+/** The open data index (cofire/v13/open_data.py). */
+const OpenFile = z.object({ bytes: z.number(), sha256: z.string(), uncompressed_bytes: z.number().optional() });
+export const OpenIndexSchema = z.object({
+  name: z.string(),
+  license: z.object({ name: z.string(), url: z.string(), credit: z.string(), upstream: z.array(z.object({ name: z.string(), use: z.string(), credit: z.string(), license: z.string(), url: z.string() })) }),
+  latest: z.object({ issue: z.string(), csv: z.string(), geojson: z.string(), json: z.string() }),
+  fields: z.array(z.object({ name: z.string(), type: z.string(), description: z.string() })),
+  issues: z.array(z.object({ issue: z.string(), rows: z.number(), csv: z.string(), geojson: z.string() })),
+  files: z.record(z.string(), OpenFile),
+});
+export type OpenIndex = z.infer<typeof OpenIndexSchema>;

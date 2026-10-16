@@ -37,6 +37,10 @@ def _city_items() -> list[dict[str, Any]]:
 
 
 def score(state: dict[str, bool], zone: str) -> dict[str, Any]:
+    """Score ticked items for a zone: wui and urban go to the frozen scorer; city returns its score,
+    items, the three heaviest free items not yet done, and the done ids. Raises ValueError for an
+    unknown zone.
+    """
     if zone not in ZONES:
         raise ValueError(f"zone must be one of {ZONES}")
     if zone != "city":

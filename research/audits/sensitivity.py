@@ -36,7 +36,7 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-LOGGER = logging.getLogger("cofire.ship.sensitivity")
+LOGGER = logging.getLogger("research.audits.sensitivity")
 OUT = Path("artifacts/audit")
 DOMAINS = ("larimer", "pueblo")
 

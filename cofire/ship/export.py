@@ -43,6 +43,9 @@ HORIZONS = (2, 4, 8)
 # Realized outcomes. Present in the built frame because the builder emits
 # labels for every split; this module drops them before use.
 def realized_columns(frame: pd.DataFrame) -> list[str]:
+    """The realized outcome columns in a frame: erc_pct, usdm, d_ and f_ names ending in a horizon
+    suffix such as _h4.
+    """
     import re
 
     pat = re.compile(r"^(erc_pct|usdm|d_|f_).*_h\d+$")
@@ -50,6 +53,7 @@ def realized_columns(frame: pd.DataFrame) -> list[str]:
 
 
 def assert_no_scoring(frame: pd.DataFrame) -> None:
+    """Raise AssertionError if any realized outcome column is still in the frame."""
     left = realized_columns(frame)
     if left:
         raise AssertionError(
@@ -309,6 +313,7 @@ def available_at(issue: pd.Timestamp) -> pd.Timestamp:
 
 
 def utc_now() -> pd.Timestamp:
+    """The current time in UTC, as a timestamp with no time zone attached."""
     return pd.Timestamp.now(tz="UTC").tz_localize(None)
 
 
@@ -597,6 +602,9 @@ def attach_rendering(frame: pd.DataFrame, decisions: pd.DataFrame) -> pd.DataFra
 
 
 def write(out_dir: Path = OUT, last_issue: pd.Timestamp | None = None, now: pd.Timestamp | None = None) -> Path:
+    """Build the export through `last_issue`, write it to forecast_issues.parquet under `out_dir`,
+    pin each new issue to the ERC vintage it was built from, and return the path.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
     from cofire.ship import vintages
 

@@ -1,7 +1,7 @@
 """v1.2 Stage 1: delayed-feedback logistic recalibration of configuration A.
 
-    python -m cofire.v12.stage1 predict <domain>   # per domain, checkpointed
-    python -m cofire.v12.stage1 report             # metrics, selection, tests, adoption
+    python -m research.v12.stage1 predict <domain>   # per domain, checkpointed
+    python -m research.v12.stage1 report             # metrics, selection, tests, adoption
 
 Follows docs/PREREGISTRATION_V12.md exactly. The online variants must pass the
 delayed-feedback gate before any of their numbers is written, so `report`
@@ -21,10 +21,11 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+from cofire.v12 import common, recal  # noqa: E402
 
-from cofire.v12 import common, preds, recal  # noqa: E402
+from research.v12 import preds
 
-LOGGER = logging.getLogger("cofire.v12.stage1")
+LOGGER = logging.getLogger("research.v12.stage1")
 OUT = common.OUT / "stage1"
 PRED = common.DATA / "stage1"
 
@@ -85,7 +86,8 @@ def predict(domain: str) -> Path:
 
 def report() -> dict[str, Any]:
     from cofire.ship import domains
-    from cofire.v12 import evaluate, gate
+
+    from research.v12 import evaluate, gate
 
     common.assert_looks()
     failed = [r for r in gate.check_all() if not r.passed]

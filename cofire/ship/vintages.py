@@ -53,6 +53,7 @@ def _stamp(t: pd.Timestamp) -> str:
 
 
 def manifest() -> list[dict[str, Any]]:
+    """Every vintage record in the manifest, or an empty list if there is none."""
     return json.loads(MANIFEST.read_text()) if MANIFEST.exists() else []
 
 
@@ -62,6 +63,9 @@ def _save(records: list[dict[str, Any]]) -> None:
 
 
 def records(domain: str, year: int, as_of: pd.Timestamp | None = None) -> list[dict[str, Any]]:
+    """The ERC vintage records for one domain-year, only those fetched by `as_of` when it is given,
+    oldest first.
+    """
     out = [r for r in manifest() if r["source"] == SOURCE and r["domain"] == domain and r["year"] == year]
     if as_of is not None:
         out = [r for r in out if pd.Timestamp(r["fetched_at"]) <= pd.Timestamp(as_of)]
@@ -69,6 +73,8 @@ def records(domain: str, year: int, as_of: pd.Timestamp | None = None) -> list[d
 
 
 def latest(domain: str, year: int) -> pd.Timestamp:
+    """When the newest vintage of a domain-year was fetched; raises FetchRefused if there is none.
+    """
     recs = records(domain, year)
     if not recs:
         raise FetchRefused(f"no vintage for {domain} {year}")
@@ -177,6 +183,7 @@ def materialize(domain: str, year: int, dest: Path, as_of: pd.Timestamp | None =
 
 
 def issue_vintages() -> dict[str, dict[str, str]]:
+    """The saved issue pins, per domain from issue to as-of time; empty if there are none."""
     data: dict[str, dict[str, str]] = json.loads(ISSUES.read_text()) if ISSUES.exists() else {}
     return data
 

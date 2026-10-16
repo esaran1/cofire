@@ -14,16 +14,8 @@ import { Adopted, readAdopted } from "@/lib/adopted";
 import type { ObservationCell } from "@/lib/schemas";
 import { z } from "zod";
 import { deviceId } from "@/lib/device";
-import {
-  Action,
-  EmptyState,
-  ErrorNote,
-  Numeral,
-  OfflineNote,
-  Panel,
-  Segmented,
-  Skeleton,
-} from "@/components/ui/Controls";
+import { Action, EmptyState, ErrorNote, Numeral, OfflineNote, Panel, Skeleton } from "@/components/ui/Controls";
+import { Segmented } from "@/components/ui/Animated";
 
 
 

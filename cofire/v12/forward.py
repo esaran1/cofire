@@ -35,10 +35,14 @@ BUNDLES = Path("artifacts/ship/domains")
 
 
 def manifest() -> list[dict[str, Any]]:
+    """Every published forecast entry, or an empty list before the first publish."""
     return json.loads(MANIFEST.read_text()) if MANIFEST.exists() else []
 
 
 def payload(issue: str) -> bytes:
+    """One issue's forecast as gzipped JSON, every domain's bundle as served, byte-identical on
+    every call.
+    """
     from cofire.ship import domains
 
     doms = {d: json.loads((BUNDLES / d / f"{issue}.json").read_text()) for d in domains.ORDER}
@@ -53,6 +57,10 @@ def is_append_only(old: list[dict[str, Any]], new: list[dict[str, Any]]) -> bool
 
 
 def publish(backfill: bool = False, now: pd.Timestamp | None = None) -> list[dict[str, Any]]:
+    """Write each issue not yet published to artifacts/forecasts and append it to the manifest and
+    the app's copy, returning the new entries. Never rewrites a file or an entry, and refuses to
+    start a manifest unless backfilling.
+    """
     from cofire.ship.export import utc_now
 
     now = utc_now() if now is None else now

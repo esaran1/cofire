@@ -26,7 +26,9 @@ const config: Config = {
         rule: "#d9d6cc",
         ember: "#b33a1a",
         "ember-soft": "#e8ddd6",
-        ochre: "#9a7420",
+        // Darkened from #9a7420 (2026-10-15) so ochre text on paper and ochre-soft,
+        // and paper text on ochre, meet WCAG AA 4.5:1 (axe, e2e/static/axe.spec.ts).
+        ochre: "#7d5e14",
         "ochre-soft": "#ece5d2",
         slate: "#4a5568",
       },

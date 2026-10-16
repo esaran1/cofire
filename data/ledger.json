@@ -1,7 +1,7 @@
 {
   "budget_bytes": 3200000000,
-  "recorded_bytes": 4688951666,
-  "correction_bytes": -1690882317,
+  "recorded_bytes": 4712704370,
+  "correction_bytes": -1714635021,
   "total_bytes": 2998069349,
   "remaining_bytes": 201930651,
   "corrections": [
@@ -46,6 +46,12 @@
       "reason": "Tool download 'license-text' is recorded with size and checksum but kept out of the data budget's total, as for the earlier tool downloads. The entry is left as written.",
       "delta_bytes": -7048,
       "evidence": "entry 'license-text' 2026-10-16, 7,048 B"
+    },
+    {
+      "at": "2026-10-16T02:45:27+00:00",
+      "reason": "Tool download 'npm-tool' is recorded with size and checksum but kept out of the data budget's total, as for the earlier tool downloads. The entry is left as written.",
+      "delta_bytes": -23752704,
+      "evidence": "entry 'npm-tool' 2026-10-16, 23,752,704 B"
     }
   ],
   "transfers": [
@@ -29798,6 +29804,13 @@
       "bytes": 7048,
       "timestamp": "2026-10-16T02:16:56+00:00",
       "note": "session=v1.3-film-assets; stored as film/LICENSES/CC0-1.0.txt for the Kenney sounds; sha256 a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    },
+    {
+      "source": "npm-tool",
+      "url": "https://registry.npmjs.org/ (app/: @axe-core/playwright 4.13.0 and axe-core 4.13.0, devDependencies; tarballs priced at 12,393 B and 594,490 B)",
+      "bytes": 23752704,
+      "timestamp": "2026-10-16T02:45:27+00:00",
+      "note": "session=v1.3-a11y-tools; tool download for the axe accessibility checks; measured as npm cache growth (23,196 KiB), most of it registry metadata for axe-core's many versions; sha512 integrity of both packages in app/package-lock.json"
     }
   ]
 }

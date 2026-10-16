@@ -59,6 +59,9 @@ DEFAULT = "denver"
 
 @dataclass(frozen=True)
 class Footprint:
+    """One v1.1 forecast domain: its boundary source and matched identifiers, the enclosing grid
+    rectangle, the gridMET cell centres it touches, its area and its nominal county FIPS.
+    """
     name: str
     label: str
     kind: str  # "urban" | "watershed"
@@ -110,6 +113,9 @@ def _area_km2(poly: Any) -> float:
 
 
 def denver() -> Footprint:
+    """Denver's footprint from the Census county boundary with GEOID 08031; raises unless exactly
+    one county matches.
+    """
     zp = BOUNDARY_DIR / "cb_2023_us_county_500k.zip"
     gdf = gpd.read_file(f"zip://{zp}")
     row = gdf[gdf["GEOID"] == DENVER_GEOID]
@@ -176,6 +182,10 @@ def _outlet_named(huc12s: gpd.GeoDataFrame, name: str) -> tuple[str, str]:
 
 
 def watershed(name: str, tag: str, huc8_name: str, nominal_fips: str) -> Footprint:
+    """A watershed domain's footprint: the HUC12s of the named HUC8 that drain to the reservoir
+    outlet (Strontia Springs for the Upper South Platte, Dillon Reservoir otherwise), merged and
+    gridded.
+    """
     h8 = huc8_by_name(tag, huc8_name)
     huc12s = gpd.read_file(WBD_DIR / f"huc12_{h8['huc8']}.geojson")
     matched: dict[str, str] = {"huc8": str(h8["huc8"]), "huc8_name": str(h8["name"]),
@@ -203,6 +213,9 @@ def watershed(name: str, tag: str, huc8_name: str, nominal_fips: str) -> Footpri
 
 
 def resolve() -> dict[str, Footprint]:
+    """Resolve the three v1.1 footprints (Denver, Upper South Platte, Dillon) from the boundary
+    files on disk.
+    """
     return {
         "denver": denver(),
         # Nominal FIPS feeds only the frozen USDM county fallback, which the
@@ -213,6 +226,7 @@ def resolve() -> dict[str, Footprint]:
 
 
 def write(path: Path = FOOTPRINTS) -> dict[str, Footprint]:
+    """Resolve the v1.1 footprints, write them as JSON to `path`, and return them."""
     fps = resolve()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({k: asdict(v) for k, v in fps.items()}, indent=1) + "\n")
@@ -220,6 +234,7 @@ def write(path: Path = FOOTPRINTS) -> dict[str, Footprint]:
 
 
 def load(path: Path = FOOTPRINTS) -> dict[str, dict[str, Any]]:
+    """The saved footprints at `path`, as plain dicts keyed by domain."""
     data: dict[str, dict[str, Any]] = json.loads(path.read_text())
     return data
 

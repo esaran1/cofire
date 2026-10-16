@@ -10,7 +10,7 @@
 4. Every issue in the current export is pinned to the vintage it was built
    from, so adopting the revision leaves those issues unchanged.
 
-    python -m cofire.ship.vintage_migration
+    python -m research.audits.vintage_migration
 """
 
 from __future__ import annotations
@@ -22,7 +22,6 @@ from typing import Any
 
 import pandas as pd
 import xarray as xr
-
 from cofire.model.data import erc_extension as ext
 from cofire.ship import domains, vintages
 

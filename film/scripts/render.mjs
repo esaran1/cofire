@@ -15,7 +15,7 @@
  * - Video is rendered silent; the sound is the mix from scripts/audio.mjs
  *   (-14 LUFS), muxed in afterwards.
  * - The map scenes read the basemap from the production build, so
- *   capture/serve.py is started if it is not already running.
+ *   scripts/serve_static.py is started if it is not already running.
  * - Every output's duration is checked (the film may not run over 3:00) and
  *   recorded with its render time, size and sha256 in out/render_report.json.
  */
@@ -59,9 +59,9 @@ async function up() { try { return (await fetch("http://127.0.0.1:4100/cofire/")
 let server = null;
 async function ensureServer() {
   if (await up()) return;
-  server = spawn("python3", [join(FILM, "capture/serve.py"), "--port", "4100", "--root", join(REPO, "app/out")], { stdio: "ignore" });
+  server = spawn("python3", [join(REPO, "scripts/serve_static.py"), "--port", "4100", "--root", join(REPO, "app/out")], { stdio: "ignore" });
   for (let i = 0; i < 50 && !(await up()); i++) await new Promise((r) => setTimeout(r, 100));
-  if (!(await up())) throw new Error("capture/serve.py did not start");
+  if (!(await up())) throw new Error("scripts/serve_static.py did not start");
 }
 
 let serveUrl = null;
@@ -124,8 +124,12 @@ async function animatic() {
 
 async function master() {
   const parts = [];
+  // FILM_PARTS=P2,P4 re-renders only those parts and reuses the others' files
+  // (for a fix confined to some parts); unset renders every part.
+  const only = process.env.FILM_PARTS ? new Set(process.env.FILM_PARTS.split(",")) : null;
   for (const p of TL.parts) {
     const out = join(OUT, "parts", `${p.id}.mp4`);
+    if (only && !only.has(p.id) && existsSync(out)) { parts.push(out); continue; }
     await renderComp(p.id, out);
     assertLength(out, p.end - p.start, p.id);
     parts.push(out);
@@ -149,14 +153,16 @@ async function exports() {
   assertLength(upload, TL.duration, "upload");
   await record("upload", upload, { loudness: loudness(upload) });
   const cap = join(OUT, "cofire_upload_1920x1080_30fps_captions_en.mp4");
-  const style = "FontName=Outfit,FontSize=15,PrimaryColour=&H00ECF2F4,BackColour=&H99171817,OutlineColour=&H99171817,BorderStyle=4,Outline=0,Shadow=0,MarginV=28,Alignment=2";
+  // An opaque box behind each caption, so it reads over light app screens as well as dark maps.
+  const style = "FontName=Outfit,FontSize=15,PrimaryColour=&H00ECF2F4,BackColour=&H26171817,OutlineColour=&H26171817,BorderStyle=4,Outline=6,Shadow=0,MarginV=24,Alignment=2";
   ff(["-i", upload, "-vf", `subtitles=${join(OUT, "captions_en.srt")}:fontsdir=${join(FILM, "public/fonts")}:force_style='${style}'`, "-c:v", "libx264", "-preset", "slow", "-crf", "17", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", cap]);
   assertLength(cap, TL.duration, "captioned");
   await record("captioned_en", cap);
-  for (const l of ["en", "es"]) await record(`srt_${l}`, join(OUT, `captions_${l}.srt`)).catch(() => {
-    report.outputs[`srt_${l}`] = { file: `film/out/captions_${l}.srt`, bytes: statSync(join(OUT, `captions_${l}.srt`)).size };
+  for (const l of ["en", "es"]) {
+    const f = join(OUT, `captions_${l}.srt`);
+    report.outputs[`srt_${l}`] = { file: `film/out/captions_${l}.srt`, bytes: statSync(f).size, sha256: await sha256(f), cues: readFileSync(f, "utf8").split("\n\n").filter(Boolean).length };
     save();
-  });
+  }
   report.renders.exports = { minutes: Number(((Date.now() - t0) / 60000).toFixed(2)), note: "ffmpeg: 60 to 30 fps by dropping alternate frames; captions burned with libass" };
   save();
 }

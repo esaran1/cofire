@@ -1,7 +1,7 @@
 """v1.2 Stage 3: partial pooling of configuration A across the five domains.
 
-    python -m cofire.v12.stage3 predict      # all domains, checkpointed per fold
-    python -m cofire.v12.stage3 report
+    python -m research.v12.stage3 predict      # all domains, checkpointed per fold
+    python -m research.v12.stage3 report
 
 Drought (docs/PREREGISTRATION_V12.md): configuration A's Markov estimator with
 its support gates and fallback order kept, and only the Dirichlet prior
@@ -28,10 +28,9 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-
 from cofire.v12 import common  # noqa: E402
 
-LOGGER = logging.getLogger("cofire.v12.stage3")
+LOGGER = logging.getLogger("research.v12.stage3")
 OUT = common.OUT / "stage3"
 PRED = common.DATA / "stage3"
 KAPPAS = (4, 16, 64, 256)
@@ -275,7 +274,7 @@ def survivors(kappa: int, w: float) -> pd.DataFrame:
 
 
 def report() -> dict[str, Any]:
-    from cofire.v12 import evaluate
+    from research.v12 import evaluate
 
     common.assert_looks()
     tables = long_tables()

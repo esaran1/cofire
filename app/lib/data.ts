@@ -1,15 +1,21 @@
-import { type Explain, ExplainSchema } from "./explain";
-import { z } from "zod";
+import type { Explain } from "./explain";
 import { API, getParsed } from "./api";
-import {
-  Bundle,
-  BundleCell,
-  BundleSchema,
-  DomainsIndex,
-  DomainsIndexSchema,
-  Place,
-  PlaceSchema,
-} from "./schemas";
+import type { Bundle, BundleCell, DomainsIndex, OpenIndex, Place } from "./schemas";
+
+export type { OpenIndex };
+
+/*
+ * The schemas, and the validator library under them, load with the first
+ * fetch rather than with the page, so they are not in the way of the first
+ * paint. Every bundle a caller holds came through a fetch here, so they are
+ * loaded by the time placeFromCell needs them.
+ */
+type Schemas = typeof import("./schemas");
+let schemas: Schemas | null = null;
+async function S(): Promise<Schemas> {
+  if (!schemas) schemas = await import("./schemas");
+  return schemas;
+}
 
 /**
  * Forecast data for the map, the Place Card and anything that needs a cell.
@@ -32,8 +38,8 @@ export function getDomains(): Promise<DomainsIndex> {
   if (!indexCache) {
     indexCache = (
       STATIC_BASE
-        ? fetchStatic("/domains/index.json", (r) => DomainsIndexSchema.parse(r))
-        : getParsed("/domains", DomainsIndexSchema)
+        ? S().then((m) => fetchStatic("/domains/index.json", (r) => m.DomainsIndexSchema.parse(r)))
+        : S().then((m) => getParsed("/domains", m.DomainsIndexSchema))
     ).catch((e: unknown) => {
       indexCache = null;
       throw e;
@@ -50,8 +56,8 @@ export function getBundle(domain: string, issue: string): Promise<Bundle> {
   if (!p) {
     p = (
       STATIC_BASE
-        ? fetchStatic(`/domains/${key}.json`, (r) => BundleSchema.parse(r))
-        : getParsed(`/domains/${key}`, BundleSchema)
+        ? S().then((m) => fetchStatic(`/domains/${key}.json`, (r) => m.BundleSchema.parse(r)))
+        : S().then((m) => getParsed(`/domains/${key}`, m.BundleSchema))
     ).catch((e: unknown) => {
       bundleCache.delete(key);
       throw e;
@@ -69,8 +75,8 @@ export function getExplain(domain: string): Promise<Explain> {
   if (!p) {
     p = (
       STATIC_BASE
-        ? fetchStatic(`/domains/${domain}/explain.json`, (r) => ExplainSchema.parse(r))
-        : getParsed(`/explain/${domain}`, ExplainSchema)
+        ? import("./explainSchema").then((m) => fetchStatic(`/domains/${domain}/explain.json`, (r) => m.ExplainSchema.parse(r)))
+        : import("./explainSchema").then((m) => getParsed(`/explain/${domain}`, m.ExplainSchema))
     ).catch((e: unknown) => {
       explainCache.delete(domain);
       throw e;
@@ -106,7 +112,8 @@ export function placeFromCell(bundle: Bundle, cell: BundleCell, historyYears: st
     const [state, reason] = bundle.decisions.horizons[h] ?? [null, null];
     horizons[h] = { point, state, reason, hist_lo: lo, hist_hi: hi, hist_years: historyYears, target_week: week };
   }
-  return PlaceSchema.parse({
+  if (!schemas) throw new Error("placeFromCell before any bundle was fetched");
+  return schemas.PlaceSchema.parse({
     cell_id: cell.id,
     lat: cell.lat,
     lon: cell.lon,
@@ -156,22 +163,12 @@ export function localScore<T extends { items: ChecklistItem[]; score: number }>(
   return { ...data, score: done / total };
 }
 
-/** Open data (cofire/v13/open_data.py): the index a program starts from, and file URLs. */
-const OpenFile = z.object({ bytes: z.number(), sha256: z.string(), uncompressed_bytes: z.number().optional() });
-export const OpenIndexSchema = z.object({
-  name: z.string(),
-  license: z.object({ name: z.string(), url: z.string(), credit: z.string(), upstream: z.array(z.object({ name: z.string(), use: z.string(), credit: z.string(), license: z.string(), url: z.string() })) }),
-  latest: z.object({ issue: z.string(), csv: z.string(), geojson: z.string(), json: z.string() }),
-  fields: z.array(z.object({ name: z.string(), type: z.string(), description: z.string() })),
-  issues: z.array(z.object({ issue: z.string(), rows: z.number(), csv: z.string(), geojson: z.string() })),
-  files: z.record(z.string(), OpenFile),
-});
-export type OpenIndex = z.infer<typeof OpenIndexSchema>;
+/** Open data (cofire/v13/open_data.py): file URLs and the index a program starts from. */
 
 export function openDataUrl(name: string): string {
   return STATIC_BASE ? `${STATIC_BASE}/open/${name}` : `${API}/open/${name}`;
 }
 
 export function getOpenIndex(): Promise<OpenIndex> {
-  return STATIC_BASE ? fetchStatic("/open/index.json", (r) => OpenIndexSchema.parse(r)) : getParsed("/open/index.json", OpenIndexSchema);
+  return S().then((m) => (STATIC_BASE ? fetchStatic("/open/index.json", (r) => m.OpenIndexSchema.parse(r)) : getParsed("/open/index.json", m.OpenIndexSchema)));
 }

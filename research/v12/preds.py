@@ -13,7 +13,7 @@ Families are the live ones: Markov for drought, `fit_v11.load_choices` for
 fire. One parquet per domain and fold under data/v12/preds/, so a killed run
 resumes where it stopped.
 
-    python -m cofire.v12.preds <domain> [fold ...]
+    python -m research.v12.preds <domain> [fold ...]
 """
 
 from __future__ import annotations
@@ -28,10 +28,9 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-
 from cofire.v12 import common  # noqa: E402
 
-LOGGER = logging.getLogger("cofire.v12.preds")
+LOGGER = logging.getLogger("research.v12.preds")
 KEEP = ("time", "cell_id", "lat", "lon", "usdm", "erc_pct")
 
 

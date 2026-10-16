@@ -27,15 +27,18 @@ EW_PRIOR_WEEKS = 10.0
 
 
 def logit(p: np.ndarray) -> np.ndarray:
+    """The logit of probabilities clipped to [EPS, 1 - EPS]."""
     q = np.clip(np.asarray(p, dtype=float), EPS, 1 - EPS)
     return np.asarray(np.log(q / (1 - q)), dtype=float)
 
 
 def sigmoid(z: np.ndarray) -> np.ndarray:
+    """The logistic function, with its input clipped to [-30, 30]."""
     return np.asarray(1.0 / (1.0 + np.exp(-np.clip(z, -30, 30))), dtype=float)
 
 
 def apply(theta: tuple[float, float], p: np.ndarray) -> np.ndarray:
+    """Recalibrated probabilities: sigmoid(a + b * logit(p)) for theta = (a, b)."""
     a, b = theta
     return sigmoid(a + b * logit(p))
 

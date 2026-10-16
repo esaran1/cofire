@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Check } from "@phosphor-icons/react";
-import { Segmented } from "@/components/ui/Controls";
+import { Segmented } from "@/components/ui/Animated";
 import { OBSERVATION_TYPES, droughtCategories } from "@/lib/options";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";

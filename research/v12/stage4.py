@@ -1,6 +1,6 @@
 """v1.2 Stage 4: lag-aware intervals, the configuration the gate passes.
 
-    python -m cofire.v12.stage4 run
+    python -m research.v12.stage4 run
 
 The reference conformal PID with the real delay (`ahead` = h weeks of rows in
 a stream ordered by issue week then cell) and a fixed step size, around
@@ -23,10 +23,9 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-
 from cofire.v12 import common  # noqa: E402
 
-LOGGER = logging.getLogger("cofire.v12.stage4")
+LOGGER = logging.getLogger("research.v12.stage4")
 OUT = common.OUT / "stage4"
 TRAIN_END = pd.Timestamp("2021-12-31")
 START, END = pd.Timestamp("2022-01-01"), pd.Timestamp("2025-12-31")

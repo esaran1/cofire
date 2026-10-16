@@ -4,7 +4,7 @@
  *
  * The map is MapLibre with the app's own style (app/lib/basemap.ts) and its
  * own self-hosted basemap, read by byte ranges from the production build
- * served locally (capture/serve.py). Every frame sets the camera and the
+ * served locally (scripts/serve_static.py). Every frame sets the camera and the
  * layers for its time, then waits for the map to finish drawing before the
  * frame is taken. Labels and lines are drawn in React on top, placed with
  * the same Web Mercator maths MapLibre uses (mercator.ts).
@@ -23,7 +23,7 @@ import { field, type Lang } from "../trace";
 import { clamp01, easeInOut, easeOut, inOut, ramp, useT } from "../util";
 import { Kinetic, Label, SourceLine } from "../components/Type";
 
-export const SITE = "http://127.0.0.1:4100/cofire"; // capture/serve.py
+export const SITE = "http://127.0.0.1:4100/cofire"; // scripts/serve_static.py
 const HALF = 1 / 48; // half a cell, as the app draws them (components/MapView.tsx)
 
 let protocolAdded = false;
@@ -202,12 +202,12 @@ export const MapAct: React.FC<{ offset?: number; W: number; H: number; lang?: La
       {t < 10.4 ? <SourceLine t={t} start={1.2} end={10.2} text={lang === "es" ? "Sequía: U.S. Drought Monitor, como la publicó COFIRE cada semana" : "Drought: U.S. Drought Monitor, as COFIRE published it each week"} /> : null}
 
       {/* Part 2: the areas. */}
-      {t >= 10 && t < 16.2 ? <AreaLabel at={top(BOX.denver)} text="Denver" op={inOut(t, 10.4, 16.2)} big /> : null}
+      {t >= 10 && t < 16.2 ? <AreaLabel W={W} at={top(BOX.denver)} text="Denver" op={inOut(t, 10.4, 16.2)} big /> : null}
       {t >= 15.6 && t < 22.8 ? (
         <>
-          <AreaLabel at={top(BOX.usp)} text={DATA.areas.upper_south_platte.label} op={inOut(t, 16.2, 22.8)} />
-          <AreaLabel at={top(BOX.dillon)} text={DATA.areas.dillon.label} op={inOut(t, 16.6, 22.8)} />
-          <AreaLabel at={top(BOX.denver)} text="Denver" op={inOut(t, 15.6, 22.8) * 0.7} />
+          <AreaLabel W={W} at={top(BOX.usp)} text={DATA.areas.upper_south_platte.label} op={inOut(t, 16.2, 22.8)} />
+          <AreaLabel W={W} at={top(BOX.dillon)} text={DATA.areas.dillon.label} op={inOut(t, 16.6, 22.8)} />
+          <AreaLabel W={W} at={top(BOX.denver)} text="Denver" op={inOut(t, 15.6, 22.8) * 0.7} />
         </>
       ) : null}
       {t >= 19.4 && t < 28 ? <Marker at={dil} text={RES.dillon.name} op={inOut(t, 19.8, 28)} /> : null}
@@ -246,8 +246,9 @@ export const MapAct: React.FC<{ offset?: number; W: number; H: number; lang?: La
   );
 };
 
-const AreaLabel: React.FC<{ at: { x: number; y: number }; text: string; op: number; big?: boolean }> = ({ at, text, op, big }) => (
-  <div style={{ position: "absolute", left: at.x - 400, top: at.y - (big ? 74 : 56), width: 800, textAlign: "center", opacity: op, transform: `translateY(${(1 - op) * 10}px)` }}>
+const AreaLabel: React.FC<{ at: { x: number; y: number }; text: string; op: number; big?: boolean; W: number }> = ({ at, text, op, big, W }) => (
+  // Kept inside the frame: a label whose area runs off the edge stays readable.
+  <div style={{ position: "absolute", left: Math.min(Math.max(at.x, W * 0.17), W * 0.83) - 400, top: at.y - (big ? 74 : 56), width: 800, textAlign: "center", opacity: op, transform: `translateY(${(1 - op) * 10}px)` }}>
     <Label size={big ? 48 : 34} weight={500} style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>{text}</Label>
   </div>
 );

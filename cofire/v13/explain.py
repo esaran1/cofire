@@ -71,6 +71,10 @@ def _key_for(mk: Any, c: int, month: int) -> tuple[str, Any]:
 
 
 def drought_tables(train: pd.DataFrame, h: int) -> dict[str, Any]:
+    """The Markov drought model fitted on `train` at one horizon: for every category and month,
+    which row the live model uses, the row, and per-year counts of where those cells stood h weeks
+    later.
+    """
     from cofire.model.targets import N_CATEGORIES, MarkovBaseline, _season
 
     mk = MarkovBaseline(horizon=h).fit(train)
@@ -104,6 +108,10 @@ def drought_tables(train: pd.DataFrame, h: int) -> dict[str, Any]:
 
 
 def fire_tables(train: pd.DataFrame, h: int) -> dict[str, Any]:
+    """Per threshold at one horizon, the logistic's intercept and slope fitted as the live model
+    fits them, and per-year counts of training cell-weeks and events by season and 10-point dryness
+    band.
+    """
     from sklearn.linear_model import LogisticRegression
 
     from cofire.model.targets import SEASONS
@@ -135,6 +143,9 @@ def fire_tables(train: pd.DataFrame, h: int) -> dict[str, Any]:
 
 
 def build(domain: str) -> dict[str, Any]:
+    """One domain's explanation tables: the training window, drought and fire tables per horizon,
+    and any live adopted arms.
+    """
     from cofire.v12 import live
 
     train = training_frame(domain)
@@ -149,6 +160,7 @@ def build(domain: str) -> dict[str, Any]:
 
 
 def write(out: Path = OUT) -> list[Path]:
+    """Write every domain's explanation tables under `out` and return the paths."""
     from cofire.ship import domains
 
     paths = []

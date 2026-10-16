@@ -13,7 +13,6 @@ from __future__ import annotations
 from collections.abc import Callable
 
 import numpy as np
-
 from cofire.ship.leak_gate import GateResult, Stream, run_gate
 from cofire.v12 import recal
 

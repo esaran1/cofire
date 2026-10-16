@@ -131,6 +131,8 @@ warn_unused_ignores = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# research/ (non-shipping arms) is a top-level package beside cofire/.
+pythonpath = ["."]
 addopts = "-q"
 filterwarnings = [
   "ignore::DeprecationWarning",

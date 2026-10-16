@@ -31,6 +31,10 @@ def _stage(n: int) -> dict[str, Any]:
 
 
 def build() -> dict[str, Any]:
+    """The v1.2 results for the Method page, from the stage artifacts: each stage's arms against
+    configuration A, the live arms, the survivor recheck, stage 4's interval verdict and the
+    preregistration hash.
+    """
     prereg = hashlib.sha256(Path("docs/PREREGISTRATION_V12.md").read_bytes()).hexdigest()
     stages: list[dict[str, Any]] = []
 
@@ -86,6 +90,7 @@ def build() -> dict[str, Any]:
 
 
 def write() -> Path:
+    """Build the v1.2 facts, write them to app/lib/facts_v12.json, and return the path."""
     OUT.write_text(json.dumps(build(), indent=1, default=float) + "\n")
     return OUT
 

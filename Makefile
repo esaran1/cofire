@@ -31,7 +31,7 @@ export:
 # The shipped path: frozen configuration -> export -> rendering -> bundles.
 # cofire/model/ is frozen at FREEZE_COMMIT; everything here reads it.
 ship:
-	$(PY) -m cofire.ship.pid_audit
+	$(PY) -m research.audits.pid_audit
 	$(PY) -m cofire.ship.rendering
 	$(PY) -m cofire.ship.export
 	$(PY) -m cofire.ship.bundles
@@ -124,7 +124,7 @@ test:
 	cd app && npx tsc --noEmit
 
 lint:
-	$(UV) run ruff check cofire tests scripts
-	$(UV) run mypy --strict cofire/model cofire/ship cofire/v12
+	$(UV) run ruff check cofire research tests scripts
+	$(UV) run mypy --strict cofire/model cofire/ship cofire/v12 cofire/v13 cofire/api research
 	$(PY) scripts/check_copy.py
 	$(PY) scripts/check_stats.py

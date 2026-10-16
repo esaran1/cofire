@@ -340,6 +340,10 @@ def _credits() -> list[dict[str, str]]:
 
 
 def build() -> dict[str, Any]:
+    """Every fact the site shows, read from artifacts: the configuration and split, survivors,
+    multiplicity, SubX, look-3 results, audits, rendering decisions, ledger, sources, credits and
+    the hashes that pin them.
+    """
     return {
         "generated_from": "artifacts/",
         "note": (
@@ -387,6 +391,7 @@ def build() -> dict[str, Any]:
 
 
 def write(out: Path = OUT) -> Path:
+    """Build the facts and write them as JSON to `out`, returning the path."""
     facts = build()
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(facts, indent=2))

@@ -3,7 +3,7 @@
  *
  *   node scripts/stills.mjs Film 34 37 40.5     # -> out/stills/Film_034.00.png ...
  *
- * Needs capture/serve.py running for the map scenes (render.mjs starts it).
+ * Needs scripts/serve_static.py running for the map scenes (render.mjs starts it).
  */
 import { bundle } from "@remotion/bundler";
 import { renderStill, selectComposition } from "@remotion/renderer";

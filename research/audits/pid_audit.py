@@ -41,7 +41,7 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-LOGGER = logging.getLogger("cofire.ship.pid_audit")
+LOGGER = logging.getLogger("research.audits.pid_audit")
 
 OUT = Path("artifacts/audit")
 COVERAGE_TARGET = 0.90

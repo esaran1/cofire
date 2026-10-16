@@ -10,8 +10,8 @@ One AWDB request per year for every candidate station, through `safe_fetch`
 (the host is already allowlisted for NRCS), priced first. The station lists
 are written before any stage-2 model is fitted.
 
-    python -m cofire.v12.snotel price
-    python -m cofire.v12.snotel fetch
+    python -m research.v12.snotel price
+    python -m research.v12.snotel fetch
 """
 
 from __future__ import annotations
@@ -24,7 +24,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from cofire.v12 import common
 
 AWDB = "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data"

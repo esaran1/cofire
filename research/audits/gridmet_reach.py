@@ -5,7 +5,7 @@ reader and ledger accounting as the refresh, and compares it cell-day by
 cell-day with the latest held vintage. Nothing is stored as a vintage here;
 the result decides the provisional window (docs/DECISIONS.md).
 
-    python -m cofire.ship.gridmet_reach 2026 <n_days>
+    python -m research.audits.gridmet_reach 2026 <n_days>
 """
 
 from __future__ import annotations

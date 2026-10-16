@@ -33,10 +33,14 @@ CI_BUDGET_BYTES = 1_000_000_000
 
 
 def ledger_path() -> Path:
+    """The local download ledger: COFIRE_LEDGER_PATH if set, else data/ledger.json."""
     return Path(os.environ.get("COFIRE_LEDGER_PATH", "data/ledger.json"))
 
 
 def check(session: str, path: Path = CI_LEDGER, ceiling: int = CEILING_BYTES) -> dict[str, object]:
+    """Total one CI session's transfers in the ledger at `path`: the number of transfers, bytes, the
+    ceiling, how many were rejected, and whether the total is within the ceiling.
+    """
     blob = json.loads(path.read_text()) if path.exists() else {"transfers": []}
     tag = f"session={session}"
     rows = [t for t in blob["transfers"] if tag in t.get("note", "").split("; ")]

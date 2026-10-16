@@ -65,6 +65,7 @@ _OPEN_OVERHEAD = 4_300
 
 
 def settings_for(domain: str) -> Settings:
+    """Frozen settings for one domain's subset, after registering the v1.1 domains."""
     domains.register()
     return Settings(subset_name=domain, dev_subset=True)
 
@@ -179,6 +180,9 @@ def price(ledger: DownloadLedger, years: range = YEARS, extra_years: tuple[int, 
 
 
 def run(years: range = YEARS) -> dict[str, list[int]]:
+    """Fetch every year of daily ERC for each new domain into the frozen cache, checking each year's
+    size against the previous five, and return the cached sizes per domain.
+    """
     ledger = DownloadLedger(Path("data/ledger.json"))
     sizes: dict[str, list[int]] = {}
     for d in domains.NEW:

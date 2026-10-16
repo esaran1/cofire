@@ -183,7 +183,7 @@ function BriefSheet({ brief, lang, todo }: { brief: Brief; lang: Lang; todo: Tod
             )
           </span>
         </p>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={t("brief.waterTitle")}>
         <table className="mt-3 w-full min-w-[30rem] text-sm print:min-w-0" data-testid="brief-fire">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wide text-mute">

@@ -25,6 +25,7 @@ class CalendarError(AssertionError):
 
 
 def expected_weeks(year: int, through: pd.Timestamp | None = None) -> set[pd.Timestamp]:
+    """The Tuesdays of `year`, through `through` when it is given."""
     end = pd.Timestamp(f"{year}-12-31")
     if through is not None:
         end = min(end, pd.Timestamp(through))
@@ -32,6 +33,9 @@ def expected_weeks(year: int, through: pd.Timestamp | None = None) -> set[pd.Tim
 
 
 def weeks_present(year: int, raw: Path = RAW) -> set[pd.Timestamp]:
+    """The weeks whose maps are in the year's USDM archive, read from the member names; empty if
+    there is no archive.
+    """
     z = raw / "usdm" / f"{year}_USDM_M.zip"
     if not z.exists():
         return set()
@@ -45,6 +49,7 @@ def weeks_present(year: int, raw: Path = RAW) -> set[pd.Timestamp]:
 
 
 def missing(year: int, raw: Path = RAW, through: pd.Timestamp | None = None) -> list[pd.Timestamp]:
+    """The expected weeks of `year` that the archive lacks, in order."""
     return sorted(expected_weeks(year, through) - weeks_present(year, raw))
 
 

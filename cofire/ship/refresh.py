@@ -76,6 +76,7 @@ def national_peers(archive: Path, n: int = 8) -> list[int]:
 
 
 def record_national_size(name: str, n_bytes: int) -> None:
+    """Save a national weekly map's size to the sizes file, as a peer for later size checks."""
     sizes: dict[str, int] = json.loads(NATIONAL_SIZES.read_text()) if NATIONAL_SIZES.exists() else {}
     sizes[name] = n_bytes
     NATIONAL_SIZES.write_text(json.dumps(dict(sorted(sizes.items())), indent=1) + "\n")
@@ -148,6 +149,10 @@ def same_export(previous: bytes, current: Path, atol: float = 1e-9) -> bool:
 
 
 def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
+    """Run one weekly refresh: fetch missing USDM maps and new ERC days, rebuild the export through
+    the latest complete issue, then the bundles, demo fixture, story and brief, publish new issues,
+    and append the run to the log, which is returned. The look counter must read 3 before and after.
+    """
     from cofire.model.freeze import look_count
     from cofire.ship import bundles, demo, export, story
 
@@ -206,6 +211,7 @@ def run(now: pd.Timestamp | None = None) -> dict[str, Any]:
 
 
 def log_append(entry: dict[str, Any]) -> None:
+    """Append one run's entry to the refresh log."""
     runs = json.loads(LOG.read_text()) if LOG.exists() else []
     runs.append(entry)
     LOG.parent.mkdir(parents=True, exist_ok=True)

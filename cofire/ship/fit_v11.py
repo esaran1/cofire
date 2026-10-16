@@ -49,6 +49,9 @@ CONT_ARMS = ("damped_regression", "decile_mean")
 
 
 def folds(frames: dict[str, pd.DataFrame] | None = None) -> dict[str, Any]:
+    """The fold years per domain (training years whose mean USDM category is above the domain's 2007
+    to 2021 median) and the years that are folds in every domain.
+    """
     out: dict[str, Any] = {"rule": "training years whose footprint-mean USDM category exceeds the domain's 2007-2021 median"}
     per: dict[str, list[int]] = {}
     for d in domains.ORDER:
@@ -64,6 +67,9 @@ def folds(frames: dict[str, pd.DataFrame] | None = None) -> dict[str, Any]:
 
 
 def with_targets(frame: pd.DataFrame, pct: np.ndarray) -> pd.DataFrame:
+    """A copy of the frame with `erc_pct` replaced by `pct` and the horizon and event target columns
+    added.
+    """
     from cofire.model.features_a import add_horizons
     from cofire.model.targets import HORIZONS, all_event_targets
 
@@ -79,6 +85,9 @@ def embargo(train: pd.DataFrame, before: pd.Timestamp, h: int) -> pd.DataFrame:
 
 
 def predict_event(family: str, h: int, train: pd.DataFrame, target: str, index: pd.DataFrame) -> np.ndarray:
+    """Event probabilities for `index` from one family fitted on `train`: the frozen Markov drought
+    predictor for markov, else the frozen fire predictor.
+    """
     from cofire.model.shipping import _drought_prediction, _fire_prediction
 
     if family == "markov":
@@ -145,6 +154,10 @@ def _score(df: pd.DataFrame, years: list[int]) -> pd.DataFrame:
 
 
 def choose() -> dict[str, Any]:
+    """Pick, for each target, the arm with the lowest mean per-domain score on the shared folds;
+    write the choices and continuous arms with their fit-window sidecars, and the score tables,
+    under artifacts/v11, and return them.
+    """
     from cofire.model.fit_window import TRAIN_ONLY, FitWindow, checked_load, write_sidecar
     from cofire.model.shipping import load as load_frozen
 
@@ -204,6 +217,9 @@ def load_choices(domain: str) -> dict[tuple[str, int], Any]:
 
 
 def continuous_arms(domain: str) -> dict[int, str]:
+    """The continuous ERC arm per horizon for a domain, from the v1.1 or the frozen choices, through
+    the strict fit-window check.
+    """
     from cofire.model.fit_window import checked_load
 
     out_dir = OUT if domain in domains.NEW else Path("artifacts/rerun_a")

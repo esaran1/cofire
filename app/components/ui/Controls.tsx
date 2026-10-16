@@ -1,68 +1,17 @@
 "use client";
 
-import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "motion/react";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useState } from "react";
 import { useT } from "@/lib/i18n";
 
 /**
  * Shared control layer. One radius rule (surfaces near-sharp at 2px,
  * interactive elements full-pill), one accent (ember), one numeral treatment.
  * Route files use these; they do not invent values.
+ *
+ * Nothing here imports the animation library, so a page that uses only these
+ * (the map, the brief) does not download it. The animated controls,
+ * Segmented and CountUp, are in ./Animated.
  */
-
-/** Segmented picker. A real control, not a styled <select>. */
-export function Segmented<T extends string | number>({
-  options,
-  value,
-  onChange,
-  label,
-  tone = "ember",
-}: {
-  options: { value: T; label: string; hint?: string }[];
-  value: T;
-  onChange: (v: T) => void;
-  label: string;
-  tone?: "ember" | "ochre";
-}) {
-  const reduce = useReducedMotion();
-  const fill = tone === "ochre" ? "bg-ochre" : "bg-ember";
-  return (
-    <fieldset>
-      <legend className="text-sm font-medium text-ink">{label}</legend>
-      <div
-        role="radiogroup"
-        aria-label={label}
-        className="mt-2 flex flex-wrap gap-1 rounded-full border border-rule bg-paper-raised p-1"
-      >
-        {options.map((o) => {
-          const active = o.value === value;
-          return (
-            <button
-              key={String(o.value)}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              onClick={() => onChange(o.value)}
-              className={`relative flex-1 min-w-[5rem] rounded-full px-3 py-2 text-sm transition-transform active:scale-[0.97] ${
-                active ? "text-paper" : "text-ink-soft hover:text-ink"
-              }`}
-            >
-              {active && (
-                <motion.span
-                  layoutId={`seg-${label}`}
-                  className={`absolute inset-0 rounded-full ${fill}`}
-                  transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 32 }}
-                />
-              )}
-              <span className="relative z-10 block font-medium leading-tight">{o.label}</span>
-              {o.hint && <span className="relative z-10 block text-[11px] leading-tight opacity-75">{o.hint}</span>}
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
-}
 
 /** Every measurement in the app renders through this. Mono, tabular. */
 export function Numeral({
@@ -214,7 +163,6 @@ export function Disclosure({
   detail?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const reduce = useReducedMotion();
   const { t } = useT();
   return (
     <div>
@@ -228,19 +176,12 @@ export function Disclosure({
           {open ? t("ui.hide") : (detail ?? t("ui.why"))}
         </button>
       </div>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={reduce ? false : { height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={reduce ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="text-mute pt-2 text-[11px] leading-relaxed">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {open && (
+        // Slides a few pixels into place (globals.css); never fades from nothing.
+        <div className="disclosure-in">
+          <div className="text-mute pt-2 text-[11px] leading-relaxed">{children}</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -295,44 +236,5 @@ export function StatRow({
         {value}
       </span>
     </div>
-  );
-}
-
-/**
- * A number that counts up when it scrolls into view.
- *
- * Motivated, not decorative: it draws the eye to the headline verdict of a
- * section before the reader starts scanning detail. Collapses to the final
- * value instantly under reduced motion.
- */
-export function CountUp({
-  to,
-  decimals = 0,
-  suffix = "",
-}: {
-  to: number;
-  decimals?: number;
-  suffix?: string;
-}) {
-  const reduce = useReducedMotion();
-  const [shown, setShown] = useState(reduce ? to : 0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
-
-  useEffect(() => {
-    if (reduce || !inView) return;
-    const controls = animate(0, to, {
-      duration: 0.9,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => setShown(v),
-    });
-    return () => controls.stop();
-  }, [inView, to, reduce]);
-
-  return (
-    <span ref={ref} className="num">
-      {shown.toFixed(decimals)}
-      {suffix}
-    </span>
   );
 }

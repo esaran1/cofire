@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./e2e",
   // The screenshot suite is run deliberately, not on every smoke run: it is
   // slow and it writes into artifacts/.
-  testIgnore: process.env.SHOOT ? [] : ["**/screens.spec.ts"],
+  testIgnore: process.env.SHOOT ? ["**/static/**"] : ["**/screens.spec.ts", "**/static/**"],
   timeout: 60_000,
   use: {
     baseURL: "http://127.0.0.1:3000",

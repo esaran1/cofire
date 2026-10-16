@@ -93,6 +93,7 @@ class FetchRefused(RuntimeError):
 
 @dataclass
 class FetchResult:
+    """A completed fetch: the final URL, where it was saved, its size in bytes and its sha256."""
     url: str
     path: Path
     n_bytes: int
@@ -104,6 +105,9 @@ IDENTITY = {"Accept-Encoding": "identity"}
 
 
 def check_url(url: str) -> None:
+    """Raise FetchRefused unless the URL is HTTPS to an allowlisted host, and on an allowed path
+    where the host requires one.
+    """
     u = urlparse(url)
     if u.scheme != "https":
         raise FetchRefused(f"not HTTPS: {url}")
@@ -133,6 +137,9 @@ def check_magic(head: bytes, fmt: str) -> None:
 
 
 def check_peer_size(n_bytes: int, peers: list[int]) -> None:
+    """Raise FetchRefused if a size is more than 5x or less than 0.2x the median of its peers; with
+    no peers there is no check.
+    """
     if not peers:
         return
     med = statistics.median(peers)
@@ -144,6 +151,7 @@ def check_peer_size(n_bytes: int, peers: list[int]) -> None:
 
 
 def session_bytes(ledger: object) -> int:
+    """Bytes the ledger has recorded against the current fetch session."""
     transfers = getattr(ledger, "_transfers", [])
     return sum(t.bytes for t in transfers if f"session={SESSION}" in (t.note or ""))
 
