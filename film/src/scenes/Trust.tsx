@@ -241,6 +241,7 @@ export const Leak: React.FC = () => {
   const draw = ramp(t, 0.9, 2.0);
   return (
     <Dark>
+      <AbsoluteFill style={{ transformOrigin: "50% 55%", transform: `scale(${lerp(1, 1.06, t / 8.7)}) translateX(${lerp(12, -12, t / 8.7)}px)` }}>
       <div style={{ position: "absolute", left: 0, right: 0, top: 150, textAlign: "center", opacity: inOut(t, 0.2, 4.7) }}>
         <Label size={44} style={{ fontFamily: FONT.serif }}>As tested, each range was corrected with an outcome</Label>
         <Label size={44} style={{ fontFamily: FONT.serif }}>a real forecast would not know yet.</Label>
@@ -274,6 +275,7 @@ export const Leak: React.FC = () => {
       <div style={{ position: "absolute", right: left, top: top + 176 }}>
         <Label size={28} color="rgba(244,242,236,0.7)">weeks →</Label>
       </div>
+      </AbsoluteFill>
     </Dark>
   );
 };

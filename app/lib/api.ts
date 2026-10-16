@@ -3,12 +3,24 @@ import type { z } from "zod";
 export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
 /**
+ * The static site (GitHub Pages) has no live service unless one is named. Its
+ * pages that need one (Predict, Observe) say so; they must not send a
+ * visitor's browser to a service on the visitor's own computer.
+ */
+const NO_SERVICE = !!process.env.NEXT_PUBLIC_DATA_BASE && !process.env.NEXT_PUBLIC_API_URL;
+
+function serviceUrl(path: string): string {
+  if (NO_SERVICE) throw new Error("This page needs the live service, which the static site does not have.");
+  return `${API}${path}`;
+}
+
+/**
  * Every response is parsed at the boundary. A malformed or unexpectedly-null
  * field is surfaced here, where it can be defaulted, rather than thrown deep
  * inside a component where it takes the whole route down.
  */
 export async function getParsed<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API}${path}`, { cache: "no-store", ...init });
+  const res = await fetch(serviceUrl(path), { cache: "no-store", ...init });
   if (res.status === 429) throw new Error("That is a lot in one minute. Wait a moment, then try again.");
   if (!res.ok) throw new Error(`${path} returned ${res.status}`);
   const raw: unknown = await res.json();
@@ -31,7 +43,7 @@ export async function postParsed<T>(path: string, body: unknown, schema: z.ZodTy
 
 /** Raw JSON escape hatch for endpoints without a schema yet. */
 export async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${API}${path}`, { cache: "no-store" });
+  const res = await fetch(serviceUrl(path), { cache: "no-store" });
   if (!res.ok) throw new Error(`${path} ${res.status}`);
   return res.json() as Promise<T>;
 }

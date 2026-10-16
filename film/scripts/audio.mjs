@@ -204,11 +204,23 @@ function srt(lang) {
   for (const l of lines) {
     const text = lang === "es" ? l.text_es : l.text_en;
     const cs = chunks(text);
-    const end = Math.min(l.start + l.dur + 0.3, l.slotEnd - 0.05);
-    const total = cs.reduce((a, c) => a + c.length, 0);
+    // Spanish runs longer than the English voice it is timed to, so its cues
+    // use the whole slot; English follows the voice.
+    const end = lang === "es" ? l.slotEnd - 0.1 : Math.min(l.start + l.dur + 0.3, l.slotEnd - 0.05);
+    // Time shared by length, but no cue under one second: a short piece takes
+    // its second from the longer pieces of the same line.
+    const span = end - l.start;
+    let ds = cs.map((c) => (span * c.length) / cs.reduce((a, x) => a + x.length, 0));
+    const MIN = Math.min(1.0, span / cs.length);
+    const shortN = ds.filter((d) => d < MIN).length;
+    if (shortN) {
+      const rest = span - shortN * MIN;
+      const longSum = ds.filter((d) => d >= MIN).reduce((a, d) => a + d, 0);
+      ds = ds.map((d) => (d < MIN ? MIN : (d * rest) / longSum));
+    }
     let t = l.start;
-    for (const c of cs) {
-      const d = ((end - l.start) * c.length) / total;
+    for (const [k, c] of cs.entries()) {
+      const d = ds[k];
       blocks.push(`${++n}\n${ts(t)} --> ${ts(t + d - 0.04)}\n${c}\n`);
       t += d;
     }

@@ -1,4 +1,23 @@
-# STATUS: v1.2 complete (2026-10-11), preregistered
+# STATUS: v1.3 (2026-10-15), first cut of the film rendered
+
+## v1.3, 2026-10-15
+
+| Stage | State |
+|---|---|
+| 1, frequency framing | Done. Every per-cell probability in the Place Card and brief has an "in 100 weeks like this one" sentence and a 10x10 icon array, rounded as the percentage beside it. |
+| 2, weeks like this one | Done. Training-year cases (2007 to 2021, asserted) behind each drought probability, reproducing the odds; similar weeks for fire, labeled as illustration. |
+| 3, why did this change | Done. Week-over-week change split into state, season and method; parts sum to the total; shown above 5 points. |
+| 4, the demo film | First cut rendered on 2026-10-15 (`film/`): 2:49.6, master 1920x1080 at 60 fps, 30 fps upload, captioned upload, vertical 45 s, captions in English and Spanish, -14 LUFS. Scratch voice and silent music until the student records (`film/RECORDING_GUIDE.md`). |
+| 5, reviewer legibility | Done. `research/`, the shipped-path test, docstrings, the architecture diagram, "For reviewers". |
+| 6, open data | Done. CSV, GeoJSON and JSON of every issue, `index.json`, `/data` dictionary page, CC BY 4.0. |
+| 7, executable unseal | Done, not run. `scripts/unseal_2026.py` and `docs/PREREGISTRATION_UNSEAL.md` (a draft for the owner to review before 2027-01-12). |
+| 8, monitoring, accessibility, performance | Daily smoke run with alert issue; axe in CI, 0 serious or critical; Lighthouse mobile 94/94/94 (target 95 not reached; see DECISIONS). |
+
+Also fixed: the site build no longer fetches fonts (it broke when Google
+Fonts changed its responses), and the basemap's rivers are drawn as lines,
+not wedges.
+
+## v1.2 complete (2026-10-11), preregistered
 
 ## v1.2, started 2026-10-11
 
