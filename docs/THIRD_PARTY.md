@@ -26,14 +26,20 @@ renders the data, map and photo credits from `app/lib/facts.json`
 
 ## Fonts
 
-Self-hosted at build time by `next/font/google`. All three are under the SIL
-Open Font License 1.1, which requires no on-screen credit.
+Committed in `app/fonts/` and loaded with `next/font/local`, so the build
+fetches nothing. They are the latin-subset files `next/font/google` served
+until 2026-10-15, byte for byte; that day Google Fonts returned font URLs
+`next/font` could not parse and the site build failed, so the files were
+taken from the last good build instead of fetched again. All three are under
+the SIL Open Font License 1.1, which requires no on-screen credit; the
+license and each family's copyright line (from the files' own name tables)
+are in `app/fonts/OFL.txt`. The film (`film/`) uses the same files.
 
-| Font | License |
-|---|---|
-| Newsreader | SIL OFL 1.1 |
-| Outfit | SIL OFL 1.1 |
-| IBM Plex Mono | SIL OFL 1.1 |
+| Font | Version (name table) | Files | License |
+|---|---|---|---|
+| Newsreader | 1.003 | `Newsreader-latin.woff2`, `Newsreader-Italic-latin.woff2` (variable, 300 to 500) | SIL OFL 1.1 |
+| Outfit | 1.100 | `Outfit-latin.woff2` (variable, 300 to 600) | SIL OFL 1.1 |
+| IBM Plex Mono | 2.3 | `IBMPlexMono-Regular-latin.woff2`, `IBMPlexMono-Medium-latin.woff2` | SIL OFL 1.1 |
 
 ## Code libraries (main runtime dependencies)
 
