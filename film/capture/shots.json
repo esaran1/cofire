@@ -27,6 +27,7 @@
   "2026-09-29",
   "2026-10-06"
  ],
- "note": "Fixed inputs for capture/capture.mjs. issue: the latest published issue when the film was cut; clock: two days after it, inside the app's 11-day staleness window, so no stale badge; cell: the published Denver cell nearest downtown (39.74 N, 104.99 W). start_domain: where the pick starts, an area whose map has drought odds at this horizon.",
- "start_domain": "upper_south_platte"
+ "note": "Fixed inputs for capture/capture.mjs. issue: the latest published issue when the film was cut; clock: two days after it, inside the app's 11-day staleness window, so no stale badge; cell: the published Denver cell nearest downtown (39.74 N, 104.99 W). start_domain: where the pick starts, an area whose map has drought odds at this horizon. weekly_layer: the layer for the weekly-refresh shot; fire-spread dryness changes week to week, where drought odds in Denver mostly hold.",
+ "start_domain": "upper_south_platte",
+ "weekly_layer": "fire"
 }

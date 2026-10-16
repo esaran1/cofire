@@ -1,7 +1,8 @@
 # COFIRE demo film: review
 
 The checklist from the brief, completed on 2026-10-16 against the first cut
-rendered that day.
+rendered that day, and gone through again the same day against the second
+cut (see "Second pass").
 - **Evidence:** measured from the rendered files by `scripts/review.mjs`
   (`out/review.json`, with contact sheets in `out/review/`). Each result says
   how it was checked.
@@ -46,13 +47,53 @@ rendered that day.
 - **Number tracing:** "sha256" typed into a label failed the number trace;
   that card now says "fingerprint".
 
-## Outputs and render times (2026-10-16)
+## Second pass: the second half rebuilt (2026-10-16)
+
+The first cut's opening held up, but from the trust section on, several shots
+were plain cards or app pages shown too small to read. Each was rebuilt and
+then checked again, frame by frame:
+
+- **"Why trust it?"** now sits over a slow field of faint points, not a
+  flat dark frame.
+- **Held out, frozen, counted.** One diagram replaces the separate freeze
+  card and look counter.
+  - A bar of the years shows training, validation and calibration, then
+    2026, which glows and locks.
+  - The two seal cards (the commit, and the test's fingerprint) settle
+    under it.
+  - The camera pushes in on 2026 while its three looks are marked, and ends
+    on the date it is scored in full.
+- **The leak** is now a diagram of the mistake itself.
+  - A red arc reaches from today to the week being forecast and pulls that
+    week's outcome back.
+  - When the narration turns to "in real time", the arc is struck out.
+    Arcs from past weeks bring in only outcomes already known.
+- **Weekly refresh:** the fire-spread layer, which changes visibly from
+  week to week, crossfades between issues.
+- **Forecast record, seal notice, open data:** each page is framed on its
+  content column, close enough to read the dates, fingerprints and the
+  notice.
+  - The record shot opens on the table and the seal shot opens on the
+    notice, so the two no longer begin on the same view.
+- **Ending:** the film closes as it opened, on the live map. It pulls back
+  from the three areas to all five, then fades into the end card.
+- **Map edges:** where the bundled tiles stop, the map now fades into the
+  background rather than ending at a hard edge, in the opening and the
+  finale.
+- **Pick and fly-in:**
+  - The laptop stays centered.
+  - The screen eases from the full app to the place menu, so the change
+    from Upper South Platte to Denver can be read.
+  - The fly-in starts from that same view.
+- **Brief:** the printed sheet is larger and slides up into frame.
+
+## Outputs and render times (second cut, 2026-10-16)
 
 | File | Length | Size |
 |---|---|---|
-| `out/cofire_master_1920x1080_60fps.mp4` | 2:49.6 | about 198 MB |
-| `out/cofire_upload_1920x1080_30fps.mp4` | 2:49.6 | about 102 MB |
-| `out/cofire_upload_1920x1080_30fps_captions_en.mp4` | 2:49.6 | about 93 MB |
+| `out/cofire_master_1920x1080_60fps.mp4` | 2:49.6 | about 200 MB |
+| `out/cofire_upload_1920x1080_30fps.mp4` | 2:49.6 | about 104 MB |
+| `out/cofire_upload_1920x1080_30fps_captions_en.mp4` | 2:49.6 | about 95 MB |
 | `out/cofire_vertical_1080x1920_30fps_45s.mp4` | 0:45.0 | about 52 MB |
 | `out/captions_en.srt`, `out/captions_es.srt` | 35 and 42 cues | |
 | `out/cofire_animatic_640x360_15fps_scratch.mp4` | 2:49.6 | about 10 MB |
@@ -63,14 +104,14 @@ rendered that day.
 | Render | Time |
 |---|---|
 | P1 (cold open) | 1.3 min |
-| P2 (map act) | 4.6 min |
-| P3 (product) | 6.2 min |
-| P4 (trust) | 3.3 to 3.6 min |
-| P5 (close) | 1.5 min |
+| P2 (map act) | 3.7 min |
+| P3 (product) | 6.5 min |
+| P4 (trust) | 3.8 min |
+| P5 (close) | 2.0 min |
 | **Master total** | **about 17 min** |
 | Exports (30 fps, captions) | 1.3 min |
-| Vertical | 3.6 min |
-| Animatic | 2.7 min |
+| Vertical | 3.8 min |
+| Animatic | 2.4 min |
 | Captures (one command) | 3.8 min |
 
 No render came close to the 60-minute cap.

@@ -10,6 +10,7 @@ import { Label } from "../components/Type";
 import { FONT, T } from "../theme";
 import { shot } from "../data";
 import { field } from "../trace";
+import { MapAct } from "./MapAct";
 import { clamp01, easeOut, inOut, lerp, ramp, useT } from "../util";
 
 const W = 1920, H = 1080, A = W / H;
@@ -42,36 +43,42 @@ export const Weekly: React.FC = () => {
   const wk = cap("weekly") as unknown as { files: string[] };
   const files = wk.files;
   const dur = shot("close.weekly").end - shot("close.weekly").start;
-  // The issues flip over [0.3, dur - 0.5] s; scripts/audio.mjs ticks at the same moments.
-  const i = Math.min(files.length - 1, Math.max(0, Math.floor(((t - 0.3) / (dur - 0.8)) * files.length)));
-  const view = { x: lerp(0, 160, t / dur), y: lerp(0, 40, t / dur), w: lerp(1920, 1640, t / dur) };
+  // Issue after issue, dissolving into each other over [0.3, dur - 0.5] s; scripts/audio.mjs ticks at the same moments.
+  const f = Math.min(files.length - 1, Math.max(0, ((t - 0.3) / (dur - 0.8)) * files.length));
+  const i = Math.min(files.length - 1, Math.floor(f));
+  const frac = i >= files.length - 1 ? 0 : clamp01((f - i - 0.35) / 0.65);
+  const view = { x: lerp(120, 300, t / dur), y: lerp(40, 110, t / dur), w: lerp(1780, 1560, t / dur) };
   const k = W / view.w;
   return (
     <AbsoluteFill style={{ background: T.ink, overflow: "hidden" }}>
       <div style={{ position: "absolute", width: 1920, height: 1080, transformOrigin: "0 0", transform: `translate(${-view.x * k}px, ${-view.y * k}px) scale(${k})` }}>
         <Img src={staticFile(`captures/${files[i]}`)} style={{ position: "absolute", width: 1920, height: 1080 }} />
+        {frac > 0 ? <Img src={staticFile(`captures/${files[i + 1]}`)} style={{ position: "absolute", width: 1920, height: 1080, opacity: frac }} /> : null}
       </div>
     </AbsoluteFill>
   );
 };
 
+/** The forecast record, close enough to read: every issue's publish time and fingerprint. */
 export const Record: React.FC = () => {
   const t = useT();
-  const s = cap("scoreboard");
-  const table = s.rects?.["score-table"];
-  const title = s.rects?.["score-title"] ?? { x: 0, y: 0, w: 1920, h: 200 };
-  const top = { x: 360, y: 0, w: 1200 };
-  const keys: Key[] = [{ t: 0, view: top }, { t: 3.9, view: table ? { x: table.x - 80, y: table.y - 60, w: Math.max(1100, table.w + 160) } : { x: 360, y: 700, w: 1200 } }];
-  void title;
+  const table = rect("scoreboard", "score-table");
+  // The fingerprints themselves, and down the list; the next shot holds the seal notice above them.
+  const keys: Key[] = [
+    { t: 0, view: { x: table.x - 40, y: table.y - 90, w: table.w + 80 } },
+    { t: 3.8, view: { x: table.x - 30, y: table.y + 230, w: table.w + 20 } },
+  ];
   return <AbsoluteFill style={{ background: T.paper }}><CapturePlane name="scoreboard" t={t} keys={keys} box={{ w: W, h: H }} /></AbsoluteFill>;
 };
 
+/** The seal notice, then what will be scored. */
 export const Seal: React.FC = () => {
   const t = useT();
   const r = rect("scoreboard", "score-seal");
-  const a = around(r, A, 0.35);
-  const b = around(r, A, 0.08);
-  return <AbsoluteFill style={{ background: T.paper }}><CapturePlane name="scoreboard" t={t} keys={[{ t: 0, view: a }, { t: 2.0, view: b }, { t: 5.6, view: { ...b, w: b.w * 0.96, x: b.x + 6 } }]} box={{ w: W, h: H }} /></AbsoluteFill>;
+  const a = around(r, A, 0.14);
+  const b = around(r, A, 0.05);
+  const list = { x: r.x - 30, y: r.y + r.h + 10, w: r.w + 60 };
+  return <AbsoluteFill style={{ background: T.paper }}><CapturePlane name="scoreboard" t={t} keys={[{ t: 0, view: a }, { t: 2.6, view: b }, { t: 5.6, view: { ...list, y: list.y - 60 } }]} box={{ w: W, h: H }} /></AbsoluteFill>;
 };
 
 /** The open data page, when it has been captured (it ships with v1.3 stage 6). */
@@ -84,22 +91,13 @@ export const OpenData: React.FC<{ draft?: boolean }> = ({ draft = false }) => {
   }
   const latest = rect("datadict", "data-latest");
   const dict = rect("datadict", "data-dictionary");
-  const a = around({ x: latest.x, y: latest.y - 130, w: latest.w, h: latest.h + 130 }, A, 0.12);
-  const b = around({ x: dict.x, y: dict.y, w: dict.w, h: 420 }, A, 0.1);
-  return <AbsoluteFill style={{ background: T.paper }}><CapturePlane name="datadict" t={t} keys={[{ t: 0, view: a }, { t: 1.4, view: a }, { t: 4.9, view: b }]} box={{ w: W, h: H }} /></AbsoluteFill>;
+  const a = { x: latest.x - 40, y: latest.y - 150, w: latest.w + 80 };
+  const b = { x: dict.x - 40, y: dict.y - 40, w: dict.w + 80 };
+  return <AbsoluteFill style={{ background: T.paper }}><CapturePlane name="datadict" t={t} keys={[{ t: 0, view: { ...a, y: a.y - 20 } }, { t: 1.8, view: a }, { t: 4.9, view: b }]} box={{ w: W, h: H }} /></AbsoluteFill>;
 };
 
-export const Final: React.FC = () => {
-  const t = useT();
-  const keys: Key[] = [{ t: 0, view: { x: 380, y: 60, w: 1450 } }, { t: 5.3, view: { x: 0, y: 0, w: 1920 } }];
-  return (
-    <AbsoluteFill style={{ background: T.ink }}>
-      <CapturePlane name="final" t={t} keys={keys} box={{ w: W, h: H }} />
-      <AbsoluteFill style={{ background: `linear-gradient(180deg, rgba(23,24,27,0) 55%, rgba(23,24,27,${0.75 * ramp(t, 2.5, 5.3)}) 100%)` }} />
-      <AbsoluteFill style={{ background: T.ink, opacity: ramp(t, 4.6, 5.3) }} />
-    </AbsoluteFill>
-  );
-};
+/** The finale: back to the map of the opening, at the latest issue, pulling back to all five areas. */
+export const Final: React.FC = () => <MapAct W={W} H={H} finale />;
 
 export const Wordmark: React.FC<{ size: number }> = ({ size }) => (
   <div style={{ fontFamily: FONT.serif, fontSize: size, letterSpacing: "0.01em", color: T.paper, lineHeight: 1 }}>
@@ -109,9 +107,9 @@ export const Wordmark: React.FC<{ size: number }> = ({ size }) => (
 
 export const EndCard: React.FC<{ portrait?: boolean; dur?: number }> = ({ portrait = false, dur = 3 }) => {
   const t = useT();
-  const u = easeOut(clamp01(t / 0.8));
+  const u = easeOut(clamp01(t / 0.45));
   return (
-    <AbsoluteFill style={{ background: T.ink, justifyContent: "center", alignItems: "center", opacity: 1 - ramp(t, dur - 0.5, dur) * 0.0 }}>
+    <AbsoluteFill style={{ background: T.ink, justifyContent: "center", alignItems: "center" }}>
       <div style={{ textAlign: "center", transform: `translateY(${(1 - u) * 24}px)`, opacity: u }}>
         <Wordmark size={portrait ? 190 : 200} />
         <Label size={portrait ? 46 : 44} color="rgba(244,242,236,0.86)" style={{ marginTop: 34, fontFamily: FONT.serif, padding: "0 60px" }}>Calibrated odds for Denver, and for the water it depends on.</Label>

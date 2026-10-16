@@ -15,12 +15,24 @@ import { Kinetic, Label } from "../components/Type";
 const W = 1920, H = 1080;
 const Dark: React.FC<{ children: React.ReactNode }> = ({ children }) => <AbsoluteFill style={{ background: T.ink }}>{children}</AbsoluteFill>;
 
+/** The field of 115 comparison dots, faint behind the question; the next scene gathers them. */
+const DotField: React.FC<{ t: number; op: number }> = ({ t, op }) => (
+  <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
+    {Array.from({ length: 115 }, (_, i) => {
+      const x = 560 + (i % 23) * 48, y = 330 + Math.floor(i / 23) * 48;
+      const tw = 0.5 + 0.5 * Math.sin(t * 1.3 + i * 0.7);
+      return <circle key={i} cx={x} cy={y + Math.sin(t * 0.6 + i) * 3} r={4 + 2 * tw} fill={T.paper} opacity={op * (0.35 + 0.65 * tw)} />;
+    })}
+  </svg>
+);
+
 export const TrustTitle: React.FC = () => {
   const t = useT();
   return (
     <Dark>
-      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", transform: `scale(${lerp(1, 1.04, t / 5.3)})` }}>
-        <Kinetic text="Why trust it?" t={t} start={0.35} end={5.3} size={150} />
+      <DotField t={t} op={0.1 * ramp(t, 0.2, 1.5) + 0.12 * ramp(t, 4.0, 5.3)} />
+      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", transform: `scale(${lerp(1, 1.05, t / 5.3)})` }}>
+        <Kinetic text="Why trust it?" t={t} start={0.35} end={5.0} size={150} />
       </AbsoluteFill>
     </Dark>
   );
@@ -34,64 +46,86 @@ const Lock: React.FC<{ u: number; size?: number }> = ({ u, size = 64 }) => (
   </svg>
 );
 
-const Card: React.FC<{ t: number; at: number; title: string; line: string; mono: string }> = ({ t, at, title, line, mono }) => {
-  const u = easeOut(clamp01((t - at) / 0.7));
-  const lock = ramp(t, at + 0.8, at + 1.3);
-  return (
-    <div style={{ width: 780, padding: "52px 56px", border: `1px solid rgba(244,242,236,0.16)`, borderRadius: 4, background: "rgba(244,242,236,0.04)", transform: `translateY(${(1 - u) * 50}px)`, opacity: u }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
-        <Lock u={lock} size={76} />
-        <Label size={62} style={{ fontFamily: FONT.serif }}>{title}</Label>
-      </div>
-      <Label size={36} color="rgba(244,242,236,0.75)" style={{ marginTop: 28 }}>{line}</Label>
-      <Label size={46} weight={500} style={{ fontFamily: FONT.mono, marginTop: 10, letterSpacing: "0.02em" }}>{mono}</Label>
-    </div>
-  );
-};
-
-export const Freeze: React.FC = () => {
+/**
+ * The held-out year, both shots (10.9 s): the project's years as a bar
+ * (training, validation, calibration from facts.json split), 2026 locked
+ * away, the frozen model and the test written first; then the camera moves
+ * to 2026, where every look is marked and the unseal date waits.
+ */
+export const HeldOut: React.FC = () => {
   const t = useT();
+  const first = Number(field("train_start")), last = Number(field("holdout"));
+  const years = last - first + 1;
+  const L = 170, R = 1580, yBar = 440, hBar = 130;
+  const px = (y: number) => L + ((y - first) / years) * (R - L);
+  const segs = [
+    { a: Number(field("train_start")), b: Number(field("train_end")), name: "training", fill: "rgba(244,242,236,0.22)", text: `${field("train_start")} to ${field("train_end")}` },
+    { a: Number(field("val_start")), b: Number(field("val_end")), name: "validation", fill: "rgba(226,193,92,0.55)", text: `${field("val_start")} to ${field("val_end")}` },
+    { a: Number(field("cal_start")), b: Number(field("cal_end")), name: "calibration", fill: "rgba(234,178,107,0.6)", text: `${field("cal_start")} to ${field("cal_end")}` },
+  ];
+  const wipe = ramp(t, 0.15, 1.6, easeInOut);
+  const hold = ramp(t, 1.5, 2.1);
+  const lock = ramp(t, 2.3, 2.8);
+  const cards = ramp(t, 2.9, 3.6, easeOut);
+  const cards2 = ramp(t, 3.5, 4.2, easeOut);
+  const toYear = ramp(t, 5.5, 7.0, easeInOut);
+  const nLooks = Number(field("looks"));
+  const ox = px(last) + 40, oy = yBar + 40;
+  const scale = lerp(1.0, 2.1, toYear) * lerp(1, 1.025, t / 10.9);
+  const shift = lerp(0, W * 0.5 - ox, toYear);
   return (
     <Dark>
-      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", transform: `scale(${lerp(1, 1.035, t / 5.5)})` }}>
-        <Label size={40} color="rgba(244,242,236,0.7)" style={{ marginBottom: 56, opacity: ramp(t, 0.1, 0.6), letterSpacing: "0.08em", textTransform: "uppercase" }}>{field("holdout")} · held out</Label>
-        <div style={{ display: "flex", gap: 48 }}>
-          <Card t={t} at={0.3} title="The model" line="frozen at commit" mono={field("freeze_short")} />
-          <Card t={t} at={1.5} title="The test" line="written down first; its fingerprint" mono={`${field("prereg_short")}…`} />
+      <AbsoluteFill style={{ transformOrigin: `${ox}px ${oy}px`, transform: `translateX(${shift}px) scale(${scale})` }}>
+        <div style={{ position: "absolute", left: L, top: 250, opacity: ramp(t, 0.1, 0.6) * (1 - toYear) }}>
+          <Label size={44} style={{ fontFamily: FONT.serif }}>Every year of the record, and the one kept back</Label>
+        </div>
+        {segs.map((sg, i) => {
+          const x0 = px(sg.a), x1 = px(sg.b + 1);
+          const shown = clamp01((wipe * (R - L) - (x0 - L)) / (x1 - x0));
+          return (
+            <div key={sg.name}>
+              <div style={{ position: "absolute", left: x0 + 3, top: yBar, width: Math.max(0, (x1 - x0 - 6) * shown), height: hBar, background: sg.fill, borderRadius: 3 }} />
+              {/* Labels may be wider than their years; validation sits above the bar so neighbours never collide. */}
+              <div style={{ position: "absolute", left: i === 0 ? x0 : (x0 + x1) / 2 - 170, width: i === 0 ? x1 - x0 : 340, top: i === 1 ? yBar - 92 : yBar + hBar + 18, textAlign: i === 0 ? "left" : "center", whiteSpace: "nowrap", opacity: shown * (1 - toYear * 0.6) }}>
+                <Label size={i === 0 ? 36 : 30} weight={500}>{sg.name}</Label>
+                <Label size={i === 0 ? 30 : 26} color="rgba(244,242,236,0.75)" style={{ fontFamily: FONT.mono }}>{sg.text}</Label>
+              </div>
+            </div>
+          );
+        })}
+        {/* 2026: held out */}
+        <div style={{ position: "absolute", left: px(last) + 3, top: yBar, width: (R - px(last) - 6) * hold, height: hBar, borderRadius: 3, background: `rgba(226,100,60,${0.25 + 0.55 * hold})`, boxShadow: `0 0 ${40 * hold}px rgba(226,100,60,${0.45 * hold})` }} />
+        <div style={{ position: "absolute", left: px(last) - 60, width: R - px(last) + 120, top: yBar - 104, textAlign: "center", opacity: lock, transform: `translateY(${(1 - lock) * 12}px)` }}>
+          <Lock u={lock} size={84} />
+        </div>
+        {/* Right of the bar: the neighbouring labels have no room for it below. */}
+        <div style={{ position: "absolute", left: R + 22, top: yBar + hBar / 2 - 44, whiteSpace: "nowrap", opacity: hold }}>
+          <Label size={44} weight={500} color={T.emberBright}>{field("holdout")}</Label>
+          <Label size={28} color="rgba(244,242,236,0.85)">held out</Label>
+        </div>
+        {/* every look at 2026, marked on it */}
+        {Array.from({ length: nLooks }, (_, i) => {
+          const u = ramp(t, 7.0 + i * 0.35, 7.35 + i * 0.35, easeOut);
+          const x = px(last) + 14 + i * ((R - px(last) - 28) / Math.max(1, nLooks - 1));
+          return <div key={i} style={{ position: "absolute", left: x - 3, top: yBar - 18 + (1 - u) * -30, width: 6, height: hBar + 36, background: T.paper, opacity: u, borderRadius: 3 }} />;
+        })}
+        <div style={{ position: "absolute", left: px(last) - 420, width: 900, top: yBar + hBar + 100, textAlign: "center", opacity: ramp(t, 8.1, 8.7) }}>
+          <Label size={30} weight={500}>{field("looks")} looks, every one counted</Label>
+          <Label size={22} color="rgba(244,242,236,0.8)" style={{ marginTop: 4 }}>scored in full on {field("unseal")}</Label>
         </div>
       </AbsoluteFill>
-    </Dark>
-  );
-};
-
-export const Looks: React.FC = () => {
-  const t = useT();
-  const n = Number(field("looks"));
-  const col = (i: number, label: string, children: React.ReactNode) => {
-    const u = easeOut(clamp01((t - 0.2 - i * 0.45) / 0.6));
-    return (
-      <div style={{ width: 520, opacity: u, transform: `translateY(${(1 - u) * 30}px)` }}>
-        <Label size={30} color="rgba(244,242,236,0.7)" style={{ letterSpacing: "0.06em", textTransform: "uppercase" }}>{label}</Label>
-        <div style={{ marginTop: 18 }}>{children}</div>
-      </div>
-    );
-  };
-  return (
-    <Dark>
-      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", flexDirection: "row", gap: 30, transform: `translateX(${lerp(20, -20, t / 5.4)}px)` }}>
-        {col(0, "The held-out year", <Label size={120} weight={500} style={{ fontFamily: FONT.mono }}>{field("holdout")}</Label>)}
-        {col(1, "Looks at it, all counted", (
-          <div style={{ display: "flex", alignItems: "center", gap: 26 }}>
-            <Label size={120} weight={500} style={{ fontFamily: FONT.mono }}>{field("looks")}</Label>
-            <div style={{ display: "flex", gap: 14 }}>
-              {Array.from({ length: n }, (_, i) => (
-                <div key={i} style={{ width: 16, height: 96, background: T.paper, borderRadius: 2, opacity: ramp(t, 1.0 + i * 0.25, 1.2 + i * 0.25), transform: `scaleY(${ramp(t, 1.0 + i * 0.25, 1.3 + i * 0.25, easeOut)})`, transformOrigin: "bottom" }} />
-              ))}
+      {/* the two seals, below the bar, before the camera moves */}
+      <div style={{ position: "absolute", left: 0, right: 0, top: 790, display: "flex", justifyContent: "center", gap: 48, opacity: 1 - toYear }}>
+        {[{ u: cards, title: "The model, frozen", sub: "commit", mono: field("freeze_short") }, { u: cards2, title: "The test, written down first", sub: "fingerprint", mono: `${field("prereg_short")}…` }].map((c) => (
+          <div key={c.title} style={{ display: "flex", alignItems: "center", gap: 26, padding: "34px 44px", borderRadius: 4, border: "1px solid rgba(244,242,236,0.16)", background: "rgba(244,242,236,0.05)", opacity: c.u, transform: `translateY(${(1 - c.u) * 30}px)` }}>
+            <Lock u={ramp(t, 3.4, 3.9)} size={64} />
+            <div>
+              <Label size={46} style={{ fontFamily: FONT.serif }}>{c.title}</Label>
+              <Label size={32} color="rgba(244,242,236,0.8)" style={{ fontFamily: FONT.mono, marginTop: 6 }}>{c.sub} {c.mono}</Label>
             </div>
           </div>
         ))}
-        {col(2, "Scored in full on", <Label size={64} weight={500} style={{ fontFamily: FONT.serif, lineHeight: 1.1 }}>{field("unseal")}</Label>)}
-      </AbsoluteFill>
+      </div>
     </Dark>
   );
 };
@@ -226,55 +260,74 @@ export const Ranges: React.FC = () => {
   );
 };
 
-/** The leak, as a timeline: an outcome used before it could be known; then the honest delay. */
+/**
+ * The leak, both shots (8.7 s). A forecast is made today for a week ahead.
+ * As tested, its range was corrected with that week's outcome: an arrow from
+ * the future. In real time only outcomes already known can be used.
+ */
 export const Leak: React.FC = () => {
   const t = useT();
-  const n = 12, bw = 104, gap = 22, left = (W - (n * bw + (n - 1) * gap)) / 2, top = 470;
-  const bx = (i: number) => left + i * (bw + gap);
-  const outcome = 7, early = 4; // positions on the row, not data
-  const real = ramp(t, 4.6, 5.6, easeInOut);
-  const arrowTo = lerp(early, outcome + 1, real);
-  const x1 = bx(outcome) + bw / 2, x2 = bx(arrowTo) + bw / 2;
-  const back = x2 < x1;
-  const mid = (x1 + x2) / 2;
-  const lift = 150;
-  const draw = ramp(t, 0.9, 2.0);
+  const L = 170, R = 1750, y = 640, wk = (R - L) / 16;
+  const today = L + 7 * wk, target = L + 11 * wk;
+  const real = ramp(t, 4.4, 5.2, easeInOut);
+  const draw = ramp(t, 0.9, 2.1, easeInOut);
+  const past = ramp(t, 5.4, 6.6, easeInOut);
+  const arc = (x1: number, x2: number, lift: number) => `M ${x1} ${y - 60} C ${x1} ${y - 60 - lift}, ${x2} ${y - 60 - lift}, ${x2} ${y - 64}`;
   return (
     <Dark>
-      <AbsoluteFill style={{ transformOrigin: "50% 55%", transform: `scale(${lerp(1, 1.06, t / 8.7)}) translateX(${lerp(12, -12, t / 8.7)}px)` }}>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 150, textAlign: "center", opacity: inOut(t, 0.2, 4.7) }}>
-        <Label size={44} style={{ fontFamily: FONT.serif }}>As tested, each range was corrected with an outcome</Label>
-        <Label size={44} style={{ fontFamily: FONT.serif }}>a real forecast would not know yet.</Label>
-      </div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 150, textAlign: "center", opacity: ramp(t, 4.9, 5.4) }}>
-        <Label size={44} style={{ fontFamily: FONT.serif }}>In real time, an outcome is known only</Label>
-        <Label size={44} style={{ fontFamily: FONT.serif }}>{field("h_min")} to {field("h_max")} weeks after its forecast is made.</Label>
-      </div>
-      {Array.from({ length: n }, (_, i) => {
-        const isOutcome = i === outcome;
-        const isTarget = Math.abs(i - arrowTo) < 0.5;
-        return (
-          <div key={i} style={{ position: "absolute", left: bx(i), top, width: bw, height: 110, borderRadius: 3, border: `2px solid ${isOutcome ? T.emberBright : "rgba(244,242,236,0.28)"}`, background: isOutcome ? "rgba(226,100,60,0.18)" : isTarget ? "rgba(244,242,236,0.12)" : "transparent" }} />
-        );
-      })}
-      <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
-        <defs>
-          <marker id="lk" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill={back ? T.emberBright : T.paper} />
-          </marker>
-        </defs>
-        <path d={`M ${x1} ${top} C ${x1} ${top - lift}, ${x2} ${top - lift}, ${x2} ${top - 4}`} stroke={back ? T.emberBright : T.paper} strokeWidth={5} fill="none" markerEnd="url(#lk)" strokeDasharray={1400} strokeDashoffset={1400 * (1 - draw)} />
-        <line x1={left} x2={bx(n - 1) + bw} y1={top + 160} y2={top + 160} stroke="rgba(244,242,236,0.4)" strokeWidth={2} markerEnd="url(#lk)" />
-      </svg>
-      <div style={{ position: "absolute", left: bx(outcome) - 60, width: bw + 120, top: top + 122, textAlign: "center" }}>
-        <Label size={30} color={T.emberBright}>outcome</Label>
-      </div>
-      <div style={{ position: "absolute", left: mid - 300, width: 600, top: top - lift - 50, textAlign: "center", opacity: draw }}>
-        <Label size={34} color={back ? T.emberBright : T.paper}>{back ? "used before it was known" : "used once it is known"}</Label>
-      </div>
-      <div style={{ position: "absolute", right: left, top: top + 176 }}>
-        <Label size={28} color="rgba(244,242,236,0.7)">weeks →</Label>
-      </div>
+      <AbsoluteFill style={{ transformOrigin: "50% 55%", transform: `scale(${lerp(1, 1.05, t / 8.7)}) translateX(${lerp(14, -14, t / 8.7)}px)` }}>
+        <div style={{ position: "absolute", left: 0, right: 0, top: 120, textAlign: "center", opacity: ramp(t, 0.1, 0.5) * (1 - real) }}>
+          <Label size={52} style={{ fontFamily: FONT.serif }}>As tested, each range was corrected with an outcome</Label>
+          <Label size={52} style={{ fontFamily: FONT.serif }}>a real forecast would not know yet.</Label>
+        </div>
+        <div style={{ position: "absolute", left: 0, right: 0, top: 120, textAlign: "center", opacity: real }}>
+          <Label size={52} style={{ fontFamily: FONT.serif }}>In real time, an outcome is known only</Label>
+          <Label size={52} style={{ fontFamily: FONT.serif }}>{field("h_min")} to {field("h_max")} weeks after its forecast is made.</Label>
+        </div>
+        <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
+          <defs>
+            <marker id="lkR" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill={T.emberBright} /></marker>
+            <marker id="lkP" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill={T.paper} /></marker>
+          </defs>
+          {/* weeks */}
+          <line x1={L} x2={R} y1={y} y2={y} stroke="rgba(244,242,236,0.45)" strokeWidth={3} />
+          {Array.from({ length: 17 }, (_, i) => <line key={i} x1={L + i * wk} x2={L + i * wk} y1={y - 12} y2={y + 12} stroke="rgba(244,242,236,0.35)" strokeWidth={2} />)}
+          {/* the past: already known (filled) */}
+          <rect x={L} y={y - 40} width={today - L} height={34} fill="rgba(244,242,236,0.12)" />
+          {/* today */}
+          <line x1={today} x2={today} y1={y - 230} y2={y + 40} stroke={T.paper} strokeWidth={3} strokeDasharray="10 8" />
+          {/* the week it forecasts */}
+          <rect x={target - wk / 2 + 6} y={y - 52} width={wk - 12} height={52} rx={4} fill="rgba(226,100,60,0.35)" stroke={T.emberBright} strokeWidth={3} />
+          {/* as tested: from the future */}
+          <path d={arc(target, today + 10, 210)} stroke={T.emberBright} strokeWidth={6} fill="none" markerEnd="url(#lkR)" strokeDasharray={1200} strokeDashoffset={1200 * (1 - draw)} opacity={1 - 0.75 * real} />
+          {real > 0.05 ? (
+            <g opacity={real} stroke={T.emberBright} strokeWidth={8} strokeLinecap="round">
+              <line x1={(target + today) / 2 - 34} y1={y - 250} x2={(target + today) / 2 + 34} y2={y - 190} />
+              <line x1={(target + today) / 2 + 34} y1={y - 250} x2={(target + today) / 2 - 34} y2={y - 190} />
+            </g>
+          ) : null}
+          {/* in real time: only what is already known */}
+          {[3, 4.5, 6].map((w, i) => (
+            <path key={i} d={arc(L + w * wk, today - 10, 90 + i * 25)} stroke={T.paper} strokeWidth={5} fill="none" markerEnd="url(#lkP)" strokeDasharray={600} strokeDashoffset={600 * (1 - clamp01(past * 1.4 - i * 0.2))} />
+          ))}
+        </svg>
+        <div style={{ position: "absolute", left: today - 200, width: 400, top: y + 52, textAlign: "center" }}>
+          <Label size={34} weight={500}>today</Label>
+          <Label size={26} color="rgba(244,242,236,0.75)">the forecast is made</Label>
+        </div>
+        <div style={{ position: "absolute", left: target - 220, width: 440, top: y + 52, textAlign: "center" }}>
+          <Label size={34} weight={500} color={T.emberBright}>the week it forecasts</Label>
+          <Label size={26} color="rgba(244,242,236,0.75)">{field("h_min")} to {field("h_max")} weeks ahead</Label>
+        </div>
+        <div style={{ position: "absolute", left: L, top: y + 52, opacity: 0.8 }}>
+          <Label size={28} color="rgba(244,242,236,0.7)">← already known</Label>
+        </div>
+        <div style={{ position: "absolute", left: (target + today) / 2 - 450, width: 900, top: y - 320, textAlign: "center", whiteSpace: "nowrap", opacity: draw * (1 - real) }}>
+          <Label size={36} weight={500} color={T.emberBright}>its outcome, used before it was known</Label>
+        </div>
+        <div style={{ position: "absolute", left: L + 3 * wk - 100, width: 700, top: y - 220, textAlign: "left", opacity: past }}>
+          <Label size={36} weight={500}>only outcomes already known</Label>
+        </div>
       </AbsoluteFill>
     </Dark>
   );

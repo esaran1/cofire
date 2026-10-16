@@ -122,6 +122,11 @@ const [trainStart, trainEnd] = facts.split.train.match(/(\d{4})-\d{2}-\d{2} to (
 field("train_start", trainStart, "facts.json: split.train (first year)");
 field("train_end", trainEnd, "facts.json: split.train (last year)");
 field("holdout", facts.split.holdout, "facts.json: split.holdout");
+for (const [key, label] of [["validate", "val"], ["calibrate", "cal"]]) {
+  const [a, b] = String(facts.split[key]).match(/(\d{4}) to (\d{4})/).slice(1);
+  field(`${label}_start`, a, `facts.json: split.${key} (first year)`);
+  field(`${label}_end`, b, `facts.json: split.${key} (last year)`);
+}
 if (String(seal.holdout_year) !== facts.split.holdout) throw new Error("seal.json and facts.json disagree about the holdout year");
 field("n_survivors", facts.multiplicity.n_survivors, "facts.json: multiplicity.n_survivors");
 field("n_comparisons", facts.multiplicity.n_comparisons, "facts.json: multiplicity.n_comparisons");

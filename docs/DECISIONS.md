@@ -2896,3 +2896,29 @@ Accessibility and best practices are 100 on all three.
     script (about 100 kB) and the two translation tables.
   - Loading Spanish only when asked for would mean moving the reserved
     review flag out of `es.ts`, so it was left for the owner to decide.
+
+## The demo film: second pass on the second half, 2026-10-16
+
+The owner watched the first cut. The opening worked; from the trust section
+on, several shots were "not properly done". They were rebuilt, not patched
+(`film/REVIEW.md`, "Second pass", has the full list).
+- **Held-out year as one diagram.** The freeze card and the look counter
+  became a single bar of the years.
+  - Validation and calibration are drawn from `facts.json`
+    (`split.validate`, `split.calibrate`), traced like every other number.
+  - Two shots of cards said less than one picture of what is held out
+    and why.
+- **The leak as a picture of the mistake.** It shows an arc from the
+  forecast week back to today, then strikes it out. Before, it was two
+  rows of labels. The claim is unchanged: outcomes are known only 2 to 8
+  weeks after a forecast is made (the horizons, read from the bundle).
+- **Ending on the map.** The film opens on the live map and now closes on
+  it, pulling back to all five areas, instead of on a page capture. This
+  needed no new capture and no new number.
+- **Map edges.** The opening and finale fade the map at the edge of the
+  bundled tiles. The fade is computed from the zoom the tiles are drawn
+  at. Masking at the extract's nominal bounds was tried first; it hid the
+  Pueblo area.
+- **Nothing outside the film changed.** The app, the model and the data
+  are unchanged. Every on-screen number is still checked against
+  `public/data/film.json` on every frame.

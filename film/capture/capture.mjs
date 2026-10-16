@@ -336,7 +336,7 @@ if (want("weekly")) {
   const weeks = SHOTS.weekly_issues;
   manifest.shots.weekly = { kind: "desktop", viewport: { width: 1920, height: 1080 }, scale: 2, issues: weeks, files: [] };
   for (const issue of weeks) {
-    await s.page.goto(url({ domain: SHOTS.weekly_domain, issue, layer: "drought" }));
+    await s.page.goto(url({ domain: SHOTS.weekly_domain, issue, layer: SHOTS.weekly_layer }));
     await s.settle(1200);
     const cl = s.page.getByRole("button", { name: /^close$/i });
     if (await cl.count()) { await cl.first().click(); await s.settle(); }

@@ -83,7 +83,8 @@ for (const dir of ["src/scenes", "src/components"]) {
   for (const f of readdirSync(join(FILM, dir))) {
     const src = readFileSync(join(FILM, dir, f), "utf8");
     for (const m of src.matchAll(/(?:cap|rect)\("([a-z_]+)"/g)) named.add(m[1]);
-    for (const m of src.matchAll(/name(?:=|: )"([a-z_]+)"/g)) named.add(m[1]);
+    for (const m of src.matchAll(/name="([a-z_]+)"/g)) named.add(m[1]);
+    for (const m of src.matchAll(/crossTo=\{\{ name: "([a-z_]+)"/g)) named.add(m[1]);
   }
 }
 for (const s of TL.shots) if (s.cursor) named.add(s.cursor.capture);

@@ -48,41 +48,42 @@ export const LaptopIntro: React.FC = () => {
   );
 };
 
+/** Scale the laptop about the frame's centre. */
+const centred = (k: number) => ({ s: k, x: (W / 2) * (1 - k), y: (H / 2) * (1 - k) });
+const PICK_END = 1.12;
+
+/** The picker, chosen: the laptop holds still and grows a little; only the screen's view moves to the picker. */
 export const Pick: React.FC = () => {
   const t = useT();
   const sw = rect("pick", "switcher");
   const box = { w: LAP.screenW, h: LAP.screenH };
-  // Push the whole laptop toward the picker while the screen's view narrows on it.
-  const u = ramp(t, 0, 2.4);
-  const target = { x: screenOrigin.x + ((sw.x + sw.w / 2) / 1920) * LAP.screenW, y: screenOrigin.y + ((sw.y + sw.h / 2) / 1080) * LAP.screenH };
-  const s = lerp(1, 1.5, u);
-  const x = lerp(0, W * 0.62 - target.x * s, u), y = lerp(0, H * 0.36 - target.y * s, u);
+  const r = centred(lerp(1, PICK_END, ramp(t, 0, 2.9)));
+  const near = { x: sw.x + sw.w / 2 - 520, y: Math.max(0, sw.y - 40), w: 760 };
   const track = cap("pick").cursor ?? [];
   return (
     <Ground>
-      <LaptopRig s={s} x={x} y={y}>
-        <CapturePlane name="pick" t={t} keys={[{ t: 0, view: FULL }, { t: 2.6, view: { x: 760, y: 0, w: 1160 } }]} box={box} cursor={{ track, start: shot("product.pick").cursor!.start, speed: shot("product.pick").cursor!.speed }} />
+      <LaptopRig s={r.s} x={r.x} y={r.y}>
+        <CapturePlane name="pick" t={t} keys={[{ t: 0, view: FULL }, { t: 0.5, view: FULL }, { t: 2.4, view: near }]} box={box} cursor={{ track, start: shot("product.pick").cursor!.start, speed: shot("product.pick").cursor!.speed }} />
       </LaptopRig>
     </Ground>
   );
 };
 
+/** Into the screen: the laptop grows until its screen is the frame, the view eases back to the whole app, and the map moves to Denver. */
 export const FlyIn: React.FC = () => {
   const t = useT();
   const sw = rect("pick", "switcher");
-  const target = { x: screenOrigin.x + ((sw.x + sw.w / 2) / 1920) * LAP.screenW, y: screenOrigin.y + ((sw.y + sw.h / 2) / 1080) * LAP.screenH };
-  // From where the pick shot ended to the screen filling the frame.
-  const from = { s: 1.5, x: W * 0.62 - target.x * 1.5, y: H * 0.36 - target.y * 1.5 };
-  const u = ramp(t, 0, 0.9);
+  const from = centred(PICK_END);
+  const u = ramp(t, 0, 1.0, easeInOut);
   const s = lerp(from.s, FILL.s, u), x = lerp(from.x, FILL.x, u), y = lerp(from.y, FILL.y, u);
   const f = cap("flyin");
   const frame = Math.max(0, (t - 0.55) * (f.fps ?? 60));
   const box = { w: LAP.screenW, h: LAP.screenH };
-  const view = lerp(1160, 1920, u);
+  const near = { x: sw.x + sw.w / 2 - 520, y: Math.max(0, sw.y - 40), w: 760 };
   return (
     <Ground>
       <LaptopRig s={s} x={x} y={y}>
-        <CapturePlane name="flyin" t={t} frameAt={frame} keys={[{ t: 0, view: { x: 760 * (1 - u), y: 0, w: view } }]} box={box} />
+        <CapturePlane name="flyin" t={t} frameAt={frame} keys={[{ t: 0, view: near }, { t: 1.0, view: FULL }]} box={box} />
       </LaptopRig>
     </Ground>
   );
@@ -198,14 +199,15 @@ export const Spanish: React.FC = () => {
 export const Brief: React.FC = () => {
   const t = useT();
   const b = cap("brief");
-  const sheetW = 1100;
+  // Large enough to read (the sheet's 14 px type at about 26 px), panned from its title down.
+  const sheetW = 1500;
   const sheetH = (sheetW * (b.height ?? b.viewport.height)) / b.viewport.width;
-  const enter = easeOut(clamp01(t / 0.9));
-  const pan = ramp(t, 0.6, 4.9);
-  const y = lerp(H + 40, 70, enter) - pan * (sheetH - H + 140);
+  const enter = easeOut(clamp01(t / 0.8));
+  const pan = ramp(t, 0.7, 4.9, easeInOut);
+  const y = lerp(H * 0.55, 40, enter) - pan * (sheetH * 0.62);
   return (
     <Ground>
-      <div style={{ position: "absolute", left: (W - sheetW) / 2, top: y, width: sheetW, height: sheetH, transform: `rotate(${lerp(-2.5, 0, enter)}deg)`, boxShadow: "0 30px 80px rgba(0,0,0,0.55)", background: "#fff" }}>
+      <div style={{ position: "absolute", left: (W - sheetW) / 2, top: y, width: sheetW, height: sheetH, transform: `rotate(${lerp(-2, 0, enter)}deg)`, transformOrigin: "50% 0%", boxShadow: "0 30px 80px rgba(0,0,0,0.55)", background: "#fff", opacity: clamp01(t / 0.25) }}>
         <Img src={staticFile(`captures/${b.file}`)} style={{ width: sheetW, height: sheetH }} />
       </div>
     </Ground>

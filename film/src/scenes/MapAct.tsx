@@ -79,7 +79,17 @@ function cameras(W: number, H: number) {
   return { all, denver, three, tun, portrait };
 }
 
-function stateAt(t: number, W: number, H: number): State {
+/** The finale: Denver and its watersheds at the latest issue, pulling back to all five areas. */
+function finaleState(t: number, W: number, H: number): State {
+  const c = cameras(W, H);
+  const u = easeInOut(clamp01(t / 5.1));
+  const cam = mix({ ...c.three, zoom: c.three.zoom + 0.3 }, { ...c.all, zoom: c.all.zoom - 0.08 }, u);
+  const rest = 0.2 + 0.6 * ramp(t, 1.4, 3.4);
+  return { cam, issue: D.issues.length - 1, op: { denver: 0.85, upper_south_platte: 0.85, dillon: 0.85, larimer: rest, pueblo: rest }, threat: 0 };
+}
+
+function stateAt(t: number, W: number, H: number, finale = false): State {
+  if (finale) return finaleState(t, W, H);
   const c = cameras(W, H);
   const out = (cam: Cam, dz: number): Cam => ({ ...cam, zoom: cam.zoom + dz });
   const keys: [number, Cam][] = [
@@ -120,13 +130,13 @@ function apply(m: maplibregl.Map, s: State, applied: { issue: number }) {
   m.setPaintProperty("cells-threat", "fill-opacity", s.threat);
 }
 
-export const MapAct: React.FC<{ offset?: number; W: number; H: number; lang?: Lang }> = ({ offset = 0, W, H, lang = "en" }) => {
+export const MapAct: React.FC<{ offset?: number; W: number; H: number; lang?: Lang; finale?: boolean }> = ({ offset = 0, W, H, lang = "en", finale = false }) => {
   const t = useT() + offset;
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const applied = useRef({ issue: -1, key: "" });
-  const latest = useRef<State>(stateAt(t, W, H));
-  const s = useMemo(() => stateAt(t, W, H), [t, W, H]);
+  const latest = useRef<State>(stateAt(t, W, H, finale));
+  const s = useMemo(() => stateAt(t, W, H, finale), [t, W, H, finale]);
   latest.current = s;
   const [ready, setReady] = useState(false);
   const [initHandle] = useState(() => delayRender("map: style and tiles", { timeoutInMilliseconds: 180000 }));
@@ -175,7 +185,20 @@ export const MapAct: React.FC<{ offset?: number; W: number; H: number; lang?: La
   return (
     <AbsoluteFill style={{ background: T.ink }}>
       <div ref={ref} style={{ position: "absolute", inset: 0, width: W, height: H }} />
+      <ExtractEdges P={P} zoom={s.cam.zoom} W={W} H={H} />
 
+      {finale ? (
+        <>
+          <AreaLabel W={W} at={top(BOX.denver)} text="Denver" op={ramp(t, 0.3, 1.0) * (1 - ramp(t, 4.3, 4.9))} big />
+          <AreaLabel W={W} at={top(BOX.usp)} text={DATA.areas.upper_south_platte.label} op={ramp(t, 0.6, 1.3) * (1 - ramp(t, 2.0, 2.6))} />
+          <AreaLabel W={W} at={top(BOX.dillon)} text={DATA.areas.dillon.label} op={ramp(t, 0.8, 1.5) * (1 - ramp(t, 2.0, 2.6))} />
+          <AreaLabel W={W} at={top(BOX.larimer)} text={DATA.areas.larimer.label} op={ramp(t, 2.4, 3.1) * (1 - ramp(t, 4.3, 4.9))} />
+          <AreaLabel W={W} at={top(BOX.pueblo)} text={DATA.areas.pueblo.label} op={ramp(t, 2.6, 3.3) * (1 - ramp(t, 4.3, 4.9))} />
+          <AbsoluteFill style={{ background: `radial-gradient(90% 80% at 50% 50%, rgba(23,24,27,0) 55%, rgba(23,24,27,0.75) 100%)` }} />
+          <AbsoluteFill style={{ background: T.ink, opacity: ramp(t, 4.75, 5.1) }} />
+        </>
+      ) : (
+        <>
       {/* Cold open: the week ticker and the one line of kinetic type. */}
       {tick ? (
         <div style={{ position: "absolute", left: portrait ? 70 : 96, top: portrait ? 150 : 84, opacity: inOut(t, 0.9, 10.4, 0.5) }}>
@@ -241,8 +264,34 @@ export const MapAct: React.FC<{ offset?: number; W: number; H: number; lang?: La
       {t >= 15.6 && t < 27.6 ? <SourceLine t={t} start={15.9} end={27.6} text={src("denver_water_sources")} /> : null}
       {t >= 27.5 ? <SourceLine t={t} start={27.8} end={33.4} text={src("denver_water_watershed")} /> : null}
 
+        </>
+      )}
       <div style={{ position: "absolute", right: 22, bottom: 16, fontFamily: FONT.sans, fontSize: 18, color: "rgba(244,242,236,0.6)" }}>© OpenStreetMap contributors · © Protomaps</div>
     </AbsoluteFill>
+  );
+};
+
+/**
+ * The basemap extract covers Colorado's middle; a wide frame reaches past its
+ * east and west edges, where the map would stop in a straight line. Feather
+ * those edges into the dark ground instead.
+ */
+const ExtractEdges: React.FC<{ P: (lon: number, lat: number) => { x: number; y: number }; zoom: number; W: number; H: number }> = ({ P, zoom, W, H }) => {
+  // What is drawn is whole tiles at the zoom MapLibre loads (512-pixel tiles:
+  // the floor of the camera zoom, at most the extract's maximum), so the map
+  // really ends at those tiles' outer edges, past the extract's own bounds.
+  const [w, , e] = DATA.basemap.bounds;
+  const z = Math.max(0, Math.min(DATA.basemap.maxZoom, Math.floor(zoom)));
+  const n = 2 ** z;
+  const west = (Math.floor(((w + 180) / 360) * n) / n) * 360 - 180;
+  const east = ((Math.floor(((e + 180) / 360) * n) + 1) / n) * 360 - 180;
+  const x0 = P(west, 39.4).x, x1 = P(east, 39.4).x;
+  const F = 160;
+  return (
+    <>
+      {x0 + F > 0 ? <div style={{ position: "absolute", left: 0, top: 0, width: x0 + F, height: H, background: `linear-gradient(90deg, ${T.ink} 0px, ${T.ink} ${Math.max(0, x0)}px, rgba(23,24,27,0) ${x0 + F}px)` }} /> : null}
+      {x1 - F < W ? <div style={{ position: "absolute", left: x1 - F, top: 0, width: W - x1 + F, height: H, background: `linear-gradient(90deg, rgba(23,24,27,0) 0px, ${T.ink} ${F}px, ${T.ink} 100%)` }} /> : null}
+    </>
   );
 };
 

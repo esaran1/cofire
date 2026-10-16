@@ -9,7 +9,7 @@ import { shot, TIMELINE } from "./data";
 import { Guard } from "./Guard";
 import { MapAct } from "./scenes/MapAct";
 import { Brief, CardRows, FlyIn, Frequency, Icons, LaptopIntro, PhoneCard, Pick, Spanish, Tap, Watershed, Weeks } from "./scenes/Product";
-import { Collapse, Control, Freeze, Leak, Looks, Ranges, TrustTitle } from "./scenes/Trust";
+import { Collapse, Control, HeldOut, Leak, Ranges, TrustTitle } from "./scenes/Trust";
 import { EndCard, Final, NoBandCard, NoBandReason, OpenData, PhoneFlow, Record, Seal, Weekly } from "./scenes/Close";
 import { Label } from "./components/Type";
 import { T } from "./theme";
@@ -48,8 +48,7 @@ export const Film: React.FC<FilmProps> = ({ draft = false, scratch = false }) =>
       <S from="product.brief"><Brief /></S>
       <S from="product.phone"><PhoneCard /></S>
       <S from="trust.title"><TrustTitle /></S>
-      <S from="trust.freeze"><Freeze /></S>
-      <S from="trust.looks"><Looks /></S>
+      <S from="trust.freeze" to="trust.looks"><HeldOut /></S>
       <S from="trust.dots" to="trust.survivors"><Control /></S>
       <S from="trust.ranges" to="trust.perfect"><Ranges /></S>
       <S from="trust.leak" to="trust.delay"><Leak /></S>
