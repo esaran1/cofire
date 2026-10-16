@@ -11,6 +11,8 @@ import emberEs from "@/lib/i18n/ember_es.json";
 import { LINKS } from "@/lib/links";
 import type { DomainsIndex } from "@/lib/schemas";
 import { ErrorNote } from "@/components/ui/Controls";
+import { IconArray } from "@/components/Explain";
+import { frequency } from "@/lib/explain";
 import { StaleBadge } from "@/components/StaleBadge";
 
 /**
@@ -132,6 +134,36 @@ function BriefSheet({ brief, lang, todo }: { brief: Brief; lang: Lang; todo: Tod
           </tbody>
         </table>
         <p className="mt-1 text-[11px] leading-relaxed text-mute">{t("brief.droughtNote", { h })}</p>
+        <ul className="mt-2 space-y-2" data-testid="brief-frequency">
+          {d.rows.map((r) => {
+            const cat = `D${r.cat}`;
+            const n = (v: number | null | "impossible") => (typeof v === "number" ? frequency(v).n : null);
+            const stay = n(r.stay);
+            const ease = n(r.ease);
+            const worsen = n(r.worsen);
+            const parts = [
+              stay !== null ? t("brief.freqStay", { n: stay, cat }) : null,
+              ease !== null ? t("brief.freqEase", { n: ease }) : null,
+              worsen !== null ? t("brief.freqWorsen", { n: worsen }) : null,
+            ].filter(Boolean) as string[];
+            if (parts.length === 0) return null;
+            const sentence = t("brief.freq", { cat, parts: parts.join(", "), h });
+            return (
+              <li key={r.cat} className="flex items-start gap-3" data-cat={r.cat} data-stay={stay ?? ""} data-ease={ease ?? ""} data-worsen={worsen ?? ""}>
+                <IconArray
+                  n={0}
+                  label={sentence}
+                  segments={[
+                    { n: stay ?? 0, cls: "bg-ink-soft" },
+                    { n: ease ?? 0, cls: "bg-[#8fb3c4]" },
+                    { n: worsen ?? 0, cls: "bg-ochre" },
+                  ]}
+                />
+                <span className="text-[11px] leading-relaxed text-ink-soft">{sentence}</span>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       <section className="mt-5">

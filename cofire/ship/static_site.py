@@ -35,6 +35,11 @@ def build(out: Path = OUT, src: Path = bundles.OUT) -> dict[str, int]:
         for issue in idx["issues"]:
             shutil.copy2(src / dom / f"{issue}.json", out / "domains" / dom / f"{issue}.json")
             n += 1
+    # What lies behind each probability (cofire/v13/explain.py), one file per domain.
+    explain = Path("artifacts/v13/explain")
+    for dom in idx["order"]:
+        if (explain / f"{dom}.json").exists():
+            shutil.copy2(explain / f"{dom}.json", out / "domains" / dom / "explain.json")
     (out / "ember").mkdir()
     for zone in ("city", "wui"):
         (out / "ember" / f"{zone}.json").write_text(json.dumps(score({}, zone)))

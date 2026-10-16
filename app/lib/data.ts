@@ -1,3 +1,4 @@
+import { type Explain, ExplainSchema } from "./explain";
 import { getParsed } from "./api";
 import {
   Bundle,
@@ -55,6 +56,25 @@ export function getBundle(domain: string, issue: string): Promise<Bundle> {
       throw e;
     });
     bundleCache.set(key, p);
+  }
+  return p;
+}
+
+const explainCache = new Map<string, Promise<Explain>>();
+
+/** The tables behind a domain's probabilities (cofire/v13/explain.py). */
+export function getExplain(domain: string): Promise<Explain> {
+  let p = explainCache.get(domain);
+  if (!p) {
+    p = (
+      STATIC_BASE
+        ? fetchStatic(`/domains/${domain}/explain.json`, (r) => ExplainSchema.parse(r))
+        : getParsed(`/explain/${domain}`, ExplainSchema)
+    ).catch((e: unknown) => {
+      explainCache.delete(domain);
+      throw e;
+    });
+    explainCache.set(domain, p);
   }
   return p;
 }

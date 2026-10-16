@@ -2612,3 +2612,46 @@ the unseal, when 2026 outcomes may be used.
   area in both languages, Lighthouse, screenshots) and the alert test in the
   new repository. They wait until the repository is public with
   `PAGES_ENABLED=true`, a manual step for the owner.
+
+## v1.3 Stages 1 to 3: what lies behind each number, 2026-10-15
+
+- **Tables.** `cofire/v13/explain.py` writes, per domain, the tables behind
+  every live probability, from the training rows the export fits on
+  (2007 to 2021, asserted):
+  - drought: the Markov row used for each category and month, with per-year
+    destination counts;
+  - fire: the damped logistic's coefficients, and illustrative per-year
+    counts by dryness band and season;
+  - the adopted v1.2 arm.
+
+  They reproduce the published probabilities exactly: 29,986 checks on the
+  newest issue, 0 mismatches (`tests/test_v13_explain.py`). They are
+  committed under `artifacts/v13/explain/`, because the static site build has
+  no data stores to recompute them; they change only if the model or an
+  adoption does.
+- **Frequency framing.** "In 100 weeks like this one, about N ..." with a
+  10x10 icon array, N rounded exactly as the percentage beside it (a test
+  walks every row in every area and range). Regional base rates say "in 100
+  weeks at this time of year across this area".
+  - The targets describe the category **exactly h weeks later**, so the
+    sentences say "4 weeks later", not the brief's suggested "within 4
+    weeks", which would describe a different event.
+- **Weeks like this one.**
+  - Drought: the training cell-weeks in the same state the live model
+    conditions on (category with month, season or all year, whichever row the
+    model uses), five most recent years plus all years. A test reproduces the
+    odds from the counts and the prior.
+  - Fire: the live model is a smooth curve over the dryness percentile, not a
+    table, so similar weeks (same 10-point band and season) are shown as
+    illustration and labeled as not matching the odds exactly.
+- **Why did this change.** The week-over-week change splits into the cell's
+  own state, the time of year, and any change of forecast method between the
+  issues (the v1.2 arm starting).
+  - The fire model has no calendar term, so its change is all state; a
+    regional rate's change is all season.
+  - A residue under 0.001 is the bundles' four-decimal rounding and goes to
+    the state part.
+  - The note shows only above 5 points. A test checks that the parts sum to
+    the total for every cell and target.
+- **The brief** gains one frequency line per drought category, with an icon
+  array split into stayed, eased and worsened.

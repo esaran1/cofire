@@ -9,6 +9,8 @@ import { targetHorizon, targetLabel } from "@/lib/targets";
 import { type Lang, locale, useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import { reasonEs } from "@/lib/i18n/reasons";
+import { type CellState, type Explain, categoryOf, decompose, frequency, monthOf, weeksLikeThis } from "@/lib/explain";
+import { IconArray, WeeksLikeThis, WhyChanged, eventPhrase, frequencySentence } from "./Explain";
 import { LINKS } from "@/lib/links";
 import { Disclosure } from "./ui/Controls";
 import { WatershedPanel } from "./WatershedPanel";
@@ -172,7 +174,15 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
  */
 const AREA: Record<string, MessageKey> = { county: "area.county", urban: "area.urban", watershed: "area.watershed" };
 
-function TargetRow({ name, t: target, kind }: { name: string; t: Target; kind?: string | null }) {
+function TargetRow({ name, t: target, kind, place, prev, prevTarget, explain }: {
+  name: string;
+  t: Target;
+  kind?: string | null;
+  place: Place;
+  prev?: Place | null;
+  prevTarget?: Target | null;
+  explain?: Explain | null;
+}) {
   const { lang, t } = useT();
   const isBase = target.state === "base_rate";
   const hidden = target.p === null || target.p === undefined;
@@ -182,26 +192,63 @@ function TargetRow({ name, t: target, kind }: { name: string; t: Target; kind?: 
   if (hidden && !isBase) return null;
   const area = t(AREA[kind ?? "county"] ?? "area.other");
   const marker = hidden ? t("card.notChecked") : t("card.usualRate", { area });
+  const p = target.p as number;
+  const event = eventPhrase(t, name, kind);
+  const sentence = hidden ? "" : frequencySentence(t, p, event, isBase);
+  const f = hidden ? null : frequency(p);
+  const now: CellState = { issue: place.issue ?? "", usdm: place.usdm ?? null, erc_pct: place.erc_pct ?? null };
+  const cases = explain && !isBase && !hidden ? weeksLikeThis(explain, name, now) : null;
+  const before: CellState | null = prev ? { issue: prev.issue ?? "", usdm: prev.usdm ?? null, erc_pct: prev.erc_pct ?? null } : null;
+  const pPrev = prevTarget?.p;
+  const change =
+    before && !hidden && pPrev !== null && pPrev !== undefined && prevTarget?.state === target.state
+      ? decompose(explain ?? null, name, before, now, pPrev, p, isBase)
+      : null;
   return (
     <li
       className="border-rule border-b py-2.5 last:border-b-0"
       data-testid={isBase ? "target-base-rate" : "target-probability"}
       data-target={name}
+      data-p={hidden ? "" : p}
     >
       <Disclosure
         summary={
-          <div className="flex items-baseline justify-between gap-3">
-            <span className="min-w-0">
-              <span className="block text-sm">{targetLabel(name, kind, lang)}</span>
-              {isBase ? <span className="text-mute block text-[11px]">{marker}</span> : null}
-            </span>
-            <span className={`num text-sm ${hidden ? "text-mute" : "text-ink"}`} data-testid={hidden ? "target-not-shown" : undefined}>
-              {hidden ? t("card.notShown") : formatProbability(target.p as number)}
-            </span>
+          <div>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="min-w-0">
+                <span className="block text-sm">{targetLabel(name, kind, lang)}</span>
+                {isBase ? <span className="text-mute block text-[11px]">{marker}</span> : null}
+              </span>
+              <span className={`num text-sm ${hidden ? "text-mute" : "text-ink"}`} data-testid={hidden ? "target-not-shown" : "target-percent"}>
+                {hidden ? t("card.notShown") : formatProbability(p)}
+              </span>
+            </div>
+            {sentence ? (
+              <span className="text-ink-soft mt-0.5 block text-[11px] leading-relaxed" data-testid="frequency" data-n={f?.lessThanOne ? "<1" : f?.n}>
+                {sentence}
+              </span>
+            ) : null}
+            {change && prev?.issue ? (
+              <WhyChanged change={change} prevIssue={prev.issue} fire={name.startsWith("f_")} regional={isBase} ercFrom={prev.erc_pct} ercTo={place.erc_pct} />
+            ) : null}
           </div>
         }
       >
-        <Reason text={target.reason} lang={lang} />
+        {f ? <IconArray n={f.n} label={sentence} tone={name.startsWith("f_") ? "ember" : "ochre"} /> : null}
+        {cases && explain ? (
+          <WeeksLikeThis
+            cases={cases}
+            target={name}
+            kind={kind}
+            category={categoryOf(place.usdm ?? null) === 0 ? t("card.droughtNone") : `D${categoryOf(place.usdm ?? null)}`}
+            month={monthOf(now.issue)}
+            start={explain.train[0].slice(0, 4)}
+            end={explain.train[1].slice(0, 4)}
+          />
+        ) : null}
+        <div className="mt-2">
+          <Reason text={target.reason} lang={lang} />
+        </div>
       </Disclosure>
     </li>
   );
@@ -250,7 +297,13 @@ export function PlaceCard({
   embedded = false,
   meta = null,
   sources = {},
+  explain = null,
+  prev = null,
 }: {
+  /** The tables behind the probabilities (cofire/v13/explain.py), when loaded. */
+  explain?: Explain | null;
+  /** The same cell at the previous issue, for "why did this change". */
+  prev?: Place | null;
   place: Place;
   /** The area this cell belongs to: its name, kind and how it was evaluated. */
   meta?: DomainMeta | null;
@@ -337,7 +390,16 @@ export function PlaceCard({
           </p>
           <ul className="mt-1">
             {targets.map(([name, t]) => (
-              <TargetRow key={name} name={name} t={t} kind={meta?.kind} />
+              <TargetRow
+                key={name}
+                name={name}
+                t={t}
+                kind={meta?.kind}
+                place={place}
+                prev={prev}
+                prevTarget={prev?.targets?.[name] ?? null}
+                explain={explain}
+              />
             ))}
           </ul>
         </>

@@ -356,6 +356,17 @@ def domain_bundle(domain: str, issue: str) -> Any:
     return json.loads(path.read_text())
 
 
+@app.get("/explain/{domain}")
+def domain_explain(domain: str) -> Any:
+    """The tables behind a domain's live probabilities (cofire/v13/explain.py)."""
+    if not _DOMAIN_RE.match(domain):
+        raise HTTPException(400, "bad domain")
+    path = Path("artifacts/v13/explain") / f"{domain}.json"
+    if not path.exists():
+        raise HTTPException(404, f"no explanation tables for {domain}")
+    return json.loads(path.read_text())
+
+
 @app.get("/forecast/issues")
 def issues() -> dict[str, Any]:
     index = load_index()

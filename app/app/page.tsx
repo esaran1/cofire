@@ -12,7 +12,8 @@ import { StaleBadge } from "@/components/StaleBadge";
 import { TimeScrubber } from "@/components/TimeScrubber";
 import { ErrorNote } from "@/components/ui/Controls";
 import type { Place } from "@/lib/api";
-import { getBundle, getDomains, nearestCell, placeFromCell } from "@/lib/data";
+import { getBundle, getDomains, getExplain, nearestCell, placeFromCell } from "@/lib/data";
+import type { Explain } from "@/lib/explain";
 import { useDomain } from "@/lib/domain";
 import { Adopted, readAdopted, toggleAdopted } from "@/lib/adopted";
 import type { Bundle, DomainsIndex } from "@/lib/schemas";
@@ -34,6 +35,8 @@ export default function HomePage() {
   const [place, setPlace] = useState<Place | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [adopted, setAdopted] = useState<Adopted[]>([]);
+  const [explain, setExplain] = useState<Explain | null>(null);
+  const [prevBundle, setPrevBundle] = useState<Bundle | null>(null);
   // Settings named in the link (the Hindcast page's replay link, a shared URL):
   // read once, after the page mounts, then kept in the URL as they change.
   const [linked, setLinked] = useState<{ issue?: string; cell?: string } | null>(null);
@@ -117,6 +120,32 @@ export default function HomePage() {
       live = false;
     };
   }, [ready, index, domain, issue]);
+
+  // The tables behind the odds, and last issue's bundle for "why did this change".
+  useEffect(() => {
+    if (!ready) return;
+    let live = true;
+    setExplain(null);
+    getExplain(domain).then((e) => live && setExplain(e)).catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [ready, domain]);
+  useEffect(() => {
+    if (!index || !issue) return;
+    let live = true;
+    const i = index.issues.indexOf(issue);
+    setPrevBundle(null);
+    if (i > 0) getBundle(domain, index.issues[i - 1]).then((b) => live && setPrevBundle(b)).catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [index, issue, domain]);
+  const prevPlace = useMemo(() => {
+    if (!prevBundle || !place || !index || prevBundle.domain !== place.domain) return null;
+    const c = prevBundle.cells.find((x) => x.id === place.cell_id);
+    return c ? placeFromCell(prevBundle, c, index.history_years) : null;
+  }, [prevBundle, place, index]);
 
   const onClick = useCallback(
     (lat: number, lon: number) => {
@@ -208,6 +237,8 @@ export default function HomePage() {
         {place ? (
           <PlaceCard
             place={place}
+            explain={explain}
+            prev={prevPlace}
             meta={meta}
             sources={bundle?.sources ?? {}}
             horizon={horizon}
