@@ -1,0 +1,10 @@
+node_modules/
+out/
+# Generated from the project's files (scripts/prepare.mjs, capture/capture.mjs)
+public/data/
+public/captures/
+public/fonts/
+# The student's own voice and chosen music never go in the repository
+audio/voice.wav
+audio/music.wav
+audio/*.wav

@@ -2655,3 +2655,102 @@ the unseal, when 2026 outcomes may be used.
     the total for every cell and target.
 - **The brief** gains one frequency line per drought category, with an icon
   array split into stayed, eased and worsened.
+
+## v1.3 Stage 4: the demo film (first cut), and Stage 6: open data, 2026-10-15
+
+### Two fixes found on the way
+
+- **The site build failed on `f0f665b`.** `next/font/google` could not parse
+  the font URLs Google Fonts returned. The three OFL families are now
+  committed in `app/fonts/` (the same latin files, byte for byte) and loaded
+  with `next/font/local`, so the build fetches nothing.
+- **The deployed basemap drew rivers as wedges.** The Protomaps water layer
+  carries rivers as lines; a fill over a line closes it into a polygon.
+  Clear Creek and the North Fork of the South Platte crossed the map west of
+  Denver as blue wedges. The fill now takes polygons only, and a line layer
+  draws the rivers.
+
+### The film
+
+- **Built in code and rendered locally.** Remotion 4.0.531 (pinned, over two
+  weeks old, lockfile committed).
+  - It renders with the Chrome for Testing headless shell that Playwright
+    had already installed, so no browser was downloaded.
+  - WebGL is software-rendered ("swangle"), so rendering is CPU only.
+  - The free license covers an individual (`film/LICENSES/REMOTION.md`).
+  - No account, no cloud, no AI voice.
+- **Three corrections to the brief, so the film stays true:**
+  - 22 survivors, not eleven;
+  - 2026 has been looked at three times, not once: the film says every look
+    is counted and scoring opens at the unseal;
+  - there is no address search: the magic moment picks Denver and taps a
+    square.
+- **Every number is traced at render time.** `src/trace.ts` hands out every
+  number from `public/data/film.json`, and each entry names its source file
+  and key. After each frame, `src/Guard.tsx` reads all the text on screen and
+  fails the render on any run of digits not handed out by a field. It caught
+  "sha256" typed into a label; that card now says "fingerprint". The
+  narration and captions use `{field}` references and refuse typed digits.
+- **The unseal date is now data.** `app/lib/seal.json` is read by the
+  scoreboard, the film and (stage 7) the unseal script. Before this it was a
+  constant in the scoreboard page.
+- **Captures are the production build, frame-stepped.**
+  - Playwright drives the static build, served locally with range requests
+    by `film/capture/serve.py`, with the clock fixed and every other request
+    aborted.
+  - MapLibre animates on the real clock, which a frame-stepped capture
+    cannot follow. The fly-in therefore sets the camera on every frame (an
+    eased path between the two cameras the app itself chose) and waits for
+    the map to draw each one.
+- **The maps in parts 1 and 2 are drawn by MapLibre inside Remotion**, with
+  the app's own style and basemap. The drought progression comes from the
+  40 bundles the app published: observed inputs, not outcomes, so nothing is
+  computed against 2026.
+- **The Roberts Tunnel is drawn schematically**, from Dillon Reservoir's
+  basemap label point to the nearest Upper South Platte cell, and labeled so.
+  The project's sources do not give the tunnel's path.
+- **Sound:**
+  - 11 Kenney CC0 sounds (1.25 MB, priced first);
+  - a silent music placeholder with the ducking applied;
+  - two-pass loudnorm, which measured -14.0 LUFS and -1.2 dBTP on the scratch
+    mix;
+  - scratch narration from macOS `say`, labeled on screen until the
+    student's `audio/voice.wav` replaces it.
+- **Timing.** After the animatic, the phone beat was cut from 3.9 to 2.5 s
+  and everything after it moved 1.4 s earlier (2:51.0 to 2:49.6). Line 23
+  ("January 12, 2027") was given a longer slot, because spoken dates run
+  long.
+- **Downloads this session:**
+  - tools: 46.7 MB (npm, measured as cache growth; priced at 68.0 MB);
+  - assets: 1.25 MB (Kenney) and 7 kB (CC0 text);
+  - data: 0;
+  - total: well under the 600 MB cap.
+- **ffmpeg** was already installed from Homebrew (8.0.1, December 2025, with
+  loudnorm and libass), so nothing was downloaded for it.
+
+### Open data
+
+- **Formats:**
+  - every published issue as CSV and GeoJSON (gzipped, about 0.4 MB each);
+  - the latest issue uncompressed, plus as compact JSON;
+  - `index.json` as the endpoint, listing every file with its size and
+    sha256, the fields and the license.
+- **License:** CC BY 4.0, with the upstream credits from `facts.json`.
+- **Fields are those the brief names:** issue, vintage, area, cell (and its
+  centre), target, horizon, live probability, rendering state and reason.
+  The probability is the bundle's exactly; a target the app does not show
+  has no number. The vintage is the issue's pin in
+  `artifacts/ship/issue_vintages.json`.
+- **Size.** A whole issue uncompressed is 9.5 MB as CSV, so 40 issues would
+  add about 380 MB to the site; gzipped, all of it adds 21 MB. Pages compresses
+  the uncompressed latest files in transit.
+- **The `/data` page** is the data dictionary in English and Spanish (draft,
+  under the existing notice). Its field list comes from `index.json`, so the
+  page and the files cannot disagree; a browser test checks both languages
+  and that the CSV header matches.
+- **`/data` was added to the list of routes with Spanish text**
+  (`components/LangSwitch.tsx`). The reserved Spanish review notice itself,
+  meaning its text and its reviewed flag, is untouched.
+- **The API serves the same files** at `/open/{name}`. It builds them once
+  into a gitignored cache, including when serving the demo fixture, which
+  is never written to.

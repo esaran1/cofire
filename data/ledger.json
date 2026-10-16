@@ -1,7 +1,7 @@
 {
   "budget_bytes": 3200000000,
-  "recorded_bytes": 4640991445,
-  "correction_bytes": -1642922096,
+  "recorded_bytes": 4688951666,
+  "correction_bytes": -1690882317,
   "total_bytes": 2998069349,
   "remaining_bytes": 201930651,
   "corrections": [
@@ -28,6 +28,24 @@
       "reason": "The pmtiles Homebrew bottle is a tool download, recorded with size and checksum but kept out of the data budget's total, as for the earlier v1.2 tool downloads. The entry is left as written.",
       "delta_bytes": -15906842,
       "evidence": "entry 'homebrew-tool' 2026-10-12, 15,906,842 B, session=v1.2-basemap-tools"
+    },
+    {
+      "at": "2026-10-16T01:38:28+00:00",
+      "reason": "Tool download 'npm-tool' is recorded with size and checksum but kept out of the data budget's total, as for the earlier tool downloads. The entry is left as written.",
+      "delta_bytes": -46706688,
+      "evidence": "entry 'npm-tool' 2026-10-16, 46,706,688 B"
+    },
+    {
+      "at": "2026-10-16T02:16:40+00:00",
+      "reason": "Tool download 'kenney-asset' is recorded with size and checksum but kept out of the data budget's total, as for the earlier tool downloads. The entry is left as written.",
+      "delta_bytes": -1246485,
+      "evidence": "entry 'kenney-asset' 2026-10-16, 1,246,485 B"
+    },
+    {
+      "at": "2026-10-16T02:16:56+00:00",
+      "reason": "Tool download 'license-text' is recorded with size and checksum but kept out of the data budget's total, as for the earlier tool downloads. The entry is left as written.",
+      "delta_bytes": -7048,
+      "evidence": "entry 'license-text' 2026-10-16, 7,048 B"
     }
   ],
   "transfers": [
@@ -29759,6 +29777,27 @@
       "bytes": 208144,
       "timestamp": "2026-10-12T07:47:44+00:00",
       "note": "session=v1.2-basemap; via the GitHub contents API; blob hashes 7f65901599b368dc8c1d70d5fed9642148db9836 and f0302889321b2fb9f83e13b5df1a9a6b0b10e6f3 match; SIL OFL 1.1"
+    },
+    {
+      "source": "npm-tool",
+      "url": "https://registry.npmjs.org/ (film/: remotion 4.0.531, @remotion/cli 4.0.531 and its @remotion/* packages, maplibre-gl 6.14.0, pmtiles 4.5.0, react 19.3.0, typescript 5.9.3 and dependencies; 286 tarballs for darwin-arm64, priced at 68,020,707 B from each tarball's Content-Range)",
+      "bytes": 46706688,
+      "timestamp": "2026-10-16T01:38:28+00:00",
+      "note": "session=v1.3-film-tools; tool download; measured as npm cache growth (45,612 KiB; the rest was already cached); integrity hashes (sha512) for every package are in film/package-lock.json; npm audit: 0 vulnerabilities; node_modules 302,128 KiB"
+    },
+    {
+      "source": "kenney-asset",
+      "url": "https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip and https://kenney.nl/media/pages/assets/ui-audio/490d233f68-1677590494/kenney_ui-audio.zip (Kenney Interface Sounds, 100 files; Kenney UI Audio, 50 files; CC0 1.0)",
+      "bytes": 1246485,
+      "timestamp": "2026-10-16T02:16:40+00:00",
+      "note": "session=v1.3-film-assets; asset download for the film's UI sounds, priced first by Content-Length (834,536 B + 411,949 B); sha256 f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232 and 946fc23a63d535d693eb31b2eabb80c8c28d6351e2186b344ceb71b2cb1d5eb6; License.txt in each zip states CC0 1.0; 11 files kept in film/audio/sfx"
+    },
+    {
+      "source": "license-text",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt (CC0 1.0 legal code, plain text)",
+      "bytes": 7048,
+      "timestamp": "2026-10-16T02:16:56+00:00",
+      "note": "session=v1.3-film-assets; stored as film/LICENSES/CC0-1.0.txt for the Kenney sounds; sha256 a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
     }
   ]
 }

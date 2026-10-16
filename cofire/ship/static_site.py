@@ -40,6 +40,9 @@ def build(out: Path = OUT, src: Path = bundles.OUT) -> dict[str, int]:
     for dom in idx["order"]:
         if (explain / f"{dom}.json").exists():
             shutil.copy2(explain / f"{dom}.json", out / "domains" / dom / "explain.json")
+    # Open data (cofire/v13/open_data.py): CSV, GeoJSON and JSON of every issue, CC BY 4.0.
+    from cofire.v13 import open_data
+    open_data.build(out / "open", src)
     (out / "ember").mkdir()
     for zone in ("city", "wui"):
         (out / "ember" / f"{zone}.json").write_text(json.dumps(score({}, zone)))

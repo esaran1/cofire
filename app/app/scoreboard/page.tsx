@@ -1,6 +1,7 @@
 "use client";
 
 import forward from "@/lib/forward.json";
+import seal from "@/lib/seal.json";
 import { locale, useT } from "@/lib/i18n";
 
 /**
@@ -9,7 +10,7 @@ import { locale, useT } from "@/lib/i18n";
  * here: the forecasts are for 2026, the sealed test year, and scoring opens
  * when the seal lifts.
  */
-const UNSEAL = "2027-01-12";
+const UNSEAL = seal.unseal_date; // one source for the app, the film and the unseal script
 
 type Entry = { issue: string; sha256: string; published_at: string; backfilled: boolean };
 

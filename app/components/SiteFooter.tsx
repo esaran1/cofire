@@ -36,6 +36,7 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2 text-sm text-mute">
               <li><Link href="/hindcast" className="hover:text-ink">{t("foot.hindcast")}</Link></li>
               <li><Link href="/scoreboard" className="hover:text-ink">{t("foot.record")}</Link></li>
+              <li><Link href="/data" className="hover:text-ink">{t("foot.data")}</Link></li>
               <li><Link href="/about" className="hover:text-ink">{t("foot.method")}</Link></li>
               <li><Link href="/landing" className="hover:text-ink">{t("foot.how")}</Link></li>
             </ul>

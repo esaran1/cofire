@@ -1,0 +1,1 @@
+{ "site_url": null, "note": "site_url: the address shown on the end card, without https://. Null derives it from the git remote as GitHub Pages serves it; set it after the repository moves." }

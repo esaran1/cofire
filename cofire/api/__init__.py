@@ -367,6 +367,29 @@ def domain_explain(domain: str) -> Any:
     return json.loads(path.read_text())
 
 
+_OPEN_RE = re.compile(r"^(?:issues/)?[a-zA-Z0-9_.-]{1,80}$")
+
+
+@app.get("/open/{name:path}")
+def open_data_file(name: str) -> Any:
+    """The open data files (cofire/v13/open_data.py), built from the bundles on first request."""
+    from fastapi.responses import FileResponse
+
+    from cofire.v13 import open_data
+
+    if not _OPEN_RE.match(name) or ".." in name:
+        raise HTTPException(400, "bad file name")
+    src = art_path("ship/domains")
+    # Built once into a cache that is never committed, even when serving the demo fixture.
+    root = settings.artifacts_dir / "ship" / ("open_demo" if DEMO_ROOT in src.parents else "open")
+    if not (root / "index.json").exists():
+        open_data.build(root, src, strict=False)
+    path = root / name
+    if not path.is_file():
+        raise HTTPException(404, f"no open data file {name}")
+    return FileResponse(path)
+
+
 @app.get("/forecast/issues")
 def issues() -> dict[str, Any]:
     index = load_index()

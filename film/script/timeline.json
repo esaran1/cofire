@@ -1,0 +1,620 @@
+{
+  "note": "The film's shot list: the one source for the compositions (src/), the audio mix and captions (scripts/), and STORYBOARD.md (scripts/storyboard.mjs). Times in seconds. Narration timing is in narration.json.",
+  "duration": 169.6,
+  "vertical_duration": 45.0,
+  "parts": [
+    {
+      "id": "P1",
+      "title": "Cold open",
+      "start": 0.0,
+      "end": 10.0
+    },
+    {
+      "id": "P2",
+      "title": "The problem",
+      "start": 10.0,
+      "end": 33.0
+    },
+    {
+      "id": "P3",
+      "title": "The product",
+      "start": 33.0,
+      "end": 86.6
+    },
+    {
+      "id": "P4",
+      "title": "Why it can be trusted",
+      "start": 86.6,
+      "end": 144.1
+    },
+    {
+      "id": "P5",
+      "title": "Impact and close",
+      "start": 144.1,
+      "end": 169.6
+    }
+  ],
+  "shots": [
+    {
+      "id": "cold.wide",
+      "start": 0.0,
+      "end": 5.0,
+      "visual": "Map of the five areas on the app's dark basemap; every square coloured by its drought category, stepping through the 2026 issues week by week.",
+      "camera": "Slow push-in on all five areas.",
+      "text": "Kinetic: \"{year}, week by week.\" Ticker: issue date; squares in D2 or worse of {n_cells}.",
+      "sound": "Music only (placeholder).",
+      "fields": [
+        "year",
+        "issue_i",
+        "d2_i",
+        "n_cells"
+      ]
+    },
+    {
+      "id": "cold.deep",
+      "start": 5.0,
+      "end": 10.0,
+      "visual": "The weeks keep stepping through summer to the latest issue; the drought deepens.",
+      "camera": "Drift south and in, toward Denver.",
+      "text": "Ticker continues.",
+      "sound": "Music.",
+      "fields": [
+        "issue_i",
+        "d2_i",
+        "n_cells"
+      ]
+    },
+    {
+      "id": "problem.denver",
+      "start": 10.0,
+      "end": 15.6,
+      "visual": "Denver's squares at the latest issue; the other areas dim.",
+      "camera": "Ease in to Denver.",
+      "text": "Label: Denver.",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "problem.sources",
+      "start": 15.6,
+      "end": 19.4,
+      "visual": "Denver's two source watersheds light up: the Upper South Platte and Dillon (the Blue River above Dillon Reservoir).",
+      "camera": "Pull back to frame Denver and both watersheds.",
+      "text": "Labels: Upper South Platte, Dillon. Source line: Denver Water.",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "problem.west",
+      "start": 19.4,
+      "end": 22.6,
+      "visual": "Dillon Reservoir marked, from the basemap's own label point.",
+      "camera": "Drift west toward Dillon.",
+      "text": "Label: Dillon Reservoir. Source line: Denver Water.",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "problem.tunnel",
+      "start": 22.6,
+      "end": 27.5,
+      "visual": "A dashed line draws from Dillon Reservoir east into the Upper South Platte: the Roberts Tunnel, route drawn schematically.",
+      "camera": "Track east with the line.",
+      "text": "Label: Roberts Tunnel (route schematic). Source line: Denver Water.",
+      "sound": "Narration; one soft tone as the line lands.",
+      "fields": []
+    },
+    {
+      "id": "problem.threat",
+      "start": 27.5,
+      "end": 33.0,
+      "visual": "Both watersheds warm to ember; Denver Water's words in a quote card.",
+      "camera": "Slow pull back.",
+      "text": "Quote: \"the greatest threat to Denver's raw water supply\". Source line: Denver Water.",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.laptop",
+      "start": 33.0,
+      "end": 35.3,
+      "visual": "A laptop drawn in code rises into frame; on its screen, the app.",
+      "camera": "Rise and settle.",
+      "text": "",
+      "sound": "Soft transition.",
+      "fields": []
+    },
+    {
+      "id": "product.pick",
+      "start": 35.3,
+      "end": 38.2,
+      "visual": "The cursor goes to the area picker and chooses Denver (capture: pick).",
+      "camera": "Push in to the screen, toward the picker.",
+      "text": "",
+      "sound": "Click.",
+      "fields": [],
+      "cursor": {
+        "capture": "pick",
+        "start": 0.9,
+        "speed": 1
+      }
+    },
+    {
+      "id": "product.flyin",
+      "start": 38.2,
+      "end": 42.3,
+      "visual": "The map moves from the first area to Denver and its squares appear (capture: flyin, 60 fps frames).",
+      "camera": "The screen grows to fill the frame.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.tap",
+      "start": 42.3,
+      "end": 49.0,
+      "visual": "The magic moment: the cursor taps a square downtown and the Place Card resolves (captures: denver, card).",
+      "camera": "Follow the cursor, then ease to the card.",
+      "text": "",
+      "sound": "Click; soft resolve.",
+      "fields": [],
+      "cursor": {
+        "capture": "card",
+        "start": 0.45,
+        "speed": 1
+      }
+    },
+    {
+      "id": "product.card",
+      "start": 49.0,
+      "end": 51.9,
+      "visual": "The card's first rows: the chance of drought reaching D2 or worse.",
+      "camera": "Glide down the card.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.freq",
+      "start": 51.9,
+      "end": 56.6,
+      "visual": "The frequency sentence under the percentage.",
+      "camera": "Zoom to the sentence.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.icons",
+      "start": 56.6,
+      "end": 61.9,
+      "visual": "The cursor opens Why; the 10 by 10 icon array (capture: card_why_open).",
+      "camera": "Zoom to the icon array.",
+      "text": "",
+      "sound": "Click.",
+      "fields": [],
+      "cursor": {
+        "capture": "card_why_open",
+        "start": 0.3,
+        "speed": 1.15
+      }
+    },
+    {
+      "id": "product.weeks",
+      "start": 61.9,
+      "end": 65.8,
+      "visual": "Weeks like this one: the training-year cases behind the odds (capture: card_weeks).",
+      "camera": "Zoom to the list.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.weeks2",
+      "start": 65.8,
+      "end": 69.4,
+      "visual": "Down the list to its totals.",
+      "camera": "Pan down.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.ws",
+      "start": 69.4,
+      "end": 72.6,
+      "visual": "Where Denver's water comes from: the watershed panel (capture: card_ws).",
+      "camera": "Zoom to the panel heading.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.ws2",
+      "start": 72.6,
+      "end": 75.6,
+      "visual": "Fire-spread odds in each watershed.",
+      "camera": "Pan to the table.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "product.es",
+      "start": 75.6,
+      "end": 79.2,
+      "visual": "The cursor taps ES and the card turns to Spanish (captures: card_en_top, card_es).",
+      "camera": "Hold on the card; a flip on the vertical axis.",
+      "text": "",
+      "sound": "Toggle.",
+      "fields": [],
+      "cursor": {
+        "capture": "card_es",
+        "start": 0.25,
+        "speed": 1
+      }
+    },
+    {
+      "id": "product.brief",
+      "start": 79.2,
+      "end": 84.1,
+      "visual": "The weekly brief, as printed (capture: brief, print layout).",
+      "camera": "A sheet of paper slides in; pan down it.",
+      "text": "",
+      "sound": "Paper-soft transition.",
+      "fields": []
+    },
+    {
+      "id": "product.phone",
+      "start": 84.1,
+      "end": 86.6,
+      "visual": "The same card on a phone drawn in code (capture: m_card).",
+      "camera": "Phone turns slightly toward camera.",
+      "text": "",
+      "sound": "Music swell (placeholder).",
+      "fields": []
+    },
+    {
+      "id": "trust.title",
+      "start": 86.6,
+      "end": 91.9,
+      "visual": "Dark frame.",
+      "camera": "Still type, slow push.",
+      "text": "Kinetic: \"Why trust it?\"",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "trust.freeze",
+      "start": 91.9,
+      "end": 97.4,
+      "visual": "Two cards seal shut: the model frozen at a commit; the test written down first, with its fingerprint.",
+      "camera": "Slow push.",
+      "text": "Model frozen: commit {freeze_short}. Test written first: sha256 {prereg_short}.",
+      "sound": "Two soft locks.",
+      "fields": [
+        "freeze_short",
+        "prereg_short",
+        "holdout"
+      ]
+    },
+    {
+      "id": "trust.looks",
+      "start": 97.4,
+      "end": 102.8,
+      "visual": "The held-out year and its counter of looks; the next look's date.",
+      "camera": "Slide.",
+      "text": "Looks at {holdout}: {looks}. Next: {unseal}.",
+      "sound": "Narration.",
+      "fields": [
+        "holdout",
+        "looks",
+        "unseal"
+      ]
+    },
+    {
+      "id": "trust.dots",
+      "start": 102.8,
+      "end": 108.1,
+      "visual": "115 dots, one per forecast comparison, move onto an axis: real outcomes against the same outcomes shuffled.",
+      "camera": "Still, the dots move.",
+      "text": "Axis label: better than shuffled.",
+      "sound": "Narration.",
+      "fields": [
+        "n_comparisons",
+        "n_estimable"
+      ]
+    },
+    {
+      "id": "trust.survivors",
+      "start": 108.1,
+      "end": 113.6,
+      "visual": "The comparisons whose whole interval clears the shuffled control light up.",
+      "camera": "Slow push to the lit dots.",
+      "text": "{n_survivors} of {n_comparisons}.",
+      "sound": "Narration.",
+      "fields": [
+        "n_survivors",
+        "n_comparisons"
+      ]
+    },
+    {
+      "id": "trust.ranges",
+      "start": 113.6,
+      "end": 118.0,
+      "visual": "Six forecast ranges, as tested: worst 13-week coverage rises to sit on the target line.",
+      "camera": "Still.",
+      "text": "Values {pair_i_tested}; target {coverage_target}.",
+      "sound": "Narration.",
+      "fields": [
+        "pair_i_tested",
+        "pair_i_label",
+        "coverage_target"
+      ]
+    },
+    {
+      "id": "trust.perfect",
+      "start": 118.0,
+      "end": 121.3,
+      "visual": "The bars hold.",
+      "camera": "Push in.",
+      "text": "Kinetic: \"It looked perfect.\"",
+      "sound": "Silence under the line (the turn).",
+      "fields": []
+    },
+    {
+      "id": "trust.leak",
+      "start": 121.3,
+      "end": 125.6,
+      "visual": "A row of weeks: the test updated each forecast with the same week's outcome.",
+      "camera": "Still.",
+      "text": "As tested: updated with the same week's outcome.",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "trust.delay",
+      "start": 125.6,
+      "end": 130.0,
+      "visual": "The same update arrives weeks later, as it would in real time.",
+      "camera": "Slide right.",
+      "text": "In real time: the outcome arrives {h_min} to {h_max} weeks later.",
+      "sound": "Narration.",
+      "fields": [
+        "h_min",
+        "h_max"
+      ]
+    },
+    {
+      "id": "trust.collapse",
+      "start": 130.0,
+      "end": 134.8,
+      "visual": "The six bars fall to their real-time coverage.",
+      "camera": "Still.",
+      "text": "Values {pair_i_realtime}.",
+      "sound": "A low drop.",
+      "fields": [
+        "pair_i_realtime"
+      ]
+    },
+    {
+      "id": "trust.27",
+      "start": 134.8,
+      "end": 136.8,
+      "visual": "The lowest value, large.",
+      "camera": "Push.",
+      "text": "{roll13_pct}%",
+      "sound": "Narration.",
+      "fields": [
+        "roll13_pct"
+      ]
+    },
+    {
+      "id": "trust.card",
+      "start": 136.8,
+      "end": 140.4,
+      "visual": "The app: the cursor opens \"Why there is no band\" (capture: noband).",
+      "camera": "Ease to the card.",
+      "text": "",
+      "sound": "Click.",
+      "fields": [],
+      "cursor": {
+        "capture": "noband",
+        "start": 0.4,
+        "speed": 1
+      }
+    },
+    {
+      "id": "trust.reason",
+      "start": 140.4,
+      "end": 144.1,
+      "visual": "The reason, in the app's words.",
+      "camera": "Zoom to the text.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "close.weekly",
+      "start": 144.1,
+      "end": 147.2,
+      "visual": "The map steps through the weekly issues (captures: weekly).",
+      "camera": "Slow push.",
+      "text": "",
+      "sound": "Soft ticks, low.",
+      "fields": []
+    },
+    {
+      "id": "close.record",
+      "start": 147.2,
+      "end": 151.0,
+      "visual": "The forecast record: every issue with its publish time and sha256 (capture: scoreboard).",
+      "camera": "Pan down the list.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "close.seal",
+      "start": 151.0,
+      "end": 156.6,
+      "visual": "The seal notice: scoring opens on the unseal date.",
+      "camera": "Zoom to the notice.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "close.data",
+      "start": 156.6,
+      "end": 161.5,
+      "visual": "The open data page: CSV, GeoJSON and JSON, CC BY 4.0 (capture: datadict).",
+      "camera": "Pan.",
+      "text": "",
+      "sound": "Narration.",
+      "fields": []
+    },
+    {
+      "id": "close.final",
+      "start": 161.5,
+      "end": 166.6,
+      "visual": "The live map, Denver.",
+      "camera": "Slow pull back.",
+      "text": "Tagline.",
+      "sound": "Music up (placeholder).",
+      "fields": []
+    },
+    {
+      "id": "close.end",
+      "start": 166.6,
+      "end": 169.6,
+      "visual": "End card: COFIRE, the tagline, the address, and the data credits.",
+      "camera": "Still.",
+      "text": "COFIRE · {site_url}",
+      "sound": "Music out.",
+      "fields": [
+        "site_url"
+      ]
+    }
+  ],
+  "vertical": [
+    {
+      "id": "v.cold",
+      "start": 0.0,
+      "end": 10.0,
+      "from": [
+        "cold.wide",
+        "cold.deep"
+      ]
+    },
+    {
+      "id": "v.problem",
+      "start": 10.0,
+      "end": 33.0,
+      "from": [
+        "problem.denver",
+        "problem.sources",
+        "problem.west",
+        "problem.tunnel",
+        "problem.threat"
+      ]
+    },
+    {
+      "id": "v.phone",
+      "start": 33.0,
+      "end": 42.3,
+      "from": [
+        "product.laptop",
+        "product.pick",
+        "product.flyin"
+      ],
+      "note": "On the phone: pick, fly in, tap."
+    },
+    {
+      "id": "v.end",
+      "start": 42.3,
+      "end": 45.0,
+      "note": "End card for the vertical cut."
+    }
+  ],
+  "sfx": {
+    "note": "Sound cues other than cursor clicks (those come from each shot's cursor and the capture's recorded click). t in film seconds; gain in dB; files in film/audio/sfx (Kenney, CC0).",
+    "click": {
+      "file": "kenney-ui-audio_click3.ogg",
+      "gain": -14
+    },
+    "toggle_click": {
+      "file": "kenney-interface-sounds_toggle_002.ogg",
+      "gain": -14
+    },
+    "cues": [
+      {
+        "t": 25.55,
+        "file": "kenney-interface-sounds_glass_002.ogg",
+        "gain": -20,
+        "why": "the tunnel line lands"
+      },
+      {
+        "t": 33.05,
+        "file": "kenney-interface-sounds_maximize_003.ogg",
+        "gain": -22,
+        "why": "laptop rises"
+      },
+      {
+        "t": 79.25,
+        "file": "kenney-interface-sounds_scroll_002.ogg",
+        "gain": -26,
+        "why": "the brief slides in"
+      },
+      {
+        "t": 93.2,
+        "file": "kenney-interface-sounds_switch_002.ogg",
+        "gain": -22,
+        "why": "first lock"
+      },
+      {
+        "t": 94.4,
+        "file": "kenney-interface-sounds_switch_002.ogg",
+        "gain": -22,
+        "why": "second lock"
+      },
+      {
+        "t": 108.45,
+        "file": "kenney-interface-sounds_confirmation_002.ogg",
+        "gain": -24,
+        "why": "survivors light"
+      },
+      {
+        "t": 130.6,
+        "file": "kenney-interface-sounds_drop_003.ogg",
+        "gain": -18,
+        "why": "the ranges fall"
+      }
+    ],
+    "weekly_ticks": {
+      "file": "kenney-interface-sounds_tick_002.ogg",
+      "gain": -28,
+      "shot": "close.weekly"
+    },
+    "vertical": [
+      {
+        "t": 39.3,
+        "file": "kenney-ui-audio_click3.ogg",
+        "gain": -14,
+        "why": "tap on the phone"
+      },
+      {
+        "t": 33.05,
+        "file": "kenney-interface-sounds_maximize_003.ogg",
+        "gain": -22,
+        "why": "phone rises"
+      },
+      {
+        "t": 25.55,
+        "file": "kenney-interface-sounds_glass_002.ogg",
+        "gain": -20,
+        "why": "the tunnel line lands"
+      }
+    ]
+  }
+}

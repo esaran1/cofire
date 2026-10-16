@@ -54,6 +54,8 @@ artifacts/frontend/screens/*.png
 # Per-domain bundles are rebuilt from artifacts/ship/forecast_issues.parquet by
 # `python -m cofire.ship.bundles`; demo/ keeps the committed copy make demo serves.
 artifacts/ship/domains/
+artifacts/ship/open/
+artifacts/ship/open_demo/
 # Built by scripts/build_static.sh from the bundles.
 app/public/data/
 

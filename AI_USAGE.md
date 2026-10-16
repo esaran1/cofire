@@ -80,6 +80,27 @@ with records kept rather than rewritten:
 | `app/scripts/copy-maplibre-worker.mjs` | serves MapLibre 6's worker | AI agent |
 | Spanish text in `app/lib/i18n/` for every page | draft translation, pending human review | AI agent |
 
+### v1.3 modules and film assets (all agent-generated)
+
+| Module or asset | What it does | Author |
+|---|---|---|
+| `cofire/v13/explain.py`, `artifacts/v13/explain/` | the tables behind frequency sentences, weeks like this one, why did this change | AI agent |
+| `app/lib/explain.ts`, `app/components/Explain.tsx` | frequency sentence, icon array, weeks like this one, change decomposition | AI agent |
+| `app/fonts/` (files and `OFL.txt` header) | the app's OFL fonts, self-hosted so the build fetches nothing | AI agent (fonts by their authors, SIL OFL) |
+| `app/lib/basemap.ts` waterways fix | rivers drawn as lines, not filled wedges | AI agent |
+| `app/lib/seal.json` | the unseal date as data, for the app, the film and the unseal script | AI agent (date decided by the owner) |
+| `scripts/ledger_tool.py` | records a tool download in the ledger | AI agent |
+| `cofire/v13/open_data.py`, `/open` API route | open data: CSV, GeoJSON, JSON and the index, CC BY 4.0 | AI agent |
+| `app/app/data/page.tsx` and its strings | the open data page and data dictionary (Spanish draft, pending review) | AI agent |
+| `film/` Remotion project (`src/`, `scripts/`, `capture/`) | the demo film: scenes, captures, number tracing, audio mix, captions, renders | AI agent |
+| `film/SCRIPT.md`, `film/script/narration.json` | the narration, a draft for the student to rewrite and record | AI agent (draft) |
+| `film/STORYBOARD.md`, `film/SOURCES.md`, `film/REVIEW.md`, `film/RECORDING_GUIDE.md` | the film's storyboard, sources, review checklist, recording guide | AI agent |
+| `film/LICENSES/REMOTION.md` | the Remotion free-license determination | AI agent |
+| `film/audio/sfx/` | 11 UI sounds chosen from Kenney's CC0 packs | AI agent selected (sounds by Kenney, CC0) |
+| `film/audio/ducking.json` | the music ducking automation | AI agent |
+| Scratch narration (generated, not committed) | macOS `say` reading the draft, marked as scratch on screen | AI agent |
+| Spanish captions (`film/out/captions_es.srt`, generated) | draft translation, pending human review | AI agent |
+
 ## What the student wrote or decided
 
 _To be completed by the student. This section is intentionally left blank.

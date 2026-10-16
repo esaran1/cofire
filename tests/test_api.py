@@ -252,3 +252,15 @@ def test_every_ember_item_has_spanish() -> None:
             for item in group.get("items", []):
                 t = es["items"].get(item["id"])
                 assert t and t["label"] and t["rationale"], item["id"]
+
+
+def test_open_data_is_served_and_names_are_checked() -> None:
+    r = client.get("/open/index.json")
+    assert r.status_code == 200
+    idx = r.json()
+    assert idx["license"]["name"] == "CC BY 4.0"
+    assert [f["name"] for f in idx["fields"]][:3] == ["issue", "vintage", "area"]
+    latest = client.get(f"/open/{idx['latest']['csv']}")
+    assert latest.status_code == 200 and latest.text.startswith("issue,vintage,area,cell")
+    assert client.get("/open/..%2Findex.json").status_code in (400, 404)
+    assert client.get("/open/issues/../../secrets").status_code in (400, 404)

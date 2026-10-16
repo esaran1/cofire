@@ -1,0 +1,159 @@
+{
+  "status": "DRAFT for the student to rewrite in their own words. Numbers are {field} references filled from data at render time; never type a digit here (scripts/check.mjs fails if you do).",
+  "spanish_status": "Spanish captions are a draft translation, flagged for review by a person, like the app's Spanish.",
+  "lines": [
+    {
+      "id": 1,
+      "start": 3.0,
+      "en": "This is the drought of {year}, week by week.",
+      "es": "Esta es la sequía de {year}, semana a semana."
+    },
+    {
+      "id": 2,
+      "start": 10.0,
+      "en": "If you live in Denver, drought and wildfire can feel far away.",
+      "es": "Si vives en Denver, la sequía y los incendios pueden parecer lejanos."
+    },
+    {
+      "id": 3,
+      "start": 15.6,
+      "en": "But about half of Denver's water comes from mountain rivers west of the Continental Divide.",
+      "es": "Pero cerca de la mitad del agua de Denver viene de ríos de montaña al oeste de la Divisoria Continental.",
+      "source": "denver_water_sources"
+    },
+    {
+      "id": 4,
+      "start": 22.6,
+      "en": "A tunnel carries it under the Divide from Dillon Reservoir.",
+      "es": "Un túnel la trae bajo la Divisoria desde el embalse Dillon.",
+      "source": "denver_water_sources"
+    },
+    {
+      "id": 5,
+      "start": 27.5,
+      "en": "And Denver Water calls wildfire the greatest threat to that supply.",
+      "es": "Y Denver Water dice que los incendios son la mayor amenaza para ese suministro.",
+      "source": "denver_water_watershed"
+    },
+    {
+      "id": 6,
+      "start": 33.0,
+      "en": "So I built COFIRE.",
+      "es": "Por eso creé COFIRE."
+    },
+    {
+      "id": 7,
+      "start": 35.3,
+      "en": "Pick Denver, and tap any square on the map. Each is {cell_km} kilometers across.",
+      "es": "Elige Denver y toca cualquier cuadro del mapa. Cada uno mide {cell_km} kilómetros de lado."
+    },
+    {
+      "id": 8,
+      "start": 42.3,
+      "en": "The card shows the odds that drought deepens, or that conditions let a fire spread, {h_min} to {h_max} weeks ahead.",
+      "es": "La tarjeta muestra la probabilidad de que la sequía empeore, o de que las condiciones dejen propagarse un incendio, con {h_min} a {h_max} semanas de anticipación."
+    },
+    {
+      "id": 9,
+      "start": 51.9,
+      "en": "Not as a bare percentage, but as a count: out of a hundred weeks like this one, how many went that way.",
+      "es": "No como un porcentaje suelto, sino como un conteo: de cien semanas como esta, cuántas terminaron así."
+    },
+    {
+      "id": 10,
+      "start": 61.9,
+      "en": "Open it, and you see the real weeks behind the number, from {train_start} to {train_end}.",
+      "es": "Ábrela y verás las semanas reales detrás del número, de {train_start} a {train_end}."
+    },
+    {
+      "id": 11,
+      "start": 69.4,
+      "en": "For Denver, it also shows fire odds where the city's water comes from.",
+      "es": "Para Denver, también muestra la probabilidad de incendio donde nace el agua de la ciudad."
+    },
+    {
+      "id": 12,
+      "start": 75.6,
+      "en": "One tap, and it's all in Spanish.",
+      "es": "Un toque, y todo está en español."
+    },
+    {
+      "id": 13,
+      "start": 79.2,
+      "en": "And every week there's a one-page brief you can print.",
+      "es": "Y cada semana hay un resumen de una página que puedes imprimir."
+    },
+    {
+      "id": 14,
+      "start": 86.6,
+      "en": "Why trust it? Because I tried hard to prove it wrong.",
+      "es": "¿Por qué confiar en ella? Porque me esforcé por demostrar que fallaba."
+    },
+    {
+      "id": 15,
+      "start": 91.9,
+      "en": "{holdout} is held out. Before testing on it, I froze the model and wrote the test down. Every look at that year is counted.",
+      "es": "{holdout} está reservado. Antes de probarlo, congelé el modelo y dejé la prueba por escrito. Cada vez que se mira ese año, queda contada."
+    },
+    {
+      "id": 16,
+      "start": 102.8,
+      "en": "On years it never trained on, {n_survivors} of {n_comparisons} forecasts beat a control with the outcomes shuffled. Only those claim skill.",
+      "es": "En años con los que nunca se entrenó, {n_survivors} de {n_comparisons} pronósticos superaron a un control con los resultados barajados. Solo esos afirman tener habilidad."
+    },
+    {
+      "id": 17,
+      "start": 113.6,
+      "en": "Then my forecast ranges. They hit their target almost exactly. It looked perfect.",
+      "es": "Luego, mis rangos de pronóstico. Dieron en el blanco casi exactamente. Parecía perfecto."
+    },
+    {
+      "id": 18,
+      "start": 121.3,
+      "en": "Then I found a leak in my own test. It used outcomes a real forecast wouldn't know for weeks.",
+      "es": "Entonces encontré una fuga en mi propia prueba. Usaba resultados que un pronóstico real no conocería sino semanas después."
+    },
+    {
+      "id": 19,
+      "start": 130.0,
+      "en": "With an honest delay, the worst stretch fell to {roll13_pct} percent.",
+      "es": "Con un retraso honesto, el peor tramo cayó al {roll13_pct} por ciento."
+    },
+    {
+      "id": 20,
+      "start": 136.8,
+      "en": "So I took the ranges out. The app tells you why, right on the card.",
+      "es": "Así que quité los rangos. La aplicación explica por qué, en la misma tarjeta."
+    },
+    {
+      "id": 21,
+      "start": 144.1,
+      "en": "COFIRE updates every week.",
+      "es": "COFIRE se actualiza cada semana."
+    },
+    {
+      "id": 22,
+      "start": 146.4,
+      "en": "Every forecast is timestamped and fingerprinted, so it can't be changed later.",
+      "es": "Cada pronóstico lleva fecha, hora y huella digital, así que no se puede cambiar después."
+    },
+    {
+      "id": 23,
+      "start": 151.2,
+      "en": "Scoring opens on {unseal}, when the seal on {holdout} lifts.",
+      "es": "La evaluación se abre el {unseal}, cuando se levanta el sello sobre {holdout}."
+    },
+    {
+      "id": 24,
+      "start": 158.2,
+      "en": "The data is open, for anyone to use.",
+      "es": "Los datos son abiertos, para que cualquiera los use."
+    },
+    {
+      "id": 25,
+      "start": 162.2,
+      "en": "COFIRE. Calibrated odds for Denver, and for the water it depends on.",
+      "es": "COFIRE. Probabilidades calibradas para Denver y para el agua de la que depende."
+    }
+  ]
+}

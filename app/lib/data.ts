@@ -1,5 +1,6 @@
 import { type Explain, ExplainSchema } from "./explain";
-import { getParsed } from "./api";
+import { z } from "zod";
+import { API, getParsed } from "./api";
 import {
   Bundle,
   BundleCell,
@@ -153,4 +154,24 @@ export function localScore<T extends { items: ChecklistItem[]; score: number }>(
   const total = data.items.reduce((a, i) => a + i.item_weight, 0) || 1;
   const done = data.items.filter((i) => state[i.id]).reduce((a, i) => a + i.item_weight, 0);
   return { ...data, score: done / total };
+}
+
+/** Open data (cofire/v13/open_data.py): the index a program starts from, and file URLs. */
+const OpenFile = z.object({ bytes: z.number(), sha256: z.string(), uncompressed_bytes: z.number().optional() });
+export const OpenIndexSchema = z.object({
+  name: z.string(),
+  license: z.object({ name: z.string(), url: z.string(), credit: z.string(), upstream: z.array(z.object({ name: z.string(), use: z.string(), credit: z.string(), license: z.string(), url: z.string() })) }),
+  latest: z.object({ issue: z.string(), csv: z.string(), geojson: z.string(), json: z.string() }),
+  fields: z.array(z.object({ name: z.string(), type: z.string(), description: z.string() })),
+  issues: z.array(z.object({ issue: z.string(), rows: z.number(), csv: z.string(), geojson: z.string() })),
+  files: z.record(z.string(), OpenFile),
+});
+export type OpenIndex = z.infer<typeof OpenIndexSchema>;
+
+export function openDataUrl(name: string): string {
+  return STATIC_BASE ? `${STATIC_BASE}/open/${name}` : `${API}/open/${name}`;
+}
+
+export function getOpenIndex(): Promise<OpenIndex> {
+  return STATIC_BASE ? fetchStatic("/open/index.json", (r) => OpenIndexSchema.parse(r)) : getParsed("/open/index.json", OpenIndexSchema);
 }

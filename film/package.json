@@ -1,0 +1,36 @@
+{
+  "name": "cofire-film",
+  "private": true,
+  "description": "The COFIRE demo film: a Remotion project, rendered locally. See film/README.md.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "prepare:data": "node scripts/prepare.mjs",
+    "capture": "node capture/capture.mjs",
+    "check": "node scripts/check.mjs",
+    "check:draft": "node scripts/check.mjs --draft",
+    "docs": "node scripts/docs.mjs",
+    "audio": "node scripts/audio.mjs",
+    "stills": "node scripts/stills.mjs",
+    "render:animatic": "node scripts/render.mjs animatic",
+    "render:master": "node scripts/render.mjs master",
+    "render:exports": "node scripts/render.mjs exports",
+    "render:vertical": "node scripts/render.mjs vertical",
+    "render:prompter": "node scripts/render.mjs prompter",
+    "film": "node scripts/render.mjs all",
+    "studio": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.531",
+    "maplibre-gl": "6.14.0",
+    "pmtiles": "4.5.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.531"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}
