@@ -238,5 +238,11 @@
   "sha256": "0e26d95008acac4fa57d45bc1d68f6390d0cf2ebcb00444a25ab6376e027c693",
   "published_at": "2026-10-11T22:38:26Z",
   "backfilled": true
+ },
+ {
+  "issue": "2026-10-13",
+  "sha256": "a6fe61a73b19447d127e8109fd4f217fd3d6d4403f93b2d9c0e3fb3f0358820a",
+  "published_at": "2026-10-16T21:33:00Z",
+  "backfilled": false
  }
 ]
