@@ -74,6 +74,7 @@ const MUTED = "#2a2d33";
 const ROAD = "#353941";
 const ROAD_MAJOR = "#454a54";
 const WATER = "#142130";
+const WATER_LINE = "#1b2c40";
 const LABEL = "#b9bcc3";
 
 function glyphsUrl(): string {
@@ -82,7 +83,7 @@ function glyphsUrl(): string {
 }
 
 /** Ids of the layers drawn from the tile archive, hidden if it fails to load. */
-export const BASEMAP_LAYERS = ["earth", "landcover", "landuse", "water", "roads-minor", "roads-major", "boundaries", "buildings", "places"];
+export const BASEMAP_LAYERS = ["earth", "landcover", "landuse", "water", "waterways", "roads-minor", "roads-major", "boundaries", "buildings", "places"];
 
 function selfhostStyle(): maplibregl.StyleSpecification {
   return {
@@ -101,7 +102,19 @@ function selfhostStyle(): maplibregl.StyleSpecification {
       { id: "earth", type: "fill", source: "basemap", "source-layer": "earth", paint: { "fill-color": LAND } },
       { id: "landcover", type: "fill", source: "basemap", "source-layer": "landcover", paint: { "fill-color": MUTED, "fill-opacity": 0.35 } },
       { id: "landuse", type: "fill", source: "basemap", "source-layer": "landuse", paint: { "fill-color": MUTED, "fill-opacity": 0.45 } },
-      { id: "water", type: "fill", source: "basemap", "source-layer": "water", paint: { "fill-color": WATER } },
+      // The water layer carries rivers and streams as lines beside lakes and
+      // reservoirs as polygons; a fill drawn over a line closes it into a
+      // wedge across the map, so each geometry gets its own layer.
+      {
+        id: "water", type: "fill", source: "basemap", "source-layer": "water",
+        filter: ["in", ["geometry-type"], ["literal", ["Polygon", "MultiPolygon"]]],
+        paint: { "fill-color": WATER },
+      },
+      {
+        id: "waterways", type: "line", source: "basemap", "source-layer": "water",
+        filter: ["in", ["geometry-type"], ["literal", ["LineString", "MultiLineString"]]],
+        paint: { "line-color": WATER_LINE, "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.4, 12, 1.2, 14, 2] },
+      },
       {
         id: "roads-minor", type: "line", source: "basemap", "source-layer": "roads",
         filter: ["!", ["in", ["get", "kind"], ["literal", ["highway", "major_road"]]]],
