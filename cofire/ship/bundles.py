@@ -21,7 +21,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from cofire.ship import domains
+from cofire.ship import cells, domains
 from cofire.ship.index_build import HISTORY_YEARS
 
 LOGGER = logging.getLogger("cofire.ship.bundles")
@@ -162,40 +162,5 @@ if __name__ == "__main__":
 
 
 def legacy_cells(root: Path = OUT) -> dict[str, Any]:
-    """The old forecast-index structure, rebuilt from the bundles under `root`.
-
-    The API's cell endpoints (`/forecast`, `/predictions`, `/observations`)
-    were written against one index of every cell and issue. Rebuilding that
-    view from the bundles keeps them working for every domain without writing
-    the 240 MB file.
-    """
-    idx = json.loads((root / "index.json").read_text())
-    cells: list[dict[str, Any]] = []
-    issues: set[str] = set()
-    for dom in idx["order"]:
-        for path in sorted((root / dom).glob("*.json")):
-            b = json.loads(path.read_text())
-            issues.add(b["issue"])
-            dec_t, dec_h = b["decisions"]["targets"], b["decisions"]["horizons"]
-            for c in b["cells"]:
-                horizons: dict[str, Any] = {}
-                for h, (point, lo, hi, week) in c["h"].items():
-                    state, reason = dec_h.get(h, [None, None])
-                    blk: dict[str, Any] = {"point": point, "state": state, "reason": reason}
-                    if lo is not None and hi is not None:
-                        blk |= {"hist_lo": lo, "hist_hi": hi, "hist_years": idx["history_years"], "target_week": week}
-                    horizons[h] = blk
-                cells.append({
-                    "cell_id": c["id"], "lat": c["lat"], "lon": c["lon"], "issue": b["issue"],
-                    "domain": dom, "resolution_m": 4000, "erc": c["erc"], "erc_pct": c["erc_pct"],
-                    "usdm": c["usdm"], "horizons": horizons,
-                    "targets": {t: {"p": c["p"][i], "state": dec_t[t][0], "reason": dec_t[t][1]}
-                                for i, t in enumerate(b["targets"])},
-                    "model": dict(zip(b.get("model_targets", []), c.get("m", []), strict=False)),
-                })
-    return {
-        "resolution_m": 4000,
-        "resolution_note": "4 km gridMET cells. The displayed value is the cell's own, not an interpolation to a point.",
-        "issues": sorted(issues), "cells": cells, "domains": idx["order"], "targets": idx["targets"],
-        "configuration": "frozen at FREEZE_COMMIT; see docs/PREREGISTRATION_LOOK3.md",
-    }
+    """The old forecast-index structure, rebuilt from the bundles under `root` (see cofire.ship.cells)."""
+    return cells.legacy_cells(root)

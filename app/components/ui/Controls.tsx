@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
+import { NO_SERVICE } from "@/lib/api";
 import { useT } from "@/lib/i18n";
 
 /**
@@ -114,7 +115,7 @@ export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () 
 export function OfflineNote() {
   // The static site has no service at all; saying "no connection" there would
   // suggest retrying something that will never answer.
-  const isStatic = !!process.env.NEXT_PUBLIC_DATA_BASE;
+  const isStatic = NO_SERVICE;
   const { t } = useT();
   return (
     <div className="rounded border border-ochre/40 bg-ochre-soft p-4" data-testid="offline-note">

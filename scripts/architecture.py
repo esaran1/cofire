@@ -45,8 +45,8 @@ COLUMNS: list[tuple[str, list[tuple[str, list[str]]]]] = [
     ]),
     ("Delivered", [
         ("refresh", ["weekly refresh", "GitHub Actions"]),
-        ("site", ["static site", "Vercel"]),
-        ("api", ["API", "local demo"]),
+        ("site", ["web app", "Vercel"]),
+        ("api", ["API", "Vercel, /api"]),
     ]),
     ("Readers", [
         ("map", ["map and Place Card"]),

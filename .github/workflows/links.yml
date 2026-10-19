@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: uv sync --extra dev
+      - run: uv sync --extra dev --extra pipeline
       - name: Open every link
         env:
           COFIRE_CHECK_LINKS: "1"

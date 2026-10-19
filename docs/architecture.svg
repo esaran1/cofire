@@ -88,11 +88,11 @@
 <text x="1080" y="93" font-size="13" font-weight="bold" fill="#17181b">weekly refresh</text>
 <text x="1080" y="110" font-size="13" font-weight="normal" fill="#17181b">GitHub Actions</text>
 <rect x="1070" y="146" width="190" height="54" rx="3" fill="#faf9f5" stroke="#3d3f45" stroke-width="1.2"/>
-<text x="1080" y="169" font-size="13" font-weight="bold" fill="#17181b">static site</text>
+<text x="1080" y="169" font-size="13" font-weight="bold" fill="#17181b">web app</text>
 <text x="1080" y="186" font-size="13" font-weight="normal" fill="#17181b">Vercel</text>
 <rect x="1070" y="222" width="190" height="54" rx="3" fill="#faf9f5" stroke="#3d3f45" stroke-width="1.2"/>
 <text x="1080" y="245" font-size="13" font-weight="bold" fill="#17181b">API</text>
-<text x="1080" y="262" font-size="13" font-weight="normal" fill="#17181b">local demo</text>
+<text x="1080" y="262" font-size="13" font-weight="normal" fill="#17181b">Vercel, /api</text>
 <rect x="1330" y="70" width="190" height="37" rx="3" fill="#faf9f5" stroke="#3d3f45" stroke-width="1.2"/>
 <text x="1340" y="93" font-size="13" font-weight="bold" fill="#17181b">map and Place Card</text>
 <rect x="1330" y="129" width="190" height="37" rx="3" fill="#faf9f5" stroke="#3d3f45" stroke-width="1.2"/>

@@ -2971,3 +2971,77 @@ Vercel building the site from the repository, and Pages removed.
   refresh commits as its own bot.
 - **Not deployed:** the Python service, as before. Predict and Observe say
   so on the static site.
+
+## Vercel with two services: the app and the API, 2026-10-19
+
+Later the same day, the owner chose one Vercel project with two services
+instead of the static site alone, so Predict and Observe work in
+production. Names, routing and storage were the owner's choices.
+- **Services** (`vercel.json`):
+  - `web` is the Next.js app (`app/`), public at `/`.
+  - `api` is FastAPI (`cofire/deploy/vercel_app.py`), public at `/api`.
+  - Vercel passes the full path (`/api/leaderboard`) on to the service, so
+    the API is mounted under `/api`; `cofire.api.main:app` still serves it
+    from the root locally.
+- **Map data stays static.** `web` is the Next.js server build. Its pages
+  are prerendered, and the bundles are served as files under `/data`, as
+  before. Only picks, reports, the leaderboard and Ember reach a function.
+- **One binding: `api` calls `web`** (`WEB_URL`).
+  - The API checks each pick against the forecast cells, so it needs the
+    bundles. It reads them from `web`'s published copies
+    (`cofire/ship/cells.py`, standard library only), keeps them per
+    instance and re-reads after ten minutes.
+  - Building its own copy would have meant the whole pipeline environment
+    in the API's build, and 48 MB more in its function.
+  - The browser calls `/api` itself, so `web` needs no binding.
+  - `COFIRE_BUNDLES_URL` overrides the address, in case the internal route
+    does not serve static files.
+- **Postgres for picks and reports.** The API reads `DATABASE_URL`, which a
+  Vercel Postgres integration sets. Postgres URLs get the psycopg driver
+  name, and connections are checked before use.
+  - Without a database, SQLite under /tmp keeps the API up, and
+    `/api/health` reports `"storage": "temporary"`.
+  - `scripts/check_deploy.py` fails until storage is Postgres.
+- **A read-only filesystem.** The frozen settings create `data/raw`,
+  `data/cache` and `logs` on first use, and `cofire/model/` cannot change.
+  So `cofire/deploy/vercel_env.py` points those folders at /tmp before the
+  API is imported.
+  - It lives outside `cofire.api`, because importing anything in that
+    package runs its `__init__`, which opens the database.
+  - A first version inside `cofire.api` did open `data/cofire.db` during a
+    local check, and wrote one test pick into it. That row was deleted
+    (after a backup), the module was moved, and the check now refuses to
+    run unless the API opened its temporary database.
+  - `tests/test_deploy.py` asserts the order in a fresh interpreter.
+- **Dependencies split.** Vercel installs a Python service's
+  `pyproject.toml` dependencies; the full set (torch, rasterio, LightGBM
+  and the rest) is about 1.6 GB, against a 500 MB function limit.
+  - The project's dependencies are now what the API needs at run time
+    (about 160 MB installed, plus psycopg). Everything else moved, unchanged,
+    to the `pipeline` extra.
+  - `uv.lock` gained psycopg and changed no other version.
+  - Every `uv sync` (CI, refresh, smoke, links, `make setup`, the web build)
+    adds `--extra pipeline`. `uv run` syncs inexactly, so it keeps them.
+  - matplotlib and pandas stay in the slim set: the frozen
+    `cofire/model/uncertainty/__init__.py` imports them.
+  - Large functions (up to 5 GB, beta) would have taken the full set, at
+    the cost of slow cold starts.
+- **Checked locally.**
+  - The slim environment on Python 3.12 (Vercel has no 3.11) passes
+    `scripts/check_api_slim.py`, now a CI job.
+  - The web build runs from `app/` as Vercel will.
+  - With a local stand-in for the rewrites, all 86 axe and smoke checks
+    pass against the server build and the live API. A pick posted through
+    `/api` is checked against cells read from `web`'s files, and an unknown
+    cell is refused.
+- **Not verified until the first deploy:**
+  - whether a binding call reaches `web`'s static files (the override
+    covers it);
+  - whether the web build can read the repository outside `app/`. Vercel
+    includes it by default; the build needs it for the Python steps.
+- **Unchanged:** CI's accessibility job still builds the static export at
+  the root. The film still captures the static export under `/cofire`.
+- **Vercel's defaults, by the owner's choice.** There are no custom
+  response headers (the static setup's security and caching headers were
+  dropped), no tile cache rule, and the default function timeout (300 s on
+  Hobby).

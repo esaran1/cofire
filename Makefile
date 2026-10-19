@@ -7,7 +7,7 @@ API_HOST ?= 127.0.0.1
 API_PORT ?= 8000
 
 setup:
-	$(UV) sync --extra dev
+	$(UV) sync --extra dev --extra pipeline
 	cd app && npm install
 
 data:

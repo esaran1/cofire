@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: uv sync --extra dev
+      - run: uv sync --extra dev --extra pipeline
       - name: Restore the data pack
         # 14 MB: USDM clipped to Colorado (gated identical to the national
         # archives), daily ERC caches, and the store cubes the builder reads.

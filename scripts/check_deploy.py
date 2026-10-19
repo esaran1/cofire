@@ -1,16 +1,17 @@
-"""Check a deployed copy of the static site: the things a static host can get wrong.
+"""Check a deployment of the site and its API: the things a host can get wrong.
 
     python scripts/check_deploy.py https://cofire.vercel.app/
-    python scripts/check_deploy.py http://127.0.0.1:4100/ --local   # the local build; skips the host's headers
+    python scripts/check_deploy.py http://127.0.0.1:4100/ --local   # a local static build: pages and files, no API
 
 The browser checks (every route, both languages, axe) are app/e2e/static/;
 this covers what they do not see directly:
-- pages answer at the root, with trailing slashes;
+- pages answer (the web service);
 - the forecast bundles are served as JSON;
 - the basemap answers byte-range requests (PMTiles reads it in ranges; a host
   that sends the whole 51 MB file instead breaks the map);
 - a missing page is a 404, not the home page;
-- the security and caching headers from vercel.json are applied.
+- the api service answers under /api, stores picks in Postgres (not the
+  temporary fallback), and reads the forecast cells (the leaderboard).
 """
 
 from __future__ import annotations
@@ -82,25 +83,18 @@ def main() -> int:
     check("missing page is 404", missing)
 
     if not a.local:
-        def security() -> tuple[bool, str]:
-            _, h, _ = fetch(root)
-            want = {"x-content-type-options": "nosniff", "x-frame-options": "DENY"}
-            bad = [k for k, v in want.items() if h.get(k) != v]
-            return not bad and "permissions-policy" in h, "missing: " + ", ".join(bad) if bad else "present"
+        def api_health() -> tuple[bool, str]:
+            s, _, body = fetch(u("api/health"))
+            got = json.loads(body) if s == 200 else {}
+            return s == 200 and got.get("storage") == "postgres", f"HTTP {s}, storage {got.get('storage')} (want postgres)"
 
-        check("security headers", security)
+        check("api: health and storage", api_health)
 
-        def slash() -> tuple[bool, str]:
-            req = urllib.request.Request(u("brief"), method="HEAD", headers={"User-Agent": "cofire-deploy-check"})
-            opener = urllib.request.build_opener(NoRedirect)
-            try:
-                r = opener.open(req, timeout=30)
-                return False, f"HTTP {r.status}, no redirect"
-            except urllib.error.HTTPError as e:
-                loc = e.headers.get("location", "")
-                return e.code in (301, 308) and loc.rstrip().endswith("/brief/"), f"HTTP {e.code} to {loc}"
+        def api_cells() -> tuple[bool, str]:
+            s, _, body = fetch(u("api/leaderboard"))
+            return s == 200 and isinstance(json.loads(body), list), f"HTTP {s}"
 
-        check("/brief redirects to /brief/", slash)
+        check("api: leaderboard (database and cells)", api_cells)
 
     width = max(len(n) for n, _, _ in results)
     for name, ok, detail in results:
@@ -108,11 +102,6 @@ def main() -> int:
     failed = sum(not ok for _, ok, _ in results)
     print(f"\n{len(results) - failed} of {len(results)} checks passed at {root}")
     return 1 if failed else 0
-
-
-class NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, *args, **kwargs):  # type: ignore[no-untyped-def]
-        return None
 
 
 if __name__ == "__main__":

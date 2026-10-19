@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-# Vercel's install and build steps for the static site (see vercel.json).
+# The web service's install and build steps on Vercel (see vercel.json).
 #
-#   bash scripts/vercel_build.sh install   # uv, the locked Python environment, the app's npm packages
-#   bash scripts/vercel_build.sh build     # the basemap, then scripts/build_static.sh at the root path
+#   bash scripts/vercel_build.sh install   # uv, the Python environment with the pipeline extra, the app's npm packages
+#   bash scripts/vercel_build.sh build     # the basemap, the forecast bundles, then the Next.js build
 #
-# Vercel serves the site from the domain's root, so the base path is empty.
+# Vercel runs these from the service root (app/); the script works from the
+# repository's root either way. The site is the Next.js server build: the map
+# reads the forecast bundles as static files under /data, and Predict and
+# Observe call the api service at /api on the same domain.
+#
 # The basemap is the 'basemap' release asset of this private repository, so
 # reading it needs COFIRE_RELEASE_TOKEN in the Vercel project's environment
 # variables: a fine-grained GitHub token with read-only Contents access to
@@ -32,7 +36,7 @@ install() {
       | env UV_INSTALL_DIR="$TOOLS" UV_NO_MODIFY_PATH=1 INSTALLER_NO_MODIFY_PATH=1 sh
   fi
   # uv fetches the Python that .python-version names if the image lacks it.
-  uv sync
+  uv sync --extra pipeline
   npm ci --prefix app
 }
 
@@ -71,7 +75,10 @@ fetch_basemap() {
 
 build() {
   fetch_basemap
-  BASE_PATH="" ./scripts/build_static.sh
+  uv run python -m cofire.ship.bundles
+  uv run python -m cofire.ship.static_site
+  cd app
+  NEXT_PUBLIC_DATA_BASE=/data NEXT_PUBLIC_API_URL=/api npx next build
 }
 
 case "${1:-}" in

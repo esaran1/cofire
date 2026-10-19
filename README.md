@@ -54,8 +54,8 @@ flowchart LR
   end
   subgraph c4["Delivered"]
     refresh["weekly refresh<br/>GitHub Actions"]
-    site["static site<br/>Vercel"]
-    api["API<br/>local demo"]
+    site["web app<br/>Vercel"]
+    api["API<br/>Vercel, /api"]
   end
   subgraph c5["Readers"]
     map["map and Place Card"]
@@ -116,7 +116,7 @@ It does **not** predict ignitions or where a fire will occur.
 
 ```bash
 git clone <this-repo> && cd cofire
-make setup   # uv sync + npm install
+make setup   # uv sync --extra dev --extra pipeline + npm install
 make demo    # offline: no API keys, no network, no pipeline run
 ```
 
@@ -135,39 +135,54 @@ Core pipeline needs **zero API keys**. Optional Earthdata / Synoptic keys are li
 
 ## Deploying (Vercel)
 
-The site is the static build (`scripts/build_static.sh`), served from the
-domain's root. Vercel builds it from this repository on every push to `main`;
-`vercel.json` holds the commands, the output folder and the headers, so leave
-the dashboard's build settings at their defaults.
+One Vercel project with two services (`vercel.json`), on one domain:
+
+| Service | What | Public at |
+|---|---|---|
+| `web` | the Next.js app (`app/`); the map reads the forecast bundles as static files under `/data` | `/` |
+| `api` | the FastAPI service (`cofire/deploy/vercel_app.py`): Predict picks, Observe reports, leaderboard, Ember | `/api` |
+
+`api` reads the forecast cells it checks picks against from `web`'s published
+bundles, through a binding (`WEB_URL`, injected by Vercel). Leave the
+dashboard's build settings at their defaults; `vercel.json` holds them.
 
 1. **A token for the basemap.** The 51 MB map extract is a release asset of
    this private repository. Create a fine-grained GitHub token limited to
    this repository, with **Contents: Read-only** and no other permission.
 2. **Import the project.** In Vercel: Add New, Project, import this
-   repository. Keep the root directory at the top of the repository.
-3. **Set the variable.** Add `COFIRE_RELEASE_TOKEN` (the token) for
-   Production, and for Preview if previews should show the map. A
-   production build without it stops with an error. A preview build
-   without it draws the forecast on a plain background.
-4. **Deploy.** The install step fetches uv, Python 3.11 and the locked
-   packages; the build step makes the bundles and the Next.js export.
-   Locally, the two steps took about 3 minutes each.
-5. **Check the deployment:**
+   repository, root directory at the top of the repository.
+3. **Add a Postgres database** from the project's Storage tab (Neon has a
+   free tier). It sets `DATABASE_URL` for the project; the API uses it for
+   picks and reports. Without one, they are kept only while a function
+   instance lives, and `/api/health` says `"storage": "temporary"`.
+4. **Set the variable** `COFIRE_RELEASE_TOKEN` (the token) for Production,
+   and for Preview if previews should show the map. A production build
+   without it stops with an error.
+5. **Deploy, then check:**
    `python scripts/check_deploy.py https://<your-project>.vercel.app/`. It
    checks the pages, the bundles, the basemap's byte-range requests, the
-   404 page and the headers.
+   404 page, and that `/api` answers with Postgres storage.
 6. **Point the checks at it.** Set the repository variable `SITE_URL` to the
    address; the daily smoke run then checks the live site. Set `site_url`
    in `film/config.json` too, then re-render the film's end card.
+
+**Python dependencies.** The project's own dependencies are what the API
+needs at run time, so Vercel's install for `api` stays near 160 MB, under
+the 500 MB function limit. The pipeline, the model and the static build
+need the `pipeline` extra (`make setup`, or
+`uv sync --extra dev --extra pipeline`). CI's `api-slim` job runs the entry
+point on the slim set alone (`scripts/check_api_slim.py`). Vercel runs
+Python 3.12, so it ignores the 3.11 in `.python-version`.
+
+**If the API cannot read the bundles** (the check's leaderboard line
+fails), set `COFIRE_BUNDLES_URL` to the site's public
+`https://<domain>/data/domains/` in the project's environment variables.
 
 The weekly refresh commits as its own bot. If Vercel skips those commits
 (on the Hobby plan, a private repository's commits by an author outside the
 Vercel account can be blocked), make a Deploy Hook for `main` in the
 project's Git settings and save its URL as the repository secret
 `VERCEL_DEPLOY_HOOK`; the refresh calls it after each push.
-
-Predict and Observe need the Python service to store picks and reports. It
-is not deployed, and the static site says so on those screens.
 
 ## What you get
 

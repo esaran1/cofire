@@ -49,7 +49,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          uv sync
+          uv sync --extra pipeline
           mkdir -p app/public/tiles
           gh release download basemap --pattern colorado.pmtiles --dir app/public/tiles
           echo "b661b095ddda73c62b705e478a31deea66c7f3b745e2411e9361c79b7bb50fba  app/public/tiles/colorado.pmtiles" | sha256sum -c -

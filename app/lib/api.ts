@@ -3,11 +3,12 @@ import type { z } from "zod";
 export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
 /**
- * The static site (GitHub Pages) has no live service unless one is named. Its
- * pages that need one (Predict, Observe) say so; they must not send a
- * visitor's browser to a service on the visitor's own computer.
+ * A build that reads its data as static files has no live service unless one
+ * is named: the static export has none, and the Vercel deployment names its api
+ * service (`/api`). Pages that need one (Predict, Observe) say so; they must
+ * not send a visitor's browser to a service on the visitor's own computer.
  */
-const NO_SERVICE = !!process.env.NEXT_PUBLIC_DATA_BASE && !process.env.NEXT_PUBLIC_API_URL;
+export const NO_SERVICE = !!process.env.NEXT_PUBLIC_DATA_BASE && !process.env.NEXT_PUBLIC_API_URL;
 
 function serviceUrl(path: string): string {
   if (NO_SERVICE) throw new Error("This page needs the live service, which the static site does not have.");

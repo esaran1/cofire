@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from collections import defaultdict
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -20,12 +21,32 @@ from sqlmodel import Session, SQLModel, create_engine, select
 
 from cofire.model.config import get_settings
 from cofire.model.uncertainty.status import classify, pool_from_artifacts
+from cofire.ship.cells import legacy_cells
 from cofire.ship.ember_zones import ZONES as EMBER_ZONES
 from cofire.ship.ember_zones import score as ember_score
 
 settings = get_settings()
-DB_URL = os.environ.get("DATABASE_URL") or os.environ.get("COFIRE_DATABASE_URL") or str(settings.database_url)
-engine = create_engine(DB_URL, connect_args={"check_same_thread": False} if DB_URL.startswith("sqlite") else {})
+
+
+def database_url() -> str:
+    """The database to store picks and reports in, with Postgres URLs given SQLAlchemy's driver name.
+
+    Postgres providers on Vercel (Neon, Supabase) hand out `postgres://` or
+    `postgresql://` URLs; SQLAlchemy needs the driver named
+    (`postgresql+psycopg://`). Local runs keep SQLite (`data/cofire.db`).
+    """
+    url = os.environ.get("DATABASE_URL") or os.environ.get("COFIRE_DATABASE_URL") or str(settings.database_url)
+    return re.sub(r"^postgres(ql)?://", "postgresql+psycopg://", url)
+
+
+DB_URL = database_url()
+engine = (
+    create_engine(DB_URL, connect_args={"check_same_thread": False})
+    if DB_URL.startswith("sqlite")
+    # A function instance can sit idle long enough for the server to drop its
+    # connection: check each one before use, and keep the pool small.
+    else create_engine(DB_URL, pool_pre_ping=True, pool_size=2, max_overflow=3)
+)
 
 app = FastAPI(title="COFIRE", version="0.2.0")
 app.add_middleware(
@@ -211,18 +232,47 @@ def art_path(rel: str) -> Path:
 _INDEX_CACHE: dict[str, Any] = {}
 
 
+# How long a function instance keeps the bundles read from COFIRE_BUNDLES_URL
+# before checking whether a new issue was published.
+REMOTE_INDEX_TTL_S = 600
+
+
+def _remote_index(base: str) -> dict[str, Any]:
+    """Every cell and issue, read over HTTP from the published bundles (the api service on Vercel).
+
+    Kept per instance, and re-read once the TTL has passed. A failed re-read
+    keeps serving the copy already held rather than failing every request.
+    """
+    held = _INDEX_CACHE.get("remote")
+    if held and time.monotonic() - held["at"] < REMOTE_INDEX_TTL_S:
+        idx: dict[str, Any] = held["index"]
+        return idx
+    try:
+        fresh = legacy_cells(base)
+    except OSError:
+        if held:
+            stale: dict[str, Any] = held["index"]
+            return stale
+        raise
+    _INDEX_CACHE["remote"] = {"at": time.monotonic(), "index": fresh}
+    return fresh
+
+
 def load_index() -> dict[str, Any]:
     """Every cell and issue, rebuilt from the per-domain bundles when present.
 
-    Cached on the bundle index's modification time, so a refresh is picked up
-    without a restart and a request never re-reads every bundle.
+    From COFIRE_BUNDLES_URL when it is set (on Vercel, the web service's
+    published copies), otherwise from the local bundle folder, cached on its
+    index's modification time, so a refresh is picked up without a restart and
+    a request never re-reads every bundle.
     """
+    remote = os.environ.get("COFIRE_BUNDLES_URL")
+    if remote:
+        return _remote_index(remote)
     bundles = art_path("ship/domains/index.json")
     if bundles.exists():
         key = f"{bundles}:{bundles.stat().st_mtime_ns}"
         if key not in _INDEX_CACHE:
-            from cofire.ship.bundles import legacy_cells
-
             _INDEX_CACHE.clear()
             _INDEX_CACHE[key] = legacy_cells(bundles.parent)
         cached: dict[str, Any] = _INDEX_CACHE[key]
@@ -261,8 +311,11 @@ def startup() -> None:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    """Liveness check; always answers with status ok."""
-    return {"status": "ok"}
+    """Liveness check: status ok, and where picks and reports are stored ("postgres", "sqlite", or
+    "temporary" when a deployment has no database and keeps them only while an instance lives).
+    """
+    storage = "postgres" if DB_URL.startswith("postgresql") else "temporary" if DB_URL.startswith("sqlite:////tmp/") else "sqlite"
+    return {"status": "ok", "storage": storage}
 
 
 @app.get("/meta")

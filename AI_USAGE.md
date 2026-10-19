@@ -98,7 +98,8 @@ with records kept rather than rewritten:
 | `docs/PREREGISTRATION_UNSEAL.md` | the unseal scoring plan, a draft for the owner to review before 2027-01-12 | AI agent (draft) |
 | `scripts/unseal_2026.py`, `tests/test_unseal_2026.py` | the executable unseal and its refusal tests (not run) | AI agent |
 | `scripts/serve_static.py`, `app/e2e/static/`, `app/playwright.static.config.ts`, `.github/workflows/smoke.yml` | local static server, daily smoke run, axe checks | AI agent |
-| `vercel.json`, `scripts/vercel_build.sh`, `scripts/check_deploy.py` | the Vercel build, its headers, and the post-deploy checks | AI agent |
+| `vercel.json`, `scripts/vercel_build.sh`, `scripts/check_deploy.py` | the Vercel services (web, api), the web build, headers, and the post-deploy checks | AI agent |
+| `cofire/deploy/`, `cofire/ship/cells.py`, `scripts/check_api_slim.py`, `tests/test_deploy.py`; the `pipeline` extra in `pyproject.toml` | the API's Vercel entry point, cells read from a URL, the slim-dependency check | AI agent |
 | `film/` Remotion project (`src/`, `scripts/`, `capture/`) | the demo film: scenes, captures, number tracing, audio mix, captions, renders | AI agent |
 | `film/SCRIPT.md`, `film/script/narration.json` | the narration, a draft for the student to rewrite and record | AI agent (draft) |
 | `film/STORYBOARD.md`, `film/SOURCES.md`, `film/REVIEW.md`, `film/RECORDING_GUIDE.md` | the film's storyboard, sources, review checklist, recording guide | AI agent |

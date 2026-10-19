@@ -22,9 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: uv sync --extra dev
+      - run: uv sync --extra dev --extra pipeline
       - run: uv run ruff check cofire research tests scripts
-      - run: uv run mypy --strict cofire/model cofire/ship cofire/v12 cofire/v13 cofire/api research
+      - run: uv run mypy --strict cofire/model cofire/ship cofire/v12 cofire/v13 cofire/api cofire/deploy research
       - run: uv run python scripts/architecture.py --check
       - run: uv run python scripts/check_copy.py
       - run: uv run python scripts/check_stats.py
@@ -35,6 +35,18 @@ jobs:
         working-directory: app
       - run: npx tsc --noEmit
         working-directory: app
+
+  # The api service on Vercel installs the project's own dependencies only, no
+  # extras, on Python 3.12 (Vercel's default; it has no 3.11). Run its entry
+  # point on exactly that set, and fail if it imports a pipeline package.
+  api-slim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync --frozen --python 3.12
+      - run: du -sh .venv/lib/python3.12/site-packages
+      - run: uv run --no-sync python scripts/check_api_slim.py
 
   # Accessibility (axe, WCAG 2.1 A and AA) on every route in both languages,
   # and the smoke checks, against the production static build with its
@@ -51,7 +63,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: uv sync
+      - run: uv sync --extra pipeline
       - run: npm install
         working-directory: app
       - name: Basemap extract (release asset, checksum verified)
