@@ -18,6 +18,15 @@ def _load(d: str) -> dict:
     return json.loads((ROOT / f"{d}.json").read_text())
 
 
+def _with_live_arm(e: dict, target: str, issue: str, p: float) -> float:
+    """An adopted v1.2 arm's logit recalibration, from its start date, as app/lib/explain.ts applies it."""
+    arm = next((a for a in e["live"] if a["target"] == target and issue >= a["applies_from"]), None)
+    if arm is None:
+        return p
+    q = min(1 - 1e-4, max(1e-4, p))
+    return float(1 / (1 + np.exp(-(arm["a"] + arm["b"] * np.log(q / (1 - q))))))
+
+
 def _event(t: str, c: int) -> np.ndarray:
     k = np.arange(5)
     return {"d_ge2": k >= 2, "d_ge3": k >= 3, "d_improve1": k <= c - 1, "d_intensify1": k >= c + 1,
@@ -50,13 +59,15 @@ def test_the_tables_give_the_published_probabilities(d: str) -> None:
     ex = pd.read_parquet(EXPORT)
     issue = ex["time"].max()
     rows = ex[(ex["domain"] == d) & (ex["time"] == issue)]
+    day = pd.Timestamp(issue).strftime("%Y-%m-%d")
     e = _load(d)
     for h in ("2", "4", "8"):
         tab = e["drought"][h]["rows"]
         for t in ("d_ge2", "d_ge3", "d_improve1", "d_intensify1", "d_intensify2", "d_nochange"):
             for c_raw, p, mo in zip(rows["usdm"], rows[f"{t}_h{h}_model_prob"], pd.to_datetime(rows["time"]).dt.month, strict=True):
                 c = int(np.clip(np.floor(c_raw + 0.5), 0, 4))
-                assert abs(float(np.array(tab[f"{c},{mo}"]["row"])[_event(t, c)].sum()) - p) < 1e-6
+                q = float(np.array(tab[f"{c},{mo}"]["row"])[_event(t, c)].sum())
+                assert abs(_with_live_arm(e, f"{t}_h{h}", day, q) - p) < 1e-6, (t, h, c, mo)
         for thr in ("80", "90", "97"):
             f = e["fire"][h][thr]
             x = rows["erc_pct"].to_numpy(float)
