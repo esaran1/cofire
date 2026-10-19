@@ -2,11 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 /**
  * Checks against the production static build: the daily smoke run and the
- * accessibility checks (e2e/static/). STATIC_URL is the site's root, with its
- * base path and a trailing slash: the deployed GitHub Pages address once Pages
- * is enabled, otherwise the local build served by scripts/serve_static.py.
+ * accessibility checks (e2e/static/). STATIC_URL is the site's root, with a
+ * trailing slash: the deployed Vercel address once the SITE_URL repository
+ * variable is set, otherwise the local build served by scripts/serve_static.py
+ * (`--base ''`, the root, as Vercel serves it).
  */
-const base = process.env.STATIC_URL ?? "http://127.0.0.1:4100/cofire/";
+const base = process.env.STATIC_URL ?? "http://127.0.0.1:4100/";
 
 export default defineConfig({
   testDir: "./e2e/static",

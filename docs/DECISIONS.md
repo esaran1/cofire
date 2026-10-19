@@ -2922,3 +2922,52 @@ on, several shots were "not properly done". They were rebuilt, not patched
 - **Nothing outside the film changed.** The app, the model and the data
   are unchanged. Every on-screen number is still checked against
   `public/data/film.json` on every frame.
+
+## Deploying on Vercel instead of GitHub Pages, 2026-10-19
+
+The repository is private, and GitHub Pages on a private repository needs a
+paid plan, so Pages was never switched on. The owner chose Vercel, with
+Vercel building the site from the repository, and Pages removed.
+- **One build, two callers.** Vercel runs `scripts/vercel_build.sh`, which
+  installs pinned uv (0.11.17), the locked Python environment
+  (`UV_FROZEN=1`) and the app's npm lockfile. It then calls the same
+  `scripts/build_static.sh` that CI tests, with an empty base path, since
+  Vercel serves from the root.
+  - CI's accessibility job and the local smoke run now build and serve
+    that root layout, so the tests run against what is deployed.
+  - The film keeps `/cofire` (the default) for its local captures.
+- **The basemap from the private release.** The build reads it through
+  GitHub's API with `COFIRE_RELEASE_TOKEN`, a fine-grained token limited to
+  this repository's contents, read-only, stored only in Vercel. The checksum
+  is verified as in CI.
+  - A production build without the token fails. A silent fallback to a
+    blank map was the alternative; it would have shipped a broken-looking
+    site.
+  - Previews may build without it.
+- **What the host has to get right, checked.** `scripts/check_deploy.py`
+  checks a deployed URL:
+  - the pages at the root;
+  - the bundles;
+  - a byte-range request on the basemap (PMTiles reads by range; a host
+    answering with the whole file breaks the map);
+  - a real 404;
+  - the headers.
+  Run against a local root build, everything passed.
+- **Headers** (`vercel.json`):
+  - `nosniff`, a strict referrer policy and `DENY` framing;
+  - a permissions policy that allows geolocation only for the site itself
+    (Observe uses it);
+  - immutable caching for hashed `_next/static` files, and a day for the
+    checksum-pinned basemap.
+  - No content security policy yet: the static export's inline hydration
+    scripts would need `unsafe-inline`, which adds little. It is left for
+    a nonce-capable setup.
+- **Removed:** `.github/workflows/site.yml`, the Pages build and deploy. The
+  daily smoke run checks the repository variable `SITE_URL` (the live
+  site) instead of `PAGES_ENABLED`.
+- **The weekly refresh** can call an optional deploy hook
+  (`VERCEL_DEPLOY_HOOK`). Vercel's Hobby plan can block commits to a
+  private repository whose author is outside the account, and the
+  refresh commits as its own bot.
+- **Not deployed:** the Python service, as before. Predict and Observe say
+  so on the static site.

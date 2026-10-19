@@ -29,6 +29,9 @@ artifacts/calibration/
 app/node_modules/
 app/.next/
 app/out/
+# Vercel: the CLI's project link and the build's tools (scripts/vercel_build.sh).
+.vercel/
+.vercel-tools/
 app/tsconfig.tsbuildinfo
 app/test-results/
 app/playwright-report/

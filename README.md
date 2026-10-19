@@ -54,7 +54,7 @@ flowchart LR
   end
   subgraph c4["Delivered"]
     refresh["weekly refresh<br/>GitHub Actions"]
-    site["static site<br/>GitHub Pages"]
+    site["static site<br/>Vercel"]
     api["API<br/>local demo"]
   end
   subgraph c5["Readers"]
@@ -132,6 +132,42 @@ Then open http://127.0.0.1:3000 (API on :8000). The Larimer County vertical slic
 started while `STATUS.md` reads No-go.
 
 Core pipeline needs **zero API keys**. Optional Earthdata / Synoptic keys are listed in `.env.example` and skipped when blank.
+
+## Deploying (Vercel)
+
+The site is the static build (`scripts/build_static.sh`), served from the
+domain's root. Vercel builds it from this repository on every push to `main`;
+`vercel.json` holds the commands, the output folder and the headers, so leave
+the dashboard's build settings at their defaults.
+
+1. **A token for the basemap.** The 51 MB map extract is a release asset of
+   this private repository. Create a fine-grained GitHub token limited to
+   this repository, with **Contents: Read-only** and no other permission.
+2. **Import the project.** In Vercel: Add New, Project, import this
+   repository. Keep the root directory at the top of the repository.
+3. **Set the variable.** Add `COFIRE_RELEASE_TOKEN` (the token) for
+   Production, and for Preview if previews should show the map. A
+   production build without it stops with an error. A preview build
+   without it draws the forecast on a plain background.
+4. **Deploy.** The install step fetches uv, Python 3.11 and the locked
+   packages; the build step makes the bundles and the Next.js export.
+   Locally, the two steps took about 3 minutes each.
+5. **Check the deployment:**
+   `python scripts/check_deploy.py https://<your-project>.vercel.app/`. It
+   checks the pages, the bundles, the basemap's byte-range requests, the
+   404 page and the headers.
+6. **Point the checks at it.** Set the repository variable `SITE_URL` to the
+   address; the daily smoke run then checks the live site. Set `site_url`
+   in `film/config.json` too, then re-render the film's end card.
+
+The weekly refresh commits as its own bot. If Vercel skips those commits
+(on the Hobby plan, a private repository's commits by an author outside the
+Vercel account can be blocked), make a Deploy Hook for `main` in the
+project's Git settings and save its URL as the repository secret
+`VERCEL_DEPLOY_HOOK`; the refresh calls it after each push.
+
+Predict and Observe need the Python service to store picks and reports. It
+is not deployed, and the static site says so on those screens.
 
 ## What you get
 

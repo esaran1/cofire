@@ -38,8 +38,8 @@ jobs:
 
   # Accessibility (axe, WCAG 2.1 A and AA) on every route in both languages,
   # and the smoke checks, against the production static build with its
-  # self-hosted basemap, served as GitHub Pages serves it. Serious and
-  # critical violations fail the build.
+  # self-hosted basemap, served from the root as Vercel serves it. Serious
+  # and critical violations fail the build.
   a11y:
     runs-on: ubuntu-latest
     steps:
@@ -61,15 +61,15 @@ jobs:
           mkdir -p app/public/tiles
           gh release download basemap --pattern colorado.pmtiles --dir app/public/tiles
           echo "b661b095ddda73c62b705e478a31deea66c7f3b745e2411e9361c79b7bb50fba  app/public/tiles/colorado.pmtiles" | sha256sum -c -
-      - run: BASE_PATH=/cofire ./scripts/build_static.sh
+      - run: BASE_PATH= ./scripts/build_static.sh
       - name: Serve the build locally
         run: |
-          python3 scripts/serve_static.py --port 4100 --root app/out --base /cofire &
-          for i in $(seq 1 50); do curl -sf http://127.0.0.1:4100/cofire/ >/dev/null && break; sleep 0.2; done
+          python3 scripts/serve_static.py --port 4100 --root app/out --base '' &
+          for i in $(seq 1 50); do curl -sf http://127.0.0.1:4100/ >/dev/null && break; sleep 0.2; done
       - name: axe and smoke checks (Chrome on the runner)
         working-directory: app
         env:
-          STATIC_URL: http://127.0.0.1:4100/cofire/
+          STATIC_URL: http://127.0.0.1:4100/
         run: npx playwright test -c playwright.static.config.ts
       - uses: actions/upload-artifact@v4
         if: failure()

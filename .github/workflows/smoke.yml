@@ -1,9 +1,9 @@
 name: daily smoke
 
 # Every day, every route in both languages is loaded and checked
-# (app/e2e/static/smoke.spec.ts): against the deployed site once GitHub Pages
-# is enabled (repository variable PAGES_ENABLED = "true"), and against the
-# production static build served locally until then. A failure opens an issue,
+# (app/e2e/static/smoke.spec.ts): against the deployed site once its address
+# is set (repository variable SITE_URL, for example https://cofire.vercel.app/),
+# and against the production static build served locally until then. A failure opens an issue,
 # or comments on the open one.
 on:
   schedule:
@@ -34,18 +34,18 @@ jobs:
       - run: npm install
         working-directory: app
       - name: Target the deployed site
-        if: vars.PAGES_ENABLED == 'true'
-        run: |
-          owner=$(echo "${GITHUB_REPOSITORY%%/*}" | tr '[:upper:]' '[:lower:]')
-          echo "STATIC_URL=https://${owner}.github.io/${GITHUB_REPOSITORY#*/}/" >> "$GITHUB_ENV"
+        if: vars.SITE_URL != ''
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: echo "STATIC_URL=${SITE_URL%/}/" >> "$GITHUB_ENV"
       - uses: astral-sh/setup-uv@v4
-        if: vars.PAGES_ENABLED != 'true'
+        if: vars.SITE_URL == ''
       - uses: actions/setup-python@v5
-        if: vars.PAGES_ENABLED != 'true'
+        if: vars.SITE_URL == ''
         with:
           python-version: "3.11"
-      - name: Build and serve the static site locally (Pages not enabled yet)
-        if: vars.PAGES_ENABLED != 'true'
+      - name: Build and serve the static site locally (no deployed address set yet)
+        if: vars.SITE_URL == ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -53,10 +53,10 @@ jobs:
           mkdir -p app/public/tiles
           gh release download basemap --pattern colorado.pmtiles --dir app/public/tiles
           echo "b661b095ddda73c62b705e478a31deea66c7f3b745e2411e9361c79b7bb50fba  app/public/tiles/colorado.pmtiles" | sha256sum -c -
-          BASE_PATH=/cofire ./scripts/build_static.sh
-          python3 scripts/serve_static.py --port 4100 --root app/out --base /cofire &
-          for i in $(seq 1 50); do curl -sf http://127.0.0.1:4100/cofire/ >/dev/null && break; sleep 0.2; done
-          echo "STATIC_URL=http://127.0.0.1:4100/cofire/" >> "$GITHUB_ENV"
+          BASE_PATH= ./scripts/build_static.sh
+          python3 scripts/serve_static.py --port 4100 --root app/out --base '' &
+          for i in $(seq 1 50); do curl -sf http://127.0.0.1:4100/ >/dev/null && break; sleep 0.2; done
+          echo "STATIC_URL=http://127.0.0.1:4100/" >> "$GITHUB_ENV"
       - name: Smoke checks
         working-directory: app
         run: npx playwright test -c playwright.static.config.ts e2e/static/smoke.spec.ts

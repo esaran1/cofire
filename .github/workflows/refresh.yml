@@ -68,6 +68,8 @@ jobs:
           uv run python -m cofire.ship.datapack pack "$RUNNER_TEMP/cofire-datapack.tar.gz"
           gh release upload data-pack "$RUNNER_TEMP/cofire-datapack.tar.gz" --clobber
       - name: Commit the refreshed export
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
           git config user.name "cofire-refresh"
           git config user.email "cofire-refresh@users.noreply.github.com"
@@ -80,6 +82,13 @@ jobs:
             # reject this one; the bot touches only generated files, so rebase.
             git pull --rebase origin main
             git push
+            # Vercel deploys every push to main by itself. The deploy hook
+            # (optional secret) is for when it skips this bot's commits: on
+            # Vercel's Hobby plan, a private repository's commits by an author
+            # outside the Vercel account can be blocked.
+            if [ -n "$VERCEL_DEPLOY_HOOK" ]; then
+              curl -fsS -X POST "$VERCEL_DEPLOY_HOOK" >/dev/null && echo "asked Vercel to deploy"
+            fi
           fi
       - name: Keep the ledger of a failed run
         # The commit step above runs only on success, so a failed run's
