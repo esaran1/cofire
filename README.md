@@ -171,8 +171,10 @@ needs at run time, so Vercel's install for `api` stays near 160 MB, under
 the 500 MB function limit. The pipeline, the model and the static build
 need the `pipeline` extra (`make setup`, or
 `uv sync --extra dev --extra pipeline`). CI's `api-slim` job runs the entry
-point on the slim set alone (`scripts/check_api_slim.py`). Vercel runs
-Python 3.12, so it ignores the 3.11 in `.python-version`.
+point on the slim set alone (`scripts/check_api_slim.py`). Vercel offers
+Python 3.12 and later only, so both services build on 3.12; local runs and
+CI keep the 3.11 in `.python-version`. The web build installs the `site`
+extra (geopandas, pyarrow), not the whole pipeline.
 
 **If the API cannot read the bundles** (the check's leaderboard line
 fails), set `COFIRE_BUNDLES_URL` to the site's public

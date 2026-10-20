@@ -3045,3 +3045,19 @@ production. Names, routing and storage were the owner's choices.
   response headers (the static setup's security and caching headers were
   dropped), no tile cache rule, and the default function timeout (300 s on
   Hobby).
+
+### First deploy: Python 3.12 for the web build, 2026-10-20
+
+The first Vercel build failed in the web service's install step: uv,
+following `.python-version`, asked for Python 3.11 and found no download. Vercel offers
+3.12 and later only.
+- The web build now sets `UV_PYTHON=3.12`. It runs no model: it rebuilds
+  the bundles and open data from the committed export. Built locally on
+  3.12, with only managed interpreters allowed and an empty interpreter
+  folder (so only 3.12 was fetched), all 300 files under `app/public/data`
+  were byte-identical to the 3.11 build.
+- The web build installs a new `site` extra (pyarrow, geopandas, shapely,
+  pyproj; the same pins) instead of the whole pipeline. On Linux, torch
+  alone pulls in gigabytes of CUDA libraries the site never uses.
+  `uv.lock` changed no package or version.
+- Local runs, CI and the refresh keep Python 3.11 and the full pipeline.

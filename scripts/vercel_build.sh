@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The web service's install and build steps on Vercel (see vercel.json).
 #
-#   bash scripts/vercel_build.sh install   # uv, the Python environment with the pipeline extra, the app's npm packages
+#   bash scripts/vercel_build.sh install   # uv, Python 3.12 with the site extra, the app's npm packages
 #   bash scripts/vercel_build.sh build     # the basemap, the forecast bundles, then the Next.js build
 #
 # Vercel runs these from the service root (app/); the script works from the
@@ -24,6 +24,10 @@ TOOLS="$PWD/.vercel-tools"
 export PATH="$TOOLS:$PATH"
 # Install exactly what uv.lock pins; never re-resolve during a deploy.
 export UV_FROZEN=1
+# Vercel offers Python 3.12 and later only; its build cannot fetch the 3.11
+# that .python-version names for local runs and CI. The site build reads the
+# committed export and runs no model, so 3.12 changes nothing it writes.
+export UV_PYTHON=3.12
 export NEXT_TELEMETRY_DISABLED=1
 
 sha256() {
@@ -35,8 +39,9 @@ install() {
     curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" \
       | env UV_INSTALL_DIR="$TOOLS" UV_NO_MODIFY_PATH=1 INSTALLER_NO_MODIFY_PATH=1 sh
   fi
-  # uv fetches the Python that .python-version names if the image lacks it.
-  uv sync --extra pipeline
+  # The API's packages plus the site extra (geopandas, pyarrow): not the whole
+  # pipeline, whose torch alone brings gigabytes of CUDA libraries on Linux.
+  uv sync --extra site
   npm ci --prefix app
 }
 
