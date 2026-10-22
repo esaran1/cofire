@@ -17,7 +17,7 @@ export function DomainSwitcher({ className = "" }: { className?: string }) {
         data-testid="domain-switcher"
         value={domain}
         onChange={(e) => setDomain(e.target.value)}
-        className="w-[6.5rem] rounded-full border border-rule bg-paper-raised px-2.5 py-1.5 min-[380px]:w-[8.5rem] min-[380px]:px-3 text-sm text-ink sm:w-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-ember"
+        className="w-[6.5rem] rounded-full border border-rule bg-paper-raised px-2.5 py-1.5 min-[380px]:w-[8.5rem] min-[380px]:px-3 text-sm text-ink sm:w-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-spruce"
       >
         <optgroup label={t("domain.district")}>
           <option value="denver">{DOMAIN_LABELS.denver}</option>

@@ -41,10 +41,18 @@ export function V12Results() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={`${r.stage}-${r.arm}`} className="border-t border-rule align-top">
+            {rows.map((r, i) => [
+              // One heading per registered approach, rather than a stage number
+              // repeated down the first column.
+              i === 0 || rows[i - 1].stage !== r.stage ? (
+                <tr key={`stage-${r.stage}`}>
+                  <th colSpan={4} scope="colgroup" className="pb-1 pt-5 text-left text-xs font-medium text-ink-soft">
+                    {t(`v12.stage.${r.stage}` as MessageKey)}
+                  </th>
+                </tr>
+              ) : null,
+              <tr key={`${r.stage}-${r.arm}`} data-row="arm" className="border-t border-rule align-top">
                 <td className="py-2 pr-3">
-                  <span className="text-mute">{r.stage}. </span>
                   {t(`v12.arm.${family(r)}` as MessageKey)}
                   {r.stage === 1 && r.shippable === false ? (
                     <span className="block text-[11px] text-mute">{t("v12.notEligible")}</span>
@@ -55,8 +63,8 @@ export function V12Results() {
                 </td>
                 <td className="num py-2 text-right">{t("v12.beatOf", { n: r.beat_A_paired, m: r.estimable })}</td>
                 <td className="num py-2 text-right">{r.adopted}</td>
-              </tr>
-            ))}
+              </tr>,
+            ])}
           </tbody>
         </table>
       </div>

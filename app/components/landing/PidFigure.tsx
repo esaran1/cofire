@@ -1,5 +1,7 @@
 "use client";
 
+import { domainLabel } from "@/lib/domainNames";
+import { useT } from "@/lib/i18n";
 
 /*
  * Bars grow by transform, not by width.
@@ -14,7 +16,7 @@
  *
  * Not decoration: this is the finding. Each pair of bars is one domain and
  * horizon; the dark bar is the reference conformal PID controller's worst
- * rolling 13-week coverage and the pale bar is ACI's on the same rows. The
+ * rolling 13-week coverage and the red bar is ACI's on the same rows. The
  * dashed line is the 0.90 target, and the floor the preregistration set was
  * 0.70.
  *
@@ -33,6 +35,7 @@ export function PidVsAciFigure({
   /** Plain-language caption for the story; the default is the technical one. */
   caption?: string;
 }) {
+  const { t } = useT();
   const axisMin = floor;
   const targetAt = (target - axisMin) / (1 - axisMin);
   const pairs = [...new Set(rows.map((r) => `${r.domain}|${r.horizon}`))].map((key) => {
@@ -62,7 +65,7 @@ export function PidVsAciFigure({
         className={
           tone === "pid"
             ? "bar-grow h-full origin-left rounded-r-sm bg-ink"
-            : "bar-grow h-full origin-left rounded-r-sm bg-ember/40"
+            : "bar-grow h-full origin-left rounded-r-sm bg-ember"
         }
         style={{ width }}
       />
@@ -75,8 +78,9 @@ export function PidVsAciFigure({
         <ul className="space-y-5">
           {pairs.map((p) => (
             <li key={`${p.domain}-${p.horizon}`} className="grid grid-cols-[6rem_1fr] items-center gap-5 md:grid-cols-[9rem_1fr]">
-              <span className="text-xs uppercase tracking-wider text-mute md:text-sm">
-                {p.domain} h{p.horizon}
+              <span className="text-xs leading-snug md:text-sm">
+                <span className="block text-ink-soft">{domainLabel(p.domain)}</span>
+                <span className="block text-mute">{t("scrub.weeks", { h: String(p.horizon) })}</span>
               </span>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
@@ -121,6 +125,7 @@ export function ReliabilityFigure({
   threshold?: number;
   caption?: string;
 }) {
+  const { t } = useT();
   const entries = Object.entries(byHorizon).sort((a, b) => Number(a[0]) - Number(b[0]));
   const scale = Math.max(threshold * 2, ...entries.map(([, v]) => v.max));
 
@@ -130,9 +135,7 @@ export function ReliabilityFigure({
         <ul className="space-y-6">
           {entries.map(([h, v]) => (
             <li key={h} className="grid grid-cols-[6rem_1fr] items-center gap-5 md:grid-cols-[9rem_1fr]">
-              <span className="text-xs uppercase tracking-wider text-mute md:text-sm">
-                {h} weeks
-              </span>
+              <span className="text-xs text-ink-soft md:text-sm">{t("scrub.weeks", { h })}</span>
               <div className="flex items-center gap-3">
                 <Track at={threshold / scale} tone="ember">
                   <div

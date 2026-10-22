@@ -4,7 +4,8 @@ import { droughtCategories, fireBandFor, fireBands } from "@/lib/options";
 import { useT } from "@/lib/i18n";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 import { API, LeaderRow, getParsed, postParsed } from "@/lib/api";
 import { LeaderRowSchema, PickSchema, PredictionSchema } from "@/lib/schemas";
 import type { PickRow } from "@/lib/schemas";
@@ -27,7 +28,8 @@ function BeatInner() {
   const BANDS = fireBands(lang);
   const bandLabel = (v: string | null | undefined) => BANDS.find((x) => x.value === v)?.label ?? "";
   const params = useSearchParams();
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const [cell, setCell] = useState(params.get("cell") ?? "");
   const [cat, setCat] = useState(2);
   const [band, setBand] = useState("high");
@@ -104,7 +106,11 @@ function BeatInner() {
   return (
     <div className="reading px-6 pb-24 pt-12">
       <h1 className="display text-4xl">{t("beat.title")}</h1>
-      <p className="mt-2 leading-relaxed text-ink-soft">{t("beat.intro")}</p>
+      <p className="mt-2 max-w-[60ch] leading-relaxed text-ink-soft">{t("beat.intro")}</p>
+      <details className="mt-3 max-w-[60ch] text-sm text-ink-soft">
+        <summary className="cursor-pointer text-ink underline-offset-4 hover:underline">{t("beat.howTitle")}</summary>
+        <p className="mt-2 leading-relaxed">{t("beat.how")}</p>
+      </details>
 
       {offline && (
         <div className="mt-4">
@@ -118,7 +124,7 @@ function BeatInner() {
       )}
 
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
-        <Segmented label={t("beat.drought")} options={CATEGORIES} value={cat} onChange={setCat} tone="ochre" />
+        <Segmented label={t("beat.drought")} options={CATEGORIES} value={cat} onChange={setCat} />
         <Segmented label={t("beat.fire")} options={BANDS} value={band} onChange={setBand} />
         <div className="flex flex-wrap items-center gap-3">
           <Action type="submit" busy={busy} disabled={!where}>
@@ -132,7 +138,7 @@ function BeatInner() {
                   {where.lat.toFixed(2)}, {where.lon.toFixed(2)}
                 </span>
                 .{" "}
-                <a href="/" className="text-ember underline underline-offset-2">
+                <a href="/" className="text-spruce underline underline-offset-2">
                   {t("beat.pickAnother")}
                 </a>
               </>
@@ -150,7 +156,7 @@ function BeatInner() {
             initial={reduce ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            transition={instant ? { duration: 0 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="mt-8"
           >
             <Panel>
@@ -209,7 +215,7 @@ function BeatInner() {
                 </div>
               </div>
               {cat !== lockedPick.cat || band !== lockedPick.band ? (
-                <p className="mt-4 text-xs leading-relaxed text-ember" data-testid="pick-changed">
+                <p className="mt-4 text-xs leading-relaxed text-ochre" data-testid="pick-changed">
                   {t("beat.changed")}
                 </p>
               ) : null}

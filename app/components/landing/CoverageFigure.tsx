@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 
 /**
  * The calibration result, drawn from real measured coverage.
@@ -19,7 +20,8 @@ export function CoverageFigure({
   variants: { label: string; mean: number }[];
   target?: number;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const max = 1;
   const rows = variants.slice(0, 6);
 
@@ -53,7 +55,7 @@ export function CoverageFigure({
                   initial={reduce ? false : { scaleX: 0 }}
                   whileInView={{ scaleX: 1 }}
                   viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.7, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  transition={instant ? { duration: 0 } : { duration: 0.7, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                 />
               </span>
               <span className="num text-xs text-ink-soft">{v.mean.toFixed(3)}</span>
@@ -78,7 +80,8 @@ export function InflationFigure({
 }: {
   series: { year: number; p90: number; heldOut: boolean }[];
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const max = Math.max(...series.map((s) => s.p90)) * 1.1;
 
   return (
@@ -88,16 +91,16 @@ export function InflationFigure({
       <div className="grid h-44 items-end gap-2 border-b border-rule" style={{ gridTemplateColumns: `repeat(${series.length}, minmax(0, 1fr))` }}>
         {series.map((s, i) => (
           <div key={s.year} className="flex h-full flex-col justify-end gap-2">
-            <span className={`num text-center text-[11px] ${s.heldOut ? "text-ember" : "text-mute"}`}>
+            <span className={`num text-center text-[11px] ${s.heldOut ? "text-spruce" : "text-mute"}`}>
               {s.p90.toFixed(0)}
             </span>
             <motion.div
-              className={`w-full origin-bottom ${s.heldOut ? "bg-ember" : "bg-rule"}`}
+              className={`w-full origin-bottom ${s.heldOut ? "bg-spruce" : "bg-rule"}`}
               style={{ height: `${(s.p90 / max) * 100}%` }}
               initial={reduce ? false : { scaleY: 0 }}
               whileInView={{ scaleY: 1 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+              transition={instant ? { duration: 0 } : { duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
             />
           </div>
         ))}

@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { Check } from "@phosphor-icons/react";
+import { motion } from "motion/react";
+import { usePrefersReducedMotion } from "@/lib/motion";
 import { API, Checklist, EmberItem, getParsed, postParsed } from "@/lib/api";
 import { ChecklistSchema } from "@/lib/schemas";
 import { IS_STATIC, getDomains, localScore, staticChecklist } from "@/lib/data";
@@ -51,27 +53,27 @@ function itemText(i: EmberItem, lang: Lang): { label: string; rationale: string 
 }
 
 function Ring({ score, label }: { score: number; label: string }) {
-  const reduce = useReducedMotion();
+  const instant = usePrefersReducedMotion();
   const r = 52;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(1, score));
   return (
     <div className="relative h-32 w-32">
       <svg viewBox="0 0 128 128" className="h-32 w-32 -rotate-90">
-        <circle cx="64" cy="64" r={r} fill="none" stroke="#d9d6cc" strokeWidth="10" />
+        <circle cx="64" cy="64" r={r} fill="none" stroke="#d5d8cf" strokeWidth="10" />
         {/* Animates only when the score changes, never on a loop. */}
         <motion.circle
           cx="64"
           cy="64"
           r={r}
           fill="none"
-          stroke="#b33a1a"
+          stroke="#245e50"
           strokeWidth="10"
           strokeLinecap="round"
           strokeDasharray={c}
           initial={false}
           animate={{ strokeDashoffset: c * (1 - pct) }}
-          transition={reduce ? { duration: 0 } : { duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={instant ? { duration: 0 } : { duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -245,11 +247,17 @@ export default function EmberPage() {
                 role="checkbox"
                 aria-checked={!!state[i.id]}
                 onClick={() => toggle(i.id)}
-                className="flex w-full items-start gap-3 rounded-lg border border-ember/30 bg-ember-soft p-3 text-left transition-transform active:scale-[0.99]"
+                className="flex w-full items-start gap-3 rounded border border-spruce/25 bg-spruce-soft p-3 text-left transition-transform active:scale-[0.99]"
               >
-                <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-ember/60" />
+                <span
+                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                    state[i.id] ? "border-spruce bg-spruce text-paper" : "border-spruce/60 bg-paper-raised"
+                  }`}
+                >
+                  {state[i.id] ? <Check size={11} weight="bold" aria-hidden /> : null}
+                </span>
                 <span>
-                  <span className="block text-sm text-ink">{itemText(i, lang).label}</span>
+                  <span className={`block text-sm ${state[i.id] ? "text-mute line-through" : "text-ink"}`}>{itemText(i, lang).label}</span>
                   <span className="mt-0.5 block text-xs leading-snug text-ink-soft">{itemText(i, lang).rationale}</span>
                 </span>
               </button>
@@ -280,11 +288,11 @@ export default function EmberPage() {
                         className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-paper-sunk"
                       >
                         <span
-                          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
-                            done ? "border-ember bg-ember text-paper" : "border-rule"
+                          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                            done ? "border-spruce bg-spruce text-paper" : "border-rule"
                           }`}
                         >
-                          {done ? "x" : ""}
+                          {done ? <Check size={11} weight="bold" aria-hidden /> : null}
                         </span>
                         <span className="flex-1">
                           <span className={`block text-sm ${done ? "text-mute line-through" : "text-ink"}`}>

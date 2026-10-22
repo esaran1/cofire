@@ -27,7 +27,7 @@ export function IconArray({ n, label, tone = "ember", segments }: { n: number; l
     for (let i = 0; i < Math.min(100, n); i++) fills.push(tone === "ember" ? "bg-ember" : "bg-ochre");
   }
   return (
-    <div role="img" aria-label={label} data-testid="icon-array" data-filled={fills.length} className="inline-grid grid-cols-10 gap-[2px]">
+    <div role="img" aria-label={label} data-testid="icon-array" data-filled={fills.length} className="inline-grid shrink-0 grid-cols-[repeat(10,7px)] gap-[2px]">
       {Array.from({ length: 100 }, (_, i) => (
         <span key={i} aria-hidden className={`h-[7px] w-[7px] rounded-[1px] ${fills[i] ?? "bg-paper-sunk border border-rule/70"}`} />
       ))}

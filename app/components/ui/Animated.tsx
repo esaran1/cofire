@@ -1,7 +1,8 @@
 "use client";
 
-import { animate, motion, useInView, useReducedMotion } from "motion/react";
+import { animate, motion, useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { useReduceMotion } from "@/lib/motion";
 
 /**
  * The controls that animate with the Motion library: the segmented picker's
@@ -9,29 +10,32 @@ import { useEffect, useRef, useState } from "react";
  * that do not use them never download the library.
  */
 
-/** Segmented picker. A real control, not a styled <select>. */
+/**
+ * Segmented picker. A real control, not a styled <select>.
+ *
+ * The selected option is ink, as every selection in the app is. The options
+ * share the row and shrink rather than wrap, so on a phone the group stays one
+ * pill instead of breaking into a two-line blob.
+ */
 export function Segmented<T extends string | number>({
   options,
   value,
   onChange,
   label,
-  tone = "ember",
 }: {
   options: { value: T; label: string; hint?: string }[];
   value: T;
   onChange: (v: T) => void;
   label: string;
-  tone?: "ember" | "ochre";
 }) {
-  const reduce = useReducedMotion();
-  const fill = tone === "ochre" ? "bg-ochre" : "bg-ember";
+  const reduce = useReduceMotion();
   return (
     <fieldset>
       <legend className="text-sm font-medium text-ink">{label}</legend>
       <div
         role="radiogroup"
         aria-label={label}
-        className="mt-2 flex flex-wrap gap-1 rounded-full border border-rule bg-paper-raised p-1"
+        className="mt-2 flex gap-0.5 rounded-full border border-rule bg-paper-raised p-1 sm:gap-1"
       >
         {options.map((o) => {
           const active = o.value === value;
@@ -42,19 +46,21 @@ export function Segmented<T extends string | number>({
               role="radio"
               aria-checked={active}
               onClick={() => onChange(o.value)}
-              className={`relative flex-1 min-w-[5rem] rounded-full px-3 py-2 text-sm transition-transform active:scale-[0.97] ${
+              className={`relative min-w-0 flex-1 rounded-full px-1.5 py-2 text-[13px] transition-transform active:scale-[0.97] sm:px-3 sm:text-sm ${
                 active ? "text-paper" : "text-ink-soft hover:text-ink"
               }`}
             >
               {active && (
                 <motion.span
                   layoutId={`seg-${label}`}
-                  className={`absolute inset-0 rounded-full ${fill}`}
+                  className="absolute inset-0 rounded-full bg-ink"
                   transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 32 }}
                 />
               )}
               <span className="relative z-10 block font-medium leading-tight">{o.label}</span>
-              {o.hint && <span className="relative z-10 block text-[11px] leading-tight opacity-90">{o.hint}</span>}
+              {o.hint && (
+                <span className="relative z-10 mt-0.5 block text-[10px] leading-tight opacity-80 sm:text-[11px]">{o.hint}</span>
+              )}
             </button>
           );
         })}
@@ -79,8 +85,11 @@ export function CountUp({
   decimals?: number;
   suffix?: string;
 }) {
-  const reduce = useReducedMotion();
-  const [shown, setShown] = useState(reduce ? to : 0);
+  // The real number is what the server renders and what a reader without
+  // JavaScript (or with reduced motion) sees. Only once it scrolls into view
+  // does it count up from zero.
+  const reduce = useReduceMotion();
+  const [shown, setShown] = useState(to);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.6 });
 

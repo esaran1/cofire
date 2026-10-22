@@ -88,7 +88,7 @@ export function SiteNav() {
           {path !== "/" && (
             <Link
               href="/"
-              className="hidden rounded-full bg-ember px-4 py-2 text-sm font-medium text-paper transition-transform active:scale-[0.98] xl:inline-flex"
+              className="hidden rounded-full bg-spruce px-4 py-2 text-sm font-medium text-paper hover:bg-spruce-deep transition-transform active:scale-[0.98] xl:inline-flex"
             >
               {t("nav.openMap")}
             </Link>
@@ -114,7 +114,7 @@ export function SiteNav() {
                 <Link
                   href={it.href}
                   aria-current={isOn(it.href) ? "page" : undefined}
-                  className={`block py-3 ${isOn(it.href) ? "text-ember" : "text-ink"}`}
+                  className={`block py-3 ${isOn(it.href) ? "font-medium text-spruce" : "text-ink"}`}
                 >
                   {t(it.label)}
                 </Link>

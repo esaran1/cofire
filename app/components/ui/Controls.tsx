@@ -6,7 +6,7 @@ import { useT } from "@/lib/i18n";
 
 /**
  * Shared control layer. One radius rule (surfaces near-sharp at 2px,
- * interactive elements full-pill), one accent (ember), one numeral treatment.
+ * interactive elements full-pill), one accent (spruce), one numeral treatment.
  * Route files use these; they do not invent values.
  *
  * Nothing here imports the animation library, so a page that uses only these
@@ -55,7 +55,7 @@ export function Action({
 }) {
   const base =
     variant === "primary"
-      ? "bg-ember text-paper disabled:bg-ember/40"
+      ? "bg-spruce text-paper hover:bg-spruce-deep disabled:bg-spruce/40"
       : "border border-rule text-ink hover:border-ink-soft disabled:opacity-50";
   return (
     <button

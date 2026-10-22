@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { asset } from "@/lib/asset";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 import { useRef } from "react";
 import { ArrowRight } from "@phosphor-icons/react";
 import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigure";
@@ -16,7 +17,8 @@ import facts from "@/lib/facts.json";
 import { useT } from "@/lib/i18n";
 
 export default function LandingPage() {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const { t } = useT();
   const look = facts.look3;
   const audit = facts.interval_audit;
@@ -32,7 +34,7 @@ export default function LandingPage() {
         <motion.h1
           initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={instant ? { duration: 0 } : { duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="display text-[clamp(3.5rem,11vw,11rem)] leading-[0.95]"
         >
           CO<em>FIRE</em>
@@ -40,7 +42,7 @@ export default function LandingPage() {
         <motion.p
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.25 }}
+          transition={instant ? { duration: 0 } : { duration: 0.8, delay: 0.25 }}
           className="mt-6 text-[clamp(0.7rem,0.85vw,0.95rem)] uppercase tracking-[0.2em] text-mute sm:rule-flank sm:tracking-[0.24em]"
         >
           <span className="sm:hidden">{t("land.tagShort")}</span>
@@ -49,12 +51,12 @@ export default function LandingPage() {
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
+          transition={instant ? { duration: 0 } : { duration: 0.7, delay: 0.4 }}
           className="mt-12 flex flex-wrap items-center justify-center gap-3"
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full bg-ember px-6 py-3 font-medium text-paper transition-transform active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-full bg-spruce px-6 py-3 font-medium text-paper hover:bg-spruce-deep transition-transform active:scale-[0.98]"
           >
             {t("nav.openMap")}
             <ArrowRight size={17} weight="bold" />
@@ -92,7 +94,7 @@ export default function LandingPage() {
       </PhotoChapter>
 
       {/* 3. What COFIRE does, shown as the forecast itself. */}
-      <section className="flex min-h-[100dvh] items-center border-t border-rule px-6 py-20">
+      <section className="border-t border-rule px-6 py-24 md:py-32">
         <div className="measure w-full">
           <StoryMap
             title={<>{t("land.forecasts")}</>}
@@ -167,7 +169,7 @@ export default function LandingPage() {
           />
           <Link
             href="/"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-ember px-6 py-3 font-medium text-paper transition-transform active:scale-[0.98]"
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-paper px-6 py-3 font-medium text-ink transition-transform hover:bg-paper-raised active:scale-[0.98]"
           >
             {t("nav.openMap")}
             <ArrowRight size={17} weight="bold" />
@@ -181,9 +183,10 @@ export default function LandingPage() {
 /**
  * One chapter of the story: a headline, at most one line, then the picture.
  *
- * Each chapter takes at least a full screen so the reader meets one idea at a
- * time. `min-h-[100dvh]`, not `h-screen`, because the mobile address bar
- * changes the viewport height mid-scroll.
+ * Each chapter is one idea, set off by generous, equal padding. They used to
+ * take a full screen each and centre their content, which left a short chapter
+ * (the sealed-year bar) floating in 400 to 500 px of blank paper; equal padding
+ * keeps one idea at a time without the dead air.
  */
 function Chapter({
   title,
@@ -198,7 +201,7 @@ function Chapter({
 }) {
   return (
     <section
-      className={`flex min-h-[100dvh] items-center border-t border-rule px-6 py-24 ${
+      className={`border-t border-rule px-6 py-24 md:py-32 ${
         tinted ? "bg-paper-sunk" : ""
       }`}
     >
@@ -236,7 +239,8 @@ function PhotoChapter({
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   return (

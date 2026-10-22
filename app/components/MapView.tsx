@@ -65,7 +65,7 @@ export function MapLegend({ layer, empty = false }: { layer: Layer; empty?: bool
   const text = (k: string) => (k.startsWith("legend.") ? t(k as MessageKey) : k);
   return (
     <div data-testid="map-legend" className="pointer-events-none absolute left-3 top-3 z-10 rounded border border-rule bg-paper/95 px-3 py-2 text-[11px] text-ink-soft shadow-sm">
-      <p className="text-ink">{t(l.title)}</p>
+      <p className="max-w-[10rem] text-ink sm:max-w-[13rem]">{t(l.title)}</p>
       <div className="mt-1 h-2 w-40 rounded-sm" style={{ background: `linear-gradient(to right, ${l.stops.join(", ")})` }} />
       <div className="mt-0.5 flex w-40 justify-between">
         {l.labels.map((k) => (
@@ -182,7 +182,7 @@ export function MapView({
       if (basemapFailed || sourceId !== "basemap" || mode !== "selfhost") return;
       basemapFailed = true;
       for (const id of BASEMAP_LAYERS) if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", "none");
-      if (map.getLayer("bg")) map.setPaintProperty("bg", "background-color", "#eceae2");
+      if (map.getLayer("bg")) map.setPaintProperty("bg", "background-color", "#eaebe4");
     });
     map.on("click", (e) => clickRef.current(e.lngLat.lat, e.lngLat.lng));
     const ready = () => {
@@ -241,13 +241,13 @@ export function MapView({
           id: "cells-line",
           type: "line",
           source: "cells",
-          paint: { "line-color": "#17181b", "line-opacity": 0.12, "line-width": 0.5 },
+          paint: { "line-color": "#161a19", "line-opacity": 0.12, "line-width": 0.5 },
         });
         map.addLayer({
           id: "cells-selected",
           type: "line",
           source: "cells",
-          paint: { "line-color": "#17181b", "line-width": 2.5 },
+          paint: { "line-color": "#161a19", "line-width": 2.5 },
           filter: ["==", ["get", "id"], ""],
         });
       }
@@ -259,8 +259,8 @@ export function MapView({
         if (!map.getSource("tracts")) {
           map.addSource("tracts", { type: "geojson", data: tracts as unknown as GeoJSON.FeatureCollection, promoteId: "geoid" });
           map.addLayer({ id: "tracts-fill", type: "fill", source: "tracts", paint: { "fill-color": BURDEN_RAMP, "fill-opacity": 0.7 } });
-          map.addLayer({ id: "tracts-line", type: "line", source: "tracts", paint: { "line-color": "#17181b", "line-opacity": 0.25, "line-width": 0.6 } });
-          map.addLayer({ id: "tracts-selected", type: "line", source: "tracts", paint: { "line-color": "#17181b", "line-width": 2.5 }, filter: ["==", ["get", "geoid"], ""] });
+          map.addLayer({ id: "tracts-line", type: "line", source: "tracts", paint: { "line-color": "#161a19", "line-opacity": 0.25, "line-width": 0.6 } });
+          map.addLayer({ id: "tracts-selected", type: "line", source: "tracts", paint: { "line-color": "#161a19", "line-width": 2.5 }, filter: ["==", ["get", "geoid"], ""] });
         }
         for (const id of ["tracts-fill", "tracts-line", "tracts-selected"]) map.setLayoutProperty(id, "visibility", burden ? "visible" : "none");
         map.setFilter("tracts-selected", ["==", ["get", "geoid"], selectedTract ?? ""]);

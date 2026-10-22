@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigure";
 import { Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
 import { CountUp } from "@/components/ui/Animated";
@@ -56,7 +57,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function HindcastPage() {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const { lang, t } = useT();
   const [domain] = useDomain();
   const sealedHere = domain === "larimer" || domain === "pueblo";
@@ -65,7 +67,7 @@ export default function HindcastPage() {
       <motion.header
         initial={reduce ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        transition={instant ? { duration: 0 } : { duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       >
         <h1 className="display text-4xl font-normal md:text-5xl">{t("hind.title")}</h1>
         <p className="text-ink-soft mt-3 max-w-[58ch] leading-relaxed">{t("hind.lede")}</p>
@@ -93,7 +95,7 @@ export default function HindcastPage() {
         </div>
       ) : null}
 
-      <div className="border-rule mt-10 grid gap-8 border-y py-8 sm:grid-cols-3">
+      <div className="border-rule mt-10 grid gap-8 border-t pt-8 sm:grid-cols-3">
         <Verdict
           value={`${look.by_test["5"].n_pass}/${look.by_test["5"].n_total}`}
           label={t("hind.probPassed")}
@@ -205,7 +207,7 @@ export default function HindcastPage() {
 
       <a
         href="/?issue=2026-05-05&horizon=2"
-        className="bg-ochre text-paper mt-12 inline-block rounded-full px-5 py-2.5 text-sm font-medium transition-transform active:scale-[0.98]"
+        className="mt-12 inline-block rounded-full bg-spruce px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:bg-spruce-deep active:scale-[0.98]"
       >
         {t("hind.replay")}
       </a>

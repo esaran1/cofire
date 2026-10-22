@@ -27,7 +27,7 @@ export function SealedTimeline() {
     { key: "train", label: t("land.seg.train"), span: years(facts.split.train), tone: "bg-ink" },
     { key: "validate", label: t("land.seg.validate"), span: years(facts.split.validate), tone: "bg-ink-soft" },
     { key: "calibrate", label: t("land.seg.calibrate"), span: years(facts.split.calibrate), tone: "bg-mute" },
-    { key: "holdout", label: t("land.seg.holdout"), span: years(facts.split.holdout), tone: "bg-ember" },
+    { key: "holdout", label: t("land.seg.holdout"), span: years(facts.split.holdout), tone: "bg-spruce" },
   ];
   const first = segs[0].span[0];
   const last = segs[segs.length - 1].span[1];
@@ -52,7 +52,7 @@ export function SealedTimeline() {
               </div>
               <div className="mt-3 hidden truncate md:block">
                 <span
-                  className={`block text-sm font-medium md:text-base ${s.key === "holdout" ? "text-ember" : "text-ink"}`}
+                  className={`block text-sm font-medium md:text-base ${s.key === "holdout" ? "text-spruce" : "text-ink"}`}
                 >
                   {s.label}
                 </span>
@@ -71,7 +71,7 @@ export function SealedTimeline() {
           // A <dl> may hold only dt and dd groups (axe: definition-list), so
           // the colour swatch sits inside the term.
           <div key={s.key}>
-            <dt className={`flex items-start gap-3 text-sm font-medium ${s.key === "holdout" ? "text-ember" : "text-ink"}`}>
+            <dt className={`flex items-start gap-3 text-sm font-medium ${s.key === "holdout" ? "text-spruce" : "text-ink"}`}>
               <span className={`mt-1 h-3 w-3 shrink-0 ${s.tone}`} aria-hidden />
               {s.label}
             </dt>

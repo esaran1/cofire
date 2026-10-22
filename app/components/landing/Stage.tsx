@@ -10,12 +10,12 @@ import { ReactNode } from "react";
  * competing in one viewport means neither is read: the eye has to choose, and
  * the charts are the whole argument.
  *
- * A Stage gives one figure the entire viewport. The claim is the headline, the
- * figure is the body, and nothing else is on screen. The reader arrives, reads
- * one thing, and scrolls to the next one.
+ * A Stage gives one figure its own section. The claim is the headline, the
+ * figure is the body, and nothing else competes with it. The reader arrives,
+ * reads one thing, and scrolls to the next one.
  *
- * `min-h-[100dvh]` rather than `h-screen`, because the iOS address bar changes
- * the viewport height mid-scroll and `vh` does not follow it.
+ * Generous, equal padding sets it apart. A full-viewport minimum used to centre
+ * a short figure (the three-bar drift chart) in a screen of blank paper.
  */
 export function Stage({
   claim,
@@ -32,7 +32,7 @@ export function Stage({
 }) {
   return (
     <section
-      className={`flex min-h-[100dvh] items-center border-t border-rule px-6 py-20 ${
+      className={`border-t border-rule px-6 py-24 md:py-32 ${
         tinted ? "bg-paper-sunk" : ""
       }`}
     >

@@ -58,14 +58,14 @@ function Locator() {
       role="img"
       aria-label={t("land.mapAria")}
     >
-      <path d={m.state} fill="#eceae2" stroke="#77797f" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+      <path d={m.state} fill="#eaebe4" stroke="#8a8f88" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
       <rect
         x={vx}
         y={vy}
         width={vw}
         height={vh}
         fill="none"
-        stroke="#b33a1a"
+        stroke="#245e50"
         strokeWidth={1.6}
         vectorEffect="non-scaling-stroke"
       />
@@ -81,6 +81,21 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
   const summary = m.by_horizon[h as keyof typeof m.by_horizon];
   const [vx, vy, vw, vh] = m.view;
   const label = vw * 0.05;
+  // Each name sits above its area unless it would run into a name already
+  // placed (Dillon and Upper South Platte are neighbours), then below it.
+  const placed: { x0: number; x1: number; y0: number; y1: number }[] = [];
+  const labelY = new Map<string, number>();
+  // Shorter names first, so a long name is the one that moves.
+  for (const a of [...m.areas].sort((p, q) => p.name.length - q.name.length)) {
+    const width = a.name.length * label * 0.56;
+    const boxAt = (baseline: number) => ({ x0: a.x, x1: a.x + width, y0: baseline - label, y1: baseline + label * 0.25 });
+    const hits = (b: { x0: number; x1: number; y0: number; y1: number }) =>
+      placed.some((q) => b.x0 < q.x1 && q.x0 < b.x1 && b.y0 < q.y1 && q.y0 < b.y1);
+    let y = a.y - label * 0.45;
+    if (hits(boxAt(y))) y = a.y + a.h + label * 1.05;
+    placed.push(boxAt(y));
+    labelY.set(a.name, y);
+  }
 
   return (
     // Three grid items so the phone order is headline, map, controls: with the
@@ -106,7 +121,7 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
               key={o.name}
               d={o.d}
               fill="none"
-              stroke="#d9d6cc"
+              stroke="#d5d8cf"
               strokeWidth={0.8}
               vectorEffect="non-scaling-stroke"
             />
@@ -133,14 +148,14 @@ export function StoryMap({ title, line }: { title: ReactNode; line: ReactNode })
                   width={a.w}
                   height={a.h}
                   fill="none"
-                  stroke="#17181b"
+                  stroke="#161a19"
                   strokeWidth={1.4}
                   vectorEffect="non-scaling-stroke"
                 />
               ) : null}
               <text
                 x={a.x}
-                y={a.y - label * 0.45}
+                y={labelY.get(a.name) ?? a.y - label * 0.45}
                 className="fill-ink"
                 style={{ fontSize: label, fontFamily: "var(--font-sans)" }}
               >

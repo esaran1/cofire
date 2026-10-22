@@ -5,7 +5,8 @@ import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 import { API, Observation, getParsed, postParsed } from "@/lib/api";
 import { ObservationAckSchema, ObservationSchema } from "@/lib/schemas";
 import { resolvePlace } from "@/lib/data";
@@ -24,7 +25,8 @@ function ObserveInner() {
   const { t } = useT();
   const TYPES = OBSERVATION_TYPES.map((o) => ({ ...o, label: t(`obs.type.${o.value}` as MessageKey) }));
   const params = useSearchParams();
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const [lat, setLat] = useState(params.get("lat") ?? "");
   const [lon, setLon] = useState(params.get("lon") ?? "");
   const [type, setType] = useState("lawn_crispy");
@@ -145,7 +147,7 @@ function ObserveInner() {
       )}
 
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
-        <Segmented label={t("obs.what")} options={TYPES} value={type} onChange={setType} tone="ochre" />
+        <Segmented label={t("obs.what")} options={TYPES} value={type} onChange={setType} />
 
         <div className="flex flex-col gap-2">
           <label htmlFor="note" className="text-sm font-medium text-ink">
@@ -156,7 +158,7 @@ function ObserveInner() {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            className="rounded-lg border border-rule bg-paper-raised px-3 py-2 text-ink placeholder:text-mute focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+            className="rounded-lg border border-rule bg-paper-raised px-3 py-2 text-ink placeholder:text-mute focus:border-spruce focus:outline-none focus:ring-1 focus:ring-spruce"
             placeholder={t("obs.notePlaceholder")}
           />
           <p className="text-xs text-ink-soft">{t("obs.noteHelp")}</p>
@@ -188,7 +190,7 @@ function ObserveInner() {
                     setLat(a.lat.toFixed(3));
                     setLon(a.lon.toFixed(3));
                   }}
-                  className="rounded-full border border-rule bg-paper-raised px-3 py-1.5 text-xs text-ink hover:border-ember"
+                  className="rounded-full border border-rule bg-paper-raised px-3 py-1.5 text-xs text-ink hover:border-ink-soft"
                 >
                   {domainLabel(a.domain)} {a.lat.toFixed(2)}, {a.lon.toFixed(2)}
                 </button>
@@ -207,7 +209,7 @@ function ObserveInner() {
               value={lat}
               onChange={(e) => setLat(e.target.value)}
               inputMode="decimal"
-              className="rounded-lg border border-rule bg-paper-raised px-3 py-2 font-mono text-ink focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+              className="rounded-lg border border-rule bg-paper-raised px-3 py-2 font-mono text-ink focus:border-spruce focus:outline-none focus:ring-1 focus:ring-spruce"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -219,7 +221,7 @@ function ObserveInner() {
               value={lon}
               onChange={(e) => setLon(e.target.value)}
               inputMode="decimal"
-              className="rounded-lg border border-rule bg-paper-raised px-3 py-2 font-mono text-ink focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember"
+              className="rounded-lg border border-rule bg-paper-raised px-3 py-2 font-mono text-ink focus:border-spruce focus:outline-none focus:ring-1 focus:ring-spruce"
             />
           </div>
         </div>
@@ -247,7 +249,7 @@ function ObserveInner() {
           <motion.div
             initial={reduce ? false : { y: 12 }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            transition={instant ? { duration: 0 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="mt-8"
             role="status"
           >
@@ -266,7 +268,7 @@ function ObserveInner() {
       <div className="mt-12 grid grid-cols-2 gap-4">
         <Panel>
           <p className="text-sm font-medium text-ink">{t("obs.rank")}</p>
-          <p className="mt-2 text-2xl font-medium">{rank}</p>
+          <p className="mt-2 text-lg font-medium leading-snug sm:text-2xl">{rank}</p>
         </Panel>
         <Panel>
           <p className="text-sm font-medium text-ink">{t("obs.reports")}</p>

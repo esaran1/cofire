@@ -10,7 +10,8 @@
  * correct. A reveal that can hide content will hide content.
  */
 
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 import { ReactNode, useRef } from "react";
 
 /**
@@ -31,13 +32,14 @@ import { ReactNode, useRef } from "react";
 export function ReadingProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   if (reduce) return null;
   return (
     <motion.div
       aria-hidden
       style={{ scaleX }}
-      className="fixed left-0 right-0 top-16 z-50 h-px origin-left bg-ember"
+      className="fixed left-0 right-0 top-16 z-50 h-px origin-left bg-spruce"
     />
   );
 }
@@ -48,7 +50,8 @@ export function ReadingProgress() {
  */
 export function RecedingHero({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
@@ -74,7 +77,8 @@ export function LineReveal({
   lines: ReactNode[];
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   return (
     <p className={className}>
       {lines.map((line, i) => (
@@ -84,7 +88,7 @@ export function LineReveal({
           initial={reduce ? false : { y: "0.35em" }}
           whileInView={{ y: 0 }}
           viewport={{ once: true, amount: 0 }}
-          transition={{ duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+          transition={instant ? { duration: 0 } : { duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
         >
           {line}
         </motion.span>
@@ -104,7 +108,8 @@ export function ParallaxFigure({
   caption: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
 
@@ -133,14 +138,15 @@ export function Reveal({
   delay?: number;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   return (
     <motion.div
       className={className}
       initial={reduce ? false : { y: 18 }}
       whileInView={{ y: 0 }}
       viewport={{ once: true, amount: 0 }}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={instant ? { duration: 0 } : { duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>
@@ -152,7 +158,8 @@ export function Reveal({
  * discipline figures, where the number is the content.
  */
 export function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: string; decimals?: number }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.9", "start 0.5"] });
   const v = useTransform(scrollYProgress, [0, 1], [0, to]);

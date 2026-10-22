@@ -3061,3 +3061,81 @@ following `.python-version`, asked for Python 3.11 and found no download. Vercel
   alone pulls in gigabytes of CUDA libraries the site never uses.
   `uv.lock` changed no package or version.
 - Local runs, CI and the refresh keep Python 3.11 and the full pipeline.
+
+## Interface pass: a colour system, and what was crowded or broken, 2026-10-22
+
+The owner asked for a thorough pass over the interface, and for a more
+deliberate palette than the coral accent, which is common on generated sites.
+Every route was screenshotted at 1440 and 390 px in both states before and
+after (the place card's scrolling panel captured separately).
+
+- **One job per colour.** Ember (`#b33a1a`) had five jobs: the primary button,
+  the selected layer, the slider, the fire-spread reading and the brand.
+  - **Spruce** (`#245e50`, 6.8:1 on paper) is now the one interface accent:
+    actions, links, focus, the current page. It is the forested watersheds the
+    forecasts are about, and the one hue no data layer uses (fire is
+    orange-red, drought ochre-brown, neighbourhoods purple, water pale blue), so
+    an action never reads as a measurement.
+  - **Ink** marks every selection: segmented pickers, the chosen horizon, the
+    selected layer. Pickers had been ochre on one page and ember on another.
+  - **Ember and ochre** are data: fire-spread and drought. Each also carries
+    the one status that shares its meaning: ember errors and corrections,
+    ochre caution notices.
+  - The neutrals lean faintly green-grey, to sit with the accent. The display
+    italic no longer changes colour: emphasis is made by the type.
+  - Layer buttons carry a swatch of their data colour, so selection stays ink
+    and the button still keys the map.
+  - The slider is a hairline with a spruce thumb, not a solid bar across the
+    map.
+- **Broken, now fixed:**
+  - Readers with reduced motion on got a hydration mismatch on the landing,
+    Method and Hindcast pages (React discarded the server HTML on the landing
+    page). `lib/motion.ts` gives a hook that is false until mount, for markup;
+    transitions take the real preference, so no motion still means no motion.
+    The count-up stats render their real number in the HTML; they used to read
+    0 without JavaScript.
+  - Harden's "start here" checkboxes never showed a tick; the other list ticked
+    with a letter "x".
+  - The place card's selected horizon was the lighter chip, so the chosen one
+    looked unselected.
+  - "Not shown" wrapped onto two lines in the mono face.
+  - The history range read "28  to  69" (the word set in mono).
+  - Story-map labels collided (Dillon, Upper South Platte). Names now sit
+    above their area unless they would hit a placed name, shortest first.
+  - The reliability chart's "2 weeks" was hard-coded English.
+  - On phones: segmented pickers wrapped into two-line blobs (they now share
+    one row and shrink), icon arrays collapsed into stripes (`grid-cols-10` is
+    `minmax(0, 1fr)`; the columns are now a fixed 7 px), and the data
+    dictionary and the forecast record ran off the right edge (type and
+    fingerprint now sit under the name and date).
+- **Crowded or unclear, now simpler:**
+  - The card's "Close" was a bare word above the section, read as a heading;
+    it is a close button beside the place and date.
+  - The card's actions were the only square buttons in a pill-button app.
+  - Predict opened with a five-line paragraph; the scoring rules are now
+    behind "How picks are scored".
+  - Chart labels "LARIMER H2" read "Larimer, 2 weeks". The real-delay series
+    is solid red, not a pale coral, and its captions say "red".
+  - The v1.2 table numbered its rows "1. 1. 1. 1. 1. 2. 2. 3."; it is grouped
+    under Recalibration, Climate state and Pooling.
+  - Landing chapters each forced a full screen and centred their content, so
+    short chapters floated in 400 to 500 px of blank paper; they now have
+    equal padding.
+  - The Harden preview sat beside the other two, stretched to their height
+    with empty paper under its items; it now leads full width.
+  - "Past two weeks, the odds drifted" reads as "in the last two weeks"; it is
+    "Beyond two weeks", as the Spanish already said.
+  - The fire legend says "Fire-spread: dryness vs usual for the week", tying
+    it to the button that shows it.
+  - The doubled rule under the Method and Hindcast stats is gone.
+- **Checked:** the type check and copy lint pass. On the static build, all 86
+  axe and smoke checks pass in both languages, including colour contrast.
+  The main end-to-end suite passes 91 of 91, with 1 skipped, against a
+  throwaway database. Three tests followed the structure (the v1.2 table's
+  heading rows, the Spanish legend text, and the method part across the
+  recalibration's start date on 2026-10-13, which predates this pass).
+- **Not changed:**
+  - The reserved Denver's-water section and the Spanish review notice.
+  - The fonts, the map's data ramps, and the brand's fire-coloured "FIRE".
+  - The film, which still shows the old palette in its captures; re-capturing
+    is a separate render.

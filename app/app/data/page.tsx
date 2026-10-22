@@ -72,19 +72,23 @@ export default function DataPage() {
             <h2 className="text-lg font-medium">{t("data.dictTitle")}</h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-soft">{t("data.dictLede")}</p>
             <div className="mt-3 overflow-x-auto" tabIndex={0} role="region" aria-label={t("data.dictTitle")}>
-              <table className="w-full min-w-[34rem] text-sm">
+              <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-[11px] uppercase tracking-wide text-mute">
                     <th className="pb-1 pr-4 font-normal">{t("data.colField")}</th>
-                    <th className="pb-1 pr-4 font-normal">{t("data.colType")}</th>
+                    <th className="hidden pb-1 pr-4 font-normal sm:table-cell">{t("data.colType")}</th>
                     <th className="pb-1 font-normal">{t("data.colMeaning")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {idx.fields.map((f) => (
                     <tr key={f.name} className="border-t border-rule align-top" data-field={f.name}>
-                      <td className="py-2 pr-4 font-mono">{f.name}</td>
-                      <td className="py-2 pr-4 text-mute">{f.type}</td>
+                      <td className="py-2 pr-4">
+                        <span className="font-mono">{f.name}</span>
+                        {/* On a phone the type sits under the name, so the table fits without scrolling sideways. */}
+                        <span className="block text-xs text-mute sm:hidden">{f.type}</span>
+                      </td>
+                      <td className="hidden py-2 pr-4 text-mute sm:table-cell">{f.type}</td>
                       <td className="py-2 leading-relaxed text-ink-soft">{FIELD_KEYS[f.name] ? t(FIELD_KEYS[f.name]) : f.description}</td>
                     </tr>
                   ))}
@@ -114,7 +118,7 @@ export default function DataPage() {
             <h2 className="text-lg font-medium">{t("data.allTitle")}</h2>
             <p className="mt-1 text-sm text-mute" data-testid="data-count">{t("data.allLede", { n: idx.issues.length })}</p>
             <div className="mt-2 overflow-x-auto" tabIndex={0} role="region" aria-label={t("data.allTitle")}>
-              <table className="w-full min-w-[24rem] text-sm">
+              <table className="w-full text-sm">
                 <tbody>
                   {[...idx.issues].reverse().map((i) => (
                     <tr key={i.issue} className="border-t border-rule" data-issue={i.issue}>

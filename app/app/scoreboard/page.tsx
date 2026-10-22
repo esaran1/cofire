@@ -48,12 +48,12 @@ export default function ScoreboardPage() {
 
       <p className="mt-8 text-sm text-mute" data-testid="score-count">{t("score.count", { n: entries.length })}</p>
       <div className="mt-2 overflow-x-auto" tabIndex={0} role="region" aria-label={t("score.title")}>
-        <table className="w-full min-w-[30rem] text-sm" data-testid="score-table">
+        <table className="w-full text-sm" data-testid="score-table">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wide text-mute">
               <th className="pb-1 font-normal">{t("score.colIssue")}</th>
               <th className="pb-1 font-normal">{t("score.colPublished")}</th>
-              <th className="pb-1 font-normal">{t("score.colHash")}</th>
+              <th className="hidden pb-1 font-normal sm:table-cell">{t("score.colHash")}</th>
             </tr>
           </thead>
           <tbody>
@@ -63,8 +63,12 @@ export default function ScoreboardPage() {
                 <td className="py-1.5 pr-3 text-ink-soft">
                   {day(e.published_at)}
                   {e.backfilled ? <span className="ml-1 text-[11px] text-mute">({t("score.backfilled")})</span> : null}
+                  {/* On a phone the fingerprint goes under the date rather than off the edge. */}
+                  <span className="num block text-[11px] text-mute sm:hidden" title={e.sha256}>
+                    {e.sha256.slice(0, 16)}…
+                  </span>
                 </td>
-                <td className="num py-1.5 text-[11px] text-mute" title={e.sha256}>
+                <td className="num hidden py-1.5 text-[11px] text-mute sm:table-cell" title={e.sha256}>
                   {e.sha256.slice(0, 16)}…
                 </td>
               </tr>

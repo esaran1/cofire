@@ -150,7 +150,7 @@ test("the brief links straight to Denver's map and neighborhoods views", async (
 test("the Method page reports every v1.2 stage and the live arm from the artifacts", async ({ page }) => {
   const v12 = JSON.parse(require("node:fs").readFileSync("lib/facts_v12.json", "utf8"));
   await page.goto("/about?lang=en");
-  await expect(page.getByTestId("v12-table").locator("tbody tr")).toHaveCount(v12.stages.length, { timeout: 20_000 });
+  await expect(page.getByTestId("v12-table").locator("tbody tr[data-row='arm']")).toHaveCount(v12.stages.length, { timeout: 20_000 });
   if (v12.live.changed.length) {
     await expect(page.getByTestId("v12-live")).toContainText(`${v12.live.on_configuration_A} of the ${v12.live.pairs}`);
   } else {

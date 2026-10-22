@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { Horizon, Place, Target } from "@/lib/api";
@@ -134,7 +135,7 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
               years: hz.hist_years ?? t("card.historyYears"),
               week: hz.target_week ? formatWeek(hz.target_week, lang) : t("card.historyWeek"),
             })}{" "}
-            <span className="num text-ink">{t("card.range", { lo: hz.hist_lo.toFixed(0), hi: hz.hist_hi.toFixed(0) })}</span>.
+            <span className="text-ink tabular-nums">{t("card.range", { lo: hz.hist_lo.toFixed(0), hi: hz.hist_hi.toFixed(0) })}</span>.
             {erc !== null && erc !== undefined ? (
               <> {t("card.historyNow", { erc: erc.toFixed(0) })}</>
             ) : null}
@@ -219,7 +220,10 @@ function TargetRow({ name, t: target, kind, place, prev, prevTarget, explain }: 
                 <span className="block text-sm">{targetLabel(name, kind, lang)}</span>
                 {isBase ? <span className="text-mute block text-[11px]">{marker}</span> : null}
               </span>
-              <span className={`num text-sm ${hidden ? "text-mute" : "text-ink"}`} data-testid={hidden ? "target-not-shown" : "target-percent"}>
+              <span
+                className={hidden ? "text-mute shrink-0 whitespace-nowrap text-xs" : "num text-ink shrink-0 text-sm"}
+                data-testid={hidden ? "target-not-shown" : "target-percent"}
+              >
                 {hidden ? t("card.notShown") : formatProbability(p)}
               </span>
             </div>
@@ -342,15 +346,21 @@ export function PlaceCard({
           : "border-rule bg-paper-raised border-t px-5 pb-8 pt-5 lg:px-6 lg:pt-6"
       }
     >
-      {!embedded ? (
-        <button className="text-ink-soft text-sm" onClick={onClose}>
-          {t("card.close")}
-        </button>
-      ) : null}
-      <p className="text-ink-soft mt-1 text-xs" data-testid="place-domain">
-        {meta?.label ?? domainLabel(place.domain)}
-        {place.issue ? ` · ${place.issue}` : ""}
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-ink-soft text-xs" data-testid="place-domain">
+          {meta?.label ?? domainLabel(place.domain)}
+          {place.issue ? ` · ${place.issue}` : ""}
+        </p>
+        {!embedded ? (
+          <button
+            onClick={onClose}
+            className="text-ink-soft hover:bg-paper-sunk hover:text-ink -mr-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs"
+          >
+            <X size={14} aria-hidden />
+            {t("card.close")}
+          </button>
+        ) : null}
+      </div>
       {meta?.evaluation === "validation" ? (
         <p className="text-mute mt-1 text-[11px] leading-relaxed" data-testid="validation-note">
           {t("card.validation")}
@@ -363,7 +373,7 @@ export function PlaceCard({
             onClick={() => onHorizon(h)}
             aria-pressed={horizon === h}
             aria-label={t("card.chipLabel", { h })}
-            className={`rounded-full px-3 py-1 text-sm ${horizon === h ? "bg-paper text-ink" : "bg-paper-sunk"}`}
+            className={`rounded-full px-3 py-1 text-sm transition-colors ${horizon === h ? "bg-ink text-paper" : "bg-paper-sunk text-ink-soft hover:text-ink"}`}
           >
             {t("card.chip", { h })}
           </button>
@@ -418,19 +428,21 @@ export function PlaceCard({
       </section>
 
       {!embedded ? (
-        <div className="mt-5 grid grid-cols-3 gap-2">
+        <div className="mt-6 grid grid-cols-3 gap-2">
           <button
             onClick={onAdopt}
             aria-pressed={adopted}
             data-testid="adopt"
-            className={`rounded-lg py-3 text-sm ${adopted ? "bg-ink text-paper" : "bg-paper-sunk"}`}
+            className={`rounded-full border py-2.5 text-sm transition-colors ${
+              adopted ? "border-ink bg-ink text-paper" : "border-rule text-ink hover:border-ink-soft"
+            }`}
           >
             {adopted ? t("card.adopted") : t("card.adopt")}
           </button>
-          <button onClick={onPredict} className="bg-paper-sunk rounded-lg py-3 text-sm">
+          <button onClick={onPredict} className="border-rule text-ink hover:border-ink-soft rounded-full border py-2.5 text-sm transition-colors">
             {t("card.predict")}
           </button>
-          <button onClick={onReport} className="bg-paper-sunk rounded-lg py-3 text-sm">
+          <button onClick={onReport} className="border-rule text-ink hover:border-ink-soft rounded-full border py-2.5 text-sm transition-colors">
             {t("card.report")}
           </button>
         </div>

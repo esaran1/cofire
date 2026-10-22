@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 import { Disclosure, StatRow, Verdict } from "@/components/ui/Controls";
 import { Reveal } from "@/components/ui/Reveal";
 import facts from "@/lib/facts.json";
@@ -31,7 +32,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function AboutPage() {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
+  const instant = usePrefersReducedMotion();
   const { lang, t } = useT();
   const survivors = facts.survivors;
   const byDomain = survivors.reduce<Record<string, typeof survivors>>((acc, s) => {
@@ -44,13 +46,13 @@ export default function AboutPage() {
       <motion.header
         initial={reduce ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        transition={instant ? { duration: 0 } : { duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       >
         <h1 className="display text-4xl font-normal md:text-5xl">{t("meth.title")}</h1>
         <p className="text-ink-soft mt-3 max-w-[58ch] leading-relaxed">{t("meth.lede")}</p>
       </motion.header>
 
-      <div className="border-rule mt-10 grid gap-8 border-y py-8 sm:grid-cols-3">
+      <div className="border-rule mt-10 grid gap-8 border-t pt-8 sm:grid-cols-3">
         <Verdict
           value={String(survivors.length)}
           label={t("meth.beat")}

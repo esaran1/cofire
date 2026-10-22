@@ -5,8 +5,15 @@
 @layer base {
   html,
   body {
-    background: #f4f2ec;
-    color: #17181b;
+    background: #f3f3ee;
+    color: #161a19;
+  }
+
+  /* Paragraphs avoid ending on a single short word ("cell." alone on a line). */
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
   }
 
   /* Every number in this app is tabular, so figures line up in columns and a
@@ -17,8 +24,9 @@
     letter-spacing: -0.01em;
   }
 
-  /* Display statements. The italic carries the emphasis word, in the accent,
-     which is the one typographic move the whole page is built on. */
+  /* Display statements. The italic carries the emphasis word: the one
+     typographic move the whole page is built on. Same colour as the line, so
+     emphasis is made by the type, not by a highlight. */
   .display {
     font-family: var(--font-serif), Georgia, serif;
     font-weight: 300;
@@ -29,7 +37,6 @@
 
   .display em {
     font-style: italic;
-    color: #b33a1a;
     /* Italic descenders need room at display scale. */
     padding-bottom: 0.06em;
   }
@@ -85,9 +92,58 @@
   }
 
   :focus-visible {
-    outline: 2px solid #b33a1a;
+    outline: 2px solid #245e50;
     outline-offset: 2px;
   }
+}
+
+/* The issue scrubber: a hairline track, filled in spruce up to the thumb, and
+   a spruce thumb. The control reads as a control without a heavy coloured bar
+   across the map. --pct is set by the component. */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #245e50 var(--pct, 0%), #d5d8cf var(--pct, 0%));
+}
+.range::-moz-range-track {
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #245e50 var(--pct, 0%), #d5d8cf var(--pct, 0%));
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -7px;
+  border-radius: 9999px;
+  background: #245e50;
+  border: 2px solid #fafaf6;
+  box-shadow: 0 0 0 1px #245e50;
+}
+.range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #245e50;
+  border: 2px solid #fafaf6;
+  box-shadow: 0 0 0 1px #245e50;
+}
+.range:focus-visible {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 1px #245e50, 0 0 0 5px rgba(36, 94, 80, 0.28);
+}
+.range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 1px #245e50, 0 0 0 5px rgba(36, 94, 80, 0.28);
 }
 
 /* The basemap credit (OpenStreetMap, and Protomaps in the deployed build) must
@@ -98,13 +154,13 @@
 .maplibregl-ctrl-top-right .maplibregl-ctrl-attrib {
   margin: 8px 8px 0 0;
   border-radius: 2px;
-  background: rgba(244, 242, 236, 0.85);
+  background: rgba(243, 243, 238, 0.85);
   font-size: 10px;
   line-height: 1.3;
   max-width: 44vw;
 }
 .maplibregl-ctrl-attrib a {
-  color: #3d3f45;
+  color: #383e3c;
 }
 
 /* A hairline rule used as a section divider and as the flanking marks on the
@@ -115,7 +171,7 @@
   display: inline-block;
   width: 2.5rem;
   height: 1px;
-  background: #d9d6cc;
+  background: #d5d8cf;
   vertical-align: middle;
   margin: 0 0.9rem;
 }

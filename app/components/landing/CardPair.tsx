@@ -46,7 +46,7 @@ export function CardPair() {
       <ol className="order-2 space-y-10 lg:order-1">
         {notes.map((n, i) => (
           <li key={n.head} className="grid grid-cols-[2.5rem_1fr] gap-4">
-            <span className="display text-ember text-3xl leading-none">{i + 1}</span>
+            <span className="display text-3xl leading-none text-mute">{i + 1}</span>
             <div>
               <p className="text-ink text-lg font-medium md:text-xl">{n.head}</p>
               <p className="text-ink-soft mt-1.5 leading-relaxed">{n.body}</p>

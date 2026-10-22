@@ -1,13 +1,21 @@
 import type { Config } from "tailwindcss";
 
 /**
- * One palette, locked.
+ * One palette, locked. Four jobs, four colours, and no colour does two jobs.
  *
- * Paper and ink carry the page. The accent is a single deep ember, used for
- * exactly one thing: the primary action and the fire-spread measurement. Drought
- * gets a muted ochre because it is a second data series, not a second brand
- * colour. Slate is the "suppressed / not available" tone, deliberately cool so
- * it reads as absence rather than as a third series.
+ * - Paper and ink carry the page. The neutrals lean faintly green-grey so they
+ *   sit with the accent rather than against it.
+ * - Spruce is the one interface accent: primary actions, links, focus, the
+ *   current place in the site. It is the colour of the forested watersheds the
+ *   forecasts are about, and it is the one hue no data layer uses, so an action
+ *   can never be mistaken for a reading.
+ * - Ink marks a selected option (segmented pickers, the active page, the chosen
+ *   horizon), so "selected" looks the same everywhere.
+ * - Ember and ochre are data, never decoration: ember is fire-spread
+ *   conditions, ochre is drought. Each also carries the one status that shares
+ *   its meaning: ember an error or a correction, ochre a caution notice (the
+ *   seal, stale data, offline). Slate is "suppressed / not available", cool so
+ *   it reads as absence.
  *
  * Radius scale, locked: surfaces 2px (near-sharp, instrument-like), interactive
  * elements full-pill. Nothing else.
@@ -17,19 +25,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "#f4f2ec",
-        "paper-sunk": "#eceae2",
-        "paper-raised": "#faf9f5",
-        ink: "#17181b",
-        "ink-soft": "#3d3f45",
-        mute: "#66686e",
-        rule: "#d9d6cc",
+        paper: "#f3f3ee",
+        "paper-sunk": "#eaebe4",
+        "paper-raised": "#fafaf6",
+        ink: "#161a19",
+        "ink-soft": "#383e3c",
+        mute: "#5f655f",
+        rule: "#d5d8cf",
+        // The interface accent (6.8:1 on paper, and paper on it).
+        spruce: "#245e50",
+        "spruce-deep": "#1b4a3f",
+        "spruce-soft": "#e1e9e3",
+        // Data: fire-spread conditions; also alerts and corrections.
         ember: "#b33a1a",
-        "ember-soft": "#e8ddd6",
-        // Darkened from #9a7420 (2026-10-15) so ochre text on paper and ochre-soft,
-        // and paper text on ochre, meet WCAG AA 4.5:1 (axe, e2e/static/axe.spec.ts).
+        "ember-soft": "#efe1da",
+        // Data: drought. Darkened from #9a7420 (2026-10-15) so ochre text on
+        // paper and ochre-soft, and paper text on ochre, meet WCAG AA 4.5:1.
         ochre: "#7d5e14",
-        "ochre-soft": "#ece5d2",
+        "ochre-soft": "#ede7d4",
         slate: "#4a5568",
       },
       fontFamily: {

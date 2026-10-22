@@ -39,7 +39,7 @@ function plainStyle(): maplibregl.StyleSpecification {
   return {
     version: 8,
     sources: {},
-    layers: [{ id: "bg", type: "background", paint: { "background-color": "#eceae2" } }],
+    layers: [{ id: "bg", type: "background", paint: { "background-color": "#eaebe4" } }],
   } as unknown as maplibregl.StyleSpecification;
 }
 
@@ -68,7 +68,7 @@ function osmStyle(): maplibregl.StyleSpecification {
  * legible on a phone. Glyphs are self-hosted (Noto Sans Regular, OFL), so the
  * deployed map needs no third-party server.
  */
-const INK = "#17181b";
+const INK = "#161a19";
 const LAND = "#1f2126";
 const MUTED = "#2a2d33";
 const ROAD = "#353941";

@@ -53,7 +53,7 @@ test("the map, Place Card and legend switch to Spanish and stay switched", async
   await page.getByTestId("lang-es").click();
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
   await expect(page.getByTestId("dryness-heading")).toHaveText(/Sequedad en \d semanas/);
-  await expect(page.getByTestId("map-legend")).toContainText(/Sequedad|Probabilidad/);
+  await expect(page.getByTestId("map-legend")).toContainText(/sequedad|probabilidad/i);
   await expect(page.getByTestId("lang-notice")).toContainText("Borrador");
   await expect(page.getByTestId("adopt")).toHaveText(/Adoptar|Adoptada/);
   await page.getByRole("button", { name: /Mostrar|Por qué/ }).first().click();

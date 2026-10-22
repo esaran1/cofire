@@ -72,7 +72,11 @@ test("a change's parts sum to the total for every cell and target", () => {
         if (!prev || cell.p[ti] === null || prev.p[ti] === null) continue;
         const ch = decompose(ex, target, { issue: prevIssue, usdm: prev.usdm, erc_pct: prev.erc_pct }, { issue, usdm: cell.usdm, erc_pct: cell.erc_pct }, prev.p[ti], cell.p[ti], regional);
         expect(Math.abs(ch.state + ch.season + ch.method - ch.total)).toBeLessThan(1e-9);
-        if (!regional && target.startsWith("d_")) expect(ch.method).toBe(0); // same method both weeks
+        // Same method both weeks, unless an adopted v1.2 arm (a recalibration)
+        // starts between them: then the method part is exactly that change.
+        const armStarts = ex.live.some((l: { target: string; applies_from: string }) =>
+          l.target === target && prevIssue < l.applies_from && issue >= l.applies_from);
+        if (!regional && target.startsWith("d_") && !armStarts) expect(ch.method).toBe(0);
         checked++;
       }
     });

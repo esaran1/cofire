@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useT } from "@/lib/i18n";
 
 /**
@@ -30,60 +31,48 @@ export function TimeScrubber({
   const idx = Math.max(0, issues.indexOf(issue));
   const single = issues.length <= 1;
 
+  // Each layer button carries a swatch of its own data colour: selection is ink,
+  // as everywhere else, and the swatch keys the button to what the map draws.
+  const layers: { key: "fire" | "drought" | "burden"; label: string; swatch: string; testid?: string }[] = [
+    { key: "fire", label: t("scrub.fire"), swatch: "bg-ember" },
+    { key: "drought", label: t("scrub.drought"), swatch: "bg-ochre" },
+    ...(burden ? [{ key: "burden" as const, label: t("scrub.burden"), swatch: "bg-[#3b2a78]", testid: "layer-burden" }] : []),
+  ];
+  const pill = (on: boolean) =>
+    `inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[13px] transition-colors sm:px-3 sm:py-1.5 sm:text-sm ${
+      on ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
+    }`;
+  const pct = single ? 100 : (idx / Math.max(1, issues.length - 1)) * 100;
+
   return (
-    <div data-testid="time-scrubber" className="absolute inset-x-4 bottom-4 z-20 rounded border border-rule bg-paper/95 p-4 shadow-[0_2px_16px_rgba(23,24,27,0.08)] backdrop-blur">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1" role="group" aria-label={t("scrub.horizon")}>
+    <div data-testid="time-scrubber" className="absolute inset-x-2 bottom-2 z-20 rounded border border-rule bg-paper/95 p-3 shadow-[0_2px_16px_rgba(22,26,25,0.08)] backdrop-blur sm:inset-x-4 sm:bottom-4 sm:p-4">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="flex items-center gap-0.5 sm:gap-1" role="group" aria-label={t("scrub.horizon")}>
           {(["2", "4", "8"] as const).map((h) => (
-            <button
-              key={h}
-              onClick={() => onHorizon(h)}
-              aria-pressed={horizon === h}
-              className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
-                horizon === h ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
-              }`}
-            >
+            <button key={h} onClick={() => onHorizon(h)} aria-pressed={horizon === h} className={pill(horizon === h)}>
               {t("scrub.weeks", { h })}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-1" role="group" aria-label={t("scrub.layer")}>
-          <button
-            onClick={() => onLayer("fire")}
-            aria-pressed={layer === "fire"}
-            className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
-              layer === "fire" ? "bg-ember text-paper" : "text-ink-soft hover:text-ink"
-            }`}
-          >
-            {t("scrub.fire")}
-          </button>
-          <button
-            onClick={() => onLayer("drought")}
-            aria-pressed={layer === "drought"}
-            className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
-              layer === "drought" ? "bg-ochre text-paper" : "text-ink-soft hover:text-ink"
-            }`}
-          >
-            {t("scrub.drought")}
-          </button>
-          {burden ? (
+        <div className="flex items-center gap-0.5 sm:gap-1" role="group" aria-label={t("scrub.layer")}>
+          {layers.map((l) => (
             <button
-              onClick={() => onLayer("burden")}
-              aria-pressed={layer === "burden"}
-              data-testid="layer-burden"
-              className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
-                layer === "burden" ? "bg-[#3b2a78] text-paper" : "text-ink-soft hover:text-ink"
-              }`}
+              key={l.key}
+              onClick={() => onLayer(l.key)}
+              aria-pressed={layer === l.key}
+              data-testid={l.testid}
+              className={pill(layer === l.key)}
             >
-              {t("scrub.burden")}
+              <span aria-hidden className={`h-2 w-2 shrink-0 rounded-[1px] ${l.swatch}`} />
+              {l.label}
             </button>
-          ) : null}
+          ))}
         </div>
       </div>
 
       {!single && (
-        <div className="mt-4">
+        <div className="mt-3 sm:mt-4">
           <label htmlFor="issue-scrub" className="flex items-baseline justify-between text-xs">
             <span className="text-mute">{t("scrub.issue")}</span>
             <span className="num text-ink">{issue || "n/a"}</span>
@@ -95,7 +84,8 @@ export function TimeScrubber({
             max={Math.max(0, issues.length - 1)}
             value={idx}
             onChange={(e) => onIssue(issues[Number(e.target.value)] ?? issue)}
-            className="mt-2 w-full accent-ember"
+            className="range mt-1 w-full"
+            style={{ "--pct": `${pct}%` } as CSSProperties}
           />
         </div>
       )}

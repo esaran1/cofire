@@ -19,8 +19,10 @@ import story from "@/lib/story.json";
  * so trying it here is trying the feature. Nothing is submitted from the
  * landing page; the link carries the reader to the screen that does.
  *
- * Layout is deliberately unequal: Harden leads, because acting on a bad
- * outlook is the point, and the other two stack beside it.
+ * Layout is deliberately unequal: Harden leads, full width, because acting on
+ * a bad outlook is the point; the other two sit side by side beneath it. (It
+ * used to sit beside them, stretched to their combined height, with a block of
+ * empty paper under its three items.)
  */
 
 function Tile({
@@ -38,15 +40,15 @@ function Tile({
 }) {
   const { t } = useT();
   return (
-    <div className={`bg-paper flex flex-col p-7 md:p-10 ${large ? "lg:col-span-3" : ""}`}>
+    <div className={`bg-paper flex flex-col p-7 md:p-10 ${large ? "md:col-span-2" : ""}`}>
       <h4 className={`display ${large ? "text-4xl md:text-5xl" : "text-3xl"}`}>{verb}</h4>
       <p className="text-ink-soft mt-2 max-w-[40ch]">{line}</p>
       <div className="mt-8 flex-1">{children}</div>
       <Link
         href={href}
-        className="text-ember mt-8 inline-flex items-center gap-1.5 text-sm font-medium"
+        className="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-spruce"
       >
-        {t("land.open", { verb: verb.toLowerCase() })}
+        {t("land.open", { verb })}
         <ArrowRight size={15} weight="bold" />
       </Link>
     </div>
@@ -60,7 +62,7 @@ function HardenPreview() {
   const items = story.quick_wins.map((i) => ({ ...i, label: lang === "es" ? (ES_ITEMS[i.id]?.label ?? i.label) : i.label }));
   return (
     <div>
-      <ul className="space-y-2">
+      <ul className="grid gap-2 md:grid-cols-3">
         {items.map((i) => {
           const on = !!done[i.id];
           return (
@@ -68,11 +70,11 @@ function HardenPreview() {
               <button
                 onClick={() => setDone((d) => ({ ...d, [i.id]: !d[i.id] }))}
                 aria-pressed={on}
-                className="border-rule hover:bg-paper-sunk flex w-full items-center gap-3 border px-4 py-3 text-left transition-colors active:scale-[0.99]"
+                className="border-rule hover:bg-paper-sunk flex h-full w-full items-center gap-3 border px-4 py-3 text-left transition-colors active:scale-[0.99]"
               >
                 <span
                   className={`flex h-5 w-5 shrink-0 items-center justify-center border transition-colors ${
-                    on ? "border-ember bg-ember text-paper" : "border-rule"
+                    on ? "border-spruce bg-spruce text-paper" : "border-rule"
                   }`}
                 >
                   {on ? <Check size={13} weight="bold" /> : null}
@@ -99,7 +101,6 @@ function PredictPreview() {
       value={v}
       onChange={setV}
       label={t("land.yourCall")}
-      tone="ochre"
     />
   );
 }
@@ -109,25 +110,23 @@ function ObservePreview() {
   const { t } = useT();
   const opts = OBSERVATION_TYPES.map((o) => ({ ...o, label: t(`obs.type.${o.value}` as MessageKey) }));
   return (
-    <Segmented options={opts} value={v} onChange={setV} label={t("land.youSaw")} tone="ochre" />
+    <Segmented options={opts} value={v} onChange={setV} label={t("land.youSaw")} />
   );
 }
 
 export function ActPreviews() {
   const { t } = useT();
   return (
-    <div className="bg-rule grid gap-px overflow-hidden border border-rule lg:grid-cols-5">
+    <div className="bg-rule grid gap-px overflow-hidden border border-rule md:grid-cols-2">
       <Tile verb={t("nav.harden")} line={t("land.harden")} href="/ember" large>
         <HardenPreview />
       </Tile>
-      <div className="bg-rule grid gap-px lg:col-span-2">
-        <Tile verb={t("nav.predict")} line={t("land.predict")} href="/beat">
-          <PredictPreview />
-        </Tile>
-        <Tile verb={t("nav.observe")} line={t("land.observe")} href="/observe">
-          <ObservePreview />
-        </Tile>
-      </div>
+      <Tile verb={t("nav.predict")} line={t("land.predict")} href="/beat">
+        <PredictPreview />
+      </Tile>
+      <Tile verb={t("nav.observe")} line={t("land.observe")} href="/observe">
+        <ObservePreview />
+      </Tile>
     </div>
   );
 }
