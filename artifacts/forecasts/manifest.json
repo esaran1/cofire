@@ -326,5 +326,13 @@
   "bytes": 56850,
   "published_at": "2026-10-16T21:33:00Z",
   "backfilled": false
+ },
+ {
+  "issue": "2026-10-20",
+  "file": "2026-10-20.json.gz",
+  "sha256": "a0c2585f3b9645297271d578de465654ecf0c2df2a5c9b99aec54c0942526dee",
+  "bytes": 55256,
+  "published_at": "2026-10-23T21:35:23Z",
+  "backfilled": false
  }
 ]

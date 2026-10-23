@@ -1,23 +1,23 @@
 {
  "brief": {
-  "issue": "2026-10-13",
-  "prevIssue": "2026-10-06",
+  "issue": "2026-10-20",
+  "prevIssue": "2026-10-13",
   "denver": {
    "id": "denver",
    "label": "Denver",
    "cells": 52,
-   "dryNow": 62.6,
-   "dryNowPrev": 39.0,
-   "dryAhead": 54.7,
+   "dryNow": 39.5,
+   "dryNowPrev": 62.6,
+   "dryAhead": 46.7,
    "f80": {
-    "mean": 0.2276,
+    "mean": 0.1415,
     "state": "probability"
    },
    "f90": {
-    "mean": 0.1004,
+    "mean": 0.0505,
     "state": "probability"
    },
-   "f80Prev": 0.1395,
+   "f80Prev": 0.2276,
    "rows": [
     {
      "cat": 3,
@@ -42,18 +42,18 @@
     "id": "upper_south_platte",
     "label": "Upper South Platte",
     "cells": 202,
-    "dryNow": 59.3,
-    "dryNowPrev": 29.5,
-    "dryAhead": 52.8,
+    "dryNow": 22.9,
+    "dryNowPrev": 59.3,
+    "dryAhead": 42.5,
     "f80": {
-     "mean": 0.2083,
+     "mean": 0.1069,
      "state": "probability"
     },
     "f90": {
-     "mean": 0.0867,
+     "mean": 0.0334,
      "state": "probability"
     },
-    "f80Prev": 0.1231,
+    "f80Prev": 0.2083,
     "rows": [
      {
       "cat": 4,
@@ -85,18 +85,18 @@
     "id": "dillon",
     "label": "Dillon",
     "cells": 79,
-    "dryNow": 60.0,
-    "dryNowPrev": 41.9,
-    "dryAhead": 52.5,
+    "dryNow": 35.2,
+    "dryNowPrev": 60.0,
+    "dryAhead": 46.3,
     "f80": {
-     "mean": 0.2045,
+     "mean": 0.1355,
      "state": "probability"
     },
     "f90": {
-     "mean": 0.085,
+     "mean": 0.0478,
      "state": "probability"
     },
-    "f80Prev": 0.1549,
+    "f80Prev": 0.2045,
     "rows": [
      {
       "cat": 4,
