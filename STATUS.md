@@ -1,5 +1,12 @@
 # STATUS: v1.3 (2026-10-15), first cut of the film rendered
 
+## Frozen for judging, 2026-10-24
+
+The code is frozen for the 2026 Congressional App Challenge (submission
+closes 2026-10-26 12:00 ET; tag `cac-2026-submission`). Until December, the
+only commits to `main` are the scheduled weekly data refresh (forecast data,
+never code). Any other change waits until judging ends.
+
 ## v1.3, 2026-10-15
 
 | Stage | State |

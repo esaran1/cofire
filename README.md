@@ -10,7 +10,7 @@ COFIRE gives calibrated odds of drought and of the conditions that let fire spre
 |---|---|
 | [`cofire/model/`](cofire/model/) | The frozen model at `FREEZE_COMMIT` (configuration A: Markov drought, damped-persistence logistic fire, damped regression dryness), hash-checked |
 | [`cofire/ship/`](cofire/ship/), [`cofire/v12/`](cofire/v12/), [`cofire/v13/`](cofire/v13/) | The shipped path: fetch and vintages, weekly export, rendering decisions, bundles, explanations, open data, the forecast record |
-| [`app/`](app/) | The Next.js app, served as a static site |
+| [`app/`](app/) | The Next.js app: prerendered pages reading the forecasts as static files, and an API (`cofire/deploy/`) for Predict and Observe |
 | [`tests/`](tests/), [`app/e2e/`](app/e2e/) | Python tests and browser tests |
 | Gates | [`tests/test_frozen_model.py`](tests/test_frozen_model.py) (configuration hash), [`tests/test_delayed_feedback_gate.py`](tests/test_delayed_feedback_gate.py) (no update uses the future), [`tests/test_shipped_path.py`](tests/test_shipped_path.py) (research never ships; shipped code documented), [`scripts/check_stats.py`](scripts/check_stats.py) and [`scripts/check_copy.py`](scripts/check_copy.py) (no hard-coded numbers, no overclaiming) |
 | [`research/`](research/) | What was tried and does not ship, and why |
