@@ -3179,3 +3179,25 @@ dependency; the map and the other tools are unchanged.
   - The main suite passes 91 with 1 skipped, on a throwaway database.
 - **On branch `interface-refinements`.** `main` is frozen for judging at tag
   `cac-2026-submission`; merging is the owner's call.
+
+## Why the app felt slow while browsing locally, 2026-10-25
+
+The owner found pages slow to open while navigating. Measured, not guessed:
+- **The cause was the development server.** It compiles each page on its
+  first visit, and every page pulled in about 10,850 modules because the
+  icons are imported by name from `@phosphor-icons/react`, whose root
+  re-exports all ~3,000 icons. First visits took 0.4 to 5.5 s (5.5 s for the
+  homepage, 2.2 s for Harden).
+- **The fix is one line**, `experimental.optimizePackageImports` for the icon
+  package in `next.config.mjs`, which rewrites each import to the one icon it
+  names. Modules per page fell to about 1,800, the homepage's first compile
+  to 1.9 s (including server start), and every other page's to 120 to 160 ms.
+- **Production was never slow, and is unchanged.**
+  - The build already tree-shook the icons: shared JavaScript is 103 kB
+    before and after.
+  - Every page loads in 35 to 245 ms on this machine, and moving between
+    pages from the navigation bar takes 20 to 120 ms.
+  - Lighthouse mobile is still 94 on the map and the place card.
+- **The data was never the bottleneck.** A map view downloads 5 to 20 kB of
+  compressed forecast, and the local API answers in a few milliseconds.
+- The static suite passes 86 of 86 with the change.
