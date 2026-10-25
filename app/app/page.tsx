@@ -21,6 +21,7 @@ import type { Bundle, DomainsIndex } from "@/lib/schemas";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
 import { DOMAIN_LABELS } from "@/lib/domainNames";
+import { useEdgeFade } from "@/lib/useEdgeFade";
 
 // MapLibre is most of this page's script. Loaded on its own, it no longer holds
 // back the panel beside it, which is what a reader (and Lighthouse) sees first.
@@ -51,6 +52,9 @@ export default function HomePage() {
   // The linked cell applies to the first load only; after that the card follows
   // the reader's clicks and area changes.
   const linkedCell = useRef<string | undefined>(undefined);
+  // The panel scrolls on its own; its bottom edge fades while there is more below.
+  const panel = useRef<HTMLElement>(null);
+  useEdgeFade(panel, place?.cell_id);
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
@@ -208,7 +212,7 @@ export default function HomePage() {
 
   return (
     <div className="grid h-[calc(100dvh-4.0625rem)] grid-rows-[55dvh_1fr] overflow-hidden lg:grid-cols-[24rem_1fr] lg:grid-rows-1">
-      <aside className="row-start-2 overflow-y-auto border-t border-rule bg-paper-raised lg:col-start-1 lg:row-start-1 lg:border-r lg:border-t-0">
+      <aside ref={panel} className="edge-fade row-start-2 overflow-y-auto border-t border-rule bg-paper-raised lg:col-start-1 lg:row-start-1 lg:border-r lg:border-t-0">
         <div className="p-6 pb-0">
           <h1 className="display text-2xl" data-testid="map-title">
             {meta?.label ?? DOMAIN_LABELS[domain] ?? t("map.loading")}

@@ -3139,3 +3139,40 @@ after (the place card's scrolling panel captured separately).
   - The fonts, the map's data ramps, and the brand's fire-coloured "FIRE".
   - The film, which still shows the old palette in its captures; re-capturing
     is a separate render.
+
+## Three interaction ideas taken from Skiper UI, written from scratch, 2026-10-25
+
+The owner pointed to the Skiper UI component library. Its terms grant
+personal use only and forbid copying or redistributing its material, and its
+premium components cost $129, so no source was taken. Of its 106 components,
+most are landing-page and portfolio effects (preloaders, parallax, carousels,
+cursor trails) that would work against a forecast meant to be trusted. Three
+ideas answered real gaps in this app. Each was written here in plain CSS and
+a few lines of React: no new dependency, and nothing that loads the animation
+library on the map page, which is kept off it for speed.
+- **Edge fade on scrolling areas** (idea: "Scroll with fade effect").
+  - The map's side panel holds about 2,400 px of content in an 835 px
+    window, and a clean bottom edge gave no hint of the odds, watersheds and
+    actions below. The edge now fades while there is more to scroll, and the
+    fade leaves at the end (`lib/useEdgeFade.ts`).
+  - The same applies to the cell list.
+- **Rolling digits** (idea: "Number flow").
+  - When the reader switches horizon or issue, the dryness figure and the
+    odds change silently. Now only the characters that changed roll into
+    place (`components/ui/RollingNumber.tsx`).
+  - The text content is always exactly the value shown, nothing moves on
+    first render, and the reduced-motion rule stops it.
+  - The odds rows are keyed without their horizon, so a row updates in place
+    rather than remounting.
+- **A week timeline under the issue slider** (idea: "Timeline calendar").
+  - One tick per weekly issue, a taller one and a short month name where each
+    month starts, lined up with the thumb's travel.
+  - The bare slider gave no sense of the 42 issues or the season.
+- **Checked:**
+  - The 86 accessibility and smoke checks pass on the static build. The main
+    suite passes 91 with 1 skipped, on a throwaway database.
+  - Lighthouse mobile medians are unchanged: map 94, place card 94,
+    accessibility and best practices 100. Layout shift is 0.024, against
+    0.017 before.
+- **On a branch** (`interface-refinements`): `main` is frozen for judging at
+  tag `cac-2026-submission`, and merging is the owner's call.
