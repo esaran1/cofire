@@ -7,6 +7,11 @@ closes 2026-10-26 12:00 ET; tag `cac-2026-submission`). Until December, the
 only commits to `main` are the scheduled weekly data refresh (forecast data,
 never code). Any other change waits until judging ends.
 
+One change was made after the tag, at the owner's request on 2026-10-25:
+homepage motion (the photo reveal, the word-by-word thesis, rolling labels,
+a tile spotlight) and a development-server fix (icons compiled per page). The
+map and the other tools are unchanged. See `docs/DECISIONS.md`.
+
 ## v1.3, 2026-10-15
 
 | Stage | State |
