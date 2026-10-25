@@ -13,6 +13,7 @@ import { SealedTimeline } from "@/components/landing/SealedTimeline";
 import { Stage } from "@/components/landing/Stage";
 import { StoryMap } from "@/components/landing/StoryMap";
 import { LineReveal, ReadingProgress, RecedingHero } from "@/components/landing/Scroll";
+import { RollText, ScrollWords } from "@/components/landing/Flourish";
 import facts from "@/lib/facts.json";
 import { useT } from "@/lib/i18n";
 
@@ -56,10 +57,10 @@ export default function LandingPage() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full bg-spruce px-6 py-3 font-medium text-paper hover:bg-spruce-deep transition-transform active:scale-[0.98]"
+            className="group inline-flex items-center gap-2 rounded-full bg-spruce px-6 py-3 font-medium text-paper transition-[transform,background-color] hover:bg-spruce-deep active:scale-[0.98]"
           >
-            {t("nav.openMap")}
-            <ArrowRight size={17} weight="bold" />
+            <RollText>{t("nav.openMap")}</RollText>
+            <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </Link>
         </motion.div>
       </RecedingHero>
@@ -107,9 +108,9 @@ export default function LandingPage() {
       <Chapter
         tinted
         title={
-          <>
-            {t("land.trust1")} <em>{t("land.trustEm")}</em>.
-          </>
+          <ScrollWords
+            segments={[{ text: t("land.trust1") }, { text: t("land.trustEm"), em: true }, { text: ".", join: true }]}
+          />
         }
       >
         <CardPair />
@@ -169,10 +170,10 @@ export default function LandingPage() {
           />
           <Link
             href="/"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-paper px-6 py-3 font-medium text-ink transition-transform hover:bg-paper-raised active:scale-[0.98]"
+            className="group mt-10 inline-flex items-center gap-2 rounded-full bg-paper px-6 py-3 font-medium text-ink transition-[transform,background-color] hover:bg-paper-raised active:scale-[0.98]"
           >
-            {t("nav.openMap")}
-            <ArrowRight size={17} weight="bold" />
+            <RollText>{t("nav.openMap")}</RollText>
+            <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </Link>
         </div>
       </section>
@@ -240,22 +241,29 @@ function PhotoChapter({
 }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReduceMotion();
-  const instant = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  // The photograph arrives as a framed plate and opens to the full width as
+  // its section rises into view: the calm of the title gives way to the fire.
+  // It is fully open by the time the headline is in the reading zone.
+  const enter = useScroll({ target: ref, offset: ["start end", "start 0.25"] }).scrollYProgress;
+  const inset = useTransform(enter, [0, 1], [7, 0]);
+  const clipPath = useTransform(inset, (v) => `inset(${v}% ${v * 0.75}% ${v}% ${v * 0.75}% round ${v > 0.2 ? 2 : 0}px)`);
   return (
-    <section ref={ref} className="relative flex min-h-[100dvh] items-end overflow-hidden bg-ink">
-      <motion.img
-        src={src}
-        alt={alt}
-        style={reduce ? undefined : { y, scale: 1.14 }}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      {/* Scrim so the headline passes contrast over any part of the photo. */}
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent"
-        aria-hidden
-      />
+    <section ref={ref} className="relative flex min-h-[100dvh] items-end overflow-hidden bg-paper">
+      <motion.div className="absolute inset-0 overflow-hidden bg-ink" style={reduce ? undefined : { clipPath }}>
+        <motion.img
+          src={src}
+          alt={alt}
+          style={reduce ? undefined : { y, scale: 1.14 }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* Scrim so the headline passes contrast over any part of the photo. */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent"
+          aria-hidden
+        />
+      </motion.div>
       <div className="measure relative w-full px-6 pb-20 md:pb-28">
         <div className="reveal">{children}</div>
         <p className="text-paper/55 mt-12 text-xs">{credit}</p>
