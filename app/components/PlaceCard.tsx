@@ -14,7 +14,6 @@ import { type CellState, type Explain, categoryOf, decompose, frequency, monthOf
 import { IconArray, WeeksLikeThis, WhyChanged, eventPhrase, frequencySentence } from "./Explain";
 import { LINKS } from "@/lib/links";
 import { Disclosure } from "./ui/Controls";
-import { RollingNumber } from "./ui/RollingNumber";
 import { WatershedPanel } from "./WatershedPanel";
 
 const HCHIPS = ["2", "4", "8"] as const;
@@ -92,7 +91,7 @@ function ErcBlock({ hz, erc }: { hz: Horizon | undefined; erc?: number | null })
   return (
     <>
       <p className="text-ember display text-5xl font-normal" data-testid="erc-point">
-        <RollingNumber value={point.toFixed(0)} />
+        {point.toFixed(0)}
       </p>
 
       {hasInterval ? (
@@ -225,7 +224,7 @@ function TargetRow({ name, t: target, kind, place, prev, prevTarget, explain }: 
                 className={hidden ? "text-mute shrink-0 whitespace-nowrap text-xs" : "num text-ink shrink-0 text-sm"}
                 data-testid={hidden ? "target-not-shown" : "target-percent"}
               >
-                {hidden ? t("card.notShown") : <RollingNumber value={formatProbability(p)} />}
+                {hidden ? t("card.notShown") : formatProbability(p)}
               </span>
             </div>
             {sentence ? (
@@ -402,9 +401,7 @@ export function PlaceCard({
           <ul className="mt-1">
             {targets.map(([name, t]) => (
               <TargetRow
-                // Keyed by the target without its horizon, so switching 2w/4w/8w
-                // updates each row in place and its figure rolls to the new value.
-                key={name.replace(/_h\d+$/, "")}
+                key={name}
                 name={name}
                 t={t}
                 kind={meta?.kind}

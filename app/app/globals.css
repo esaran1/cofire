@@ -146,59 +146,6 @@
   box-shadow: 0 0 0 1px #245e50, 0 0 0 5px rgba(36, 94, 80, 0.28);
 }
 
-/* A digit that changed rolls up into place (components/ui/RollingNumber).
-   Inline-block so the transform applies; the clip keeps the travel inside the
-   line. The reduced-motion rule below cuts it to nothing. */
-.digit-roll {
-  display: inline-block;
-  animation: digit-roll 420ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes digit-roll {
-  from {
-    transform: translateY(0.55em);
-    opacity: 0;
-    clip-path: inset(0 0 0.55em 0);
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-/* Edge fade for a scrolling area (lib/useEdgeFade sets the attributes). The
-   lengths are registered so the fade itself eases in and out rather than
-   snapping. */
-@property --fade-top {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --fade-bottom {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-.edge-fade {
-  --fade-top: 0px;
-  --fade-bottom: 0px;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
-  transition: --fade-top 200ms ease, --fade-bottom 200ms ease;
-}
-.edge-fade[data-fade-top] {
-  --fade-top: 24px;
-}
-.edge-fade[data-fade-bottom] {
-  --fade-bottom: 56px;
-}
-@media print {
-  .edge-fade {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-}
-
 /* The basemap credit (OpenStreetMap, and Protomaps in the deployed build) must
    be visible on the map. Styled to sit quietly in the top-right corner. */
 .maplibregl-ctrl-logo {

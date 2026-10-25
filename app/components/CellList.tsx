@@ -1,9 +1,8 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import type { MapCell } from "./MapView";
 import { useT } from "@/lib/i18n";
-import { useEdgeFade } from "@/lib/useEdgeFade";
 
 /**
  * Every cell on the map as a list of buttons: the screen-reader and keyboard
@@ -23,8 +22,6 @@ export function CellList({
   onSelect: (c: MapCell) => void;
 }) {
   const { t } = useT();
-  const list = useRef<HTMLUListElement>(null);
-  useEdgeFade(list, cells.length);
   const sorted = useMemo(() => [...cells].sort((a, b) => (b.value ?? -1) - (a.value ?? -1)), [cells]);
   if (cells.length === 0) return null;
   const describe = (v: number | null) => {
@@ -40,7 +37,7 @@ export function CellList({
       <p className="px-3 text-[11px] leading-relaxed text-mute">
         {layer === "fire" ? t("map.listHintFire") : t("map.listHintDrought")}
       </p>
-      <ul ref={list} className="edge-fade mt-1 max-h-72 overflow-y-auto border-t border-rule">
+      <ul className="mt-1 max-h-72 overflow-y-auto border-t border-rule">
         {sorted.map((c) => {
           const on = c.id === selectedId;
           return (

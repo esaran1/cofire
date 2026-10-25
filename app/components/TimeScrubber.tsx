@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { locale, useT } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 
 /**
  * Map controls. Floats over the map because it controls the map, but it is a
@@ -27,7 +27,7 @@ export function TimeScrubber({
   /** Offer the EnviroScreen neighborhoods layer (Denver only). */
   burden?: boolean;
 }) {
-  const { lang, t } = useT();
+  const { t } = useT();
   const idx = Math.max(0, issues.indexOf(issue));
   const single = issues.length <= 1;
 
@@ -43,15 +43,6 @@ export function TimeScrubber({
       on ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
     }`;
   const pct = single ? 100 : (idx / Math.max(1, issues.length - 1)) * 100;
-  // The week timeline under the slider: one tick per weekly issue, a taller one
-  // and a short month name where each month starts. Positions follow the
-  // thumb's travel (16 px wide, so its centre runs from 8 px to 100% - 8 px).
-  const at = (i: number) => `calc(8px + (100% - 16px) * ${i / Math.max(1, issues.length - 1)})`;
-  const monthStarts = issues
-    .map((iso, i) => ({ iso, i }))
-    .filter(({ iso, i }) => i === 0 || issues[i - 1].slice(0, 7) !== iso.slice(0, 7));
-  const monthName = (iso: string) =>
-    new Date(`${iso}T12:00:00Z`).toLocaleDateString(locale(lang), { month: "short", timeZone: "UTC" });
 
   return (
     <div data-testid="time-scrubber" className="absolute inset-x-2 bottom-2 z-20 rounded border border-rule bg-paper/95 p-3 shadow-[0_2px_16px_rgba(22,26,25,0.08)] backdrop-blur sm:inset-x-4 sm:bottom-4 sm:p-4">
@@ -96,29 +87,6 @@ export function TimeScrubber({
             className="range mt-1 w-full"
             style={{ "--pct": `${pct}%` } as CSSProperties}
           />
-          <div aria-hidden className="relative -mt-1 h-5 select-none" data-testid="issue-timeline">
-            {issues.map((iso, i) => {
-              const starts = monthStarts.some((m) => m.i === i);
-              return (
-                <span
-                  key={iso}
-                  className={`absolute top-0 w-px ${starts ? "h-2 bg-ink-soft/50" : "h-1 bg-rule"}`}
-                  style={{ left: at(i) }}
-                />
-              );
-            })}
-            {monthStarts.map(({ iso, i }) => (
-              <span
-                key={`m-${iso}`}
-                className={`absolute top-2.5 text-[10px] leading-none text-mute ${
-                  i / Math.max(1, issues.length - 1) > 0.92 ? "-translate-x-full" : ""
-                }`}
-                style={{ left: at(i) }}
-              >
-                {monthName(iso)}
-              </span>
-            ))}
-          </div>
         </div>
       )}
       {single && issue && (
