@@ -173,7 +173,9 @@ need the `pipeline` extra (`make setup`, or
 `uv sync --extra dev --extra pipeline`). CI's `api-slim` job runs the entry
 point on the slim set alone (`scripts/check_api_slim.py`). Vercel offers
 Python 3.12 and later only, so both services build on 3.12; local runs and
-CI keep the 3.11 in `.python-version`. The web build installs the `site`
+CI use 3.11 (`UV_PYTHON` in the Makefile and the workflows). There is no
+`.python-version` file, because uv would refuse a 3.11 pin in Vercel's
+Python build. The web build installs the `site`
 extra (geopandas, pyarrow), not the whole pipeline.
 
 **If the API cannot read the bundles** (the check's leaderboard line

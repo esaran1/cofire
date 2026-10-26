@@ -25,8 +25,8 @@ TOOLS="$PWD/.vercel-tools"
 export PATH="$TOOLS:$PATH"
 # Install exactly what uv.lock pins; never re-resolve during a deploy.
 export UV_FROZEN=1
-# Vercel offers Python 3.12 and later only; its build cannot fetch the 3.11
-# that .python-version names for local runs and CI. The site build reads the
+# Vercel offers Python 3.12 and later only; local runs and CI use 3.11
+# (UV_PYTHON in the Makefile and the workflows). The site build reads the
 # committed export and runs no model, so 3.12 changes nothing it writes.
 export UV_PYTHON=3.12
 export NEXT_TELEMETRY_DISABLED=1

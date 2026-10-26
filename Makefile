@@ -2,6 +2,9 @@
 
 export COFIRE_DEV_SUBSET ?= 1
 UV ?= uv
+# Local runs use Python 3.11, as CI does (there is no .python-version file:
+# Vercel's Python build offers 3.12 only and uv would refuse a 3.11 pin there).
+export UV_PYTHON ?= 3.11
 PY := $(UV) run python
 API_HOST ?= 127.0.0.1
 API_PORT ?= 8000

@@ -3225,3 +3225,19 @@ twin with an identical tree and a new ID. AI use is still disclosed in
 - **The original history** is kept outside the repository as a git bundle,
   with a list of every old ref, so the old IDs can be shown to resolve to the
   same trees if anyone asks.
+
+## No `.python-version` file, so the API builds on Vercel, 2026-10-26
+
+Every deploy's `api` service failed at its install step: Vercel's Python
+build offers 3.12 only and says it ignores `.python-version` (3.11), but it
+installs with `uv sync --active --frozen`, and uv honours the file, finds no
+3.11 and stops ("No interpreter found for Python 3.11"). The web service was
+already building on 3.12 through `UV_PYTHON` in `scripts/vercel_build.sh`.
+- **The file is gone; the pin moved to where it is used.** `UV_PYTHON: "3.11"`
+  at the top of every workflow (CI, smoke, links, refresh) and
+  `export UV_PYTHON ?= 3.11` in the Makefile. CI's `api-slim` job sets 3.12,
+  as Vercel runs the API.
+- **Checked locally:** Vercel's exact install command on a fresh 3.12
+  environment now installs and the API imports; `api-slim` passes on 3.12;
+  the local `.venv` stays on 3.11.
+- `requires-python` stays `>=3.11`.

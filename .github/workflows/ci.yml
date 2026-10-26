@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
 
+# The project runs on Python 3.11 here, as in local development. (There is no
+# .python-version file: Vercel's Python build offers 3.12 only, and uv would
+# refuse a 3.11 pin there. Jobs that test 3.12 pass --python 3.12, which wins.)
+env:
+  UV_PYTHON: "3.11"
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -41,6 +47,9 @@ jobs:
   # point on exactly that set, and fail if it imports a pipeline package.
   api-slim:
     runs-on: ubuntu-latest
+    # The API as Vercel runs it: Python 3.12, the project's runtime dependencies only.
+    env:
+      UV_PYTHON: "3.12"
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4

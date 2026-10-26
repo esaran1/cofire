@@ -15,6 +15,12 @@ on:
 permissions:
   contents: read
 
+# The project runs on Python 3.11 here, as in local development. (There is no
+# .python-version file: Vercel's Python build offers 3.12 only, and uv would
+# refuse a 3.11 pin there. Jobs that test 3.12 pass --python 3.12, which wins.)
+env:
+  UV_PYTHON: "3.11"
+
 jobs:
   links:
     runs-on: ubuntu-latest
