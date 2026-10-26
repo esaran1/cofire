@@ -11,7 +11,7 @@
  */
 
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
+import { usePrefersReducedMotion, useReduceMotion, useSmooth } from "@/lib/motion";
 import { ReactNode, useRef } from "react";
 
 /**
@@ -48,18 +48,31 @@ export function ReadingProgress() {
  * Hero that recedes as you leave it. The next section then reads as arriving
  * over the top of it rather than simply following it.
  */
-export function RecedingHero({ children }: { children: ReactNode }) {
+export function RecedingHero({ children, backdrop }: { children: ReactNode; backdrop?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReduceMotion();
-  const instant = usePrefersReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const raw = useScroll({ target: ref, offset: ["start start", "end start"] }).scrollYProgress;
+  const scrollYProgress = useSmooth(raw);
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const blur = useTransform(scrollYProgress, [0.15, 0.8], ["blur(0px)", "blur(6px)"]);
+  // The backdrop moves the other way: it grows and drifts up as the title
+  // recedes, so the page opens into the map rather than sliding past it.
+  const backScale = useTransform(scrollYProgress, [0, 1], [1, 1.18]);
+  const backY = useTransform(scrollYProgress, [0, 1], [0, -70]);
 
   return (
-    <section ref={ref} className="relative flex min-h-[88dvh] items-center justify-center px-6 pt-16">
-      <motion.div style={reduce ? undefined : { opacity, scale, y }} className="text-center">
+    <section
+      ref={ref}
+      className="relative flex min-h-[88dvh] items-center justify-center overflow-hidden px-6 pt-16"
+    >
+      {backdrop ? (
+        <motion.div className="absolute inset-0 will-change-transform" style={reduce ? undefined : { scale: backScale, y: backY }}>
+          {backdrop}
+        </motion.div>
+      ) : null}
+      <motion.div style={reduce ? undefined : { opacity, scale, y, filter: blur }} className="relative text-center will-change-transform">
         {children}
       </motion.div>
     </section>
@@ -166,4 +179,24 @@ export function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?
   const text = useTransform(v, (n) => `${n.toFixed(decimals)}${suffix}`);
   if (reduce) return <span>{`${to.toFixed(decimals)}${suffix}`}</span>;
   return <motion.span ref={ref}>{text}</motion.span>;
+}
+
+/**
+ * Settles into place as it arrives: from slightly smaller, with softer corners,
+ * to full size. Scale only, so the content is whole at every scroll position
+ * (a screenshot or print shows it at nearly full size). Used on the two
+ * pictures of the product, the map and the card.
+ */
+export function ZoomIn({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReduceMotion();
+  const raw = useScroll({ target: ref, offset: ["start end", "start 0.3"] }).scrollYProgress;
+  const p = useSmooth(raw);
+  const scale = useTransform(p, [0, 1], [0.88, 1]);
+  const y = useTransform(p, [0, 1], [60, 0]);
+  return (
+    <motion.div ref={ref} className={`will-change-transform ${className}`} style={reduce ? undefined : { scale, y, transformOrigin: "50% 30%" }}>
+      {children}
+    </motion.div>
+  );
 }

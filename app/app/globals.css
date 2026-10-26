@@ -146,6 +146,29 @@
   box-shadow: 0 0 0 1px #245e50, 0 0 0 5px rgba(36, 94, 80, 0.28);
 }
 
+/* Homepage tiles: a faint spruce light under the pointer
+   (components/landing/ActPreviews). Pointer devices only; it sits behind the
+   tile's content and never takes a click. */
+.spotlight > * {
+  position: relative;
+  z-index: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(360px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(36, 94, 80, 0.09), transparent 65%);
+    transition: opacity 300ms ease;
+  }
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+}
+
 /* The basemap credit (OpenStreetMap, and Protomaps in the deployed build) must
    be visible on the map. Styled to sit quietly in the top-right corner. */
 .maplibregl-ctrl-logo {

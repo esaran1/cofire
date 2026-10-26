@@ -31,7 +31,7 @@ COLUMNS: list[tuple[str, list[tuple[str, list[str]]]]] = [
         ("vintages", ["vintages", "every fetch kept,", "each issue pinned"]),
     ]),
     ("Frozen model", [
-        ("model", ["cofire/model @ 46c17ae", "configuration A:", "Markov drought, damped", "logistic fire, damped", "regression dryness"]),
+        ("model", ["cofire/model @ 1d3b2c5", "configuration A:", "Markov drought, damped", "logistic fire, damped", "regression dryness"]),
         ("seal", ["2026 sealed", "looks counted;", "unseal 2027-01-12"]),
     ]),
     ("Ship layer", [

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Check } from "@phosphor-icons/react";
 import { Segmented } from "@/components/ui/Animated";
+import { RollText } from "@/components/landing/Flourish";
 import { OBSERVATION_TYPES, droughtCategories } from "@/lib/options";
 import { useT } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/en";
@@ -40,16 +41,26 @@ function Tile({
 }) {
   const { t } = useT();
   return (
-    <div className={`bg-paper flex flex-col p-7 md:p-10 ${large ? "md:col-span-2" : ""}`}>
+    <div
+      // A faint spruce light follows the pointer across the tile (.spotlight in
+      // globals.css): an invitation to try the working miniature inside. The
+      // position goes straight to CSS variables, so React never re-renders.
+      onPointerMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.setProperty("--spot-x", `${e.clientX - r.left}px`);
+        e.currentTarget.style.setProperty("--spot-y", `${e.clientY - r.top}px`);
+      }}
+      className={`spotlight bg-paper relative flex flex-col p-7 md:p-10 ${large ? "md:col-span-2" : ""}`}
+    >
       <h4 className={`display ${large ? "text-4xl md:text-5xl" : "text-3xl"}`}>{verb}</h4>
       <p className="text-ink-soft mt-2 max-w-[40ch]">{line}</p>
       <div className="mt-8 flex-1">{children}</div>
       <Link
         href={href}
-        className="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-spruce"
+        className="group mt-8 inline-flex items-center gap-1.5 self-start text-sm font-medium text-spruce"
       >
-        {t("land.open", { verb })}
-        <ArrowRight size={15} weight="bold" />
+        <RollText>{t("land.open", { verb })}</RollText>
+        <ArrowRight size={15} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
       </Link>
     </div>
   );

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { asset } from "@/lib/asset";
 import { motion, useScroll, useTransform } from "motion/react";
-import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
+import { usePrefersReducedMotion, useReduceMotion, useSmooth } from "@/lib/motion";
 import { useRef } from "react";
 import { ArrowRight } from "@phosphor-icons/react";
 import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigure";
@@ -12,7 +12,9 @@ import { CardPair } from "@/components/landing/CardPair";
 import { SealedTimeline } from "@/components/landing/SealedTimeline";
 import { Stage } from "@/components/landing/Stage";
 import { StoryMap } from "@/components/landing/StoryMap";
-import { LineReveal, ReadingProgress, RecedingHero } from "@/components/landing/Scroll";
+import { ReadingProgress, RecedingHero, ZoomIn } from "@/components/landing/Scroll";
+import { Letters, Magnetic, RollText, ScrollWords } from "@/components/landing/Flourish";
+import { HeroField } from "@/components/landing/HeroField";
 import facts from "@/lib/facts.json";
 import { useT } from "@/lib/i18n";
 
@@ -30,15 +32,10 @@ export default function LandingPage() {
       {/* 1. Hero. Centered is allowed here: this is a launch statement and the
           message is the design (skill 4.3 override). It recedes on scroll so
           the first section arrives over it. */}
-      <RecedingHero>
-        <motion.h1
-          initial={reduce ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={instant ? { duration: 0 } : { duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="display text-[clamp(3.5rem,11vw,11rem)] leading-[0.95]"
-        >
-          CO<em>FIRE</em>
-        </motion.h1>
+      <RecedingHero backdrop={<HeroField />}>
+        <h1 className="display text-[clamp(3.5rem,11vw,11rem)] leading-[0.95]">
+          <Letters plain="CO" em="FIRE" />
+        </h1>
         <motion.p
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -54,13 +51,15 @@ export default function LandingPage() {
           transition={instant ? { duration: 0 } : { duration: 0.7, delay: 0.4 }}
           className="mt-12 flex flex-wrap items-center justify-center gap-3"
         >
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-full bg-spruce px-6 py-3 font-medium text-paper hover:bg-spruce-deep transition-transform active:scale-[0.98]"
-          >
-            {t("nav.openMap")}
-            <ArrowRight size={17} weight="bold" />
-          </Link>
+          <Magnetic>
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-2 rounded-full bg-spruce px-6 py-3 font-medium text-paper transition-[transform,background-color] hover:bg-spruce-deep active:scale-[0.98]"
+            >
+              <RollText>{t("nav.openMap")}</RollText>
+              <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
+          </Magnetic>
         </motion.div>
       </RecedingHero>
 
@@ -96,10 +95,12 @@ export default function LandingPage() {
       {/* 3. What COFIRE does, shown as the forecast itself. */}
       <section className="border-t border-rule px-6 py-24 md:py-32">
         <div className="measure w-full">
-          <StoryMap
-            title={<>{t("land.forecasts")}</>}
-            line={<>{t("land.every", { km: facts.resolution_m / 1000 })}</>}
-          />
+          <ZoomIn>
+            <StoryMap
+              title={<>{t("land.forecasts")}</>}
+              line={<>{t("land.every", { km: facts.resolution_m / 1000 })}</>}
+            />
+          </ZoomIn>
         </div>
       </section>
 
@@ -107,17 +108,19 @@ export default function LandingPage() {
       <Chapter
         tinted
         title={
-          <>
-            {t("land.trust1")} <em>{t("land.trustEm")}</em>.
-          </>
+          <ScrollWords
+            segments={[{ text: t("land.trust1") }, { text: t("land.trustEm"), em: true }, { text: ".", join: true }]}
+          />
         }
       >
-        <CardPair />
+        <ZoomIn>
+          <CardPair />
+        </ZoomIn>
       </Chapter>
 
       {/* 5. The discipline behind the claim. */}
       <Chapter
-        title={<>{t("land.locked")}</>}
+        title={<ScrollWords segments={[{ text: t("land.locked") }]} />}
         line={<>{t("land.lockedLine")}</>}
       >
         <SealedTimeline />
@@ -127,7 +130,7 @@ export default function LandingPage() {
           test with the delay a real forecaster faces. */}
       <Stage
         tinted
-        claim={<>{t("land.flaw")}</>}
+        claim={<ScrollWords segments={[{ text: t("land.flaw") }]} />}
         detail={
           <>
             {t("land.flawDetail1")}{" "}
@@ -146,7 +149,7 @@ export default function LandingPage() {
 
       {/* 7. Where it fell short, and what the app did about it. */}
       <Stage
-        claim={<>{t("land.drift")}</>}
+        claim={<ScrollWords segments={[{ text: t("land.drift") }]} />}
         detail={<>{t("land.driftDetail", { n: look.by_test["5"].n_total - look.by_test["5"].n_pass })}</>}
       >
         <ReliabilityFigure
@@ -163,17 +166,20 @@ export default function LandingPage() {
       {/* 7. Close. */}
       <section className="border-t border-rule bg-ink px-6 py-20 text-paper">
         <div className="measure">
-          <LineReveal
-            className="display max-w-[20ch] text-4xl text-paper md:text-6xl"
-            lines={[<>{t("land.see")}</>]}
-          />
-          <Link
-            href="/"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-paper px-6 py-3 font-medium text-ink transition-transform hover:bg-paper-raised active:scale-[0.98]"
-          >
-            {t("nav.openMap")}
-            <ArrowRight size={17} weight="bold" />
-          </Link>
+          <p className="display max-w-[20ch] text-4xl md:text-6xl">
+            <ScrollWords tone="dark" segments={[{ text: t("land.see") }]} />
+          </p>
+          <div className="mt-10">
+            <Magnetic>
+              <Link
+                href="/"
+                className="group inline-flex items-center gap-2 rounded-full bg-paper px-6 py-3 font-medium text-ink transition-[transform,background-color] hover:bg-paper-raised active:scale-[0.98]"
+              >
+                <RollText>{t("nav.openMap")}</RollText>
+                <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
+              </Link>
+            </Magnetic>
+          </div>
         </div>
       </section>
     </>
@@ -227,6 +233,9 @@ function Chapter({
  * animates position only, starting from rest, so the photograph is always
  * visible whether or not the animation runs.
  */
+/** The photograph's side inset, as a share of its top and bottom inset. */
+const SIDE_INSET = 0.75;
+
 function PhotoChapter({
   src,
   alt,
@@ -240,22 +249,31 @@ function PhotoChapter({
 }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReduceMotion();
-  const instant = usePrefersReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const scrollYProgress = useSmooth(useScroll({ target: ref, offset: ["start end", "end start"] }).scrollYProgress);
   const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  // The photograph arrives as a framed plate and opens to the full width as
+  // its section rises into view: the calm of the title gives way to the fire.
+  // It is fully open by the time the headline is in the reading zone.
+  // Offsets as [target, viewport] fractions: from the section's top at the
+  // bottom of the screen to its top a quarter of the way down.
+  const enter = useSmooth(useScroll({ target: ref, offset: [[0, 1], [0, 0.25]] }).scrollYProgress);
+  const inset = useTransform(enter, [0, 1], [7, 0]);
+  const clipPath = useTransform(inset, (v) => `inset(${v}% ${v * SIDE_INSET}% ${v}% ${v * SIDE_INSET}% round ${v > 0.2 ? 2 : 0}px)`);
   return (
-    <section ref={ref} className="relative flex min-h-[100dvh] items-end overflow-hidden bg-ink">
-      <motion.img
-        src={src}
-        alt={alt}
-        style={reduce ? undefined : { y, scale: 1.14 }}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      {/* Scrim so the headline passes contrast over any part of the photo. */}
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent"
-        aria-hidden
-      />
+    <section ref={ref} className="relative flex min-h-[100dvh] items-end overflow-hidden bg-paper">
+      <motion.div className="absolute inset-0 overflow-hidden bg-ink" style={reduce ? undefined : { clipPath }}>
+        <motion.img
+          src={src}
+          alt={alt}
+          style={reduce ? undefined : { y, scale: 1.14 }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* Scrim so the headline passes contrast over any part of the photo. */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent"
+          aria-hidden
+        />
+      </motion.div>
       <div className="measure relative w-full px-6 pb-20 md:pb-28">
         <div className="reveal">{children}</div>
         <p className="text-paper/55 mt-12 text-xs">{credit}</p>

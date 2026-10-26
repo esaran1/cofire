@@ -7,6 +7,11 @@ closes 2026-10-26 12:00 ET; tag `cac-2026-submission`). Until December, the
 only commits to `main` are the scheduled weekly data refresh (forecast data,
 never code). Any other change waits until judging ends.
 
+One change was made after the tag, at the owner's request on 2026-10-25:
+homepage motion (the photo reveal, the word-by-word thesis, rolling labels,
+a tile spotlight) and a development-server fix (icons compiled per page). The
+map and the other tools are unchanged. See `docs/DECISIONS.md`.
+
 ## v1.3, 2026-10-15
 
 | Stage | State |
@@ -158,7 +163,7 @@ fire family choice is unchanged in all 9 targets. Record in
 | 5, artifacts | 34656 rows, 38 issues to 2026-09-22, rendering stored per target |
 | 6, product | every figure from artifacts, contamination-era content removed |
 | 7, verification | all checks green, clone to running 201s, 20 screenshots |
-| 8, merge | `daee4a8`, pushed to origin/main |
+| 8, merge | `094b3ad`, pushed to origin/main |
 
 ## The rule that governs every skill claim
 
@@ -236,6 +241,6 @@ the rule.
 
 ## What ships
 
-`cofire/model/` is frozen at `46c17ae` and `tests/test_frozen_model.py` holds it
+`cofire/model/` is frozen at `1d3b2c5` and `tests/test_frozen_model.py` holds it
 there. `cofire/ship/` reads the frozen model and fits nothing. Any further work
 on the model requires a new preregistration; the current one is spent.

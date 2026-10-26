@@ -1766,7 +1766,7 @@ rendering.
 ## v1.1 Stage 5 results: 21 survivors over five domains, no cross-domain agreement
 
 `cofire/ship/survivors_v11.py`, run after the rules above were committed
-(79f6989). Output `artifacts/v11/survivors_v11.csv` and
+(28e6c07). Output `artifacts/v11/survivors_v11.csv` and
 `survivors_v11_summary.json`.
 
 **Reproduction check.** Larimer and Pueblo recomputed through the new runner
@@ -2660,7 +2660,7 @@ the unseal, when 2026 outcomes may be used.
 
 ### Two fixes found on the way
 
-- **The site build failed on `f0f665b`.** `next/font/google` could not parse
+- **The site build failed on `46a7bb5`.** `next/font/google` could not parse
   the font URLs Google Fonts returned. The three OFL families are now
   committed in `app/fonts/` (the same latin files, byte for byte) and loaded
   with `next/font/local`, so the build fetches nothing.
@@ -3139,3 +3139,89 @@ after (the place card's scrolling panel captured separately).
   - The fonts, the map's data ramps, and the brand's fire-coloured "FIRE".
   - The film, which still shows the old palette in its captures; re-capturing
     is a separate render.
+
+## Homepage motion: four ideas from Skiper UI, written from scratch, 2026-10-25
+
+The owner asked for premium components from the Skiper UI library on the
+homepage. A first pass put three of its ideas into the map (an edge fade,
+rolling digits, a week timeline); the owner wanted the homepage, not the
+working tools, so that commit was reverted. Skiper UI's terms forbid copying
+its material, so nothing from it is used: each piece below is original code
+with the homepage's existing animation library (Motion) and plain CSS. No new
+dependency; the map and the other tools are unchanged.
+- **The fire photograph opens as it arrives** (idea: "Scroll images
+  reveal"). It enters as a framed plate and widens to full bleed by the time
+  its section is a quarter of the way up the screen, so the calm title gives
+  way to the fire. The headline is never over plain paper: it only comes
+  into view once the frame is open. The slow parallax stays.
+- **The thesis darkens word by word** (idea: "Text Scroll animation"): "Most
+  forecasts show a number. This one says when the number cannot be trusted."
+  - Each word goes from the muted text colour to ink as it passes through
+    the reading zone. It never starts invisible, so the line is whole without
+    JavaScript, and it is static under reduced motion.
+  - Its text content is exactly the sentence.
+- **Rolling labels** (idea: "Text roll navigation") on the two "Open the map"
+  buttons and the tile links. On hover or keyboard focus the label rolls up
+  and a copy rolls in (the copy is hidden from screen readers).
+- **A pointer spotlight on the Harden, Predict and Observe tiles** (idea:
+  "Gradient hover cards").
+  - A faint spruce light follows the pointer, inviting a try of the working
+    miniature. The position goes straight to CSS variables, never through
+    React state.
+  - It only runs on pointer devices and never takes a click.
+- **Not used:** the rest of the 106 (preloaders, carousels, cursor trails,
+  3D text, parallax stacks). A preloader delays the forecast, and most of the
+  rest is decoration that would compete with the evidence.
+- **Checked:**
+  - No console errors or warnings, with and without reduced motion.
+  - The static suite passes 86 of 86, after one parallel-load flake on the
+    forecast record; 20 of 20 reruns passed.
+  - The main suite passes 91 with 1 skipped, on a throwaway database.
+- **On branch `interface-refinements`.** `main` is frozen for judging at tag
+  `cac-2026-submission`; merging is the owner's call.
+
+## Why the app felt slow while browsing locally, 2026-10-25
+
+The owner found pages slow to open while navigating. Measured, not guessed:
+- **The cause was the development server.** It compiles each page on its
+  first visit, and every page pulled in about 10,850 modules because the
+  icons are imported by name from `@phosphor-icons/react`, whose root
+  re-exports all ~3,000 icons. First visits took 0.4 to 5.5 s (5.5 s for the
+  homepage, 2.2 s for Harden).
+- **The fix is one line**, `experimental.optimizePackageImports` for the icon
+  package in `next.config.mjs`, which rewrites each import to the one icon it
+  names. Modules per page fell to about 1,800, the homepage's first compile
+  to 1.9 s (including server start), and every other page's to 120 to 160 ms.
+- **Production was never slow, and is unchanged.**
+  - The build already tree-shook the icons: shared JavaScript is 103 kB
+    before and after.
+  - Every page loads in 35 to 245 ms on this machine, and moving between
+    pages from the navigation bar takes 20 to 120 ms.
+  - Lighthouse mobile is still 94 on the map and the place card.
+- **The data was never the bottleneck.** A map view downloads 5 to 20 kB of
+  compressed forecast, and the local API answers in a few milliseconds.
+- The static suite passes 86 of 86 with the change.
+
+## Commit history rewritten; recorded commit IDs updated, 2026-10-26
+
+At the owner's request, the history was rewritten to remove the AI
+co-author line from commit messages (157 of 169 commits). Only messages
+changed: every commit keeps its files, author and date, so each one has a
+twin with an identical tree and a new ID. AI use is still disclosed in
+`AI_USAGE.md` and in the film, unchanged.
+- **The freeze commit.** The model was frozen at the commit formerly
+  `46c17ae4aac2bef2d1397e422755104284f71667`; its twin is
+  `1d3b2c5b4104b07aa76bb5a1e1007721f176d4ed`, with the identical tree
+  (`3aeb343e0ed5fd2411ef4c4bd99d0df15b61dfef`). `artifacts/FREEZE_COMMIT`,
+  the look 3 provenance records, the facts files and the demo copies now
+  name the new ID; the frozen-model check compares the same files as before.
+- **Every other recorded commit ID** (24 references in 17 files: the build
+  sha in the facts, history notes in STATUS, DECISIONS, README, the leak
+  sweep, the shown-radius audit, the architecture diagram) was mapped to its
+  twin by tree, author and date, keeping each reference's length. No
+  recorded checksum covers any of these files.
+- **Not changed:** the `cac-2026-submission` tag (the code submitted for
+  judging) still names the old freeze ID inside its files.
+- **The original history** is kept outside the repository as a git bundle,
+  with a list of every old ref, so the old IDs can be shown to resolve to the
+  same trees if anyone asks.

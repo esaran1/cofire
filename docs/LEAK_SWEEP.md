@@ -108,7 +108,7 @@ weeks of labels were outcomes from January and February 2026, the sealed year.
 The radius is no longer computed or carried by the export
 (`cofire/ship/export.py`). The values that were shown are kept for the record in
 `artifacts/audit/shown_radius.json`, restored from the export at commit
-`1e31eba`, and the audit reads them from there.
+`7d57596`, and the audit reads them from there.
 
 Everything else the export carries is fit on the training split only: point
 forecasts, probabilities, the seasonal base rates, and the typical-range
