@@ -31,7 +31,7 @@ import { webpackOverride } from "./webpack.mjs";
 
 const what = process.argv[2] ?? "animatic";
 const TL = timeline();
-const MAX_RENDER_MIN = 60;
+const MAX_RENDER_MIN = Number(process.env.FILM_MAX_MIN ?? 60);
 const IDLE_MIN = 10;
 const CONCURRENCY = Number(process.env.FILM_CONCURRENCY ?? 5);
 mkdirSync(join(OUT, "parts"), { recursive: true });

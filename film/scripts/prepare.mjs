@@ -318,6 +318,7 @@ field("ext_strontia_spoken", "About eighty percent", "as ext_strontia_pct", "Cer
 field("ext_strontia_src", "Denver Water, Sept. 9, 2017", "as ext_strontia_pct", "Denver Water, 9 de sept. de 2017");
 field("ext_sediment", "1,000,000+", "Denver Water, 'The legacy of Colorado's largest wildfire' (2017-06-16): 'more than 1 million cubic yards of sediment accumulating in Strontia Springs Reservoir', retrieved 2026-10-25");
 field("ext_sediment_src", "Denver Water, June 16, 2017", "as ext_sediment", "Denver Water, 16 de junio de 2017");
+field("ext_half_src", "Denver Water, June 29, 2021", "Denver Water, 'Where does your water come from?' (2021-06-29): 'Denver Water collects around 50% of its drinking water from tributaries of the Colorado River ... on the west side of the Continental Divide', retrieved 2026-10-25", "Denver Water, 29 de junio de 2021");
 const demoBundle = json("app/out/data/domains/denver/2026-10-06.json");
 const demoCell = demoBundle.cells.find((c) => c.id === "39.7333_-104.9750");
 const demoP = demoCell.p[demoBundle.targets.indexOf("d_ge2_h4")];

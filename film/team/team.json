@@ -1,7 +1,19 @@
 {
-  "note": "Fill in each person's real name and what they actually did. Until a name is filled in, the film shows a marked placeholder and RULES_CHECK fails for the final render.",
-  "P1": { "name": "", "role": "The Data Wrangler" },
-  "P2": { "name": "", "role": "The Probability Person" },
-  "P3": { "name": "", "role": "The Pixel Pusher" },
-  "P4": { "name": "", "role": "The Translator" }
+  "note": "Names from the team; titles from the second script (film/SCRIPT_V2 (1).md). Adjust a title to what that person actually did.",
+  "P1": {
+    "name": "Evan Saran",
+    "role": "Lead Developer"
+  },
+  "P2": {
+    "name": "Shivam Bansal",
+    "role": "Data and Research Lead"
+  },
+  "P3": {
+    "name": "Larissa Ornelas",
+    "role": "Product Designer"
+  },
+  "P4": {
+    "name": "Aedan Hernandez",
+    "role": "Outreach and Accessibility Lead"
+  }
 }

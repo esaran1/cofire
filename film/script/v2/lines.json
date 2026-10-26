@@ -1,278 +1,280 @@
 {
- "note": "COFIRE film v2. Lines from film/SCRIPT_V2.md with the factual corrections listed in film/v2/CHANGES.md. {field} values come from public/data/film.json (scripts/prepare.mjs). Each line is anchored to a beat (script/v2/beats.json) at an offset; scripts/v2/build.mjs places it and reports overflow. `rules` names the CAC requirement a line satisfies (film/RULES_CHECK.md). Spanish is a draft for review by a fluent speaker.",
+ "note": "COFIRE film v2, second script (film/SCRIPT_V2 (1).md, SLIDES_V2 (2).md), with the factual corrections in film/v2/CHANGES.md. {field} values come from public/data/film.json. Lines run back to back inside their beat (no dead air over half a second, except the opening trace and the turn); `rules` names the CAC requirement a line satisfies. Spanish is a draft for review.",
  "speakers": {
   "P1": {
-   "voice": "Samantha",
-   "label": "P1"
+   "voice": "Samantha"
   },
   "P2": {
-   "voice": "Daniel",
-   "label": "P2"
+   "voice": "Daniel"
   },
   "P3": {
-   "voice": "Flo (English (US))",
-   "label": "P3"
+   "voice": "Flo (English (US))"
   },
   "P4": {
-   "voice": "Eddy (English (US))",
-   "label": "P4"
+   "voice": "Eddy (English (US))"
   },
   "ALL": {
-   "voice": "ALL",
-   "label": "ALL"
+   "voice": "ALL"
   }
  },
  "lines": [
   {
-   "id": "cold1",
-   "speaker": "P1",
-   "beat": "cold",
-   "at": 0.4,
-   "en": "{ext_drought_spoken} of Colorado. In drought.",
-   "es": "El {ext_drought_pct} de Colorado. En sequía."
+   "id": "tap1",
+   "speaker": "P2",
+   "beat": "open",
+   "en": "Turn on a tap in Denver.",
+   "es": "Abra una llave en Denver.",
+   "at": 1.5
   },
   {
-   "id": "cold2",
+   "id": "tap2",
    "speaker": "P2",
-   "beat": "cold",
-   "at": 3.0,
+   "beat": "open",
+   "en": "About half of that water starts here, on the other side of the mountains.",
+   "es": "Cerca de la mitad de esa agua nace aquí, al otro lado de las montañas.",
+   "at": 3.4
+  },
+  {
+   "id": "tap3",
+   "speaker": "P3",
+   "beat": "open",
+   "en": "This year, here looked like this.",
+   "es": "Este año, esto se veía así.",
+   "at": 8.7
+  },
+  {
+   "id": "num1",
+   "speaker": "P1",
+   "beat": "open",
+   "en": "{ext_drought_spoken} of Colorado is in drought.",
+   "es": "El {ext_drought_pct} de Colorado está en sequía.",
+   "gap": 0.5
+  },
+  {
+   "id": "num2",
+   "speaker": "P1",
+   "beat": "open",
    "en": "{ext_strontia_spoken} of Denver's drinking water passes through one reservoir.",
-   "es": "Cerca del {ext_strontia_pct} del agua potable de Denver pasa por un solo embalse."
+   "es": "Cerca del {ext_strontia_pct} del agua potable de Denver pasa por un solo embalse.",
+   "gap": 0.5
   },
   {
-   "id": "cold3",
-   "speaker": "P3",
-   "beat": "cold",
-   "at": 6.6,
-   "en": "And after two fires, more than a million cubic yards of mud ended up in it.",
-   "es": "Y después de dos incendios, más de un millón de yardas cúbicas de lodo terminaron en él."
-  },
-  {
-   "id": "cold4",
-   "speaker": "P4",
-   "beat": "cold",
-   "at": 12.2,
-   "en": "...okay, that was intense. Hi.",
-   "es": "...bueno, eso fue intenso. Hola."
-  },
-  {
-   "id": "intro1",
+   "id": "num3",
    "speaker": "P1",
-   "beat": "card1",
-   "at": 0.25,
-   "rules": [
-    "participants"
-   ],
-   "en": "I'm {name_p1}. The data pipeline. I've read more drought reports than any teenager should.",
-   "es": "Soy {name_p1}. La canalización de datos. He leído más informes de sequía de los que debería un adolescente."
+   "beat": "open",
+   "en": "And after two past fires, more than a million cubic yards of mud ended up in it.",
+   "es": "Y después de dos incendios, más de un millón de yardas cúbicas de lodo terminaron en él.",
+   "gap": 0.5
   },
   {
-   "id": "intro2",
-   "speaker": "P2",
-   "beat": "card2",
-   "at": 0.25,
-   "rules": [
-    "participants"
-   ],
-   "en": "I'm {name_p2}. The forecasting model. Strong opinions about base rates. Don't ask.",
-   "es": "Soy {name_p2}. El modelo de pronóstico. Opiniones firmes sobre las tasas base. No pregunten."
-  },
-  {
-   "id": "intro3",
-   "speaker": "P3",
-   "beat": "card3",
-   "at": 0.25,
-   "rules": [
-    "participants"
-   ],
-   "en": "I'm {name_p3}. I designed the app. Calm colors, because fire is bright enough.",
-   "es": "Soy {name_p3}. Diseñé la aplicación. Colores tranquilos, porque el fuego ya es bastante brillante."
-  },
-  {
-   "id": "intro4",
+   "id": "num4",
    "speaker": "P4",
-   "beat": "card4",
-   "at": 0.25,
-   "rules": [
-    "participants"
-   ],
-   "en": "And I'm {name_p4}. Spanish and accessibility, so it works for more of Denver than our group chat.",
-   "es": "Y yo soy {name_p4}. Español y accesibilidad, para que sirva a más gente de Denver que nuestro chat de grupo."
+   "beat": "open",
+   "en": "And from Denver, almost nobody can see it coming.",
+   "es": "Y desde Denver, casi nadie lo ve venir.",
+   "gap": 0.45
   },
   {
-   "id": "intro5",
+   "id": "team1",
+   "speaker": "P1",
+   "beat": "team1",
+   "en": "So four of us built something. I'm {name_p1}, lead developer.",
+   "es": "Así que cuatro de nosotros construimos algo. Soy {name_p1}, desarrollador principal.",
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "team2",
+   "speaker": "P2",
+   "beat": "team2",
+   "en": "I'm {name_p2}, data and research.",
+   "es": "Soy {name_p2}, datos e investigación.",
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "team3",
+   "speaker": "P3",
+   "beat": "team3",
+   "en": "I'm {name_p3}, design.",
+   "es": "Soy {name_p3}, diseño.",
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "team4",
+   "speaker": "P4",
+   "beat": "team4",
+   "en": "And I'm {name_p4}, outreach and Spanish.",
+   "es": "Y yo soy {name_p4}, difusión y español.",
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "team5",
    "speaker": "ALL",
    "beat": "logo",
-   "at": 0.2,
+   "en": "This is COFIRE.",
+   "es": "Esto es COFIRE.",
    "rules": [
     "app_name"
    ],
-   "en": "We are COFIRE.",
-   "es": "Somos COFIRE."
+   "glance": true
   },
   {
-   "id": "stakes1",
+   "id": "team6",
    "speaker": "P1",
-   "beat": "stakes_map",
-   "at": 0.3,
-   "en": "Here's the thing. Denver feels far from wildfire. But about half of Denver's water comes from the other side of the Continental Divide, from forests that can burn.",
-   "es": "El asunto es este. Denver parece lejos de los incendios. Pero cerca de la mitad del agua de Denver viene del otro lado de la Divisoria Continental, de bosques que pueden arder."
-  },
-  {
-   "id": "stakes2",
-   "speaker": "P2",
-   "beat": "purpose",
-   "at": 0.2,
-   "en": "So we built COFIRE.",
-   "es": "Por eso creamos COFIRE."
+   "beat": "clock",
+   "en": "And we have {timer_minutes}. Let's go.",
+   "es": "Y tenemos {timer_minutes}. Vamos.",
+   "timer_words": true
   },
   {
    "id": "purpose",
-   "speaker": "P2",
+   "speaker": "P1",
    "beat": "purpose",
-   "at": 1.6,
+   "en": "COFIRE gives Denver residents plain-language odds of drought and fire danger, for their neighborhood and for the watersheds their water comes from.",
+   "es": "COFIRE ofrece a los residentes de Denver probabilidades en lenguaje sencillo de sequía y peligro de incendio, para su vecindario y para las cuencas de donde viene su agua.",
    "rules": [
     "purpose"
-   ],
-   "en": "COFIRE gives Denver residents plain-language odds of drought and fire danger, for their neighborhood and for the watersheds their water comes from.",
-   "es": "COFIRE ofrece a los residentes de Denver probabilidades en lenguaje sencillo de sequía y peligro de incendio, para su vecindario y para las cuencas de donde viene su agua."
+   ]
   },
   {
    "id": "audience",
    "speaker": "P3",
    "beat": "audience",
-   "at": 0.2,
+   "en": "It's built for Denver residents, in English and Spanish, and for the people who look out for them: neighbors, community gardeners, teachers, and city staff.",
+   "es": "Está hecho para los residentes de Denver, en inglés y en español, y para quienes los cuidan: vecinos, jardineros comunitarios, maestros y personal de la ciudad.",
    "rules": [
     "audience"
-   ],
-   "en": "It's for Denver residents, in English and Spanish, and for the people who serve them: neighborhood groups, gardeners, teachers, and city staff.",
-   "es": "Es para los residentes de Denver, en inglés y en español, y para quienes los atienden: grupos vecinales, jardineros, maestros y personal de la ciudad."
+   ]
   },
   {
    "id": "demo1",
    "speaker": "P3",
-   "beat": "demo_pick",
-   "at": 0.4,
+   "beat": "demo1",
+   "en": "Say you run a community garden in Denver. You open COFIRE.",
+   "es": "Digamos que usted lleva un huerto comunitario en Denver. Abre COFIRE.",
    "rules": [
     "functionality"
-   ],
-   "en": "Pick your spot.",
-   "es": "Elija su lugar."
+   ]
   },
   {
    "id": "demo2",
    "speaker": "P3",
-   "beat": "demo_icons",
-   "at": 0.6,
-   "en": "You get odds, not jargon. In a hundred weeks like this one, about {demo_freq_n} were in severe drought a month later.",
-   "es": "Recibe probabilidades, no jerga. En cien semanas como esta, unas {demo_freq_n} estaban en sequía severa un mes después."
-  },
-  {
-   "id": "demo3",
-   "speaker": "P2",
-   "beat": "demo_weeks",
-   "at": 0.2,
-   "en": "And it shows its work. These are the real past weeks that looked like today, and what happened next.",
-   "es": "Y muestra su trabajo. Estas son las semanas pasadas reales que se parecían a hoy, y lo que pasó después."
+   "beat": "demo2",
+   "en": "No jargon. Just odds. In a hundred weeks like this one, about {demo_freq_n} were in severe drought four weeks later.",
+   "es": "Sin jerga. Solo probabilidades. En cien semanas como esta, unas {demo_freq_n} estaban en sequía severa cuatro semanas después."
   },
   {
    "id": "demo4",
    "speaker": "P1",
-   "beat": "demo_ws",
-   "at": 0.2,
-   "en": "Then the part nobody else shows you: where your water comes from. Fire danger upstream, east and west of the Divide.",
-   "es": "Luego, lo que nadie más le muestra: de dónde viene su agua. El peligro de incendio río arriba, al este y al oeste de la Divisoria."
+   "beat": "demo4",
+   "en": "Then the part most drought maps don't show you: your water. Fire danger upstream, on both sides of the Divide.",
+   "es": "Luego, lo que la mayoría de los mapas de sequía no muestran: su agua. El peligro de incendio río arriba, a ambos lados de la Divisoria."
   },
   {
    "id": "demo5",
    "speaker": "P4",
-   "beat": "demo_es",
-   "at": 0.1,
-   "en": "One tap, and the whole thing is in Spanish.",
-   "es": "Un toque, y todo está en español."
+   "beat": "demo5",
+   "en": "Your neighbor speaks Spanish? One tap.",
+   "es": "¿Su vecino habla español? Un toque."
   },
   {
    "id": "demo6",
    "speaker": "P4",
-   "beat": "demo_brief",
-   "at": 0.2,
-   "en": "And every week, it prints a one-page brief, in both languages, for anyone who isn't going to open an app.",
-   "es": "Y cada semana imprime un resumen de una página, en los dos idiomas, para quien no va a abrir una aplicación."
+   "beat": "demo6",
+   "en": "Not on a phone at all? Every week, COFIRE makes a one-page brief, in both languages, for the bulletin board.",
+   "es": "¿No usa teléfono? Cada semana, COFIRE hace un resumen de una página, en los dos idiomas, para el tablero de anuncios."
+  },
+  {
+   "id": "demo7",
+   "speaker": "P1",
+   "beat": "demo7",
+   "en": "And it keeps itself honest. Every new forecast is time-stamped before its outcome is known, so anyone can check it later.",
+   "es": "Y se mantiene honesto. Cada pronóstico nuevo lleva fecha y hora antes de conocerse el resultado, para que cualquiera pueda verificarlo después."
   },
   {
    "id": "slide1",
    "speaker": "P1",
    "beat": "slide1",
-   "at": 0.3,
+   "en": "Under the hood: Python for the data pipeline and models. TypeScript, React, and Next.js for the app. MapLibre for the map. GitHub Actions refreshes everything every week. We used AI coding tools, and our repo documents exactly where.",
+   "es": "Por dentro: Python para la canalización de datos y los modelos. TypeScript, React y Next.js para la aplicación. MapLibre para el mapa. GitHub Actions lo actualiza todo cada semana. Usamos herramientas de programación con IA, y nuestro repositorio documenta exactamente dónde.",
    "rules": [
     "tools"
-   ],
-   "en": "Python for the data and models. TypeScript, React, and Next.js for the app. MapLibre for the map. GitHub Actions runs the weekly update. We used AI coding tools, and our repo documents exactly where.",
-   "es": "Python para los datos y los modelos. TypeScript, React y Next.js para la aplicación. MapLibre para el mapa. GitHub Actions hace la actualización semanal. Usamos herramientas de programación con IA, y nuestro repositorio documenta exactamente dónde."
+   ]
+  },
+  {
+   "id": "slide2",
+   "speaker": "P2",
+   "beat": "slide2",
+   "en": "{years_history_spoken} years of drought and fire-danger data, and every download checked before we trust it.",
+   "es": "{years_history} años de datos de sequía y de peligro de incendio, y cada descarga verificada antes de confiar en ella."
   },
   {
    "id": "slide3",
    "speaker": "P2",
    "beat": "slide3",
-   "at": 0.3,
-   "en": "We tried {n_ml_spoken} machine-learning models, one of them a neural network. The simple one won, and you can explain it in one sentence.",
-   "es": "Probamos {n_ml} modelos de aprendizaje automático, uno de ellos una red neuronal. Ganó el sencillo, y se puede explicar en una frase."
+   "en": "We tried {n_ml_spoken} machine-learning models. The simplest approach won: look at every week like today from {train_start} to {train_end}, and count what happened next. And you can explain it in one sentence.",
+   "es": "Probamos {n_ml} modelos de aprendizaje automático. Ganó el enfoque más sencillo: mirar cada semana como hoy, de {train_start} a {train_end}, y contar lo que pasó después. Y se puede explicar en una frase."
   },
   {
-   "id": "slide4a",
+   "id": "slide4",
    "speaker": "P2",
    "beat": "slide4",
-   "at": 0.3,
-   "en": "We locked away {holdout} before testing, and counted every look. We checked every result against shuffled data. {n_survivors_spoken} forecasts beat their baselines.",
-   "es": "Guardamos bajo llave {holdout} antes de probar, y contamos cada vistazo. Comparamos cada resultado con datos mezclados. {n_survivors} pronósticos superaron su referencia."
+   "en": "Then we locked away {holdout} before testing, and counted every look. {n_survivors_spoken} forecasts beat their baselines.",
+   "es": "Luego guardamos bajo llave {holdout} antes de probar, y contamos cada vistazo. {n_survivors} pronósticos superaron su referencia."
   },
   {
-   "id": "slide4b",
+   "id": "turn1",
    "speaker": "P3",
-   "beat": "slide4",
-   "at": 0.0,
-   "en": "And when we found a bug in our own best result, we took it out of the app and said why.",
-   "es": "Y cuando encontramos un error en nuestro mejor resultado, lo quitamos de la aplicación y explicamos por qué."
+   "beat": "turn",
+   "en": "One of our results looked perfect. That's what worried us.",
+   "es": "Uno de nuestros resultados se veía perfecto. Eso fue lo que nos preocupó.",
+   "at": 0.6
   },
   {
-   "id": "glance",
-   "speaker": "P4",
-   "beat": "glance",
-   "at": 0.2,
-   "timer": true,
-   "en": "{timer_spoken} seconds. We're fine.",
-   "es": "{timer_left} segundos. Vamos bien."
+   "id": "turn2",
+   "speaker": "P1",
+   "beat": "turn",
+   "en": "We dug in, found a flaw in how we'd tested it, and pulled it from the app. Now COFIRE says plainly when it can't back up a number.",
+   "es": "Investigamos, encontramos un error en cómo lo habíamos probado, y lo quitamos de la aplicación. Ahora COFIRE dice claramente cuándo no puede respaldar una cifra."
   },
   {
    "id": "close1",
    "speaker": "P4",
-   "beat": "close_map",
-   "at": 0.3,
-   "en": "Next: the rest of the Front Range, and the brief in every neighborhood that needs it.",
-   "es": "Lo siguiente: el resto de la Cordillera Frontal, y el resumen en cada vecindario que lo necesite."
+   "beat": "close",
+   "en": "Next, we want to cover the whole Front Range, and get the brief into every neighborhood that needs it.",
+   "es": "Lo siguiente: cubrir toda la Cordillera Frontal, y llevar el resumen a cada vecindario que lo necesite.",
+   "at": 0.4
   },
   {
    "id": "close2",
-   "speaker": "P1",
-   "beat": "endcard",
-   "at": 0.2,
-   "rules": [
-    "app_name"
-   ],
-   "en": "COFIRE. Free, and updated every week.",
-   "es": "COFIRE. Gratis, y actualizado cada semana."
+   "speaker": "P2",
+   "beat": "close",
+   "en": "So the next time you turn on the tap...",
+   "es": "Así que la próxima vez que abra la llave..."
   },
   {
    "id": "close3",
+   "speaker": "P1",
+   "beat": "close",
+   "en": "...you'll know where it's been, and the odds of what's coming.",
+   "es": "...sabrá de dónde viene, y las probabilidades de lo que viene."
+  },
+  {
+   "id": "close4",
    "speaker": "ALL",
    "beat": "endcard",
-   "at": 2.8,
+   "en": "We're COFIRE.",
+   "es": "Somos COFIRE.",
    "rules": [
-    "participants"
-   ],
-   "names": true,
-   "en": "{name_p1}. {name_p2}. {name_p3}. {name_p4}.",
-   "es": "{name_p1}. {name_p2}. {name_p3}. {name_p4}."
+    "app_name"
+   ]
   }
  ]
 }

@@ -1,4 +1,100 @@
-# COFIRE demo film: review
+# Film v2: self-review
+
+The brief asked for three viewings of the full render at real speed. I can't
+watch a video in real time, so each pass below was done on the rendered
+master instead:
+
+- **Picture:** stills at every beat (and at each slide framing and each cold
+  open step), read as a viewer would see them.
+- **Cuts and stillness:** ffmpeg scene detection (at a coarse and a fine
+  threshold), black detection and freeze detection over the whole file.
+- **Sound:** silence detection and EBU R128 loudness on the mix, and a check
+  that the music track is silent during the turn.
+- **Rules:** the build's own checklist (`RULES_CHECK.md`), which fails the
+  build if any required item is missing.
+
+The team should still watch it once at real speed before submitting, ideally
+on a phone.
+
+## Pass 1: as a congressional staffer (is it clear, credible, and about the district?)
+
+| Found | Changed |
+|---|---|
+| The audience scene's backdrop was a phone capture blown up to full width: a huge, blurry Spanish banner fought the text. | Purpose and audience now cut between landscape app captures (map, watershed card, weeks-like-this, brief, Spanish card, record), under a darker scrim. |
+| The turn's last line wrapped to leave "number." alone on a line. | Balanced wrapping. |
+| The close map's labels "Dillon" and "Upper South Platte" overlapped; Larimer and Pueblo showed the spruce highlight instead of their real drought colours. | Upper South Platte is labelled under its area; every area now shows its real Oct. 20 categories. |
+| The tunnel label sat on top of the Dillon Reservoir pin. | Moved along the tunnel and below the route line. |
+| The drought legend read "Oct 20" with no year. | "U.S. Drought Monitor, week of Oct 20, 2026". |
+| The third number's caption broke to leave "fires" alone. | Wider measure. |
+
+## Pass 2: as a software engineer checking the technical claims
+
+| Found | Changed |
+|---|---|
+| Slide 1's footer said "AI-assisted *parts* of the build", which understates `AI_USAGE.md` (most modules are attributed to an AI coding agent). Caught before the master render. | "AI-assisted development is disclosed in AI_USAGE.md." Narration: "We used AI coding tools, and our repo documents exactly where." |
+| Slide 2 listed SNOTEL (a research arm that did not ship) and Denver Water (cited, not a data feed); "checksum" implied verification that `safe_fetch.py` does not do; "at 4 km" is not exact for 1/24-degree cells. | Sources: U.S. Drought Monitor, gridMET fire danger, Colorado EnviroScreen, USGS watershed boundaries. "Every file logged with its checksum". "1,245 map cells". |
+| Slide 3: four model cards, "calibrated", "since 2007". | Three cards (LightGBM, physics-informed ConvLSTM, their ensemble); "approach", because what ships is a Markov transition model for drought plus persistence models for fire danger; "from 2007 to 2021"; no "calibrated". |
+| Slide 4: "tested on it exactly once". | "counted every look" (three looks, each counted). |
+| The demo line said "within a month"; the app's number is at the four-week horizon. | "four weeks later". |
+| The end card credited Denver Water as data. | "Data: U.S. Drought Monitor, gridMET. Sources: Denver Water." |
+
+Every number on screen is checked by the Guard on every frame (it fails the
+render on any digit that did not come from `public/data/film.json`).
+
+## Pass 3: only the required items
+
+`RULES_CHECK.md`, final timestamps in the report. All pass: four participants
+named (spoken and in lower thirds, and on the end card), the app's name, the
+purpose spoken and on screen verbatim, the audience, tools and languages
+spoken and on screen, AI use disclosed on screen, functionality in real app
+captures, duration 2:54.3 (cap 2:58).
+
+## Cuts, stillness and sound (from the measurements)
+
+| Found | Changed |
+|---|---|
+| Slide framings ran 4.13 s, 4.17 s, 6.5 s and 4.57 s in four places (fine-threshold scene detection). | A punch-in added to each (MapLibre tile, the AI line, the method card, the locked 2026 segment). The re-render measured slide 3 at 4.40 s still; its framings are now evenly spaced, and that one slide was re-rendered and spliced in at its own beat cuts (`scripts/v2/segment.mjs`). Re-measured: the longest slide shot is 3.83 s. Outside the two traces and the turn, every shot is 4 s or shorter (the purpose and audience plates cut under a dark scrim, too faint for the detector; checked frame by frame). |
+| The cold open's camera stopped 1.2 s before the cut to the team (a frozen frame). | The pull-back now runs to the cut. |
+| The clock beat and the turn read as frozen frames (1 to 3.9 s). | A slow push on each: the stillness is held, not frozen. The turn is still one line on black. Re-measured: no frozen stretch of 1 s or more anywhere; the only black is the 0.7 s before the turn's first line. |
+| Caption cues overlapped the next cue in 2 places (EN) and 3 (ES); English peaked at 22.4 characters a second. | Cues end before the next begins and may use the pause after their line. English now peaks at 19.5 cps. Spanish peaks at 22.6 cps on the purpose sentence, which runs straight into the audience line; flagged for the Spanish reviewer. |
+| Two hung ffmpeg processes from an earlier build, and a duplicate render, were taking CPU. | Killed; `ff()` now times out after 5 minutes instead of hanging. |
+
+Sound, measured on the mix: -14.0 LUFS integrated, -1.4 dBFS true peak,
+5.6 LU loudness range. Silences over half a second: only in the scored open
+(the hard cut on "This year, here looked like this", before the first hit, and
+the breath before the hard cut to the team), inside the turn (including the
+0.7 s held after its last word before the music returns), and the final fade.
+The music track measures silent for the whole turn.
+
+## Final outputs, measured
+
+| File | Length | Picture | Loudness | Stillness and black |
+|---|---|---|---|---|
+| `cofire_v2_master_1920x1080_60fps.mp4` | 2:54.3 | 1920x1080, 60 fps | -14.0 LUFS, -1.4 dBFS peak | No freeze of 1 s or more at 480 px; black only before the turn's first line (0.7 s) and between its two lines (0.2 s). |
+| `cofire_v2_upload_1920x1080_30fps.mp4` | 2:54.3 | 1920x1080, 30 fps | -14.0 LUFS, -1.4 dBFS | As the master. |
+| `cofire_v2_upload_1920x1080_30fps_captions_en.mp4` | 2:54.3 | 1920x1080, 30 fps, English burned in | -14.0 LUFS, -1.4 dBFS | As the master. |
+| `cofire_v2_vertical_1080x1920_30fps.mp4` | 0:45.0 | 1080x1920, 30 fps | -13.9 LUFS, -1.4 dBFS | The cold open and the team. |
+
+A coarser scan (320 px, 15 fps) flags 1.0 to 1.6 s "freezes" at the turn's
+slow push, the last second of the open's pull-back, and the vertical's first
+1.6 s (the drop forming on black). Each is a deliberate slow move, under a
+pixel a frame at that size; the full-size scan finds none.
+
+## Left as they are, and why
+
+- **The open (27.5 s) and the close (12.5 s) are single shots.** The open is
+  the backward trace the brief exempts; the close is the same move forward.
+- **The turn is 12.6 s on black.** Exempt by the brief.
+- **The demo's first beat plays its three v1 shots at 1.35x speed** to fit the
+  line; the cursor and camera moves still read.
+- **66 in the demo** is the app's own figure as the captured card shows it
+  (65.5%, rounded by the app).
+
+---
+
+# Film v1 review (2026-10-16, kept as it was)
+
+(Original title: "COFIRE demo film: review".)
 
 The checklist from the brief, completed on 2026-10-16 against the first cut
 rendered that day, and gone through again the same day against the second

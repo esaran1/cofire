@@ -1,23 +1,31 @@
 # Film v2: how to finish it
 
-The cut is built from `script/v2/lines.json` (the words) and
-`script/v2/beats.json` (the picture). `scripts/v2/build.mjs` voices each line,
+The cut follows `film/SCRIPT_V2 (1).md` and `film/SLIDES_V2 (2).md`, with the
+corrections in `CHANGES.md`. It is built from `script/v2/lines.json` (the
+words) and `script/v2/beats.json` (the picture). `scripts/v2/build.mjs` voices each line,
 lays the lines onto the beats, and writes the timeline, the audio, captions,
 line sheets (`../LINES/`) and `../RULES_CHECK.md`. The picture is
-`src/v2/FilmV2.tsx`; the demo and the map shots are windows of the v1 film, so
-they reuse its captures, camera moves and cursor.
+`src/v2/FilmV2.tsx`; the tap trace that opens and closes the film is
+`src/v2/Trace.tsx` (the app's map, one camera move each way); the demo shots
+are short windows of the v1 film, time-remapped to the lines, so they reuse
+its captures, camera moves and cursor. The build also synthesises the sound
+(tap, rising tone, low hits, music pad) and checks pacing: no dead air over
+half a second outside the open, the turn and the end card, and no held shot
+over 4 s outside the traces and the turn. Review stills:
+`node scripts/v2/stills.mjs <dir> FilmV2 <seconds>...`.
 
 ## 1. Names and roles
 
-Fill in `film/team/team.json`: each person's name, and a role that says what
-they actually did. Then `node scripts/prepare.mjs`. Until then the film shows
-`[Name A]` to `[Name D]` and the final build refuses to run.
+`film/team/team.json` has the four names and the script's titles (Lead
+Developer, Data and Research Lead, Product Designer, Outreach and
+Accessibility Lead). Change a title to what that person actually did, then
+`node scripts/prepare.mjs`.
 
 ## 2. Voices
 
 Each person records the lines in their sheet (`film/LINES/P1.md` to `P4.md`)
 and saves the best take as `film/audio/vo/<file name>.wav` (or `.m4a`), for
-example `film/audio/vo/cold1.wav`. Lines marked ALL: one file of everyone
+example `film/audio/vo/tap1.wav`. Lines marked ALL: one file of everyone
 saying it together, named as in the sheet. Any line without a file keeps its
 scratch voice, and the film keeps its "scratch" label.
 

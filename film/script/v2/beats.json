@@ -1,212 +1,244 @@
 {
- "note": "The picture of film v2, in order. A beat is a new v2 scene (scene) or a window of the v1 film (v1: [from, to] in v1 seconds), which reuses its captures, camera moves and cursor. `min` is the planned length; a stretchable beat grows to fit its lines (scripts/v2/build.mjs), a v1 window holds its last frame for any overflow and the build reports it. `rules`: what the picture itself shows on screen (film/RULES_CHECK.md).",
+ "note": "The picture of film v2 (second script), in order. A beat lasts as long as its lines plus a short tail (cut on the voice); `min` sets a floor for the trace beats. v1s: windows of the v1 film played in order, each 4 s or shorter, reusing its captures, camera moves and cursor; the beat ends when its voice does. `rules`: what the picture shows on screen (RULES_CHECK.md).",
  "beats": [
   {
-   "id": "cold",
+   "id": "open",
    "section": "Cold open",
-   "scene": "ColdOpen",
-   "min": 10.0,
-   "stretch": true
+   "scene": "Trace",
+   "dir": "back",
+   "tail": 0.4,
+   "note": "one continuous camera move, tap to watershed, then the numbers on the same map"
   },
   {
-   "id": "card1",
-   "section": "Team intros",
-   "scene": "Card",
+   "id": "team1",
+   "section": "The team",
+   "scene": "Third",
    "who": "P1",
-   "min": 4.2,
-   "stretch": true,
+   "capture": "denver",
    "rules": [
     "participants"
+   ],
+   "plates": [
+    "denver",
+    "card"
    ]
   },
   {
-   "id": "card2",
-   "section": "Team intros",
-   "scene": "Card",
+   "id": "team2",
+   "section": "The team",
+   "scene": "Third",
    "who": "P2",
-   "min": 4.2,
-   "stretch": true,
+   "capture": "card",
    "rules": [
     "participants"
    ]
   },
   {
-   "id": "card3",
-   "section": "Team intros",
-   "scene": "Card",
+   "id": "team3",
+   "section": "The team",
+   "scene": "Third",
    "who": "P3",
-   "min": 4.2,
-   "stretch": true,
+   "capture": "brief",
    "rules": [
     "participants"
    ]
   },
   {
-   "id": "card4",
-   "section": "Team intros",
-   "scene": "Card",
+   "id": "team4",
+   "section": "The team",
+   "scene": "Third",
    "who": "P4",
-   "min": 4.6,
-   "stretch": true,
+   "capture": "card_es",
    "rules": [
     "participants"
    ]
   },
   {
    "id": "logo",
-   "section": "Team intros",
+   "section": "The team",
    "scene": "Logo",
-   "min": 2.0,
-   "stretch": true,
    "rules": [
     "app_name"
    ]
   },
   {
-   "id": "stakes_map",
-   "section": "Stakes",
-   "v1": [
-    10.0,
-    19.6
-   ],
-   "min": 9.6
+   "id": "clock",
+   "section": "The team",
+   "scene": "Clock"
   },
   {
    "id": "purpose",
-   "section": "Stakes",
+   "section": "Purpose",
    "scene": "Purpose",
-   "min": 8.6,
-   "stretch": true,
    "rules": [
     "purpose"
+   ],
+   "plates": [
+    "denver",
+    "card_ws",
+    "card_weeks"
    ]
   },
   {
    "id": "audience",
-   "section": "Stakes",
+   "section": "Purpose",
    "scene": "Audience",
-   "min": 6.0,
-   "stretch": true
+   "plates": [
+    "brief",
+    "card_es",
+    "final"
+   ]
   },
   {
-   "id": "demo_pick",
+   "id": "demo1",
    "section": "Demo",
-   "v1": [
-    38.2,
-    46.5
+   "v1s": [
+    [
+     33.0,
+     35.3
+    ],
+    [
+     35.3,
+     38.2
+    ],
+    [
+     38.2,
+     42.2
+    ]
    ],
-   "min": 8.3,
    "rules": [
     "functionality"
    ]
   },
   {
-   "id": "demo_icons",
+   "id": "demo2",
    "section": "Demo",
-   "v1": [
-    52.6,
-    61.9
+   "v1s": [
+    [
+     42.3,
+     45.8
+    ],
+    [
+     49.0,
+     51.9
+    ],
+    [
+     57.0,
+     61.0
+    ]
    ],
-   "min": 9.3,
    "rules": [
     "functionality"
    ]
   },
   {
-   "id": "demo_weeks",
+   "id": "demo4",
    "section": "Demo",
-   "v1": [
-    61.9,
-    69.4
+   "v1s": [
+    [
+     69.4,
+     72.6
+    ],
+    [
+     72.6,
+     75.6
+    ]
    ],
-   "min": 7.5,
    "rules": [
     "functionality"
    ]
   },
   {
-   "id": "demo_ws",
+   "id": "demo5",
    "section": "Demo",
-   "v1": [
-    69.4,
-    75.6
+   "v1s": [
+    [
+     75.6,
+     79.2
+    ]
    ],
-   "min": 6.2,
    "rules": [
     "functionality"
    ]
   },
   {
-   "id": "demo_es",
+   "id": "demo6",
    "section": "Demo",
-   "v1": [
-    75.6,
-    79.2
+   "v1s": [
+    [
+     79.2,
+     82.2
+    ],
+    "brief",
+    [
+     84.1,
+     86.6
+    ]
    ],
-   "min": 3.6,
    "rules": [
     "functionality"
    ]
   },
   {
-   "id": "demo_brief",
+   "id": "demo7",
    "section": "Demo",
-   "v1": [
-    79.2,
-    86.6
+   "v1s": [
+    [
+     147.2,
+     151.0
+    ],
+    [
+     151.0,
+     154.9
+    ]
    ],
-   "min": 7.4,
    "rules": [
     "functionality"
    ]
   },
   {
    "id": "slide1",
-   "section": "Tech slides",
+   "section": "Under the hood",
    "scene": "SlideTools",
-   "min": 10.0,
-   "stretch": true,
    "rules": [
     "tools",
     "ai_disclosure"
    ]
   },
   {
+   "id": "slide2",
+   "section": "Under the hood",
+   "scene": "SlideData"
+  },
+  {
    "id": "slide3",
-   "section": "Tech slides",
-   "scene": "SlideModels",
-   "min": 8.0,
-   "stretch": true
+   "section": "Under the hood",
+   "scene": "SlideModels"
   },
   {
    "id": "slide4",
-   "section": "Tech slides",
-   "scene": "SlideTested",
-   "min": 12.0,
-   "stretch": true
+   "section": "Under the hood",
+   "scene": "SlideTested"
   },
   {
-   "id": "glance",
-   "section": "Tech slides",
-   "scene": "Glance",
-   "min": 2.4,
-   "stretch": true
+   "id": "turn",
+   "section": "The turn",
+   "scene": "Turn",
+   "tail": 0.7,
+   "silent_music": true
   },
   {
-   "id": "close_map",
+   "id": "close",
    "section": "Close",
-   "v1": [
-    161.5,
-    166.6
-   ],
-   "min": 5.1
+   "scene": "Trace",
+   "dir": "forward",
+   "tail": 0.4
   },
   {
    "id": "endcard",
    "section": "Close",
    "scene": "EndCard",
-   "min": 6.5,
-   "stretch": true,
+   "min": 3.2,
    "rules": [
     "participants",
     "app_name"

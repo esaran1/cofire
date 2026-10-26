@@ -24,10 +24,10 @@ import { clamp01, easeInOut, easeOut, inOut, ramp, useT } from "../util";
 import { Kinetic, Label, SourceLine } from "../components/Type";
 
 export const SITE = "http://127.0.0.1:4100/cofire"; // scripts/serve_static.py
-const HALF = 1 / 48; // half a cell, as the app draws them (components/MapView.tsx)
+export const HALF = 1 / 48; // half a cell, as the app draws them (components/MapView.tsx)
 
-let protocolAdded = false;
-function style(): maplibregl.StyleSpecification {
+export const proto = { added: false };
+export function style(): maplibregl.StyleSpecification {
   const s = structuredClone(basemapStyle("selfhost")) as maplibregl.StyleSpecification & { glyphs: string };
   s.glyphs = `${SITE}/fonts/{fontstack}/{range}.pbf`;
   (s.sources.basemap as maplibregl.VectorSourceSpecification).url = `pmtiles://${SITE}/tiles/colorado.pmtiles`;
@@ -44,10 +44,10 @@ const areaBox = (d: string): BBox => {
   const cs = D.cells.slice(a.first, a.first + a.n);
   return [Math.min(...cs.map((c) => c[2])) - HALF, Math.min(...cs.map((c) => c[1])) - HALF, Math.max(...cs.map((c) => c[2])) + HALF, Math.max(...cs.map((c) => c[1])) + HALF];
 };
-const BOX = { denver: areaBox("denver"), usp: areaBox("upper_south_platte"), dillon: areaBox("dillon"), larimer: areaBox("larimer"), pueblo: areaBox("pueblo") };
+export const BOX = { denver: areaBox("denver"), usp: areaBox("upper_south_platte"), dillon: areaBox("dillon"), larimer: areaBox("larimer"), pueblo: areaBox("pueblo") };
 const ALL = union(BOX.denver, BOX.usp, BOX.dillon, BOX.larimer, BOX.pueblo);
 const THREE = union(BOX.denver, BOX.usp, BOX.dillon);
-const RES = DATA.reservoirs as unknown as Record<string, { lon: number; lat: number; name: string }>;
+export const RES = DATA.reservoirs as unknown as Record<string, { lon: number; lat: number; name: string }>;
 
 function geojson(issue: number): GeoJSON.FeatureCollection {
   const row = D.cat[issue];
@@ -69,7 +69,7 @@ export function issueAt(t: number): number {
 
 type State = { cam: Cam; issue: number; op: Record<string, number>; threat: number };
 
-function cameras(W: number, H: number) {
+export function cameras(W: number, H: number) {
   const portrait = H > W;
   const pad: [number, number, number, number] = portrait ? [360, 70, 420, 70] : [150, 140, 150, 140];
   const all = fit(ALL, W, H, pad);
@@ -142,7 +142,7 @@ export const MapAct: React.FC<{ offset?: number; W: number; H: number; lang?: La
   const [initHandle] = useState(() => delayRender("map: style and tiles", { timeoutInMilliseconds: 180000 }));
 
   useEffect(() => {
-    if (!protocolAdded) { maplibregl.addProtocol("pmtiles", new Protocol().tile); protocolAdded = true; }
+    if (!proto.added) { maplibregl.addProtocol("pmtiles", new Protocol().tile); proto.added = true; }
     maplibregl.setWorkerUrl(`${SITE}/maplibre/maplibre-gl-worker.mjs`);
     const m = new maplibregl.Map({ container: ref.current as HTMLDivElement, style: style(), interactive: false, attributionControl: false, fadeDuration: 0, pixelRatio: 1, center: [latest.current.cam.lon, latest.current.cam.lat], zoom: latest.current.cam.zoom });
     m.on("error", (e) => { throw new Error(`map error: ${e.error?.message ?? e}`); });

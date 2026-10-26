@@ -1,6 +1,6 @@
 # COFIRE Demo Film v2: Slides
 
-Four slides, about 10 seconds each, placed 1:58 to 2:40. Built in Remotion with the app's design tokens, dark theme, and display face. Motion builds with the narration; the voice explains, the slide holds keywords.
+Four slides plus a short closing beat ("the turn"), placed 1:55 to 2:36. Built in Remotion with the app's design tokens, dark theme, and display face. Motion builds with the narration; the voice explains, the slide holds keywords.
 
 Rules for every slide:
 - Title plus at most 6 words per line. Nothing a judge has to pause to read.
@@ -31,7 +31,7 @@ Open-source libraries listed in our repo · AI-assisted parts disclosed in AI_US
 
 **Motion:** Tiles stagger in left to right in sync with the voice. Footer fades in last and holds.
 
-**Narration (P1):** Here's what's under the hood. Python for the data and models. TypeScript, React, and Next.js for the app. MapLibre for the map. GitHub Actions runs the weekly update. We used AI coding tools for parts of the build, and we documented exactly where in our repo.
+**Narration (P1):** Under the hood: Python for the data pipeline and models. TypeScript, React, and Next.js for the app. MapLibre for the map. GitHub Actions refreshes everything every week. We used AI coding tools for parts of the build, and our repo documents exactly where.
 
 ---
 
@@ -60,7 +60,7 @@ Right: **Weekly pipeline → COFIRE**
 
 **Motion:** Data flows as particles from each source into the check gate, then into the app. Counters tick up as P1 says them.
 
-**Narration (P1):** Nineteen years of the U.S. Drought Monitor and fire-danger data, across [five] areas and [1,245] map cells. Every download is checked before we trust it.
+**Narration (P2):** Nineteen years of Drought Monitor and fire-danger data, [1,245] map cells, and every download checked before we trust it.
 
 ---
 
@@ -81,9 +81,9 @@ Right: **Weekly pipeline → COFIRE**
 Caption under the remaining card:
 > Calibrated. Explainable. Hard to beat.
 
-**Narration (P2):** We tried [four] neural-network models. The simple one won: for every week like today since 2007, count what happened next. It beat the fancy ones, and you can explain it in one sentence.
+**Narration (P2):** We tried [four] machine-learning models. The simplest one won: look at every week like today since 2007, and count what happened next. It's calibrated, and you can explain it in one sentence.
 
-Note for the agent: confirm the exact count and names of the non-shipping arms from `research/README` before render. If the count differs, update both the narration and the cards. Use "models" rather than "neural-network models" if any arm is not a neural network.
+Note for the agent: confirm the exact count and names of the non-shipping arms from `research/README` before render. If the count differs, update both the narration and the cards.
 
 ---
 
@@ -105,12 +105,18 @@ Note for the agent: confirm the exact count and names of the non-shipping arms f
 - Multiple-testing correction
 - [N] forecasts beat their baselines
 
-**Bottom line, appears last on P3's line, with a strike-through animation on a small "forecast band" chip:**
-> Found a bug in our best result → removed it
+**Narration (P2):** Then we locked away all of 2026 and tested on it exactly once. [N] forecasts beat their baselines.
 
-**Narration:**
-**P2:** We locked away all of 2026 before testing, and scored it once. We checked every result against shuffled data. [N] forecasts beat their baselines.
-**P3:** And when we found a bug in our own best result, we took it out of the app and said why.
+**The turn, immediately after this slide:** the slide dims to black and music drops out. A single line appears in the display face, timed to P3 and P1:
+
+> One result looked perfect.
+
+A small "forecast band" chip appears, then a strike-through animates across it as P1 speaks:
+
+> We found the flaw. We pulled it.
+
+**P3:** One of our results looked perfect. That's what worried us.
+**P1:** We dug in, found a flaw in how we'd tested it, and pulled it from the app. Now COFIRE says plainly when it can't back up a number.
 
 Note for the agent: [N] is the current survivor count in `facts.json` after the leak-free refit and the 2022 map fix. Do not use an older count.
 
@@ -120,9 +126,10 @@ Note for the agent: [N] is the current survivor count in `facts.json` after the 
 
 | Slide | Start | Length |
 |---|---|---|
-| 1. How it's built | 1:58 | ~10 s |
-| 2. The data | 2:08 | ~9 s |
-| 3. Simple beat complex | 2:17 | ~10 s |
-| 4. How we know it works | 2:27 | ~13 s |
+| 1. How it's built | 1:55 | ~12 s |
+| 2. The data | 2:07 | ~6 s |
+| 3. Simple beat complex | 2:13 | ~9 s |
+| 4. How we know it works | 2:22 | ~5 s |
+| The turn | 2:27 | ~9 s |
 
 If the total runs long, trim Slide 2 first, then Slide 3. Never cut Slide 1; it carries the required tools and languages and the AI disclosure.

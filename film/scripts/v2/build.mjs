@@ -73,48 +73,75 @@ function lineAudio(l, text) {
   return { file: out, kind: "scratch" };
 }
 
-// ---- lay out: beats in order, each line at its anchor, never overlapping -------
+// ---- lay out: beats in order, each line at its anchor, cut on the voice -------
+// A beat lasts as long as its lines plus a short tail, so the next beat (and
+// the next voice) comes in within half a second; `min` is only for the traces.
+const AT = 0.12, TAIL = 0.3;
 const byBeat = new Map(beats.map((b) => [b.id, []]));
 for (const l of lines) {
   if (!byBeat.has(l.beat)) throw new Error(`line ${l.id}: no beat ${l.beat}`);
   byBeat.get(l.beat).push(l);
 }
+const HALVES = ["", "half a minute", "one minute", "a minute and a half", "two minutes", "two and a half minutes", "three minutes"];
+const HALVES_ES = ["", "medio minuto", "un minuto", "un minuto y medio", "dos minutos", "dos minutos y medio", "tres minutos"];
+/** Time left, in words, never rounded up: "just under" the next half minute, or "a little over" the last. */
+function minutesPhrase(left) {
+  const lo = Math.floor(left / 30), hi = lo + 1;
+  if (hi * 30 - left <= 15) return { en: `just under ${HALVES[hi]}`, es: `poco menos de ${HALVES_ES[hi]}` };
+  if (left - lo * 30 <= 4) return { en: `about ${HALVES[lo]}`, es: `unos ${HALVES_ES[lo]}` };
+  return { en: `a little over ${HALVES[lo]}`, es: `un poco más de ${HALVES_ES[lo]}` };
+}
 const placed = [];
 const laid = [];
-let t = 0, prevEnd = 0, timerStart = null;
+let t = 0, prevEnd = 0;
 const warnings = [];
+const timerStart = () => laid.find((x) => x.id === "team1")?.start;
 for (const b of beats) {
   const start = t;
-  if (b.id === "card1") timerStart = start;
-  let need = b.min;
+  let need = b.min ?? 0;
   for (const l of byBeat.get(b.id)) {
-    let when = Math.max(start + l.at, prevEnd + GAP);
-    let template = l.en;
-    if (l.timer) {
-      // The timer counts real film time down from 3:00, starting at the first intro card.
-      const left = Math.max(0, Math.floor(180 - (when - timerStart)));
-      fields.timer_left = { en: String(left), source: `film v2 timeline: 3:00 minus film time since the first intro card, at ${when.toFixed(2)} s` };
-      fields.timer_spoken = { en: cap(words(left)), source: "as timer_left", es: String(left) };
+    const when = Math.max(start + (l.at ?? AT), prevEnd + (l.gap ?? GAP));
+    if (l.timer || l.timer_words) {
+      // The timer shows 3:00 minus film time; a line that reads it says what it shows then.
+      const left = Math.max(0, Math.floor(180 - when));
+      if (l.timer) {
+        fields.timer_left = { en: String(left), source: `film v2 timeline: 3:00 minus film time, at ${when.toFixed(2)} s` };
+        fields.timer_spoken = { en: cap(words(left)), source: "as timer_left", es: String(left) };
+      } else {
+        const ph = minutesPhrase(left);
+        fields.timer_minutes = { en: ph.en, es: ph.es, source: `film v2 timeline: ${left} s left on the timer at ${when.toFixed(2)} s, in words, not rounded up` };
+      }
     }
-    const en = fill(template, "en", fields);
+    const en = fill(l.en, "en", fields);
     const es = fill(l.es, "es", fields);
     const a = lineAudio(l, en);
     const len = duration(a.file);
     const end = when + len;
     placed.push({ ...l, start: Number(when.toFixed(3)), end: Number(end.toFixed(3)), len: Number(len.toFixed(3)), text_en: en, text_es: es, audio: a.file, kind: a.kind });
     prevEnd = end;
-    need = Math.max(need, end - start + 0.45);
+    need = Math.max(need, end - start + (b.tail ?? TAIL));
   }
-  let len = b.min;
-  if (need > b.min) {
-    if (b.stretch) len = need;
-    else {
-      len = need;
-      const over = need - b.min;
-      warnings.push(`${b.id}: the line runs ${over.toFixed(2)} s past the v1 window; it holds its last frame for that long${over > 2 ? " (OVER the 2 s static limit: shorten the line or the beat before it)" : ""}`);
-    }
+  const len = need;
+  const row = { ...b, start: Number(start.toFixed(3)), end: Number((start + len).toFixed(3)) };
+  if (b.v1s) {
+    // Short shots from v1, played in order and time-remapped to fill the beat.
+    // A capture name instead of a window is a still plate with a push (2.8 s natural length).
+    const dur = (w) => (typeof w === "string" ? 2.8 : w[1] - w[0]);
+    const D = b.v1s.reduce((x, w) => x + dur(w), 0);
+    const rate = Math.min(1.35, Math.max(0.65, D / len));
+    const k = len / (D / rate);
+    let at = 0;
+    row.shots = b.v1s.map((w) => {
+      const shown = (dur(w) / rate) * k;
+      const sh = { ...(typeof w === "string" ? { plate: w, a: 0 } : { a: w[0] }), at: Number(at.toFixed(3)), len: Number(shown.toFixed(3)), rate: Number(rate.toFixed(4)) };
+      at += shown;
+      if (shown > 4.0) warnings.push(`${b.id}: a v1 shot runs ${shown.toFixed(2)} s (over 4 s)`);
+      return sh;
+    });
+    if (k > 1.001) warnings.push(`${b.id}: v1 footage runs short; shots play ${(k * rate).toFixed(2)}x their window`);
+    delete row.v1s;
   }
-  laid.push({ ...b, start: Number(start.toFixed(3)), end: Number((start + len).toFixed(3)) });
+  laid.push(row);
   t = start + len;
 }
 const total = Number(t.toFixed(3));
@@ -123,11 +150,26 @@ writeFileSync(dataPath, JSON.stringify(data));
 const timeline = {
   note: "Built by scripts/v2/build.mjs from script/v2/lines.json and beats.json. Do not edit by hand.",
   duration: total,
-  timer: { start: timerStart, end: laid.find((b) => b.id === "endcard").end },
+  timer: { start: timerStart(), end: total },
   beats: laid,
   lines: placed.map(({ audio, ...l }) => l),
 };
 writeFileSync(join(FILM, "script/v2/timeline.json"), JSON.stringify(timeline, null, 1));
+
+// ---- pacing: dead air and shot length ------------------------------------------
+// The open is scored (tap, tone, hits) and the turn's silence is the point;
+// everywhere else the voice never stops for more than half a second.
+const exempt = new Set(["open", "turn", "endcard"]);
+const pacing = [];
+for (let i = 1; i < placed.length; i++) {
+  const gap = placed[i].start - placed[i - 1].end;
+  const where = placed[i].beat;
+  if (gap > 0.5 + 1e-6 && !(exempt.has(where) || exempt.has(placed[i - 1].beat))) pacing.push(`dead air ${gap.toFixed(2)} s before \`${placed[i].id}\` at ${placed[i].start.toFixed(2)} s`);
+}
+const held = new Set(["Logo", "Clock", "Glance", "Third", "EndCard"]);
+for (const b of laid) if (held.has(b.scene) && !b.plates && b.end - b.start > 4.0 + 1e-6 && b.id !== "endcard") pacing.push(`shot \`${b.id}\` runs ${(b.end - b.start).toFixed(2)} s (over 4 s)`);
+const B = (id) => laid.find((x) => x.id === id);
+const L = (id) => placed.find((x) => x.id === id);
 
 // ---- audio: one track per speaker, ALL, the narration and the mix ---------------
 function track(sel, out) {
@@ -135,36 +177,79 @@ function track(sel, out) {
   if (!ls.length) { ff(["-f", "lavfi", "-i", `anullsrc=r=48000:cl=mono`, "-t", String(total), out]); return; }
   const inputs = ls.flatMap((l) => ["-i", l.audio]);
   const f = ls.map((l, i) => `[${i}]adelay=${Math.round(l.start * 1000)}:all=1[d${i}]`);
-  ff([...inputs, "-filter_complex", `${f.join(";")};${ls.map((_, i) => `[d${i}]`).join("")}amix=inputs=${ls.length}:normalize=0,apad,atrim=0:${total}[o]`, "-map", "[o]", "-ar", "48000", "-ac", "1", out]);
+  ff([...inputs, "-filter_complex", `${f.join(";")};${ls.map((_, i) => `[d${i}]`).join("")}amix=inputs=${ls.length}:normalize=0,apad=whole_dur=${total}[o]`, "-map", "[o]", "-t", String(total), "-ar", "48000", "-ac", "1", out]);
 }
 for (const p of ["P1", "P2", "P3", "P4", "ALL"]) track((l) => l.speaker === p, join(V2, "audio", `${p}.wav`));
 const narration = join(V2, "audio", "narration.wav");
 track(() => true, narration);
 
-// Sounds: Kenney CC0 only. The cold open's low hit is Kenney's drop sound pitched down an octave.
+// Sound: synthesised here with ffmpeg (no downloads), plus Kenney CC0 sounds.
+const SYN = join(TMP, "syn");
+mkdirSync(SYN, { recursive: true });
+const gen = (name, expr, d, post = "") => {
+  const out = join(SYN, `${name}.wav`);
+  ff(["-f", "lavfi", "-i", `aevalsrc=exprs='${expr}':s=48000:d=${d.toFixed(3)}`, ...(post ? ["-af", post] : []), "-ac", "2", "-ar", "48000", out]);
+  return out;
+};
+const open = B("open");
+const tap1 = L("tap1"), tap2 = L("tap2"), tap3 = L("tap3");
+const dropHit = tap1.start - 0.3; // Trace.tsx: the drop lands 0.3 s before the first line
+// The tap: filtered pink noise, close and quiet, gone before the tone peaks.
+const runEnd = tap2.start + 1.2;
+const tapRun = join(SYN, "tap.wav");
+ff(["-f", "lavfi", "-i", `anoisesrc=color=pink:amplitude=0.6:d=${runEnd.toFixed(3)}:r=48000`, "-af", `highpass=f=700,lowpass=f=5200,tremolo=f=6:d=0.25,afade=t=in:d=0.5,afade=t=out:st=${(runEnd - 1.6).toFixed(3)}:d=1.6`, "-ac", "2", tapRun]);
+const drip = gen("drip", "sin(2*PI*(650*t+5600*t*t))*exp(-t*26)", 0.4, "aecho=0.8:0.5:70|140:0.3|0.18");
+// The rising tone: three partials sweeping up an octave, growing, cut hard on "This year".
+const t0 = tap2.start - 0.6, t1 = tap3.start - 0.03, DT = t1 - t0;
+const tone = gen("tone", `(0.55*sin(2*PI*(55*t+27.5*t*t/${DT.toFixed(3)}))+0.3*sin(2*PI*(82.5*t+41.25*t*t/${DT.toFixed(3)}))+0.12*sin(2*PI*(220*t+110*t*t/${DT.toFixed(3)})))*pow(t/${DT.toFixed(3)},1.7)`, DT, `lowpass=f=1400,afade=t=out:st=${(DT - 0.012).toFixed(3)}:d=0.012`);
+// Low hits: a falling sub thump.
+const thump = gen("thump", "sin(2*PI*(62*t-34*t*t))*exp(-t*6.5)", 0.9);
+// Music: a soft pad, four chords on a 32-second loop, synthesised here.
+const CHORDS = [[73.42, 110, 185, 277.18, 329.63], [61.74, 92.5, 146.83, 220, 329.63], [49, 73.42, 123.47, 185, 220], [55, 82.41, 146.83, 185, 246.94]];
+const chordFiles = CHORDS.map((fs, i) => gen(`chord${i}`, fs.map((f, j) => `${(0.16 / (1 + j * 0.35)).toFixed(3)}*(sin(2*PI*${f}*t)+sin(2*PI*${(f * 1.004).toFixed(3)}*t+${j}))*(1+0.18*sin(2*PI*0.21*t+${j}))`).join("+"), 9.4, "lowpass=f=1600,afade=t=in:d=1.4,afade=t=out:st=7.6:d=1.8"));
+const loop = join(SYN, "pad_loop.wav");
+ff([...chordFiles.flatMap((f) => ["-i", f]), "-filter_complex", `${chordFiles.map((_, i) => `[${i}]adelay=${i * 8000}:all=1[c${i}]`).join(";")};${chordFiles.map((_, i) => `[c${i}]`).join("")}amix=inputs=4:normalize=0,atrim=0:32,aecho=0.8:0.7:180|310:0.25|0.15[o]`, "-map", "[o]", "-ar", "48000", "-ac", "2", loop]);
+// The bed comes in on the hard cut to the team, drops out for the turn, holds
+// silence a half-beat past the last word, returns, and fades on the end card.
+const team1 = B("team1"), turn = B("turn"), endc = B("endcard");
+const turnLast = L("turn2");
+const back = turn.end; // the turn's tail is the half-beat
+const env = `min(1,max(0,(t-${team1.start.toFixed(3)})/0.12))*(1-min(1,max(0,(t-${turn.start.toFixed(3)})/0.1))*(1-min(1,max(0,(t-${back.toFixed(3)})/0.6))))*(1-min(1,max(0,(t-${(total - 1.8).toFixed(3)})/1.7)))`;
+const music = join(V2, "audio", "music.wav");
+ff(["-stream_loop", "-1", "-i", loop, "-i", narration, "-filter_complex", `[0]atrim=0:${total},asetpts=N/SR/TB,volume=-17dB,volume='${env}':eval=frame[m];[1]aresample=48000,pan=stereo|c0=c0|c1=c0,asplit=2[k][unused];[unused]anullsink;[m][k]sidechaincompress=threshold=0.03:ratio=5:attack=25:release=350:makeup=1[o]`, "-map", "[o]", "-ar", "48000", "-ac", "2", "-t", String(total), music]);
+
 const SFX = join(FILM, "audio/sfx");
-const cues = [];
-for (const id of ["cold1", "cold2", "cold3"]) {
-  const l = placed.find((x) => x.id === id);
-  cues.push({ file: "kenney-interface-sounds_drop_003.ogg", t: Math.max(0, l.start - 0.12), gain: -4, low: true });
+const cues = [
+  { file: tapRun, t: open.start, gain: -24 },
+  { file: drip, t: dropHit - 0.02, gain: -9 },
+  { file: tone, t: t0, gain: -9 },
+];
+for (const id of ["num1", "num2", "num3"]) {
+  const l = L(id);
+  cues.push({ file: thump, t: Math.max(0, l.start - 0.05), gain: -3 });
+  cues.push({ file: join(SFX, "kenney-interface-sounds_drop_003.ogg"), t: Math.max(0, l.start - 0.05), gain: -8, low: true });
 }
-for (const b of laid.filter((x) => ["card1", "card2", "card3", "card4", "logo", "slide1", "slide2", "slide3", "slide4"].includes(x.id))) {
-  cues.push({ file: "kenney-interface-sounds_switch_002.ogg", t: b.start, gain: -14 });
-}
+for (const b of laid.filter((x) => /^slide/.test(x.id))) cues.push({ file: join(SFX, "kenney-interface-sounds_switch_002.ogg"), t: b.start, gain: -18 });
+const forward = B("close");
+cues.push({ file: drip, t: L("close3").end - 0.15, gain: -12 });
 const raw = join(TMP, "mix_raw.wav");
-const inputs = ["-i", narration, ...cues.flatMap((c) => ["-i", join(SFX, c.file)])];
-const parts = [`[0]aresample=48000,pan=stereo|c0=c0|c1=c0,atrim=0:${total}[v]`];
+const inputs = ["-i", narration, "-i", music, ...cues.flatMap((c) => ["-i", c.file])];
+const parts = [`[0]aresample=48000,pan=stereo|c0=c0|c1=c0,atrim=0:${total}[v]`, `[1]aresample=48000[mu]`];
 cues.forEach((c, i) => {
   const pitch = c.low ? `asetrate=48000*0.5,aresample=48000,lowpass=f=400,` : "aresample=48000,";
-  parts.push(`[${i + 1}]${pitch}aformat=channel_layouts=stereo,volume=${c.gain}dB,adelay=${Math.round(c.t * 1000)}:all=1[s${i}]`);
+  parts.push(`[${i + 2}]${pitch}aformat=channel_layouts=stereo,volume=${c.gain}dB,adelay=${Math.round(c.t * 1000)}:all=1[s${i}]`);
 });
-ff([...inputs, "-filter_complex", `${parts.join(";")};[v]${cues.map((_, i) => `[s${i}]`).join("")}amix=inputs=${cues.length + 1}:normalize=0:duration=first,apad,atrim=0:${total}[out]`, "-map", "[out]", "-ar", "48000", "-ac", "2", raw]);
-// Music: a silent placeholder slot (no music is downloaded); the mix is narration first.
+ff([...inputs, "-filter_complex", `${parts.join(";")};[v][mu]${cues.map((_, i) => `[s${i}]`).join("")}amix=inputs=${cues.length + 2}:normalize=0:duration=first,apad=whole_dur=${total}[out]`, "-map", "[out]", "-t", String(total), "-ar", "48000", "-ac", "2", raw]);
 const mix = join(V2, "audio", "mix.wav");
 const target = { I: -14, TP: -1.5, LRA: 11 };
 const p1 = ff(["-i", raw, "-af", `loudnorm=I=${target.I}:TP=${target.TP}:LRA=${target.LRA}:print_format=json`, "-f", "null", "-"]);
 const m = JSON.parse(p1.slice(p1.lastIndexOf("{"), p1.lastIndexOf("}") + 1));
 ff(["-i", raw, "-af", `loudnorm=I=${target.I}:TP=${target.TP}:LRA=${target.LRA}:measured_I=${m.input_i}:measured_TP=${m.input_tp}:measured_LRA=${m.input_lra}:measured_thresh=${m.input_thresh}:offset=${m.target_offset}:linear=true`, "-ar", "48000", mix]);
+// The turn must be silent apart from the voice: measure the music there.
+const turnMusic = ff(["-ss", String(turn.start + 0.15), "-t", String(Math.max(0.2, back - turn.start - 0.2)), "-i", music, "-af", "volumedetect", "-f", "null", "-"]);
+const turnMax = Number((/max_volume: (-?[\d.]+|-inf) dB/.exec(turnMusic) ?? [])[1] ?? -999);
+if (!(turnMax < -60 || Number.isNaN(turnMax))) pacing.push(`music is not silent during the turn (max ${turnMax} dB)`);
+void turnLast; void forward;
 
 // ---- captions: at most 42 characters a line, two lines a cue, a second at least -----
 const stamp = (s) => {
@@ -187,8 +272,10 @@ function srt(lang) {
     const chunks = [];
     for (let k = 0; k < rows.length; k += 2) chunks.push(rows.slice(k, k + 2));
     // Spanish runs longer than the English read: it may use the time up to the next line.
+    // A cue may run into the pause after its line (Spanish, which runs longer, a
+    // little further), never into the next line.
     const next = placed[i + 1]?.start ?? total;
-    const end = lang === "es" ? Math.min(next - 0.05, l.end + 1.2) : l.end;
+    const end = Math.min(next - 0.05, l.end + (lang === "es" ? 1.2 : 0.6));
     const span = Math.max(end - l.start, chunks.length * 1.0);
     const totalChars = chunks.reduce((a, c) => a + c.join(" ").length, 0);
     let at = l.start;
@@ -199,6 +286,7 @@ function srt(lang) {
       at += d;
     }
   });
+  for (let i = 0; i < cues.length - 1; i++) cues[i].b = Math.min(cues[i].b, cues[i + 1].a - 0.04);
   return cues.map((c, i) => `${i + 1}\n${stamp(c.a)} --> ${stamp(c.b)}\n${c.text}\n`).join("\n");
 }
 writeFileSync(join(V2, "captions_en.srt"), srt("en"));
@@ -252,10 +340,11 @@ const checks = [
   { rule: "Tools and coding languages, spoken", ok: linesFor("tools").length > 0, at: linesFor("tools").map((l) => mmss(l.start)) },
   { rule: "Tools and coding languages, on screen", ok: beatsFor("tools").length > 0, at: beatsFor("tools").map((b) => mmss(b.start)) },
   { rule: "Open-source libraries and AI-assisted development disclosed on screen", ok: beatsFor("ai_disclosure").length > 0, at: beatsFor("ai_disclosure").map((b) => mmss(b.start)) },
-  { rule: "Functionality shown with real app captures", ok: beatsFor("functionality").length >= 5 && beatsFor("functionality").every((b) => b.v1), at: [`${mmss(beatsFor("functionality")[0].start)} to ${mmss(beatsFor("functionality").at(-1).end)}`] },
+  { rule: "Functionality shown with real app captures", ok: beatsFor("functionality").length >= 5 && beatsFor("functionality").every((b) => b.shots), at: [`${mmss(beatsFor("functionality")[0].start)} to ${mmss(beatsFor("functionality").at(-1).end)}`] },
   { rule: `Duration between 1:00 and 2:58`, ok: total >= MIN_S && total <= MAX_S, at: [mmss(total)] },
 ];
 const failed = checks.filter((c) => !c.ok);
+if (pacing.length) failed.push({ rule: `pacing: ${pacing.join("; ")}` });
 const draftOnly = failed.every((c) => /participant/.test(c.rule)) && failed.length > 0;
 writeFileSync(join(FILM, "RULES_CHECK.md"), `# Film v2: CAC demonstration-video requirements
 
@@ -266,11 +355,18 @@ Written by \`scripts/v2/build.mjs\` (${FINAL ? "final" : "draft"} build), from t
 ${checks.map((c) => `| ${c.rule} | ${c.ok ? "PASS" : "**FAIL**"} | ${c.at.join(", ")} | ${c.note ?? ""} |`).join("\n")}
 
 Duration: ${mmss(total)} (${total.toFixed(1)} s). Voices: ${placed.filter((l) => l.kind === "recorded").length} recorded, ${placed.filter((l) => l.kind === "scratch").length} scratch (macOS say).
+
+## Pacing (the quality brief)
+
+No dead air over 0.5 s outside the scored open, the turn and the end card; no held shot over 4 s outside the two traces and the turn (v1 shots, plates and slide framings are cut at 4 s or less). Music is silent for the turn, back ${(back - turnLast.end).toFixed(2)} s after its last word.
+
+${pacing.length ? pacing.map((x) => `- **${x}**`).join("\n") : "- All pass."}
 ${warnings.length ? `\n## Timing warnings\n\n${warnings.map((w) => `- ${w}`).join("\n")}\n` : ""}`);
 
 const mixL = loudness(mix);
 console.log(`v2: ${mmss(total)} (${total.toFixed(2)} s), ${placed.length} lines (${placed.filter((l) => l.kind === "recorded").length} recorded), mix ${mixL.integrated_lufs} LUFS`);
 for (const w of warnings) console.log("WARN", w);
+for (const w of pacing) console.log("PACING", w);
 for (const c of checks) console.log(`${c.ok ? "PASS" : "FAIL"} ${c.rule}: ${c.at.join(", ")}`);
 if (failed.length && (FINAL || !draftOnly)) {
   console.error(`RULES CHECK FAILED: ${failed.map((c) => c.rule).join("; ")}`);

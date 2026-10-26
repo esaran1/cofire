@@ -64,7 +64,12 @@ down (never up), with a source line under it. App numbers in v2 come from
 | Cold open, first number | **61%** of Colorado in drought | U.S. Drought Monitor state statistics, Colorado, map of 2026-10-20 (valid Oct 20 to 26): D1 to D4 = 61.05% (D0 to D4 = 83.50%) | https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=10/15/2026&enddate=10/25/2026&statisticsType=1 | 2026-10-25 |
 | Cold open, second number | About **80%** of Denver's drinking water passes through one reservoir | Denver Water, "Strontia Springs: the little reservoir that could" (TAP Staff, 2017-09-09): "about 80 percent of Denver's drinking water passes through Strontia Springs Reservoir." | https://www.denverwater.org/tap/strontia-springs-the-little-reservoir-that-could | 2026-10-25 |
 | Cold open, third number | More than **1,000,000** cubic yards of mud in it, after two fires | Denver Water, "The legacy of Colorado's largest wildfire" (Sabrina Hall, 2017-06-16): the Buffalo Creek (1996) and Hayman (2002) fires, followed by rainstorms, "resulted in more than 1 million cubic yards of sediment accumulating in Strontia Springs Reservoir." | https://www.denverwater.org/tap/legacy-colorados-largest-wildfire | 2026-10-25 |
-| Stakes | About half of Denver's water comes from the other side of the Divide | Denver Water, "Where does your water come from?" (2021-06-29): "Denver Water collects around 50% of its drinking water from tributaries of the Colorado River on the west side of the Continental Divide." | https://www.denverwater.org/tap/where-does-your-water-come | 2026-10-25 |
+| Cold open, P2 over the trace (source line on screen) | "About half of that water starts here, on the other side of the mountains" | Denver Water, "Where does your water come from?" (2021-06-29): "Denver Water collects around 50% of its drinking water from tributaries of the Colorado River on the west side of the Continental Divide." | https://www.denverwater.org/tap/where-does-your-water-come | 2026-10-25 |
+
+The watershed colours in the trace are the app's own published week
+(U.S. Drought Monitor for Oct. 20, 2026, through `public/data/film.json`), and
+the route (garden cell, Strontia Springs, the tunnel's east end, Dillon) is
+drawn schematically, as the film says on screen.
 
 **Cut, could not be verified:**
 - **"94% of Colorado in drought".** The latest map is 61.05% (D1 to D4).
