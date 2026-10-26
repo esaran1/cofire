@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, type MotionValue, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
-import { useReduceMotion } from "@/lib/motion";
+import { motion, type MotionValue, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
+import { ReactNode, useRef } from "react";
+import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
 
 /**
  * Homepage-only motion, each with one job. Written here from ideas seen in the
@@ -14,6 +14,10 @@ import { useReduceMotion } from "@/lib/motion";
  *   the reading zone, so the claim is read at reading pace. Words go from the
  *   muted text colour (5.4:1 on paper, readable) to ink, never from invisible,
  *   so the line is whole without JavaScript or with reduced motion.
+ * - Letters: the wordmark assembles letter by letter on load, each rising out
+ *   of a soft blur. It plays once, on mount, so it always finishes.
+ * - Magnetic: a primary button leans a few pixels toward the pointer and
+ *   springs back, so the one action on the screen feels within reach.
  */
 
 /** The label rolls on hover or focus of the nearest `group` (the link). */
@@ -36,17 +40,19 @@ export function RollText({ children }: { children: string }) {
 /** `join` attaches a segment to the word before it, with no space (a closing period). */
 type Segment = { text: string; em?: boolean; join?: boolean };
 
-function Word({ word, i, n, progress, em }: { word: string; i: number; n: number; progress: MotionValue<number>; em?: boolean }) {
+const TONES = { light: ["#5f655f", "#161a19"], dark: ["#8d938e", "#f3f3ee"] } as const;
+
+function Word({ word, i, n, progress, em, tone }: { word: string; i: number; n: number; progress: MotionValue<number>; em?: boolean; tone: keyof typeof TONES }) {
   // Each word darkens across its own slice of the scroll range, with a little
   // overlap so the line reads as one movement rather than a ticker.
   const start = i / n;
   const end = Math.min(1, start + 1.6 / n);
-  const color = useTransform(progress, [start, end], ["#5f655f", "#161a19"]);
+  const color = useTransform(progress, [start, end], [...TONES[tone]]);
   const Tag = em ? motion.em : motion.span;
   return <Tag style={{ color }}>{word}</Tag>;
 }
 
-export function ScrollWords({ segments }: { segments: Segment[] }) {
+export function ScrollWords({ segments, tone = "light" }: { segments: Segment[]; tone?: keyof typeof TONES }) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduce = useReduceMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "end 40%"] });
@@ -73,9 +79,67 @@ export function ScrollWords({ segments }: { segments: Segment[] }) {
       {words.map(({ w, em, join }, i) => (
         <span key={i}>
           {i > 0 && !join ? " " : null}
-          <Word word={w} i={i} n={words.length} progress={scrollYProgress} em={em} />
+          <Word word={w} i={i} n={words.length} progress={scrollYProgress} em={em} tone={tone} />
         </span>
       ))}
     </span>
+  );
+}
+
+/**
+ * The wordmark, letter by letter. `em` letters are set in the display italic,
+ * as in the logo (CO<em>FIRE</em>). The whole word is in the accessible name
+ * once; the letters themselves are hidden from assistive technology.
+ */
+export function Letters({ plain, em }: { plain: string; em: string }) {
+  const instant = usePrefersReducedMotion();
+  const reduce = useReduceMotion();
+  const letters = [...plain.split("").map((c) => ({ c, em: false })), ...em.split("").map((c) => ({ c, em: true }))];
+  return (
+    <span aria-label={plain + em} role="img" className="inline-block">
+      {letters.map((l, i) => {
+        const Tag = l.em ? motion.em : motion.span;
+        return (
+          <Tag
+            key={i}
+            aria-hidden
+            className="inline-block"
+            initial={reduce ? false : { y: "0.32em", filter: "blur(10px)", opacity: 0.001 }}
+            animate={{ y: 0, filter: "blur(0px)", opacity: 1 }}
+            transition={instant ? { duration: 0 } : { duration: 0.9, delay: 0.08 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {l.c}
+          </Tag>
+        );
+      })}
+    </span>
+  );
+}
+
+/** Leans toward the pointer (at most `pull` of the offset) and springs back on leave. */
+export function Magnetic({ children, pull = 0.22 }: { children: ReactNode; pull?: number }) {
+  const reduce = useReduceMotion();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 260, damping: 18, mass: 0.4 });
+  const sy = useSpring(y, { stiffness: 260, damping: 18, mass: 0.4 });
+  if (reduce) return <>{children}</>;
+  return (
+    <motion.span
+      className="inline-block"
+      style={{ x: sx, y: sy }}
+      onPointerMove={(e) => {
+        if (e.pointerType !== "mouse") return;
+        const r = e.currentTarget.getBoundingClientRect();
+        x.set((e.clientX - (r.left + r.width / 2)) * pull);
+        y.set((e.clientY - (r.top + r.height / 2)) * pull);
+      }}
+      onPointerLeave={() => {
+        x.set(0);
+        y.set(0);
+      }}
+    >
+      {children}
+    </motion.span>
   );
 }

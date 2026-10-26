@@ -36,7 +36,7 @@ function mix(a: number[], b: number[], t: number): string {
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
 
-function colour(v: number): string {
+export function colour(v: number): string {
   const t = Math.max(-1, Math.min(1, (v - 50) / HALF));
   return t >= 0 ? mix(PAPER, EMBER, t) : mix(PAPER, SLATE, -t);
 }

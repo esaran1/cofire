@@ -12,8 +12,9 @@ import { CardPair } from "@/components/landing/CardPair";
 import { SealedTimeline } from "@/components/landing/SealedTimeline";
 import { Stage } from "@/components/landing/Stage";
 import { StoryMap } from "@/components/landing/StoryMap";
-import { LineReveal, ReadingProgress, RecedingHero } from "@/components/landing/Scroll";
-import { RollText, ScrollWords } from "@/components/landing/Flourish";
+import { ReadingProgress, RecedingHero, ZoomIn } from "@/components/landing/Scroll";
+import { Letters, Magnetic, RollText, ScrollWords } from "@/components/landing/Flourish";
+import { HeroField } from "@/components/landing/HeroField";
 import facts from "@/lib/facts.json";
 import { useT } from "@/lib/i18n";
 
@@ -31,15 +32,10 @@ export default function LandingPage() {
       {/* 1. Hero. Centered is allowed here: this is a launch statement and the
           message is the design (skill 4.3 override). It recedes on scroll so
           the first section arrives over it. */}
-      <RecedingHero>
-        <motion.h1
-          initial={reduce ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={instant ? { duration: 0 } : { duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="display text-[clamp(3.5rem,11vw,11rem)] leading-[0.95]"
-        >
-          CO<em>FIRE</em>
-        </motion.h1>
+      <RecedingHero backdrop={<HeroField />}>
+        <h1 className="display text-[clamp(3.5rem,11vw,11rem)] leading-[0.95]">
+          <Letters plain="CO" em="FIRE" />
+        </h1>
         <motion.p
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -55,13 +51,15 @@ export default function LandingPage() {
           transition={instant ? { duration: 0 } : { duration: 0.7, delay: 0.4 }}
           className="mt-12 flex flex-wrap items-center justify-center gap-3"
         >
-          <Link
-            href="/"
-            className="group inline-flex items-center gap-2 rounded-full bg-spruce px-6 py-3 font-medium text-paper transition-[transform,background-color] hover:bg-spruce-deep active:scale-[0.98]"
-          >
-            <RollText>{t("nav.openMap")}</RollText>
-            <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
-          </Link>
+          <Magnetic>
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-2 rounded-full bg-spruce px-6 py-3 font-medium text-paper transition-[transform,background-color] hover:bg-spruce-deep active:scale-[0.98]"
+            >
+              <RollText>{t("nav.openMap")}</RollText>
+              <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
+          </Magnetic>
         </motion.div>
       </RecedingHero>
 
@@ -97,10 +95,12 @@ export default function LandingPage() {
       {/* 3. What COFIRE does, shown as the forecast itself. */}
       <section className="border-t border-rule px-6 py-24 md:py-32">
         <div className="measure w-full">
-          <StoryMap
-            title={<>{t("land.forecasts")}</>}
-            line={<>{t("land.every", { km: facts.resolution_m / 1000 })}</>}
-          />
+          <ZoomIn>
+            <StoryMap
+              title={<>{t("land.forecasts")}</>}
+              line={<>{t("land.every", { km: facts.resolution_m / 1000 })}</>}
+            />
+          </ZoomIn>
         </div>
       </section>
 
@@ -113,12 +113,14 @@ export default function LandingPage() {
           />
         }
       >
-        <CardPair />
+        <ZoomIn>
+          <CardPair />
+        </ZoomIn>
       </Chapter>
 
       {/* 5. The discipline behind the claim. */}
       <Chapter
-        title={<>{t("land.locked")}</>}
+        title={<ScrollWords segments={[{ text: t("land.locked") }]} />}
         line={<>{t("land.lockedLine")}</>}
       >
         <SealedTimeline />
@@ -128,7 +130,7 @@ export default function LandingPage() {
           test with the delay a real forecaster faces. */}
       <Stage
         tinted
-        claim={<>{t("land.flaw")}</>}
+        claim={<ScrollWords segments={[{ text: t("land.flaw") }]} />}
         detail={
           <>
             {t("land.flawDetail1")}{" "}
@@ -147,7 +149,7 @@ export default function LandingPage() {
 
       {/* 7. Where it fell short, and what the app did about it. */}
       <Stage
-        claim={<>{t("land.drift")}</>}
+        claim={<ScrollWords segments={[{ text: t("land.drift") }]} />}
         detail={<>{t("land.driftDetail", { n: look.by_test["5"].n_total - look.by_test["5"].n_pass })}</>}
       >
         <ReliabilityFigure
@@ -164,17 +166,20 @@ export default function LandingPage() {
       {/* 7. Close. */}
       <section className="border-t border-rule bg-ink px-6 py-20 text-paper">
         <div className="measure">
-          <LineReveal
-            className="display max-w-[20ch] text-4xl text-paper md:text-6xl"
-            lines={[<>{t("land.see")}</>]}
-          />
-          <Link
-            href="/"
-            className="group mt-10 inline-flex items-center gap-2 rounded-full bg-paper px-6 py-3 font-medium text-ink transition-[transform,background-color] hover:bg-paper-raised active:scale-[0.98]"
-          >
-            <RollText>{t("nav.openMap")}</RollText>
-            <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
-          </Link>
+          <p className="display max-w-[20ch] text-4xl md:text-6xl">
+            <ScrollWords tone="dark" segments={[{ text: t("land.see") }]} />
+          </p>
+          <div className="mt-10">
+            <Magnetic>
+              <Link
+                href="/"
+                className="group inline-flex items-center gap-2 rounded-full bg-paper px-6 py-3 font-medium text-ink transition-[transform,background-color] hover:bg-paper-raised active:scale-[0.98]"
+              >
+                <RollText>{t("nav.openMap")}</RollText>
+                <ArrowRight size={17} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
+              </Link>
+            </Magnetic>
+          </div>
         </div>
       </section>
     </>
