@@ -9,11 +9,12 @@
 # reads the forecast bundles as static files under /data, and Predict and
 # Observe call the api service at /api on the same domain.
 #
-# The basemap is the 'basemap' release asset of this private repository, so
-# reading it needs COFIRE_RELEASE_TOKEN in the Vercel project's environment
-# variables: a fine-grained GitHub token with read-only Contents access to
-# this repository and nothing else. A production build without it fails; a
-# preview build draws the map on a plain background and says so in the log.
+# The basemap (app/public/tiles/colorado.pmtiles) is committed, so a deploy
+# finds it in the checkout, checks its sha256 and needs no token. If it is
+# ever missing, the build falls back to the 'basemap' release asset of this
+# private repository, which needs COFIRE_RELEASE_TOKEN (a fine-grained GitHub
+# token with read-only Contents access to this repository) in the Vercel
+# project's environment variables.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
