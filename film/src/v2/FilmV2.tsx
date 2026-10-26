@@ -109,8 +109,7 @@ const Timer: React.FC = () => {
   const cb = beat("clock");
   const big = cb ? Math.min(ramp(t, cb.start - 0.05, cb.start + 0.25), 1 - ramp(t, cb.end - 0.55, cb.end - 0.05)) : 0;
   // The pill's centre sits near (1760, 1006); the frame's centre is (960, 540).
-  const grow = cb ? clamp01((t - cb.start) / Math.max(0.5, cb.end - cb.start)) : 0;
-  const s = 1 + 0.7 * k + (3.0 + 0.45 * grow) * big;
+  const s = 1 + 0.7 * k + 3.0 * big;
   const dx = -60 * k - 800 * big, dy = -40 * k - 466 * big;
   return (
     <div
@@ -134,7 +133,7 @@ const Plate: React.FC<{ name: string; t: number; len: number }> = ({ name, t, le
   const vw = s.viewport.width;
   const w0 = Math.min(vw, 1920);
   const u = clamp01(t / Math.max(0.5, len));
-  return <CapturePlane name={name} t={u} keys={[{ t: 0, view: { x: 0, y: 0, w: w0 } }, { t: 1, view: { x: w0 * 0.03, y: (w0 * 0.03 * 9) / 16, w: w0 * 0.94 } }]} box={{ w: 1920, h: 1080 }} />;
+  return <CapturePlane name={name} t={u} keys={[{ t: 0, view: { x: 0, y: 0, w: w0 } }, { t: 1, view: { x: w0 * 0.01, y: (w0 * 0.01 * 9) / 16, w: w0 * 0.98 } }]} box={{ w: 1920, h: 1080 }} />;
 };
 /** Plates cut on the voice, each 3.6 seconds or shorter. */
 const Plates: React.FC<{ b: Beat; names: string[] }> = ({ b, names }) => {
@@ -268,28 +267,16 @@ const Audience: React.FC<{ b: Beat }> = ({ b }) => {
 };
 
 // ---------------------------------------------------------------------------
-// Slides: ink ground, paper type, spruce for what is being said. A slide is
-// cut into framings (wide, then pushed in on what the voice names), never
-// held in one framing for more than four seconds.
+// Slides: ink ground, paper type, spruce for what is being said. Each slide
+// holds still in one framing; its parts build with the voice.
 type Framing = { at: number; scale: number; cx: number; cy: number };
-const SlideFrame: React.FC<{ b: Beat; title: string; framings?: Framing[]; children: React.ReactNode }> = ({ b, title, framings = [], children }) => {
-  const t = useSec() + b.start;
-  const all = [{ at: b.start, scale: 1, cx: 960, cy: 540 }, ...framings].sort((p, q) => p.at - q.at);
-  let i = 0;
-  for (let j = 0; j < all.length; j++) if (t >= all[j].at) i = j;
-  const f = all[i];
-  const len = (all[i + 1]?.at ?? b.end) - f.at;
-  const s = f.scale * (1 + 0.025 * clamp01((t - f.at) / Math.max(0.5, len)));
-  // A close framing puts (cx, cy) at the centre of the frame; the title is only in the wide one.
-  return (
-    <AbsoluteFill style={{ background: T.ink, overflow: "hidden" }}>
-      <AbsoluteFill style={{ transformOrigin: "0 0", transform: `translate(${960 - f.cx * s}px, ${540 - f.cy * s}px) scale(${s})`, padding: "100px 140px" }}>
-        <div style={{ fontFamily: FONT.serif, fontWeight: 300, fontSize: 84, color: T.paper, letterSpacing: "-0.015em", opacity: f.scale === 1 ? 1 : 0 }}>{title}</div>
-        <div style={{ position: "relative", flex: 1, marginTop: 50 }}>{children}</div>
-      </AbsoluteFill>
-    </AbsoluteFill>
-  );
-};
+/** A slide: held still, in one framing, while its parts build with the voice. */
+const SlideFrame: React.FC<{ b: Beat; title: string; framings?: Framing[]; children: React.ReactNode }> = ({ title, children }) => (
+  <AbsoluteFill style={{ background: T.ink, padding: "100px 140px" }}>
+    <div style={{ fontFamily: FONT.serif, fontWeight: 300, fontSize: 84, color: T.paper, letterSpacing: "-0.015em" }}>{title}</div>
+    <div style={{ position: "relative", flex: 1, marginTop: 50 }}>{children}</div>
+  </AbsoluteFill>
+);
 
 const TOOLS = [
   { name: "Python", note: "Data pipeline and models", word: "Python" },
@@ -304,15 +291,8 @@ const SlideTools: React.FC<{ b: Beat }> = ({ b }) => {
   const t = useSec() + b.start;
   const l = line("slide1");
   const foot = wordTime(l, "We used", b.end - 3);
-  const framings: Framing[] = [
-    { at: wordTime(l, "TypeScript", b.start + 3), scale: 2.0, cx: 1372, cy: 321 },
-    { at: wordTime(l, "MapLibre", b.start + 5), scale: 2.5, cx: 1578, cy: 321 },
-    { at: wordTime(l, "GitHub", b.start + 6), scale: 1, cx: 960, cy: 540 },
-    { at: foot, scale: 1.5, cx: 600, cy: 880 },
-    { at: wordTime(l, "and our repo", b.end - 1.5), scale: 1.9, cx: 560, cy: 925 },
-  ];
   return (
-    <SlideFrame b={b} title="How it's built" framings={framings}>
+    <SlideFrame b={b} title="How it's built">
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 22 }}>
         {TOOLS.map((x, i) => {
           const at = wordTime(l, x.word, b.start + 0.6 + i * 0.8);
@@ -347,7 +327,7 @@ const SlideData: React.FC<{ b: Beat }> = ({ b }) => {
     { big: "", label: "Updated weekly", at: b.start + 0.8 },
   ];
   return (
-    <SlideFrame b={b} title="Real data, checked every week" framings={[{ at: gate, scale: 1.35, cx: 790, cy: 370 }]}>
+    <SlideFrame b={b} title="Real data, checked every week">
       <div style={{ display: "flex", alignItems: "center", gap: 40 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 14, width: 560 }}>
           {SOURCES.map((s, i) => (
@@ -382,9 +362,8 @@ const SlideModels: React.FC<{ b: Beat }> = ({ b }) => {
   const t = useSec() + b.start;
   const l = line("slide3");
   const win = wordTime(l, "The simplest", b.start + 3);
-  const why = wordTime(l, "And you can", b.end - 2);
   return (
-    <SlideFrame b={b} title="Simple beat complex" framings={[{ at: win + 0.9, scale: 1.25, cx: 960, cy: 540 }, { at: (win + 0.9 + why) / 2, scale: 1.6, cx: 960, cy: 515 }, { at: why, scale: 1.42, cx: 960, cy: 580 }]}>
+    <SlideFrame b={b} title="Simple beat complex">
       <div style={{ display: "flex", gap: 26 }}>
         {MODELS.map((m, i) => {
           const appear = easeOut(clamp01((t - b.start - 0.2 - i * 0.2) / 0.35));
@@ -399,7 +378,7 @@ const SlideModels: React.FC<{ b: Beat }> = ({ b }) => {
       {(() => {
         const k = easeOut(clamp01((t - win - 0.4) / 0.5));
         return (
-          <div style={{ position: "absolute", left: 0, right: 0, top: 200, display: "flex", flexDirection: "column", alignItems: "center", opacity: k, transform: `scale(${lerp(0.94, 1, k)})` }}>
+          <div style={{ position: "absolute", left: 0, right: 0, top: 200, display: "flex", flexDirection: "column", alignItems: "center", opacity: k, transform: `translateY(${lerp(16, 0, k)}px)` }}>
             <div style={{ padding: "40px 60px", border: `2px solid ${SPRUCE_LIGHT}`, background: "rgba(36,94,80,0.3)", borderRadius: 2, fontFamily: FONT.serif, fontWeight: 300, fontSize: 66, color: T.paper }}>
               Weeks like this one → what happened next
             </div>
@@ -428,7 +407,7 @@ const SlideTested: React.FC<{ b: Beat }> = ({ b }) => {
     { text: fill("{n_survivors} of {n_tested} forecasts beat their baselines"), at: wordTime(l, "forecasts", b.end - 2) - 0.8 },
   ];
   return (
-    <SlideFrame b={b} title="Tested before we trusted it" framings={[{ at: wordTime(l, "locked", b.start + 1.5), scale: 1.7, cx: 1574, cy: 345 }, { at: badges[2].at - 0.1, scale: 1.25, cx: 810, cy: 610 }]}>
+    <SlideFrame b={b} title="Tested before we trusted it">
       <div style={{ display: "flex", gap: 6, height: 96 }}>
         {segs.map((s, i) => {
           const fillK = ramp(t, b.start + 0.15 + i * 0.35, b.start + 0.55 + i * 0.35);
@@ -468,7 +447,7 @@ const Turn: React.FC<{ b: Beat }> = ({ b }) => {
   const strike = ramp(t, wordTime(l2, "pulled", a2 + 2) - 0.05, wordTime(l2, "pulled", a2 + 2) + 0.45);
   const plain = wordTime(l2, "Now COFIRE", b.end - 3);
   // A slow push, so the stillness is held, not frozen.
-  const push = 1 + 0.06 * clamp01((t - b.start) / Math.max(1, b.end - b.start));
+  const push = 1 + 0.02 * clamp01((t - b.start) / Math.max(1, b.end - b.start));
   return (
     <AbsoluteFill style={{ background: "#000", alignItems: "center", justifyContent: "center", transform: `scale(${push})` }}>
       <div style={{ position: "absolute", opacity: one, fontFamily: FONT.serif, fontWeight: 300, fontSize: 96, color: T.paper, letterSpacing: "-0.01em" }}>One result looked perfect.</div>
@@ -525,7 +504,7 @@ const EndCard: React.FC<{ b: Beat }> = ({ b }) => {
 const Drift: React.FC<{ b: Beat; children: React.ReactNode }> = ({ b, children }) => {
   const t = useSec();
   const u = clamp01(t / Math.max(0.1, b.end - b.start));
-  const amount = b.scene === "Clock" || b.scene === "Logo" ? 0.08 : 0.03;
+  const amount = 0.02;
   return <AbsoluteFill style={{ transform: `scale(${1 + amount * u})`, transformOrigin: "50% 45%" }}>{children}</AbsoluteFill>;
 };
 
@@ -560,11 +539,6 @@ const SceneBody: React.FC<{ b: Beat }> = ({ b }) => {
   }
 };
 
-export const ScratchV2: React.FC = () => (
-  <div style={{ position: "absolute", left: 28, top: 22, padding: "6px 12px", borderRadius: 3, background: "rgba(22,26,25,0.72)", fontFamily: FONT.sans, fontSize: 18, color: "rgba(243,243,238,0.85)" }}>
-    Scratch voices (macOS say): draft until the team records
-  </div>
-);
 
 const Beats: React.FC<{ until?: number }> = ({ until = Infinity }) => {
   const { fps } = useVideoConfig();
@@ -579,19 +553,18 @@ const Beats: React.FC<{ until?: number }> = ({ until = Infinity }) => {
   );
 };
 
-export const FilmV2: React.FC<{ scratch?: boolean }> = ({ scratch = false }) => (
+export const FilmV2: React.FC<{ scratch?: boolean }> = () => (
   <Guard name="FilmV2">
     <AbsoluteFill style={{ background: T.ink }}>
       <Beats />
       <Timer />
-      {scratch ? <ScratchV2 /> : null}
     </AbsoluteFill>
   </Guard>
 );
 
 /** The vertical cut: the cold open and the team, for phones (45 s or less). */
 export const V2_VERTICAL = Math.min(45, beat("clock").end);
-export const VerticalV2: React.FC<{ scratch?: boolean }> = ({ scratch = false }) => {
+export const VerticalV2: React.FC<{ scratch?: boolean }> = () => {
   const scale = 1080 / 1920;
   return (
     <Guard name="VerticalV2">
@@ -605,8 +578,7 @@ export const VerticalV2: React.FC<{ scratch?: boolean }> = ({ scratch = false })
         <div style={{ position: "absolute", top: 260, left: 0, right: 0, textAlign: "center" }}>
           <Wordmark size={150} />
         </div>
-        {scratch ? <ScratchV2 /> : null}
-      </AbsoluteFill>
+        </AbsoluteFill>
     </Guard>
   );
 };

@@ -66,14 +66,22 @@ the breath before the hard cut to the team), inside the turn (including the
 0.7 s held after its last word before the music returns), and the final fade.
 The music track measures silent for the whole turn.
 
+## After the team watched it (2026-10-25, evening)
+
+| Feedback | Changed |
+|---|---|
+| Remove the "Scratch voices" label: the team will record. | The label is gone from every output. (The voices are still the scratch reads until the recordings go in `audio/vo/`.) |
+| Stuttering. | Cause: the demo shots were retimed by 0.94x to 1.35x to fit the voice, and at 60 fps a fractional rate repeats or skips frames, which judders on every pan and cursor move. Every shot now plays at true speed (1.0x) and is trimmed to fit instead (from its start, middle or end); the watershed beat gained one app capture so it never runs short. |
+| Unnecessary zooming; the tools slide zoomed into some tiles and not others; the "Weeks like this one" slide zoomed. | No punch-ins on any slide. Each slide holds one still framing while its parts build with the voice; the method card fades up without scaling. The slow push on other scenes is down to 2% (from 3 to 8%). This overrides the brief's 4-second shot rule for the four slides, by the team's call. |
+
 ## Final outputs, measured
 
 | File | Length | Picture | Loudness | Stillness and black |
 |---|---|---|---|---|
-| `cofire_v2_master_1920x1080_60fps.mp4` | 2:54.3 | 1920x1080, 60 fps | -14.0 LUFS, -1.4 dBFS peak | No freeze of 1 s or more at 480 px; black only before the turn's first line (0.7 s) and between its two lines (0.2 s). |
+| `cofire_v2_master_1920x1080_60fps.mp4` | 2:54.3 | 1920x1080, 60 fps | -14.0 LUFS, -1.4 dBFS peak | Measured before the evening changes: no freeze of 1 s or more at 480 px; black only before the turn's first line (0.7 s) and between its two lines (0.2 s). Re-measured after the evening changes: same length and loudness; the only stretches still for over a second are the four slides (held in one framing between their builds, as asked) and the turn (one line on black). No scratch label in any frame. |
 | `cofire_v2_upload_1920x1080_30fps.mp4` | 2:54.3 | 1920x1080, 30 fps | -14.0 LUFS, -1.4 dBFS | As the master. |
 | `cofire_v2_upload_1920x1080_30fps_captions_en.mp4` | 2:54.3 | 1920x1080, 30 fps, English burned in | -14.0 LUFS, -1.4 dBFS | As the master. |
-| `cofire_v2_vertical_1080x1920_30fps.mp4` | 0:45.0 | 1080x1920, 30 fps | -13.9 LUFS, -1.4 dBFS | The cold open and the team. |
+| `cofire_v2_vertical_1080x1920_30fps.mp4` | 0:45.0 | 1080x1920, 30 fps | -13.9 LUFS, -1.4 dBFS | The cold open and the team; no scratch label. |
 
 A coarser scan (320 px, 15 fps) flags 1.0 to 1.6 s "freezes" at the turn's
 slow push, the last second of the open's pull-back, and the vertical's first

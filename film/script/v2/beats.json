@@ -1,5 +1,5 @@
 {
- "note": "The picture of film v2 (second script), in order. A beat lasts as long as its lines plus a short tail (cut on the voice); `min` sets a floor for the trace beats. v1s: windows of the v1 film played in order, each 4 s or shorter, reusing its captures, camera moves and cursor; the beat ends when its voice does. `rules`: what the picture shows on screen (RULES_CHECK.md).",
+ "note": "The picture of film v2 (second script), in order. A beat lasts as long as its lines plus a short tail (cut on the voice); `min` sets a floor for the trace beats. v1s: windows of the v1 film played in order at true speed (never retimed, so motion stays smooth), each trimmed to fit the voice from its start, middle (default) or end; a capture name is a still plate. The beat ends when its voice does. `rules`: what the picture shows on screen (RULES_CHECK.md).",
  "beats": [
   {
    "id": "open",
@@ -95,15 +95,18 @@
    "v1s": [
     [
      33.0,
-     35.3
+     35.3,
+     "start"
     ],
     [
      35.3,
-     38.2
+     38.2,
+     "mid"
     ],
     [
      38.2,
-     42.2
+     42.2,
+     "end"
     ]
    ],
    "rules": [
@@ -139,6 +142,7 @@
      69.4,
      72.6
     ],
+    "card_ws",
     [
      72.6,
      75.6

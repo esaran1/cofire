@@ -125,20 +125,27 @@ for (const b of beats) {
   const row = { ...b, start: Number(start.toFixed(3)), end: Number((start + len).toFixed(3)) };
   if (b.v1s) {
     // Short shots from v1, played in order and time-remapped to fill the beat.
-    // A capture name instead of a window is a still plate with a push (2.8 s natural length).
+    // Shots play at true speed: retiming a 60 fps shot by a fraction repeats or
+    // skips frames, which judders on every pan and cursor move. Each window
+    // is trimmed to its share of the beat instead, from its start, middle
+    // (default) or end. A capture name is a still plate (2.8 s natural).
     const dur = (w) => (typeof w === "string" ? 2.8 : w[1] - w[0]);
     const D = b.v1s.reduce((x, w) => x + dur(w), 0);
-    const rate = Math.min(1.35, Math.max(0.65, D / len));
-    const k = len / (D / rate);
+    const k = len / D;
+    if (k > 1.001) throw new Error(`${b.id}: its shots run ${D.toFixed(2)} s but the beat needs ${len.toFixed(2)} s; add a window or a plate in beats.json`);
     let at = 0;
     row.shots = b.v1s.map((w) => {
-      const shown = (dur(w) / rate) * k;
-      const sh = { ...(typeof w === "string" ? { plate: w, a: 0 } : { a: w[0] }), at: Number(at.toFixed(3)), len: Number(shown.toFixed(3)), rate: Number(rate.toFixed(4)) };
+      const shown = dur(w) * k;
+      let a = 0;
+      if (typeof w !== "string") {
+        const [p, q, anchor = "mid"] = w;
+        a = anchor === "start" ? p : anchor === "end" ? q - shown : p + (q - p - shown) / 2;
+      }
+      const sh = { ...(typeof w === "string" ? { plate: w } : {}), a: Number(a.toFixed(3)), at: Number(at.toFixed(3)), len: Number(shown.toFixed(3)), rate: 1 };
       at += shown;
       if (shown > 4.0) warnings.push(`${b.id}: a v1 shot runs ${shown.toFixed(2)} s (over 4 s)`);
       return sh;
     });
-    if (k > 1.001) warnings.push(`${b.id}: v1 footage runs short; shots play ${(k * rate).toFixed(2)}x their window`);
     delete row.v1s;
   }
   laid.push(row);

@@ -27,7 +27,7 @@ Each person records the lines in their sheet (`film/LINES/P1.md` to `P4.md`)
 and saves the best take as `film/audio/vo/<file name>.wav` (or `.m4a`), for
 example `film/audio/vo/tap1.wav`. Lines marked ALL: one file of everyone
 saying it together, named as in the sheet. Any line without a file keeps its
-scratch voice, and the film keeps its "scratch" label.
+scratch voice (the film no longer shows a label for it).
 
 ## 3. Final render (about 15 to 25 minutes on this laptop)
 
