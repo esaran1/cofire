@@ -233,6 +233,9 @@ function Chapter({
  * animates position only, starting from rest, so the photograph is always
  * visible whether or not the animation runs.
  */
+/** The photograph's side inset, as a share of its top and bottom inset. */
+const SIDE_INSET = 0.75;
+
 function PhotoChapter({
   src,
   alt,
@@ -251,9 +254,11 @@ function PhotoChapter({
   // The photograph arrives as a framed plate and opens to the full width as
   // its section rises into view: the calm of the title gives way to the fire.
   // It is fully open by the time the headline is in the reading zone.
-  const enter = useSmooth(useScroll({ target: ref, offset: ["start end", "start 0.25"] }).scrollYProgress);
+  // Offsets as [target, viewport] fractions: from the section's top at the
+  // bottom of the screen to its top a quarter of the way down.
+  const enter = useSmooth(useScroll({ target: ref, offset: [[0, 1], [0, 0.25]] }).scrollYProgress);
   const inset = useTransform(enter, [0, 1], [7, 0]);
-  const clipPath = useTransform(inset, (v) => `inset(${v}% ${v * 0.75}% ${v}% ${v * 0.75}% round ${v > 0.2 ? 2 : 0}px)`);
+  const clipPath = useTransform(inset, (v) => `inset(${v}% ${v * SIDE_INSET}% ${v}% ${v * SIDE_INSET}% round ${v > 0.2 ? 2 : 0}px)`);
   return (
     <section ref={ref} className="relative flex min-h-[100dvh] items-end overflow-hidden bg-paper">
       <motion.div className="absolute inset-0 overflow-hidden bg-ink" style={reduce ? undefined : { clipPath }}>

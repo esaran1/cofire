@@ -57,7 +57,8 @@ function Word({ word, i, n, progress, em, tone }: { word: string; i: number; n: 
 export function ScrollWords({ segments, tone = "light" }: { segments: Segment[]; tone?: keyof typeof TONES }) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduce = useReduceMotion();
-  const raw = useScroll({ target: ref, offset: ["start 85%", "end 40%"] }).scrollYProgress;
+  // From the line's top at 85% down the screen to its bottom at 40%.
+  const raw = useScroll({ target: ref, offset: [[0, 0.85], [1, 0.4]] }).scrollYProgress;
   const scrollYProgress = useSmooth(raw);
   const words = segments.flatMap((s) =>
     s.text
@@ -130,6 +131,9 @@ export function Letters({ plain, em }: { plain: string; em: string }) {
   );
 }
 
+/** How much further the label travels than the button, for depth. */
+const LABEL_DEPTH = 0.45;
+
 /** Leans toward the pointer (at most `pull` of the offset) and springs back on leave. */
 export function Magnetic({ children, pull = 0.22 }: { children: ReactNode; pull?: number }) {
   const reduce = useReduceMotion();
@@ -138,8 +142,8 @@ export function Magnetic({ children, pull = 0.22 }: { children: ReactNode; pull?
   const sx = useSpring(x, { stiffness: 220, damping: 16, mass: 0.5 });
   const sy = useSpring(y, { stiffness: 220, damping: 16, mass: 0.5 });
   // The label inside travels a little further than the button: depth.
-  const ix = useTransform(sx, (v) => v * 0.45);
-  const iy = useTransform(sy, (v) => v * 0.45);
+  const ix = useTransform(sx, (v) => v * LABEL_DEPTH);
+  const iy = useTransform(sy, (v) => v * LABEL_DEPTH);
   if (reduce) return <>{children}</>;
   return (
     <motion.span
