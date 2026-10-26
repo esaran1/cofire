@@ -1766,7 +1766,7 @@ rendering.
 ## v1.1 Stage 5 results: 21 survivors over five domains, no cross-domain agreement
 
 `cofire/ship/survivors_v11.py`, run after the rules above were committed
-(79f6989). Output `artifacts/v11/survivors_v11.csv` and
+(28e6c07). Output `artifacts/v11/survivors_v11.csv` and
 `survivors_v11_summary.json`.
 
 **Reproduction check.** Larimer and Pueblo recomputed through the new runner
@@ -2660,7 +2660,7 @@ the unseal, when 2026 outcomes may be used.
 
 ### Two fixes found on the way
 
-- **The site build failed on `f0f665b`.** `next/font/google` could not parse
+- **The site build failed on `46a7bb5`.** `next/font/google` could not parse
   the font URLs Google Fonts returned. The three OFL families are now
   committed in `app/fonts/` (the same latin files, byte for byte) and loaded
   with `next/font/local`, so the build fetches nothing.
@@ -3201,3 +3201,27 @@ The owner found pages slow to open while navigating. Measured, not guessed:
 - **The data was never the bottleneck.** A map view downloads 5 to 20 kB of
   compressed forecast, and the local API answers in a few milliseconds.
 - The static suite passes 86 of 86 with the change.
+
+## Commit history rewritten; recorded commit IDs updated, 2026-10-26
+
+At the owner's request, the history was rewritten to remove the AI
+co-author line from commit messages (157 of 169 commits). Only messages
+changed: every commit keeps its files, author and date, so each one has a
+twin with an identical tree and a new ID. AI use is still disclosed in
+`AI_USAGE.md` and in the film, unchanged.
+- **The freeze commit.** The model was frozen at the commit formerly
+  `46c17ae4aac2bef2d1397e422755104284f71667`; its twin is
+  `1d3b2c5b4104b07aa76bb5a1e1007721f176d4ed`, with the identical tree
+  (`3aeb343e0ed5fd2411ef4c4bd99d0df15b61dfef`). `artifacts/FREEZE_COMMIT`,
+  the look 3 provenance records, the facts files and the demo copies now
+  name the new ID; the frozen-model check compares the same files as before.
+- **Every other recorded commit ID** (24 references in 17 files: the build
+  sha in the facts, history notes in STATUS, DECISIONS, README, the leak
+  sweep, the shown-radius audit, the architecture diagram) was mapped to its
+  twin by tree, author and date, keeping each reference's length. No
+  recorded checksum covers any of these files.
+- **Not changed:** the `cac-2026-submission` tag (the code submitted for
+  judging) still names the old freeze ID inside its files.
+- **The original history** is kept outside the repository as a git bundle,
+  with a list of every old ref, so the old IDs can be shown to resolve to the
+  same trees if anyone asks.

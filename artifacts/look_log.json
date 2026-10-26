@@ -2,7 +2,7 @@
   {
     "holdout_year": 2026,
     "config_hash": "ed0c2079a5bc0eee1d0aa11869d3bc5eb0af671b9f30ee0c5114c3b9ca7be157",
-    "git_sha": "7df7a10fc46f3ae8d1fbe70373a7078b550bc413",
+    "git_sha": "ec3b5dd540af4bdc5ff00f78da4281c0d5765be8",
     "timestamp": "2026-09-21T23:06:57.092833+00:00",
     "note": "look 3, preregistered confirmatory tests"
   }

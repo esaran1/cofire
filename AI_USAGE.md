@@ -45,7 +45,7 @@ by the student": `cofire/model/features.py`, `cofire/model/train.py`,
 `cofire/model/conformal.py` and `cofire/model/models/pi_convlstm.py`. Git
 history shows no hand rewrite of them: every commit that touches them is
 agent-attributed or is the scaffold. The model tree has been frozen since
-commit `46c17ae`.
+commit `1d3b2c5`.
 
 Some agent-generated work was later found wrong and corrected in the open,
 with records kept rather than rewritten:

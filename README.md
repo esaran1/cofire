@@ -40,7 +40,7 @@ flowchart LR
     vintages["vintages<br/>every fetch kept,<br/>each issue pinned"]
   end
   subgraph c2["Frozen model"]
-    model["cofire/model @ 46c17ae<br/>configuration A:<br/>Markov drought, damped<br/>logistic fire, damped<br/>regression dryness"]
+    model["cofire/model @ 1d3b2c5<br/>configuration A:<br/>Markov drought, damped<br/>logistic fire, damped<br/>regression dryness"]
     seal["2026 sealed<br/>looks counted;<br/>unseal 2027-01-12"]
   end
   subgraph c3["Ship layer"]

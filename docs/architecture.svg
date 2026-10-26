@@ -53,7 +53,7 @@
 <text x="300" y="186" font-size="13" font-weight="normal" fill="#17181b">every fetch kept,</text>
 <text x="300" y="203" font-size="13" font-weight="normal" fill="#17181b">each issue pinned</text>
 <rect x="550" y="70" width="190" height="105" rx="3" fill="#ece5d2" stroke="#9a7420" stroke-width="1.2"/>
-<text x="560" y="93" font-size="13" font-weight="bold" fill="#17181b">cofire/model @ 46c17ae</text>
+<text x="560" y="93" font-size="13" font-weight="bold" fill="#17181b">cofire/model @ 1d3b2c5</text>
 <text x="560" y="110" font-size="13" font-weight="normal" fill="#17181b">configuration A:</text>
 <text x="560" y="127" font-size="13" font-weight="normal" fill="#17181b">Markov drought, damped</text>
 <text x="560" y="144" font-size="13" font-weight="normal" fill="#17181b">logistic fire, damped</text>
