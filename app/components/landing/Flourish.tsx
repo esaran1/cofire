@@ -2,7 +2,7 @@
 
 import { motion, type MotionValue, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
 import { ReactNode, useRef } from "react";
-import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
+import { usePrefersReducedMotion, useReduceMotion, useSmooth } from "@/lib/motion";
 
 /**
  * Homepage-only motion, each with one job. Written here from ideas seen in the
@@ -48,14 +48,17 @@ function Word({ word, i, n, progress, em, tone }: { word: string; i: number; n: 
   const start = i / n;
   const end = Math.min(1, start + 1.6 / n);
   const color = useTransform(progress, [start, end], [...TONES[tone]]);
+  // Each word also settles a hair as it darkens: position only, never hidden.
+  const y = useTransform(progress, [start, end], ["0.14em", "0em"]);
   const Tag = em ? motion.em : motion.span;
-  return <Tag style={{ color }}>{word}</Tag>;
+  return <Tag className="inline-block" style={{ color, y }}>{word}</Tag>;
 }
 
 export function ScrollWords({ segments, tone = "light" }: { segments: Segment[]; tone?: keyof typeof TONES }) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduce = useReduceMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "end 40%"] });
+  const raw = useScroll({ target: ref, offset: ["start 85%", "end 40%"] }).scrollYProgress;
+  const scrollYProgress = useSmooth(raw);
   const words = segments.flatMap((s) =>
     s.text
       .split(/\s+/)
@@ -96,7 +99,7 @@ export function Letters({ plain, em }: { plain: string; em: string }) {
   const reduce = useReduceMotion();
   const letters = [...plain.split("").map((c) => ({ c, em: false })), ...em.split("").map((c) => ({ c, em: true }))];
   return (
-    <span aria-label={plain + em} role="img" className="inline-block">
+    <span aria-label={plain + em} role="img" className="inline-block [perspective:900px]">
       {letters.map((l, i) => {
         const Tag = l.em ? motion.em : motion.span;
         return (
@@ -104,9 +107,20 @@ export function Letters({ plain, em }: { plain: string; em: string }) {
             key={i}
             aria-hidden
             className="inline-block"
-            initial={reduce ? false : { y: "0.32em", filter: "blur(10px)", opacity: 0.001 }}
-            animate={{ y: 0, filter: "blur(0px)", opacity: 1 }}
-            transition={instant ? { duration: 0 } : { duration: 0.9, delay: 0.08 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+            initial={reduce ? false : { y: "0.42em", rotateX: -55, filter: "blur(12px)", opacity: 0.001 }}
+            animate={{ y: 0, rotateX: 0, filter: "blur(0px)", opacity: 1 }}
+            transition={
+              instant
+                ? { duration: 0 }
+                : {
+                    delay: 0.1 + i * 0.065,
+                    y: { type: "spring", stiffness: 140, damping: 18, mass: 0.9 },
+                    rotateX: { type: "spring", stiffness: 140, damping: 18, mass: 0.9 },
+                    filter: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+                    opacity: { duration: 0.5, ease: "easeOut" },
+                  }
+            }
+            style={{ transformOrigin: "50% 100%" }}
           >
             {l.c}
           </Tag>
@@ -121,12 +135,15 @@ export function Magnetic({ children, pull = 0.22 }: { children: ReactNode; pull?
   const reduce = useReduceMotion();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 260, damping: 18, mass: 0.4 });
-  const sy = useSpring(y, { stiffness: 260, damping: 18, mass: 0.4 });
+  const sx = useSpring(x, { stiffness: 220, damping: 16, mass: 0.5 });
+  const sy = useSpring(y, { stiffness: 220, damping: 16, mass: 0.5 });
+  // The label inside travels a little further than the button: depth.
+  const ix = useTransform(sx, (v) => v * 0.45);
+  const iy = useTransform(sy, (v) => v * 0.45);
   if (reduce) return <>{children}</>;
   return (
     <motion.span
-      className="inline-block"
+      className="inline-block will-change-transform [&>*]:will-change-transform"
       style={{ x: sx, y: sy }}
       onPointerMove={(e) => {
         if (e.pointerType !== "mouse") return;
@@ -139,7 +156,9 @@ export function Magnetic({ children, pull = 0.22 }: { children: ReactNode; pull?
         y.set(0);
       }}
     >
-      {children}
+      <motion.span className="inline-block" style={{ x: ix, y: iy }}>
+        {children}
+      </motion.span>
     </motion.span>
   );
 }

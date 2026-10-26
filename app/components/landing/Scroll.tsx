@@ -11,7 +11,7 @@
  */
 
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
+import { usePrefersReducedMotion, useReduceMotion, useSmooth } from "@/lib/motion";
 import { ReactNode, useRef } from "react";
 
 /**
@@ -51,33 +51,28 @@ export function ReadingProgress() {
 export function RecedingHero({ children, backdrop }: { children: ReactNode; backdrop?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReduceMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const raw = useScroll({ target: ref, offset: ["start start", "end start"] }).scrollYProgress;
+  const scrollYProgress = useSmooth(raw);
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const blur = useTransform(scrollYProgress, [0.15, 0.8], ["blur(0px)", "blur(6px)"]);
   // The backdrop moves the other way: it grows and drifts up as the title
   // recedes, so the page opens into the map rather than sliding past it.
-  const backScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
-  const backY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const backScale = useTransform(scrollYProgress, [0, 1], [1, 1.18]);
+  const backY = useTransform(scrollYProgress, [0, 1], [0, -70]);
 
   return (
     <section
       ref={ref}
-      // The pointer's position, for the backdrop's light (HeroField). Written
-      // straight to CSS variables, so React never re-renders.
-      onPointerMove={(e) => {
-        const r = e.currentTarget.getBoundingClientRect();
-        e.currentTarget.style.setProperty("--fx", `${e.clientX - r.left}px`);
-        e.currentTarget.style.setProperty("--fy", `${e.clientY - r.top}px`);
-      }}
       className="relative flex min-h-[88dvh] items-center justify-center overflow-hidden px-6 pt-16"
     >
       {backdrop ? (
-        <motion.div className="absolute inset-0" style={reduce ? undefined : { scale: backScale, y: backY }}>
+        <motion.div className="absolute inset-0 will-change-transform" style={reduce ? undefined : { scale: backScale, y: backY }}>
           {backdrop}
         </motion.div>
       ) : null}
-      <motion.div style={reduce ? undefined : { opacity, scale, y }} className="relative text-center">
+      <motion.div style={reduce ? undefined : { opacity, scale, y, filter: blur }} className="relative text-center will-change-transform">
         {children}
       </motion.div>
     </section>
@@ -195,10 +190,12 @@ export function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?
 export function ZoomIn({ children, className = "" }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReduceMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 0.35"] });
-  const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
+  const raw = useScroll({ target: ref, offset: ["start end", "start 0.3"] }).scrollYProgress;
+  const p = useSmooth(raw);
+  const scale = useTransform(p, [0, 1], [0.88, 1]);
+  const y = useTransform(p, [0, 1], [60, 0]);
   return (
-    <motion.div ref={ref} className={className} style={reduce ? undefined : { scale, transformOrigin: "50% 30%" }}>
+    <motion.div ref={ref} className={`will-change-transform ${className}`} style={reduce ? undefined : { scale, y, transformOrigin: "50% 30%" }}>
       {children}
     </motion.div>
   );

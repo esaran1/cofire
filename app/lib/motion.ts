@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducedMotion } from "motion/react";
+import { type MotionValue, useReducedMotion, useSpring } from "motion/react";
 import { useEffect, useState } from "react";
 
 /**
@@ -28,4 +28,13 @@ export function useReduceMotion(): boolean {
 
 export function usePrefersReducedMotion(): boolean {
   return !!useReducedMotion();
+}
+
+/**
+ * A scroll progress, smoothed by a critically damped spring, so effects tied
+ * to the scroll glide to rest instead of stepping with each wheel notch. Fast
+ * enough that nothing lags behind the page.
+ */
+export function useSmooth(progress: MotionValue<number>): MotionValue<number> {
+  return useSpring(progress, { stiffness: 160, damping: 32, mass: 0.35, restDelta: 0.0005 });
 }

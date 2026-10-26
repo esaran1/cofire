@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { asset } from "@/lib/asset";
 import { motion, useScroll, useTransform } from "motion/react";
-import { usePrefersReducedMotion, useReduceMotion } from "@/lib/motion";
+import { usePrefersReducedMotion, useReduceMotion, useSmooth } from "@/lib/motion";
 import { useRef } from "react";
 import { ArrowRight } from "@phosphor-icons/react";
 import { PidVsAciFigure, ReliabilityFigure } from "@/components/landing/PidFigure";
@@ -246,12 +246,12 @@ function PhotoChapter({
 }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReduceMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const scrollYProgress = useSmooth(useScroll({ target: ref, offset: ["start end", "end start"] }).scrollYProgress);
   const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   // The photograph arrives as a framed plate and opens to the full width as
   // its section rises into view: the calm of the title gives way to the fire.
   // It is fully open by the time the headline is in the reading zone.
-  const enter = useScroll({ target: ref, offset: ["start end", "start 0.25"] }).scrollYProgress;
+  const enter = useSmooth(useScroll({ target: ref, offset: ["start end", "start 0.25"] }).scrollYProgress);
   const inset = useTransform(enter, [0, 1], [7, 0]);
   const clipPath = useTransform(inset, (v) => `inset(${v}% ${v * 0.75}% ${v}% ${v * 0.75}% round ${v > 0.2 ? 2 : 0}px)`);
   return (

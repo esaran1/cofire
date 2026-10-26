@@ -336,34 +336,3 @@
     transform: translateY(0);
   }
 }
-
-/*
- * The hero's forecast field (components/landing/HeroField.tsx). The cells wave
- * in once on load; the lit copy shows only inside a soft circle around the
- * pointer. Decoration only (aria-hidden), so it is allowed to start unseen.
- */
-.field-cell {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .field-cell {
-    animation: field-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-}
-@keyframes field-in {
-  from {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-}
-.hero-field-lit {
-  opacity: 0;
-}
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .hero-field-lit {
-    opacity: 0.95;
-    -webkit-mask-image: radial-gradient(240px circle at var(--fx, -999px) var(--fy, -999px), black 0%, transparent 70%);
-    mask-image: radial-gradient(240px circle at var(--fx, -999px) var(--fy, -999px), black 0%, transparent 70%);
-  }
-}
