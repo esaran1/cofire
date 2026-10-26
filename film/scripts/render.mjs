@@ -175,6 +175,55 @@ async function vertical() {
   await record("vertical", out, { loudness: loudness(out) });
 }
 
+// --- Film v2 (script/v2, scripts/v2/build.mjs) ----------------------------------------
+const V2 = join(OUT, "v2");
+const V2TL = () => JSON.parse(readFileSync(join(FILM, "script/v2/timeline.json"), "utf8"));
+const V2MIX = join(V2, "audio/mix.wav");
+// The scratch label stays on until every line is a real recording.
+const v2Scratch = () => V2TL().lines.some((l) => l.kind !== "recorded");
+
+async function v2animatic() {
+  mkdirSync(join(V2, "parts"), { recursive: true });
+  const v = await renderComp("AnimaticV2", join(V2, "parts/animatic.mp4"), { scale: 1 / 3, crf: 26, jpegQuality: 80, preset: "veryfast", inputProps: { scratch: true } });
+  const out = join(V2, "cofire_v2_animatic_640x360_15fps_scratch.mp4");
+  ff(["-i", v, "-i", V2MIX, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", out]);
+  assertLength(out, V2TL().duration, "v2 animatic");
+  await record("v2_animatic", out, { note: "scratch voices (macOS say), placeholder names where team.json is empty" });
+}
+
+async function v2master() {
+  mkdirSync(join(V2, "parts"), { recursive: true });
+  const v = await renderComp("FilmV2", join(V2, "parts/master_video.mp4"), { inputProps: { scratch: v2Scratch() } });
+  const out = join(V2, "cofire_v2_master_1920x1080_60fps.mp4");
+  ff(["-i", v, "-i", V2MIX, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-shortest", "-movflags", "+faststart", out]);
+  assertLength(out, V2TL().duration, "v2 master");
+  await record("v2_master", out, { loudness: loudness(out) });
+}
+
+async function v2exports() {
+  const master = join(V2, "cofire_v2_master_1920x1080_60fps.mp4");
+  if (!existsSync(master)) throw new Error("render v2master first");
+  const D = V2TL().duration;
+  const upload = join(V2, "cofire_v2_upload_1920x1080_30fps.mp4");
+  ff(["-i", master, "-vf", "fps=30", "-c:v", "libx264", "-preset", "slow", "-crf", "17", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", upload]);
+  assertLength(upload, D, "v2 upload");
+  await record("v2_upload", upload, { loudness: loudness(upload) });
+  const cap = join(V2, "cofire_v2_upload_1920x1080_30fps_captions_en.mp4");
+  const style = "FontName=Outfit,FontSize=15,PrimaryColour=&H00EEF3F3,BackColour=&H26191A16,OutlineColour=&H26191A16,BorderStyle=4,Outline=6,Shadow=0,MarginV=24,Alignment=2";
+  ff(["-i", upload, "-vf", `subtitles=${join(V2, "captions_en.srt")}:fontsdir=${join(FILM, "public/fonts")}:force_style='${style}'`, "-c:v", "libx264", "-preset", "slow", "-crf", "17", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", cap]);
+  assertLength(cap, D, "v2 captioned");
+  await record("v2_captioned_en", cap);
+}
+
+async function v2vertical() {
+  mkdirSync(join(V2, "parts"), { recursive: true });
+  const v = await renderComp("VerticalV2", join(V2, "parts/vertical_video.mp4"), { crf: 16, inputProps: { scratch: v2Scratch() } });
+  const len = duration(v);
+  const out = join(V2, "cofire_v2_vertical_1080x1920_30fps.mp4");
+  ff(["-i", v, "-i", V2MIX, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-af", `afade=t=out:st=${(len - 0.6).toFixed(2)}:d=0.6`, "-c:a", "aac", "-b:a", "256k", "-t", len.toFixed(3), "-movflags", "+faststart", out]);
+  await record("v2_vertical", out, { loudness: loudness(out) });
+}
+
 try {
   if (what === "all") {
     run("node", ["scripts/prepare.mjs"]);
@@ -188,6 +237,11 @@ try {
   else if (what === "master") await master();
   else if (what === "exports") await exports();
   else if (what === "vertical") await vertical();
+  else if (what === "v2animatic") await v2animatic();
+  else if (what === "v2master") await v2master();
+  else if (what === "v2exports") await v2exports();
+  else if (what === "v2vertical") await v2vertical();
+  else if (what === "v2all") { await v2master(); await v2exports(); await v2vertical(); }
   else if (what === "prompter") {
     const out = await renderComp("Prompter", join(OUT, "cofire_prompter_1280x720.mp4"), { crf: 28, jpegQuality: 80, preset: "veryfast", inputProps: { draft: true } });
     await record("prompter", out, { note: "recording aid, silent; not the film" });

@@ -27,6 +27,14 @@ export function field(key: string, lang: Lang = "en"): string {
   return remember(lang === "es" && f.es ? f.es : f.en);
 }
 
+/**
+ * A clock reading computed from film time (the v2 countdown timer). Its digits
+ * are derived, not data, so they are allowed on screen; nothing else may use it.
+ */
+export function clock(text: string): string {
+  return remember(text);
+}
+
 /** Fill {key} references in a template from fields. Literal digits in the template are refused. */
 export function fill(template: string, lang: Lang = "en"): string {
   const literal = template.replace(/\{[a-z0-9_]+\}/g, "").match(DIGITS);

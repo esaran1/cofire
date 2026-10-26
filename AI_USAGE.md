@@ -101,6 +101,7 @@ with records kept rather than rewritten:
 | `vercel.json`, `scripts/vercel_build.sh`, `scripts/check_deploy.py` | the Vercel services (web, api), the web build, headers, and the post-deploy checks | AI agent |
 | `cofire/deploy/`, `cofire/ship/cells.py`, `scripts/check_api_slim.py`, `tests/test_deploy.py`; the `pipeline` extra in `pyproject.toml` | the API's Vercel entry point, cells read from a URL, the slim-dependency check | AI agent |
 | `app/lib/motion.ts`; the colour system in `app/tailwind.config.ts` and the 2026-10-22 interface pass | hydration-safe reduced motion; spruce accent, ink selection, data-only ember and ochre; layout and mobile fixes | AI agent |
+| `film/src/v2/`, `film/scripts/v2/build.mjs`, `film/script/v2/`, the v2 targets in `film/scripts/render.mjs`, `film/RULES_CHECK.md`, `film/LINES/` | film v2: four-voice timeline, scenes, rules check, line sheets; the script's factual corrections are listed in `film/v2/CHANGES.md` | AI agent (script by the team) |
 | `film/` Remotion project (`src/`, `scripts/`, `capture/`) | the demo film: scenes, captures, number tracing, audio mix, captions, renders | AI agent |
 | `film/SCRIPT.md`, `film/script/narration.json` | the narration, a draft for the student to rewrite and record | AI agent (draft) |
 | `film/STORYBOARD.md`, `film/SOURCES.md`, `film/REVIEW.md`, `film/RECORDING_GUIDE.md` | the film's storyboard, sources, review checklist, recording guide | AI agent |

@@ -1,0 +1,216 @@
+{
+ "note": "The picture of film v2, in order. A beat is a new v2 scene (scene) or a window of the v1 film (v1: [from, to] in v1 seconds), which reuses its captures, camera moves and cursor. `min` is the planned length; a stretchable beat grows to fit its lines (scripts/v2/build.mjs), a v1 window holds its last frame for any overflow and the build reports it. `rules`: what the picture itself shows on screen (film/RULES_CHECK.md).",
+ "beats": [
+  {
+   "id": "cold",
+   "section": "Cold open",
+   "scene": "ColdOpen",
+   "min": 10.0,
+   "stretch": true
+  },
+  {
+   "id": "card1",
+   "section": "Team intros",
+   "scene": "Card",
+   "who": "P1",
+   "min": 4.2,
+   "stretch": true,
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "card2",
+   "section": "Team intros",
+   "scene": "Card",
+   "who": "P2",
+   "min": 4.2,
+   "stretch": true,
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "card3",
+   "section": "Team intros",
+   "scene": "Card",
+   "who": "P3",
+   "min": 4.2,
+   "stretch": true,
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "card4",
+   "section": "Team intros",
+   "scene": "Card",
+   "who": "P4",
+   "min": 4.6,
+   "stretch": true,
+   "rules": [
+    "participants"
+   ]
+  },
+  {
+   "id": "logo",
+   "section": "Team intros",
+   "scene": "Logo",
+   "min": 2.0,
+   "stretch": true,
+   "rules": [
+    "app_name"
+   ]
+  },
+  {
+   "id": "stakes_map",
+   "section": "Stakes",
+   "v1": [
+    10.0,
+    19.6
+   ],
+   "min": 9.6
+  },
+  {
+   "id": "purpose",
+   "section": "Stakes",
+   "scene": "Purpose",
+   "min": 8.6,
+   "stretch": true,
+   "rules": [
+    "purpose"
+   ]
+  },
+  {
+   "id": "audience",
+   "section": "Stakes",
+   "scene": "Audience",
+   "min": 6.0,
+   "stretch": true
+  },
+  {
+   "id": "demo_pick",
+   "section": "Demo",
+   "v1": [
+    38.2,
+    46.5
+   ],
+   "min": 8.3,
+   "rules": [
+    "functionality"
+   ]
+  },
+  {
+   "id": "demo_icons",
+   "section": "Demo",
+   "v1": [
+    52.6,
+    61.9
+   ],
+   "min": 9.3,
+   "rules": [
+    "functionality"
+   ]
+  },
+  {
+   "id": "demo_weeks",
+   "section": "Demo",
+   "v1": [
+    61.9,
+    69.4
+   ],
+   "min": 7.5,
+   "rules": [
+    "functionality"
+   ]
+  },
+  {
+   "id": "demo_ws",
+   "section": "Demo",
+   "v1": [
+    69.4,
+    75.6
+   ],
+   "min": 6.2,
+   "rules": [
+    "functionality"
+   ]
+  },
+  {
+   "id": "demo_es",
+   "section": "Demo",
+   "v1": [
+    75.6,
+    79.2
+   ],
+   "min": 3.6,
+   "rules": [
+    "functionality"
+   ]
+  },
+  {
+   "id": "demo_brief",
+   "section": "Demo",
+   "v1": [
+    79.2,
+    86.6
+   ],
+   "min": 7.4,
+   "rules": [
+    "functionality"
+   ]
+  },
+  {
+   "id": "slide1",
+   "section": "Tech slides",
+   "scene": "SlideTools",
+   "min": 10.0,
+   "stretch": true,
+   "rules": [
+    "tools",
+    "ai_disclosure"
+   ]
+  },
+  {
+   "id": "slide3",
+   "section": "Tech slides",
+   "scene": "SlideModels",
+   "min": 8.0,
+   "stretch": true
+  },
+  {
+   "id": "slide4",
+   "section": "Tech slides",
+   "scene": "SlideTested",
+   "min": 12.0,
+   "stretch": true
+  },
+  {
+   "id": "glance",
+   "section": "Tech slides",
+   "scene": "Glance",
+   "min": 2.4,
+   "stretch": true
+  },
+  {
+   "id": "close_map",
+   "section": "Close",
+   "v1": [
+    161.5,
+    166.6
+   ],
+   "min": 5.1
+  },
+  {
+   "id": "endcard",
+   "section": "Close",
+   "scene": "EndCard",
+   "min": 6.5,
+   "stretch": true,
+   "rules": [
+    "participants",
+    "app_name"
+   ]
+  }
+ ]
+}

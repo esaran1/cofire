@@ -57,7 +57,7 @@ export const FFMPEG = () => which("ffmpeg");
 export const FFPROBE = () => which("ffprobe");
 
 export function ff(args, opts = {}) {
-  const r = spawnSync(FFMPEG(), ["-hide_banner", "-y", ...args], { encoding: "utf8", maxBuffer: 1 << 28, ...opts });
+  const r = spawnSync(FFMPEG(), ["-hide_banner", "-nostdin", "-y", ...args], { encoding: "utf8", maxBuffer: 1 << 28, ...opts });
   if (r.status !== 0) throw new Error(`ffmpeg failed: ${args.join(" ")}\n${r.stderr.slice(-3000)}`);
   return r.stderr;
 }

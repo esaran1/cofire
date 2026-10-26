@@ -12,6 +12,7 @@ import { TIMELINE } from "./data";
 import { Film, PartView, Vertical, type FilmProps } from "./Film";
 import { loadFonts } from "./fonts";
 import { Prompter } from "./Prompter";
+import { FilmV2, V2_DURATION, V2_VERTICAL, VerticalV2 } from "./v2/FilmV2";
 
 loadFonts();
 
@@ -30,6 +31,10 @@ export const Root: React.FC = () => (
     ))}
     <Composition id="Animatic" component={Film} durationInFrames={Math.round(total * 15)} fps={15} width={1920} height={1080} defaultProps={{ draft: true, scratch: true }} />
     <Composition id="Prompter" component={Prompter} durationInFrames={Math.round(total * 15)} fps={15} width={1280} height={720} />
+    {/* Film v2 (film/SCRIPT_V2.md): the master at 60 fps, its animatic, and the vertical cut. */}
+    <Composition id="FilmV2" component={FilmV2} durationInFrames={Math.round(V2_DURATION * MASTER_FPS)} fps={MASTER_FPS} width={1920} height={1080} defaultProps={{ scratch: false }} />
+    <Composition id="AnimaticV2" component={FilmV2} durationInFrames={Math.round(V2_DURATION * 15)} fps={15} width={1920} height={1080} defaultProps={{ scratch: true }} />
+    <Composition id="VerticalV2" component={VerticalV2} durationInFrames={Math.round(V2_VERTICAL * 30)} fps={30} width={1080} height={1920} defaultProps={{ scratch: false }} />
     <Composition id="Vertical" component={Vertical} durationInFrames={Math.round(TIMELINE.vertical_duration * 30)} fps={30} width={1080} height={1920} defaultProps={defaults} />
   </>
 );

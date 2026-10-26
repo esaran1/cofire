@@ -52,3 +52,29 @@ project's sources.
 | Narration | Scratch: macOS `say` (built in), marked on screen as scratch. Final: the student's own recording, `audio/voice.wav`, never committed. | n/a | n/a |
 | Laptop and phone | Drawn in code (`src/components/Devices.tsx`), generic shapes, no brand marks | project code | n/a |
 | Remotion | npm, pinned 4.0.531 | Remotion free license for individuals (`LICENSES/REMOTION.md`) | n/a |
+
+## Film v2 (2026-10-25): outside numbers
+
+Each was checked at its source on 2026-10-25. On screen it is shown rounded
+down (never up), with a source line under it. App numbers in v2 come from
+`facts.json` and the bundles through `public/data/film.json`, as in v1.
+
+| Shown | Film says | Source, quoted | URL | Retrieved |
+|---|---|---|---|---|
+| Cold open, first number | **61%** of Colorado in drought | U.S. Drought Monitor state statistics, Colorado, map of 2026-10-20 (valid Oct 20 to 26): D1 to D4 = 61.05% (D0 to D4 = 83.50%) | https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=10/15/2026&enddate=10/25/2026&statisticsType=1 | 2026-10-25 |
+| Cold open, second number | About **80%** of Denver's drinking water passes through one reservoir | Denver Water, "Strontia Springs: the little reservoir that could" (TAP Staff, 2017-09-09): "about 80 percent of Denver's drinking water passes through Strontia Springs Reservoir." | https://www.denverwater.org/tap/strontia-springs-the-little-reservoir-that-could | 2026-10-25 |
+| Cold open, third number | More than **1,000,000** cubic yards of mud in it, after two fires | Denver Water, "The legacy of Colorado's largest wildfire" (Sabrina Hall, 2017-06-16): the Buffalo Creek (1996) and Hayman (2002) fires, followed by rainstorms, "resulted in more than 1 million cubic yards of sediment accumulating in Strontia Springs Reservoir." | https://www.denverwater.org/tap/legacy-colorados-largest-wildfire | 2026-10-25 |
+| Stakes | About half of Denver's water comes from the other side of the Divide | Denver Water, "Where does your water come from?" (2021-06-29): "Denver Water collects around 50% of its drinking water from tributaries of the Colorado River on the west side of the Continental Divide." | https://www.denverwater.org/tap/where-does-your-water-come | 2026-10-25 |
+
+**Cut, could not be verified:**
+- **"94% of Colorado in drought".** The latest map is 61.05% (D1 to D4).
+  Colorado was last at 94% or more in June 2026 (96.56% on Jun 23). The
+  D0-to-D4 share peaked at 93.81% in September, which cannot be rounded up to
+  94.
+- **"235,000 acres burned this year".** No Colorado year-to-date figure was
+  found from NIFC, the Rocky Mountain Coordination Center or the state's
+  Division of Fire Prevention and Control. The 235,000 traces to an unsourced
+  Wikipedia infobox. NIFC's daily situation report gives only a five-state
+  Rocky Mountain Area total, which is not Colorado.
+- **Replacement.** The next verified number, the Strontia Springs share,
+  took its place.

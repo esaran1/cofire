@@ -300,5 +300,43 @@ const data = {
   record: rec,
 };
 mkdirSync(OUT, { recursive: true });
+// --- Film v2 (script/v2): team, the cold open's outside numbers, the demo's figure. ---
+// Outside numbers were checked at the source on 2026-10-25 (film/SOURCES.md);
+// each is shown rounded down, never up.
+const team = existsSync(join(FILM, "team/team.json")) ? JSON.parse(readFileSync(join(FILM, "team/team.json"), "utf8")) : {};
+const PLACEHOLDER = { P1: "[Name A]", P2: "[Name B]", P3: "[Name C]", P4: "[Name D]" };
+for (const p of ["P1", "P2", "P3", "P4"]) {
+  const name = team[p]?.name?.trim();
+  field(`name_${p.toLowerCase()}`, name || PLACEHOLDER[p], name ? "film/team/team.json" : "PLACEHOLDER: film/team/team.json has no name yet");
+  field(`role_${p.toLowerCase()}`, team[p]?.role?.trim() || "[Role]", "film/team/team.json");
+}
+field("ext_drought_pct", "61%", "U.S. Drought Monitor, Colorado, map of 2026-10-20: D1-D4 61.05% (usdmdataservices.unl.edu StateStatistics, aoi=08), retrieved 2026-10-25");
+field("ext_drought_spoken", "Sixty-one percent", "as ext_drought_pct", "Sesenta y uno por ciento");
+field("ext_drought_src", "U.S. Drought Monitor, Colorado, map of Oct. 20, 2026", "as ext_drought_pct", "Monitor de Sequía de EE. UU., Colorado, mapa del 20 de oct. de 2026");
+field("ext_strontia_pct", "80%", "Denver Water, 'Strontia Springs: the little reservoir that could' (2017-09-09): 'about 80 percent of Denver's drinking water passes through Strontia Springs Reservoir', retrieved 2026-10-25");
+field("ext_strontia_spoken", "About eighty percent", "as ext_strontia_pct", "Cerca del ochenta por ciento");
+field("ext_strontia_src", "Denver Water, Sept. 9, 2017", "as ext_strontia_pct", "Denver Water, 9 de sept. de 2017");
+field("ext_sediment", "1,000,000+", "Denver Water, 'The legacy of Colorado's largest wildfire' (2017-06-16): 'more than 1 million cubic yards of sediment accumulating in Strontia Springs Reservoir', retrieved 2026-10-25");
+field("ext_sediment_src", "Denver Water, June 16, 2017", "as ext_sediment", "Denver Water, 16 de junio de 2017");
+const demoBundle = json("app/out/data/domains/denver/2026-10-06.json");
+const demoCell = demoBundle.cells.find((c) => c.id === "39.7333_-104.9750");
+const demoP = demoCell.p[demoBundle.targets.indexOf("d_ge2_h4")];
+field("demo_freq_n", Math.round(demoP * 100), "app/out/data/domains/denver/2026-10-06.json: cell 39.7333_-104.9750, d_ge2_h4, as the captured card shows it (card_why_open)");
+const SPOKEN = { 3: "three", 5: "five", 19: "Nineteen", 22: "Twenty-two" };
+const nAreas = DOMAINS.length;
+field("n_areas", nAreas, "the five forecast areas (bundles)");
+field("n_areas_spoken", SPOKEN[nAreas] ?? String(nAreas), "as n_areas");
+const firstYear = Number(String(facts.split.train).slice(0, 4));
+const yearsHistory = Number(String(facts.split.holdout).slice(0, 4)) - firstYear;
+field("years_history", yearsHistory, "facts.json: split.train first year to split.holdout (whole years of history before the held-out year)");
+field("years_history_spoken", SPOKEN[yearsHistory] ?? String(yearsHistory), "as years_history", String(yearsHistory));
+field("n_ml", 3, "README Science notes: the trained arms tried, LightGBM, a physics-informed ConvLSTM, an ensemble (cofire/model/models)");
+field("n_ml_spoken", "three", "as n_ml", "tres");
+field("n_survivors_spoken", SPOKEN[facts.multiplicity.n_survivors] ?? String(facts.multiplicity.n_survivors), "as n_survivors", String(facts.multiplicity.n_survivors));
+field("n_tested", facts.multiplicity.n_comparisons, "facts.json: multiplicity.n_comparisons");
+
+// The state outline from the app's own story map, for the v2 cold open.
+const story = json("app/lib/story.json");
+data.colorado = { d: story.map.state, width: story.map.width, height: story.map.height };
 writeFileSync(join(OUT, "film.json"), JSON.stringify(data));
 console.log(`film.json: ${Object.keys(fields).length} fields, ${issues.length} issues x ${cells.length} cells, ${comparisons.length} comparisons; Dillon at ${reservoirs.dillon.lon}, ${reservoirs.dillon.lat}; Strontia at ${reservoirs.strontia.lon}, ${reservoirs.strontia.lat}`);
