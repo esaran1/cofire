@@ -3241,3 +3241,20 @@ already building on 3.12 through `UV_PYTHON` in `scripts/vercel_build.sh`.
   environment now installs and the API imports; `api-slim` passes on 3.12;
   the local `.venv` stays on 3.11.
 - `requires-python` stays `>=3.11`.
+
+## The API reads the bundles once per instance, 2026-10-26
+
+On the first live deploy the Beat the Model page got 500s. It asks for the
+leaderboard and the reader's picks at once, and on a cold instance each
+request started its own read of all 210 bundles from the web service; the
+burst timed out (`TimeoutError: The handshake operation timed out`).
+Reproduced locally by running the Vercel entry point with `VERCEL=1` against
+the live site: 5 of 60 parallel requests failed.
+- **One read at a time** (`_INDEX_LOCK` in `cofire/api`): concurrent requests
+  wait for the first read and share its result; the held copy is still
+  served if a later re-read fails.
+- **Retries** in `cofire/ship/cells.py`: a bundle read that times out or
+  meets a server error is tried up to three times; a missing file is not.
+  Eight read threads instead of sixteen.
+- After: 140 of 140 parallel requests succeeded from a cold start, with no
+  error in the log. `tests/test_remote_index.py` pins the behaviour.

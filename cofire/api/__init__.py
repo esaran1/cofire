@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import threading
 import time
 from collections import defaultdict
 from datetime import UTC, date, datetime, timedelta
@@ -237,25 +238,48 @@ _INDEX_CACHE: dict[str, Any] = {}
 REMOTE_INDEX_TTL_S = 600
 
 
-def _remote_index(base: str) -> dict[str, Any]:
-    """Every cell and issue, read over HTTP from the published bundles (the api service on Vercel).
+# One read of the bundles at a time per instance. Without it, every request
+# that reached a cold (or expired) instance started its own read of all 210
+# bundles at once; the burst timed out against the web service and those
+# requests failed with a 500 (seen on the Beat the Model page, which asks for
+# the leaderboard and the reader's picks together).
+_INDEX_LOCK = threading.Lock()
 
-    Kept per instance, and re-read once the TTL has passed. A failed re-read
-    keeps serving the copy already held rather than failing every request.
-    """
+
+def _held_index() -> dict[str, Any] | None:
+    """The bundles this instance holds, if read within the TTL."""
     held = _INDEX_CACHE.get("remote")
     if held and time.monotonic() - held["at"] < REMOTE_INDEX_TTL_S:
         idx: dict[str, Any] = held["index"]
         return idx
-    try:
-        fresh = legacy_cells(base)
-    except OSError:
-        if held:
-            stale: dict[str, Any] = held["index"]
-            return stale
-        raise
-    _INDEX_CACHE["remote"] = {"at": time.monotonic(), "index": fresh}
-    return fresh
+    return None
+
+
+def _remote_index(base: str) -> dict[str, Any]:
+    """Every cell and issue, read over HTTP from the published bundles (the api service on Vercel).
+
+    Kept per instance, and re-read once the TTL has passed. Concurrent
+    requests share one read: the first reads, the rest wait for its result.
+    A failed re-read keeps serving the copy already held rather than failing
+    every request.
+    """
+    idx = _held_index()
+    if idx is not None:
+        return idx
+    with _INDEX_LOCK:
+        idx = _held_index()
+        if idx is not None:
+            return idx
+        held = _INDEX_CACHE.get("remote")
+        try:
+            fresh = legacy_cells(base)
+        except OSError:
+            if held:
+                stale: dict[str, Any] = held["index"]
+                return stale
+            raise
+        _INDEX_CACHE["remote"] = {"at": time.monotonic(), "index": fresh}
+        return fresh
 
 
 def load_index() -> dict[str, Any]:

@@ -14,6 +14,8 @@ nothing beyond the standard library here: no numpy, pandas or geopandas.
 from __future__ import annotations
 
 import json
+import time
+import urllib.error
 import urllib.request
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
@@ -21,7 +23,11 @@ from pathlib import Path
 from typing import Any
 
 FETCH_TIMEOUT_S = 30
-FETCH_WORKERS = 16
+FETCH_WORKERS = 8
+# A bundle read that times out or meets a server error is tried again, twice,
+# after a short pause; a missing file (4xx) is not.
+FETCH_ATTEMPTS = 3
+FETCH_BACKOFF_S = 0.5
 
 
 def _url_reader(base: str) -> Callable[[str], Any]:
@@ -29,8 +35,18 @@ def _url_reader(base: str) -> Callable[[str], Any]:
 
     def read(rel: str) -> Any:
         req = urllib.request.Request(root + rel, headers={"User-Agent": "cofire-api"})
-        with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT_S) as r:
-            return json.loads(r.read())
+        for attempt in range(1, FETCH_ATTEMPTS + 1):
+            try:
+                with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT_S) as r:
+                    return json.loads(r.read())
+            except urllib.error.HTTPError as e:
+                if e.code < 500 or attempt == FETCH_ATTEMPTS:
+                    raise
+            except OSError:
+                if attempt == FETCH_ATTEMPTS:
+                    raise
+            time.sleep(FETCH_BACKOFF_S * attempt)
+        raise AssertionError("unreachable")
 
     return read
 
