@@ -1,9 +1,9 @@
 {
   "budget_bytes": 1000000000,
-  "recorded_bytes": 11199954,
+  "recorded_bytes": 13323234,
   "correction_bytes": 9216891,
-  "total_bytes": 20416845,
-  "remaining_bytes": 979583155,
+  "total_bytes": 22540125,
+  "remaining_bytes": 977459875,
   "corrections": [
     {
       "at": "2026-10-04T22:19:14.647153+00:00",
@@ -563,6 +563,13 @@
       "bytes": 41092,
       "timestamp": "2026-10-23T21:35:35+00:00",
       "note": "session=refresh-40027763104; sha256=95e7a9f940f4e34f08f6cf41ee370e0a65ca6bf8dda011b92e2a02ff0b805d37; vintage=gridmet_erc/pueblo/2026/20261023T213523Z; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "USDM-weekly",
+      "url": "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20261027_M.zip",
+      "bytes": 2123280,
+      "timestamp": "2026-10-30T22:34:58+00:00",
+      "note": "session=refresh-41139010906; sha256=7bc62c10a29c8347bf3824352fa41a4230169e440544658aef6d6ff45c97de40"
     }
   ]
 }
