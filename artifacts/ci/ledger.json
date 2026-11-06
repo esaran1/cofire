@@ -1,9 +1,9 @@
 {
   "budget_bytes": 1000000000,
-  "recorded_bytes": 13323234,
+  "recorded_bytes": 17696278,
   "correction_bytes": 9216891,
-  "total_bytes": 22540125,
-  "remaining_bytes": 977459875,
+  "total_bytes": 26913169,
+  "remaining_bytes": 973086831,
   "corrections": [
     {
       "at": "2026-10-04T22:19:14.647153+00:00",
@@ -570,6 +570,90 @@
       "bytes": 2123280,
       "timestamp": "2026-10-30T22:34:58+00:00",
       "note": "session=refresh-41139010906; sha256=7bc62c10a29c8347bf3824352fa41a4230169e440544658aef6d6ff45c97de40"
+    },
+    {
+      "source": "USDM-weekly",
+      "url": "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20261027_M.zip",
+      "bytes": 2123280,
+      "timestamp": "2026-11-06T23:24:35+00:00",
+      "note": "session=refresh-42311639431; sha256=7bc62c10a29c8347bf3824352fa41a4230169e440544658aef6d6ff45c97de40"
+    },
+    {
+      "source": "USDM-weekly",
+      "url": "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20261103_M.zip",
+      "bytes": 2039331,
+      "timestamp": "2026-11-06T23:24:35+00:00",
+      "note": "session=refresh-42311639431; sha256=24f27ebfe779fd25f4a9b7ef4c865876dbb449ec753ed3ae506c1c1eb11064c8"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-11-06T23:24:36+00:00",
+      "note": "session=refresh-42311639431; sha256=ddc58c9d07bfc6eba084f4faaa9f623f13a2847293ef88b1a60d5a052ef64e89"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[280:308] bbox=(-105.110417, 39.597916, -104.589583, 39.910417)",
+      "bytes": 21056,
+      "timestamp": "2026-11-06T23:24:38+00:00",
+      "note": "session=refresh-42311639431; sha256=456181d6a18ef758a61ad3d849490a0135f79053ba473bf122ae172db41c9bb3; vintage=gridmet_erc/denver/2026/20261106T232434Z; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-11-06T23:24:39+00:00",
+      "note": "session=refresh-42311639431; sha256=ddc58c9d07bfc6eba084f4faaa9f623f13a2847293ef88b1a60d5a052ef64e89"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[280:308] bbox=(-105.860417, 38.889583, -105.00625, 39.61875)",
+      "bytes": 52984,
+      "timestamp": "2026-11-06T23:24:40+00:00",
+      "note": "session=refresh-42311639431; sha256=57f30beeb48041c17354139d295ccb41395043c99f54f7bf80282af993b4cf09; vintage=gridmet_erc/upper_south_platte/2026/20261106T232434Z; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-11-06T23:24:40+00:00",
+      "note": "session=refresh-42311639431; sha256=ddc58c9d07bfc6eba084f4faaa9f623f13a2847293ef88b1a60d5a052ef64e89"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[280:308] bbox=(-106.277084, 39.347916, -105.75625, 39.702084)",
+      "bytes": 22572,
+      "timestamp": "2026-11-06T23:24:41+00:00",
+      "note": "session=refresh-42311639431; sha256=29fca282f1ba2cc75c9531738794b3544b68d930bd40b57613e92ce488d4fafb; vintage=gridmet_erc/dillon/2026/20261106T232434Z; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-11-06T23:24:42+00:00",
+      "note": "session=refresh-42311639431; sha256=ddc58c9d07bfc6eba084f4faaa9f623f13a2847293ef88b1a60d5a052ef64e89"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[280:308] bbox=(-106.192, 40.324, -104.943, 40.998)",
+      "bytes": 58652,
+      "timestamp": "2026-11-06T23:24:42+00:00",
+      "note": "session=refresh-42311639431; sha256=28f94a9faf87b531a0fe5bf8a3ec5634278a5097eb2d143c094f966bb1c42e26; vintage=gridmet_erc/larimer/2026/20261106T232434Z; bytes computed from the DAP2 wire format"
+    },
+    {
+      "source": "gridMET-DAP-meta",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc.dds",
+      "bytes": 385,
+      "timestamp": "2026-11-06T23:24:43+00:00",
+      "note": "session=refresh-42311639431; sha256=ddc58c9d07bfc6eba084f4faaa9f623f13a2847293ef88b1a60d5a052ef64e89"
+    },
+    {
+      "source": "gridMET-OPeNDAP",
+      "url": "https://thredds.northwestknowledge.net/thredds/dodsC/MET/erc/erc_2026.nc?energy_release_component-g day[280:308] bbox=(-105.051, 37.735, -104.054, 38.522)",
+      "bytes": 53244,
+      "timestamp": "2026-11-06T23:24:43+00:00",
+      "note": "session=refresh-42311639431; sha256=ade96f3984763be6aa6df2bf01d0807add62bae133d3c32616b3605854e90f26; vintage=gridmet_erc/pueblo/2026/20261106T232434Z; bytes computed from the DAP2 wire format"
     }
   ]
 }

@@ -2222,5 +2222,105 @@
    "last_date": "2026-10-14",
    "max_abs": 16.0
   }
+ },
+ {
+  "id": "gridmet_erc/denver/2026/20261106T232434Z",
+  "source": "gridmet_erc",
+  "domain": "denver",
+  "year": 2026,
+  "first_day": "2026-10-08",
+  "last_day": "2026-11-04",
+  "fetched_at": "2026-11-06T23:24:34.878264",
+  "kind": "fetch",
+  "file": "data/vintages/gridmet_erc/denver_2026/20261106T232434Z_2026-10-08_2026-11-04.nc",
+  "sha256": "456181d6a18ef758a61ad3d849490a0135f79053ba473bf122ae172db41c9bb3",
+  "revisions": {
+   "n_cell_days": 1172,
+   "window_days": 365,
+   "log": "artifacts/vintages/revisions/denver_2026_20261106T232434Z.csv.gz",
+   "first_date": "2026-10-08",
+   "last_date": "2026-10-21",
+   "max_abs": 17.0
+  }
+ },
+ {
+  "id": "gridmet_erc/upper_south_platte/2026/20261106T232434Z",
+  "source": "gridmet_erc",
+  "domain": "upper_south_platte",
+  "year": 2026,
+  "first_day": "2026-10-08",
+  "last_day": "2026-11-04",
+  "fetched_at": "2026-11-06T23:24:34.878264",
+  "kind": "fetch",
+  "file": "data/vintages/gridmet_erc/upper_south_platte_2026/20261106T232434Z_2026-10-08_2026-11-04.nc",
+  "sha256": "57f30beeb48041c17354139d295ccb41395043c99f54f7bf80282af993b4cf09",
+  "revisions": {
+   "n_cell_days": 3002,
+   "window_days": 365,
+   "log": "artifacts/vintages/revisions/upper_south_platte_2026_20261106T232434Z.csv.gz",
+   "first_date": "2026-10-08",
+   "last_date": "2026-10-21",
+   "max_abs": 17.0
+  }
+ },
+ {
+  "id": "gridmet_erc/dillon/2026/20261106T232434Z",
+  "source": "gridmet_erc",
+  "domain": "dillon",
+  "year": 2026,
+  "first_day": "2026-10-08",
+  "last_day": "2026-11-04",
+  "fetched_at": "2026-11-06T23:24:34.878264",
+  "kind": "fetch",
+  "file": "data/vintages/gridmet_erc/dillon_2026/20261106T232434Z_2026-10-08_2026-11-04.nc",
+  "sha256": "29fca282f1ba2cc75c9531738794b3544b68d930bd40b57613e92ce488d4fafb",
+  "revisions": {
+   "n_cell_days": 843,
+   "window_days": 365,
+   "log": "artifacts/vintages/revisions/dillon_2026_20261106T232434Z.csv.gz",
+   "first_date": "2026-10-08",
+   "last_date": "2026-10-21",
+   "max_abs": 15.0
+  }
+ },
+ {
+  "id": "gridmet_erc/larimer/2026/20261106T232434Z",
+  "source": "gridmet_erc",
+  "domain": "larimer",
+  "year": 2026,
+  "first_day": "2026-10-08",
+  "last_day": "2026-11-04",
+  "fetched_at": "2026-11-06T23:24:34.878264",
+  "kind": "fetch",
+  "file": "data/vintages/gridmet_erc/larimer_2026/20261106T232434Z_2026-10-08_2026-11-04.nc",
+  "sha256": "28f94a9faf87b531a0fe5bf8a3ec5634278a5097eb2d143c094f966bb1c42e26",
+  "revisions": {
+   "n_cell_days": 3429,
+   "window_days": 365,
+   "log": "artifacts/vintages/revisions/larimer_2026_20261106T232434Z.csv.gz",
+   "first_date": "2026-10-08",
+   "last_date": "2026-10-21",
+   "max_abs": 18.0
+  }
+ },
+ {
+  "id": "gridmet_erc/pueblo/2026/20261106T232434Z",
+  "source": "gridmet_erc",
+  "domain": "pueblo",
+  "year": 2026,
+  "first_day": "2026-10-08",
+  "last_day": "2026-11-04",
+  "fetched_at": "2026-11-06T23:24:34.878264",
+  "kind": "fetch",
+  "file": "data/vintages/gridmet_erc/pueblo_2026/20261106T232434Z_2026-10-08_2026-11-04.nc",
+  "sha256": "ade96f3984763be6aa6df2bf01d0807add62bae133d3c32616b3605854e90f26",
+  "revisions": {
+   "n_cell_days": 3543,
+   "window_days": 365,
+   "log": "artifacts/vintages/revisions/pueblo_2026_20261106T232434Z.csv.gz",
+   "first_date": "2026-10-08",
+   "last_date": "2026-10-21",
+   "max_abs": 16.0
+  }
  }
 ]

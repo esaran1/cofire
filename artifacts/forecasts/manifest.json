@@ -334,5 +334,21 @@
   "bytes": 55256,
   "published_at": "2026-10-23T21:35:23Z",
   "backfilled": false
+ },
+ {
+  "issue": "2026-10-27",
+  "file": "2026-10-27.json.gz",
+  "sha256": "961a6d8e51b1810b3271973903636ddd57ab8749781e624104a177241fe958f5",
+  "bytes": 53775,
+  "published_at": "2026-11-06T23:24:34Z",
+  "backfilled": false
+ },
+ {
+  "issue": "2026-11-03",
+  "file": "2026-11-03.json.gz",
+  "sha256": "5efcb7f22176f8d2efc1a3feb95d7c983d212aceb5842a34fb6b138a92bc8104",
+  "bytes": 55055,
+  "published_at": "2026-11-06T23:24:34Z",
+  "backfilled": false
  }
 ]
