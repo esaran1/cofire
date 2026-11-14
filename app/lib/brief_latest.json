@@ -1,23 +1,23 @@
 {
  "brief": {
-  "issue": "2026-11-03",
-  "prevIssue": "2026-10-27",
+  "issue": "2026-11-10",
+  "prevIssue": "2026-11-03",
   "denver": {
    "id": "denver",
    "label": "Denver",
    "cells": 52,
-   "dryNow": 21.0,
-   "dryNowPrev": 34.3,
-   "dryAhead": 40.2,
+   "dryNow": 31.0,
+   "dryNowPrev": 21.0,
+   "dryAhead": 43.7,
    "f80": {
-    "mean": 0.0941,
+    "mean": 0.1154,
     "state": "probability"
    },
    "f90": {
-    "mean": 0.0285,
+    "mean": 0.038,
     "state": "probability"
    },
-   "f80Prev": 0.1254,
+   "f80Prev": 0.0941,
    "rows": [
     {
      "cat": 2,
@@ -34,22 +34,22 @@
     "id": "upper_south_platte",
     "label": "Upper South Platte",
     "cells": 202,
-    "dryNow": 22.9,
-    "dryNowPrev": 16.7,
-    "dryAhead": 42.5,
+    "dryNow": 16.4,
+    "dryNowPrev": 22.9,
+    "dryAhead": 40.7,
     "f80": {
-     "mean": 0.1123,
+     "mean": 0.1089,
      "state": "probability"
     },
     "f90": {
-     "mean": 0.036,
+     "mean": 0.0352,
      "state": "probability"
     },
-    "f80Prev": 0.0948,
+    "f80Prev": 0.1123,
     "rows": [
      {
       "cat": 4,
-      "cells": 4,
+      "cells": 2,
       "cellsPrev": 4,
       "stay": 0.7526,
       "ease": 0.2474,
@@ -57,7 +57,7 @@
      },
      {
       "cat": 3,
-      "cells": 136,
+      "cells": 114,
       "cellsPrev": 136,
       "stay": 0.4902,
       "ease": 0.2905,
@@ -65,7 +65,7 @@
      },
      {
       "cat": 2,
-      "cells": 62,
+      "cells": 86,
       "cellsPrev": 62,
       "stay": 0.7773,
       "ease": 0.0763,
@@ -77,18 +77,18 @@
     "id": "dillon",
     "label": "Dillon",
     "cells": 79,
-    "dryNow": 36.2,
-    "dryNowPrev": 16.2,
-    "dryAhead": 46.5,
+    "dryNow": 44.3,
+    "dryNowPrev": 36.2,
+    "dryAhead": 48.6,
     "f80": {
-     "mean": 0.139,
+     "mean": 0.1577,
      "state": "probability"
     },
     "f90": {
-     "mean": 0.0494,
+     "mean": 0.0592,
      "state": "probability"
     },
-    "f80Prev": 0.0982,
+    "f80Prev": 0.139,
     "rows": [
      {
       "cat": 4,
@@ -100,18 +100,10 @@
      },
      {
       "cat": 3,
-      "cells": 19,
+      "cells": 20,
       "cellsPrev": 19,
       "stay": 0.695,
       "ease": 0.2793,
-      "worsen": null
-     },
-     {
-      "cat": 2,
-      "cells": 1,
-      "cellsPrev": 1,
-      "stay": 0.5777,
-      "ease": 0.2479,
       "worsen": null
      }
     ]

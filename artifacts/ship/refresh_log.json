@@ -1014,5 +1014,96 @@
   "bytes": 4373044,
   "looks": 3,
   "outcome": "updated"
+ },
+ {
+  "run_at": "2026-11-13 23:48:25.010913",
+  "session": "refresh-43529532760",
+  "target_published": "2026-11-10",
+  "usdm": [
+   {
+    "week": "2026-11-10",
+    "fetched": true,
+    "bytes": 1848198,
+    "sha256": "98994959fab2de10058918307e0dfd7626acad3994aea36051bdebe5301130f5"
+   }
+  ],
+  "erc": [
+   {
+    "domain": "denver",
+    "year": 2026,
+    "new_days": 8,
+    "last_day": "2026-11-12",
+    "vintage": "gridmet_erc/denver/2026/20261113T234825Z",
+    "revised_cell_days": 474,
+    "bytes": 18512,
+    "materialized": "data/cache/erc_ext/denver_2026.nc"
+   },
+   {
+    "domain": "upper_south_platte",
+    "year": 2026,
+    "new_days": 8,
+    "last_day": "2026-11-12",
+    "vintage": "gridmet_erc/upper_south_platte/2026/20261113T234825Z",
+    "revised_cell_days": 1761,
+    "bytes": 43864,
+    "materialized": "data/cache/erc_ext/upper_south_platte_2026.nc"
+   },
+   {
+    "domain": "dillon",
+    "year": 2026,
+    "new_days": 8,
+    "last_day": "2026-11-12",
+    "vintage": "gridmet_erc/dillon/2026/20261113T234825Z",
+    "revised_cell_days": 541,
+    "bytes": 19716,
+    "materialized": "data/cache/erc_ext/dillon_2026.nc"
+   },
+   {
+    "domain": "larimer",
+    "year": 2026,
+    "new_days": 8,
+    "last_day": "2026-11-12",
+    "vintage": "gridmet_erc/larimer/2026/20261113T234825Z",
+    "revised_cell_days": 2199,
+    "bytes": 47084,
+    "materialized": "data/cache/erc_ext/larimer_2026.nc"
+   },
+   {
+    "domain": "pueblo",
+    "year": 2026,
+    "new_days": 8,
+    "last_day": "2026-11-12",
+    "vintage": "gridmet_erc/pueblo/2026/20261113T234825Z",
+    "revised_cell_days": 1680,
+    "bytes": 42828,
+    "materialized": "data/cache/erc_ext/pueblo_2026.nc"
+   }
+  ],
+  "revised_cell_days": {
+   "denver": 474,
+   "upper_south_platte": 1761,
+   "dillon": 541,
+   "larimer": 2199,
+   "pueblo": 1680
+  },
+  "target": "2026-11-10",
+  "export_changed": true,
+  "issues": [
+   "2026-01-06",
+   "2026-11-10"
+  ],
+  "usdm_mean_at_target": {
+   "denver": 2.0,
+   "dillon": 3.747,
+   "larimer": 2.446,
+   "pueblo": 0.625,
+   "upper_south_platte": 2.584
+  },
+  "published": [
+   "2026-11-10"
+  ],
+  "bytes": 2022127,
+  "looks": 3,
+  "outcome": "updated"
  }
 ]
